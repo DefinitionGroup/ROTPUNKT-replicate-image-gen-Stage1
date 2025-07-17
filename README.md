@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Image Generator with Replicate
+
+A modern image generation interface built with Next.js, Tailwind CSS, and Motion (formerly Framer Motion), powered by Replicate AI.
+
+## Features
+
+- 🎨 Generate images using state-of-the-art AI models
+- ✨ Beautiful animations with Motion
+- 🎯 Modern UI with Tailwind CSS
+- 💾 Download generated images
+- 📱 Fully responsive design
+- ⚡ Fast and optimized with Next.js 15
+
+## Prerequisites
+
+- Node.js 18+ installed
+- A Replicate account and API token
 
 ## Getting Started
 
-First, run the development server:
-
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd replicate-image-gen
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.local.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Edit `.env.local` and add your Replicate API token:
+```
+REPLICATE_API_TOKEN=your_replicate_api_token_here
+```
 
-## Learn More
+You can get your API token from [https://replicate.com/account/api-tokens](https://replicate.com/account/api-tokens)
 
-To learn more about Next.js, take a look at the following resources:
+5. Run the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Utility-first CSS framework
+- **Motion** - Animation library for React
+- **Replicate AI** - AI model hosting platform
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Usage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Enter a descriptive prompt in the text field
+2. Click "Generate" or press Enter
+3. Wait for the AI to generate your image
+4. Hover over generated images to download them
+
+## Customization
+
+### Changing the AI Model
+
+By default, this uses the FLUX Schnell model. You can change it in `/app/api/replicate/route.ts`:
+
+```typescript
+const { prompt, model = "black-forest-labs/flux-schnell" } = await request.json();
+```
+
+Other popular models:
+- `stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b`
+- `openai/dall-e-3:dc6bad83e327429194f5e8b1f6e1c1c0e5a7e7e5`
+
+### Styling
+
+The app uses Tailwind CSS for styling. You can customize colors, spacing, and more in `tailwind.config.ts`.
+
+## Deployment
+
+### Deploy on Vercel
+
+The easiest way to deploy is using [Vercel](https://vercel.com):
+
+1. Push your code to GitHub
+2. Import your repository on Vercel
+3. Add your `REPLICATE_API_TOKEN` environment variable
+4. Deploy!
+
+## License
+
+MIT
