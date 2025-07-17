@@ -8,7 +8,7 @@ export default function ImageGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
+  const testimage = "tmp3_jymwi5.jpg";
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       setError("Please enter a prompt");
@@ -166,13 +166,20 @@ export default function ImageGenerator() {
         </AnimatePresence>
 
         {/* Debug info */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="text-xs text-gray-500 mt-2">
-            Images array length: {images.length}
-            {images.length > 0 && <div>Latest image URL: {images[0]}</div>}
-            <div>Selected image: {selectedImage ? "Yes" : "No"}</div>
-          </div>
-        )}
+
+        <div className="text-xs text-gray-500 mt-2">
+          Images array length: {images.length}
+          {images.length > 0 && <div>Latest image URL: {images[0]}</div>}
+          <div>Selected image: {selectedImage ? "Yes" : "No"}</div>
+          {/* Test Popover Button */}
+          <motion.button
+            onClick={() => setSelectedImage("/tmp3_jymwi5.jpg")}
+            className="mt-2 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}>
+            🔍 Test Popover (First Image)
+          </motion.button>
+        </div>
       </motion.div>
 
       <AnimatePresence>
@@ -210,12 +217,12 @@ export default function ImageGenerator() {
                   className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none"
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}>
-                  <div className="absolute bottom-4 left-4 right-4 pointer-events-auto">
+                  <div className="absolute bottom-4 left-4 right-4  pointer-events-auto">
                     <motion.a
                       href={typeof img === "string" ? img : "#"}
                       download
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors"
-                      whileHover={{ scale: 1.05 }}
+                      className="inline-flex items-center gap-2 px-4 py-2 backdrop-blur-sm text-white rounded-lg 0 transition-colors"
+                      whileHover={{ scale: 1.35 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={(e) => e.stopPropagation()}>
                       <svg
@@ -226,7 +233,7 @@ export default function ImageGenerator() {
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth={2}
+                          strokeWidth={1}
                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                         />
                       </svg>
@@ -260,7 +267,7 @@ export default function ImageGenerator() {
 
             {/* Modal Content */}
             <motion.div
-              className="relative bg-gray-800 rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-700"
+              className="relative  rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-800/60"
               initial={{ opacity: 0, scale: 0.8, y: 50 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 50 }}
@@ -273,8 +280,8 @@ export default function ImageGenerator() {
               onClick={(e) => e.stopPropagation()}>
               {/* Close Button */}
               <motion.button
-                className="absolute top-4 right-4 z-10 p-2 bg-gray-700/80 hover:bg-gray-600/80 rounded-full text-white backdrop-blur-sm transition-colors"
-                whileHover={{ scale: 1.1 }}
+                className="absolute top-2 right-2 z-10 p-2 bg-gray-700/10 hover:bg-gray-600/20 cursor-pointer rounded-full text-white backdrop-blur-sm transition-colors"
+                whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setSelectedImage(null)}>
                 <svg
@@ -285,7 +292,7 @@ export default function ImageGenerator() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
+                    strokeWidth={1}
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
@@ -306,40 +313,17 @@ export default function ImageGenerator() {
 
                 {/* Image overlay with download button */}
                 <motion.div
-                  className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6"
+                  className="absolute bottom-0 left-0 right-0  bg-gradient-to-t from-black/100 to-transparent p-6 pt-12"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}>
-                  <div className="flex justify-between items-center">
-                    <div className="text-white">
-                      <h3 className="text-lg font-semibold mb-1">
-                        Generated Image
-                      </h3>
-                      <p className="text-gray-300 text-sm">
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col justify-start text-left text-white">
+                      <h3 className="text-lg font-normal">Generated Image</h3>
+                      <p className="text-gray-300 text-xs">
                         Click to download in full resolution
                       </p>
                     </div>
-
-                    <motion.a
-                      href={selectedImage}
-                      download={`generated-image-${Date.now()}.png`}
-                      className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}>
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                        />
-                      </svg>
-                      Download
-                    </motion.a>
                   </div>
                 </motion.div>
               </motion.div>
@@ -351,7 +335,7 @@ export default function ImageGenerator() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}>
                 <motion.button
-                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors"
+                  className="flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-blue-700 text-gray-500 hover:text-white rounded-full text-xs font-medium transition-colors shadow-lg"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
@@ -362,7 +346,7 @@ export default function ImageGenerator() {
                 </motion.button>
 
                 <motion.button
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors"
+                  className="flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-red-700 text-gray-500 hover:text-white rounded-full text-xs font-medium transition-colors shadow-lg"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
@@ -373,6 +357,27 @@ export default function ImageGenerator() {
                   }}>
                   Delete Image
                 </motion.button>
+
+                <motion.a
+                  href={selectedImage}
+                  download={`generated-image-${Date.now()}.png`}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-medium transition-colors shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}>
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                  Download
+                </motion.a>
               </motion.div>
             </motion.div>
           </motion.div>
