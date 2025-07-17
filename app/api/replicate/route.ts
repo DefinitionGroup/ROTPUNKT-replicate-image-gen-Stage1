@@ -16,20 +16,36 @@ export async function POST(request: Request) {
     // Add RDTDOT activation keyword to the prompt
     const enhancedPrompt = `RDTDOT ${prompt}`;
 
-  
-     const    input = {
-          prompt: enhancedPrompt,
-          finetune_id:"ef2a1a03-c2d2-4b23-bd94-ae0cf1609f0f",
-          num_outputs: 1,
-          aspect_ratio: "1:1",
-          output_format: "png",
-          output_quality: 80
-        }
+    console.log("Starting Replicate generation...");
+    
+    const prediction = await replicate.predictions.create({
+      model: model,
+      input: {
+        prompt: enhancedPrompt,
+        finetune_id: "ef2a1a03-c2d2-4b23-bd94-ae0cf1609f0f",
+        num_outputs: 1,
+        aspect_ratio: "1:1",
+        output_format: "png",
+        output_quality: 80
+      }
+    });
 
-const output = await replicate.run("black-forest-labs/flux-1.1-pro-ultra-finetuned", { input });
+    console.log("Prediction created:", prediction.id);
 
-    console.log("Replicate output:", output); // Debug log
-    return NextResponse.json({ output });
+    // Wait for the prediction to complete
+    let finalPrediction = prediction;
+    while (finalPrediction.status !== 'succeeded' && finalPrediction.status !== 'failed') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      finalPrediction = await replicate.predictions.get(prediction.id);
+      console.log("Prediction status:", finalPrediction.status);
+    }
+
+    if (finalPrediction.status === 'failed') {
+      throw new Error('Prediction failed: ' + finalPrediction.error);
+    }
+
+    console.log("Final prediction output:", finalPrediction.output);
+    return NextResponse.json({ output: finalPrediction.output });
   } catch (error) {
     console.error('Replicate API error:', error);
     return NextResponse.json(

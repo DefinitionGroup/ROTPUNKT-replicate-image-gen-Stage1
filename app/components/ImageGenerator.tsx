@@ -7,6 +7,7 @@ export default function ImageGenerator() {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -27,13 +28,20 @@ export default function ImageGenerator() {
       if (response.ok) {
         const data = await response.json();
         console.log("API Response:", data); // Debug log
+        console.log("API Response structure:", JSON.stringify(data, null, 2)); // Debug log
 
         // Handle different possible response formats
         let imageUrl = null;
         if (data.output) {
+          console.log("data.output exists:", data.output);
+          console.log("data.output type:", typeof data.output);
+
           // If output is an array, take the first item
           if (Array.isArray(data.output)) {
+            console.log("Output is array, length:", data.output.length);
             const firstItem = data.output[0];
+            console.log("First item:", firstItem, "type:", typeof firstItem);
+
             // Check if it's a string URL or an object with a URL property
             if (typeof firstItem === "string") {
               imageUrl = firstItem;
@@ -44,21 +52,27 @@ export default function ImageGenerator() {
                 firstItem.image ||
                 firstItem.src ||
                 firstItem.uri;
+              console.log("Extracted from object:", imageUrl);
             }
           } else if (typeof data.output === "string") {
             // If output is a single URL string
+            console.log("Output is string:", data.output);
             imageUrl = data.output;
           } else if (data.output && typeof data.output === "object") {
             // If output is an object with a URL property
+            console.log("Output is object:", data.output);
             imageUrl =
               data.output.url ||
               data.output.image ||
               data.output.src ||
               data.output.uri;
+            console.log("Extracted from output object:", imageUrl);
           }
+        } else {
+          console.log("No data.output found in response");
         }
 
-        console.log("Extracted image URL:", imageUrl); // Debug log
+        console.log("Final extracted image URL:", imageUrl); // Debug log
 
         if (imageUrl && typeof imageUrl === "string") {
           console.log("Adding image to state:", imageUrl); // Debug log
@@ -93,9 +107,8 @@ export default function ImageGenerator() {
         transition={{ duration: 0.5 }}>
         <div className="flex flex-col gap-4 mb-4">
           <textarea
-            type="textarea"
-            rows="5"
-            cols="33"
+            rows={5}
+            cols={33}
             placeholder="Was möchtest du generieren? (z.B. 'Ein Sonnenuntergang über dem Meer')"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
