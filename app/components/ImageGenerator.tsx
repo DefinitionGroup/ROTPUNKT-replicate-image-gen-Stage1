@@ -91,20 +91,22 @@ export default function ImageGenerator() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}>
-        <div className="flex gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Describe the image you want to generate..."
+        <div className="flex flex-col gap-4 mb-4">
+          <textarea
+            type="textarea"
+            rows="5"
+            cols="33"
+            placeholder="Was möchtest du generieren? (z.B. 'Ein Sonnenuntergang über dem Meer')"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 px-6 py-4 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+            className="flex-1 px-6 py-4 bg-grazß900 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
             disabled={loading}
           />
           <motion.button
             onClick={handleGenerate}
             disabled={loading || !prompt.trim()}
-            className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:scale-105"
+            className="px-12 py-2  self-center bg-red-500 text-white font-normal rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:scale-105"
             whileHover={{ scale: loading ? 1 : 1.05 }}
             whileTap={{ scale: loading ? 1 : 0.95 }}>
             {loading ? (
@@ -128,10 +130,10 @@ export default function ImageGenerator() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Generating...
+                Ich generiere gerade dein Bild...
               </motion.div>
             ) : (
-              "Generate"
+              "Erstellen"
             )}
           </motion.button>
         </div>
