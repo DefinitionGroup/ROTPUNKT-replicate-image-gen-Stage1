@@ -115,13 +115,13 @@ export default function ImageGenerator() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 px-6 py-4 bg-grazß900 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+            className="flex-1 px-6 py-4 bg-gray-950 border border-gray-800 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
             disabled={loading}
           />
           <motion.button
             onClick={handleGenerate}
             disabled={loading || !prompt.trim()}
-            className="px-12 py-2  self-center bg-red-500 text-white font-normal rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:scale-105"
+            className="px-12 py-2  self-center bg-red-500 mt-8 text-white font-normal rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:scale-105"
             whileHover={{ scale: loading ? 1 : 1.05 }}
             whileTap={{ scale: loading ? 1 : 0.95 }}>
             {loading ? (
@@ -179,6 +179,10 @@ export default function ImageGenerator() {
             whileTap={{ scale: 0.95 }}>
             🔍 Test Popover (First Image)
           </motion.button>
+        </div>
+
+        <div className="text-xs text-gray-600 mt-2">
+          <p> Die Bilder werden in aller Regel innerhalb von 30 s generiert.</p>
         </div>
       </motion.div>
 
