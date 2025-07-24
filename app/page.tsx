@@ -1,9 +1,12 @@
 "use client";
-
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import ImageGenerator from "./components/ImageGenerator";
 import TickerExample from "./components/Ticker";
+import KitchenWizard from "./components/KitchenWizard";
 export default function Home() {
+  const [wizardPrompt, setWizardPrompt] = useState<string | null>(null);
+
   return (
     <main>
       <div className="bg-black grid grid-cols-1 grid-rows-1  text-white h-[50vh] min-h-[500px] overflow-hidden items-center justify-center">
@@ -18,7 +21,8 @@ export default function Home() {
             mass: 1,
             damping: 20,
             delay: 1.1,
-          }}>
+          }}
+        >
           <img
             className="w-full  mb-4 col-span-1 row-span-1 col-start-1 row-start-1 object-cover object-bottom "
             src={"tmp9fp4q57x.jpg"}
@@ -30,7 +34,8 @@ export default function Home() {
             className="mx-auto  px-4 py-16 w-full "
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}>
+            transition={{ duration: 0.5, delay: 0.25 }}
+          >
             <div>
               <img
                 src="/rotpunkt-kuechen-logo.svg"
@@ -43,7 +48,8 @@ export default function Home() {
             className="mx-auto   w-full "
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", delay: 1.22 }}>
+            transition={{ type: "spring", delay: 1.22 }}
+          >
             <h1 className="text-6xl font-bold uppercase tracking-tighter text-center  bg-red-500 bg-clip-text text-transparent">
               Traumküchen.
             </h1>
@@ -52,7 +58,8 @@ export default function Home() {
             className="mx-auto   w-full "
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", delay: 1.45 }}>
+            transition={{ type: "spring", delay: 1.45 }}
+          >
             <p className="text-center text-lg text-gray-200 font-black tracking-tight">
               Träumen Sie Ihre Rotpunkt-Traumküche mit unserem AI-Assistenten.
             </p>{" "}
@@ -61,7 +68,8 @@ export default function Home() {
             className="mx-auto  max-w-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", delay: 1.7 }}>
+            transition={{ type: "spring", delay: 1.7 }}
+          >
             <p className="text-center text-sm text-gray-300 leading-relaxed mb-12 tracking-wide">
               Einfach eine Beschreibung eingeben und die AI generiert ein Bild
               Ihrer Traumküche. Und wenn wir Sie nicht haben, dann bauen wir sie
@@ -76,9 +84,20 @@ export default function Home() {
           className="my-32"
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", mass: 60, delay: 2.2 }}>
-          <ImageGenerator />
-        </motion.div>{" "}
+          transition={{ duration: 0.5, delay: 1.7 }}
+        >
+          <div>
+            {!wizardPrompt ? (
+              <KitchenWizard onPromptReady={setWizardPrompt} />
+            ) : (
+              <ImageGenerator
+                initialPrompt={wizardPrompt}
+                onBack={() => setWizardPrompt(null)}
+              />
+            )}
+          </div>
+        </motion.div>
+
         <TickerExample />
       </div>
     </main>
