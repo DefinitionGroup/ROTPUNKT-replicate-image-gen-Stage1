@@ -110,11 +110,11 @@ export default function ImageGenerator({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full  mx-auto h-full flex flex-col justify-center items-center transition-all duration-300">
       {onBack && images.length > 0 && !loading && (
         <button
           onClick={onBack}
-          className="mb-6 px-4 py-2 rounded-full bg-gray-800 text-white text-xs hover:bg-red-500 transition-all"
+          className="mb-10 px-4 py-2 rounded-full bg-gray-800 text-white text-xs hover:bg-red-500 transition-all"
         >
           ⇦ Zurück zum Küchen-Wizard
         </button>
@@ -123,28 +123,30 @@ export default function ImageGenerator({
       {/* Loading indicator */}
       <AnimatePresence>
         {loading && (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="flex flex-col items-center my-12"
-          >
-            <motion.div className="flex flex-col items-center gap-3 my-10">
-              <DotLottieReact
-                src="/UI/LoadingImageAnimation.lottie"
-                loop
-                autoplay
-                className="max-w-xl "
-              />
-              <div className="text-xs text-gray-400 ">
-                <p>
-                  Die Bilder werden in aller Regel innerhalb von 30&nbsp;s
-                  generiert.
-                </p>
+          <div className="w-full max-w-3xl mx-auto flex items-center justify-center min-h-[45rem]">
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              className="flex flex-col items-center justify-center w-full max-w-3xl min-h-[600px] bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 shadow-2xl rounded-2xl p-8"
+            >
+              <div className="flex items-center justify-center w-48 h-48 mb-4 ">
+                <DotLottieReact
+                  src="/UI/LoadingImageAnimation.lottie"
+                  loop
+                  autoplay
+                />
+              </div>
+              <span className="mt-2 text-lg text-white font-medium text-center">
+                Ich generiere gerade dein Bild...
+              </span>
+              <div className="text-xs text-gray-400 mt-2 text-center">
+                Die Bilder werden in aller Regel innerhalb von 30&nbsp;s
+                generiert.
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -165,64 +167,24 @@ export default function ImageGenerator({
       <AnimatePresence>
         {!loading && images.length > 0 && (
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            className="w-full flex flex-col items-center"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
           >
-            {images.map((img, index) => (
-              <motion.div
-                key={`${img}-${index}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative group"
-              >
-                <motion.img
-                  src={typeof img === "string" ? img : ""}
-                  alt="Generated image"
-                  className="w-full rounded-xl shadow-2xl cursor-pointer"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={() => setSelectedImage(img)}
-                  onError={() =>
-                    setImages((prev) => prev.filter((_, i) => i !== index))
-                  }
-                />
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                >
-                  <div className="absolute bottom-4 left-4 right-4 pointer-events-auto">
-                    <motion.a
-                      href={typeof img === "string" ? img : "#"}
-                      download
-                      className="inline-flex items-center gap-2 px-4 py-2 backdrop-blur-sm text-white rounded-lg transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1}
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                        />
-                      </svg>
-                      Download
-                    </motion.a>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+              {images.map((img, index) => (
+                <div key={img} className="flex items-center justify-center">
+                  <img
+                    src={img}
+                    alt="Generated image"
+                    className="rounded-xl shadow-2xl w-full"
+                    onClick={() => setSelectedImage(img)}
+                    style={{ cursor: "pointer" }}
+                  />
+                </div>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

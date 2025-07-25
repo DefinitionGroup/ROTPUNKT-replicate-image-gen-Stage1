@@ -81,12 +81,12 @@ export default function Home() {
 
       <div className="text-center mt-8">
         <motion.div
-          className="my-32"
+          className="my-32 flex justify-center"
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.7 }}
         >
-          <div>
+          <div className="w-full max-w-3xl mx-auto flex items-center justify-center min-h-[45rem]">
             {!wizardPrompt ? (
               <KitchenWizard onPromptReady={setWizardPrompt} />
             ) : (
