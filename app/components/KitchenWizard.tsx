@@ -289,19 +289,24 @@ export default function KitchenWizard({ onPromptReady, loading }: Props) {
                 <span className="mb-2">
                   <FcIdea className="text-4xl text-yellow-400" />
                 </span>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Zusätzliche Wünsche?
-                </h3>
-                <p className="text-gray-400 mb-3 text-base">
-                  Hier können Sie weitere Details eingeben (z.B. "große
-                  Kücheninsel, viel Licht")
-                </p>
+                <div className="flex flex-col items-center mb-4">
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Zusätzliche Wünsche?
+                  </h3>
+                  <p className="text-gray-400 mb-3 text-base">
+                    Hier können Sie weitere Details eingeben (z.B. "große
+                    Kücheninsel, viel Licht")
+                  </p>
+                </div>
+
                 <textarea
-                  className="w-full min-h-[100px] rounded-xl p-4 border border-gray-700 bg-gray-950 text-white mb-5 shadow-lg text-base"
+                  className="w-full min-h-[100px] rounded-xl p-4 border border-gray-700 bg-gray-950 text-white mb-5 shadow-lg text-base focus:outline-none focus:ring-0"
                   placeholder="Hier können Sie weitere Wünsche beschreiben..."
                   value={extra}
                   onChange={(e) => setExtra(e.target.value)}
                   disabled={loading}
+                  maxLength={300}
+                  tabIndex={-1}
                 />
                 <motion.button
                   onClick={() => {
