@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Card, CardHeader, CardContent } from "./ui/card";
 import {
@@ -29,33 +29,50 @@ const steps = [
     ],
     icon: <FaPalette className="text-4xl text-red-400" />,
   },
-
   {
     key: "style",
     label: "Stil",
-    options: ["elegant", "modern", "minimalistisch", "klassisch"],
+    options: [
+      { value: "elegant", label: "Elegant" },
+      { value: "modern", label: "Modern" },
+      { value: "minimalistisch", label: "Minimalistisch" },
+      { value: "klassisch", label: "Klassisch" },
+    ],
     icon: <FaCouch className="text-4xl text-blue-400" />,
   },
   {
     key: "kitchenLook",
     label: "Aussehen",
-    options: ["modern", "offen", "luxuriös", "kompakt"],
+    options: [
+      { value: "modern", label: "Modern" },
+      { value: "offen", label: "Offen" },
+      { value: "luxuriös", label: "Luxuriös" },
+      { value: "kompakt", label: "Kompakt" },
+    ],
     icon: <FaLayerGroup className="text-4xl text-green-400" />,
   },
   {
     key: "environment",
     label: "Umgebung",
-    options: ["stilvoll", "modern", "urban", "naturnah"],
+    options: [
+      { value: "stilvoll", label: "Stilvoll" },
+      { value: "modern", label: "Modern" },
+      { value: "urban", label: "Urban" },
+      { value: "naturnah", label: "Naturnah" },
+    ],
     icon: <FaTree className="text-4xl text-lime-400" />,
   },
   {
     key: "location",
     label: "Standort",
     options: [
-      "ein Strand auf Gran Canaria",
-      "in den Bergen",
-      "am Stadtrand",
-      "am See",
+      {
+        value: "ein Strand auf Gran Canaria",
+        label: "Ein Strand auf Gran Canaria",
+      },
+      { value: "in den Bergen", label: "In den Bergen" },
+      { value: "am Stadtrand", label: "Am Stadtrand" },
+      { value: "am See", label: "Am See" },
     ],
     icon: <FaMapMarkerAlt className="text-4xl text-orange-400" />,
   },
@@ -63,11 +80,11 @@ const steps = [
     key: "time",
     label: "Tageszeit",
     options: [
-      "Sonnenaufgang",
-      "Nachmittag",
-      "Abend",
-      "Sonnenuntergang",
-      "Nacht",
+      { value: "Sonnenaufgang", label: "Sonnenaufgang" },
+      { value: "Nachmittag", label: "Nachmittag" },
+      { value: "Abend", label: "Abend" },
+      { value: "Sonnenuntergang", label: "Sonnenuntergang" },
+      { value: "Nacht", label: "Nacht" },
     ],
     icon: <FaRegClock className="text-4xl text-yellow-300" />,
   },
@@ -75,17 +92,25 @@ const steps = [
     key: "houseType",
     label: "Haustyp",
     options: [
-      "modernes Holzhaus mit großen Fenstern",
-      "Stadtwohnung",
-      "Loft",
-      "Landhaus",
+      {
+        value: "modernes Holzhaus mit großen Fenstern",
+        label: "Modernes Holzhaus mit großen Fenstern",
+      },
+      { value: "Stadtwohnung", label: "Stadtwohnung" },
+      { value: "Loft", label: "Loft" },
+      { value: "Landhaus", label: "Landhaus" },
     ],
     icon: <FaHome className="text-4xl text-gray-300" />,
   },
   {
     key: "background",
     label: "Hintergrund",
-    options: ["Ozean, Strand und Palmen", "Berge", "Wald", "Stadtpanorama"],
+    options: [
+      { value: "Ozean, Strand und Palmen", label: "Ozean, Strand und Palmen" },
+      { value: "Berge", label: "Berge" },
+      { value: "Wald", label: "Wald" },
+      { value: "Stadtpanorama", label: "Stadtpanorama" },
+    ],
     icon: <FaSun className="text-4xl text-yellow-400" />,
   },
 ];
@@ -101,23 +126,49 @@ type WizardState = {
   background?: string;
   extra?: string;
 };
-interface Props {
+
+interface WizardProps {
   onPromptReady: (prompt: string) => void;
   loading?: boolean;
+  onClose?: () => void;
 }
 
-export default function KitchenWizard({ onPromptReady, loading }: Props) {
+export default function KitchenWizard({
+  onPromptReady,
+  loading,
+  onClose,
+}: WizardProps) {
   const [step, setStep] = useState(-1);
   const [state, setState] = useState<WizardState>({});
   const [extra, setExtra] = useState("");
   const [error, setError] = useState("");
+
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const CARD_HEIGHT = 600;
+  const CARD_WIDTH = 720;
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && onClose) {
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  function handleOverlayClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    if (e.target === overlayRef.current && onClose) {
+      onClose();
+    }
+  }
 
   const handleOption = (option: string) => {
     if (step < 0) return;
     const key = steps[step].key as keyof WizardState;
     setState((prev) => ({ ...prev, [key]: option }));
     setError("");
-    setTimeout(() => setStep((s) => s + 1), 90);
+    setTimeout(() => setStep((s) => s + 1), 100);
   };
 
   const handleBack = () => {
@@ -145,196 +196,241 @@ export default function KitchenWizard({ onPromptReady, loading }: Props) {
       (extra.trim() ? ` Zusätzliche Wünsche: {${extra.trim()}}.` : "");
 
     onPromptReady(prompt);
+    if (onClose) onClose();
   };
 
-  if (step === steps.length + 1) return null;
-
   return (
-    <div className="w-full min-h-[680px] flex items-center justify-center py-10">
-      <Card className="w-full max-w-3xl min-h-[620px] flex flex-col bg-gradient-to-br from-black/80 via-gray-900 to-gray-950 border border-gray-800 shadow-2xl rounded-2xl">
-        <CardHeader className="flex flex-col gap-4">
-          <div className="flex items-center justify-between w-full">
-            <button
-              onClick={handleBack}
-              disabled={step === -1 || loading}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 border-red-500 bg-transparent text-red-400 text-base font-bold shadow hover:bg-red-600/10 focus:bg-red-600/20 transition-all
-                ${
-                  step === -1 || loading
-                    ? "opacity-0 cursor-not-allowed"
-                    : "hover:scale-105"
-                }
-              `}
-              style={{ minWidth: 110 }}
-            >
-              <FaArrowLeft className="text-lg" />
-              Zurück
-            </button>
-            {step >= 0 && (
-              <div className="flex-1 flex flex-col items-end justify-end ml-3">
-                <div className="h-2 w-48 rounded-full bg-gray-800 overflow-hidden">
-                  <motion.div
-                    className="h-2 rounded-full bg-red-500"
-                    initial={false}
-                    animate={{
-                      width: `${
-                        ((Math.min(step, steps.length) + 1) /
-                          (steps.length + 1)) *
-                        100
-                      }%`,
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-                <span className="text-xs text-gray-400 mt-1">{`Schritt ${Math.min(
-                  step + 1,
-                  steps.length + 1
-                )} / ${steps.length + 1}`}</span>
+    <AnimatePresence>
+      <motion.div
+        key="wizard-popover"
+        ref={overlayRef}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        tabIndex={-1}
+        onMouseDown={handleOverlayClick}
+      >
+        <motion.div
+          initial={{ scale: 0.97, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={{ duration: 0.25, type: "spring" }}
+          className="relative"
+          style={{
+            width: CARD_WIDTH,
+            minWidth: CARD_WIDTH,
+            maxWidth: "98vw",
+            minHeight: CARD_HEIGHT,
+            maxHeight: "96vh",
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <Card className="relative w-full h-full min-h-[670px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 rounded-2xl">
+            <CardHeader className="relative flex flex-row items-center justify-between w-full px-8   ">
+              <button
+                onClick={handleBack}
+                disabled={step === -1 || loading}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border border-red-400 bg-transparent text-red-400 text-sm font-medium shadow hover:bg-red-500/10 transition-all
+                  ${
+                    step === -1 || loading
+                      ? "opacity-0 cursor-not-allowed pointer-events-none"
+                      : "hover:scale-105"
+                  }
+                `}
+                tabIndex={step > -1 ? 0 : -1}
+                style={{ minWidth: 108 }}
+              >
+                <FaArrowLeft className="text-base" />
+                Zurück
+              </button>
+              <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 gap-1">
+                {step >= 0 && (
+                  <>
+                    <div className="h-2 w-64 rounded-full bg-gray-800 overflow-hidden">
+                      <motion.div
+                        className="h-2 rounded-full bg-red-500"
+                        initial={false}
+                        animate={{
+                          width: `${
+                            ((Math.min(step, steps.length) + 1) /
+                              (steps.length + 1)) *
+                            100
+                          }%`,
+                        }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-400 mt-1">{`Schritt ${Math.min(
+                      step + 1,
+                      steps.length + 1
+                    )} / ${steps.length + 1}`}</span>
+                  </>
+                )}
               </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1 flex flex-col items-center justify-center p-8 overflow-y-auto">
-          <AnimatePresence mode="wait" initial={false}>
-            {step === -1 && (
-              <motion.div
-                key="intro"
-                className="w-full flex flex-col items-center justify-center text-center gap-7"
-                style={{ minHeight: 360 }}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.38, type: "spring" }}
-              >
-                <motion.img
-                  src="/rotpunkt-kuechen-logo.svg"
-                  alt="Rotpunkt Küchen Logo"
-                  className="mb-3 w-30 h-30"
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.16, duration: 0.38 }}
-                />
-                <div className="flex flex-col gap-2 mb-3">
-                  <h2 className="text-3xl font-extrabold text-white bg-red-500 bg-clip-text  tracking-tight drop-shadow-xl ">
-                    Schaffen Sie sich Ihren neuen Raum{" "}
-                  </h2>
-                  <p className="text-gray-200 font-semibold tracking-tight text-base   max-w-xl">
-                    Stellen Sie sich Ihre Traumküche Schritt für Schritt
-                    zusammen. Unser AI-Assistent macht daraus ein Bild!
-                  </p>
-                </div>
-
-                <motion.button
-                  onClick={() => setStep(0)}
-                  className="px-10 py-3 rounded-full bg-red-500 text-white text-lg font-bold shadow-md hover:scale-105 transition-all"
-                  whileHover={{ scale: 1.07 }}
-                  whileTap={{ scale: 0.97 }}
-                  autoFocus
+              {onClose && (
+                <button
+                  onClick={onClose}
+                  className="ml-3 text-gray-500 hover:text-red-400 text-3xl font-bold"
+                  aria-label="Schließen"
+                  tabIndex={0}
                 >
-                  Jetzt starten
-                </motion.button>
-              </motion.div>
-            )}
-            {step >= 0 && step < steps.length && (
-              <motion.div
-                key={step}
-                className="w-full flex flex-col items-center"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.25 }}
-                style={{ minHeight: 300 }}
-              >
-                <span className="mb-2">{steps[step].icon}</span>
-                <h3 className="text-2xl font-bold text-white mb-3">
-                  {steps[step].label} auswählen
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl mx-auto mt-2 mb-7">
-                  {steps[step].options.map((opt) => (
+                  ×
+                </button>
+              )}
+            </CardHeader>
+
+            <CardContent className="flex-1 flex flex-col items-center justify-center p-8  ">
+              <AnimatePresence mode="wait" initial={false}>
+                {step === -1 && (
+                  <motion.div
+                    key="intro"
+                    className="w-full flex flex-col items-center justify-center text-center gap-7"
+                    style={{ minHeight: 360 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ duration: 0.38, type: "spring" }}
+                  >
+                    <motion.img
+                      src="/rotpunkt-kuechen-logo.svg"
+                      alt="Rotpunkt Küchen Logo"
+                      className="mb-3 w-28 h-28"
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.16, duration: 0.38 }}
+                    />
+                    <div className="flex flex-col gap-2 mb-3">
+                      <h2 className="text-2xl font-extrabold text-white bg-red-500 bg-clip-text tracking-tight drop-shadow-xl">
+                        Küchen-Konfigurator
+                      </h2>
+                      <p className="text-gray-200 font-semibold tracking-tight text-base max-w-xl">
+                        Starten Sie jetzt und gestalten Sie Ihre Traumküche
+                        Schritt für Schritt.
+                      </p>
+                    </div>
                     <motion.button
-                      key={typeof opt === "string" ? opt : opt.value}
-                      className={`
-                        flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border-2 font-semibold shadow-lg text-base
-                        min-h-[52px]
-                        ${
-                          state[steps[step].key as keyof WizardState] === opt
-                            ? "bg-red-500 border-red-600 text-white scale-105"
-                            : "bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-800 hover:border-red-400"
-                        }
-                        transition-all duration-200`}
+                      onClick={() => setStep(0)}
+                      className="px-8 py-3 rounded-full bg-red-500 text-white text-base font-bold shadow-md hover:scale-105 transition-all"
                       whileHover={{ scale: 1.07 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() =>
-                        handleOption(typeof opt === "string" ? opt : opt.value)
-                      }
-                      disabled={loading}
+                      whileTap={{ scale: 0.97 }}
+                      autoFocus
                     >
-                      {typeof opt === "string"
-                        ? opt.charAt(0).toUpperCase() + opt.slice(1)
-                        : opt.label}
+                      Jetzt starten
                     </motion.button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-            {step === steps.length && (
-              <motion.div
-                key="final"
-                className="w-full flex flex-col items-center"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.25 }}
-                style={{ minHeight: 300 }}
-              >
-                <span className="mb-2">
-                  <FcIdea className="text-4xl text-yellow-400" />
-                </span>
-                <div className="flex flex-col items-center mb-4">
-                  <h3 className="text-2xl font-bold text-white mb-2">
-                    Zusätzliche Wünsche?
-                  </h3>
-                  <p className="text-gray-400 mb-3 text-base">
-                    Hier können Sie weitere Details eingeben (z.B. "große
-                    Kücheninsel, viel Licht")
-                  </p>
-                </div>
-
-                <textarea
-                  className="w-full min-h-[100px] rounded-xl p-4 border border-gray-700 bg-gray-950 text-white mb-5 shadow-lg text-base focus:outline-none focus:ring-0"
-                  placeholder="Hier können Sie weitere Wünsche beschreiben..."
-                  value={extra}
-                  onChange={(e) => setExtra(e.target.value)}
-                  disabled={loading}
-                  maxLength={300}
-                  tabIndex={-1}
-                />
-                <motion.button
-                  onClick={() => {
-                    handleSubmit();
-                    setStep(steps.length + 1);
-                  }}
-                  disabled={loading}
-                  className="w-full py-4 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-all shadow-xl text-xl"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
+                  </motion.div>
+                )}
+                {step >= 0 && step < steps.length && (
+                  <motion.div
+                    key={step}
+                    className="w-full flex flex-col items-center"
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.25 }}
+                    style={{ minHeight: 300 }}
+                  >
+                    <span className="mb-2">{steps[step].icon}</span>
+                    <h3 className="text-xl font-bold text-white mb-3">
+                      {steps[step].label} auswählen
+                    </h3>
+                    <div
+                      className={`w-full max-w-2xl mx-auto mt-2 mb-7 grid gap-5 ${
+                        steps[step].options.length === 5
+                          ? "grid-cols-2"
+                          : "grid-cols-1 sm:grid-cols-2"
+                      }`}
+                    >
+                      {steps[step].options.map((opt, idx) => {
+                        const isOddLast =
+                          steps[step].options.length === 5 && idx >= 4;
+                        return (
+                          <motion.button
+                            key={opt.value}
+                            className={`
+                              flex items-center justify-center gap-2 px-6 py-3 rounded-xl border text-base h-[48px] min-h-[48px] w-full transition-all duration-200
+                              ${
+                                state[steps[step].key as keyof WizardState] ===
+                                opt.value
+                                  ? "bg-red-500 border-red-600 text-white scale-105"
+                                  : "bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-800 hover:border-red-400"
+                              }
+                              ${isOddLast ? "col-span-2 mx-auto w-2/3" : ""}
+                            `}
+                            whileHover={{ scale: 1.07 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleOption(opt.value)}
+                            disabled={loading}
+                            style={{ minWidth: 0 }}
+                          >
+                            {opt.label}
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+                {step === steps.length && (
+                  <motion.div
+                    key="final"
+                    className="w-full flex flex-col items-center"
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.25 }}
+                    style={{ minHeight: 300 }}
+                  >
+                    <span className="mb-2">
+                      <FcIdea className="text-4xl text-yellow-400" />
+                    </span>
+                    <div className="flex flex-col items-center mb-4">
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        Zusätzliche Wünsche?
+                      </h3>
+                      <p className="text-gray-400 mb-3 text-base">
+                        Hier können Sie weitere Details eingeben (z.B. "große
+                        Kücheninsel, viel Licht")
+                      </p>
+                    </div>
+                    <textarea
+                      className="w-full min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-white mb-4 shadow-lg text-base focus:outline-none focus:ring-0"
+                      placeholder="Hier können Sie weitere Wünsche beschreiben..."
+                      value={extra}
+                      onChange={(e) => setExtra(e.target.value)}
+                      disabled={loading}
+                      maxLength={300}
+                      tabIndex={-1}
+                    />
+                    <motion.button
+                      onClick={() => {
+                        handleSubmit();
+                        setStep(steps.length + 1);
+                      }}
+                      disabled={loading}
+                      className="w-full py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-all shadow-xl text-lg"
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Bild erstellen
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-red-400 text-center mt-3"
                 >
-                  Bild erstellen
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {error && (
-            <motion.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-red-400 text-center mt-3"
-            >
-              {error}
-            </motion.p>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                  {error}
+                </motion.p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

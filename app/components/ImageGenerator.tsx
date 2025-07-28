@@ -304,6 +304,7 @@ export default function ImageGenerator({
 
                 <motion.a
                   href={selectedImage}
+                  target="_blank"
                   download={`generated-image-${Date.now()}.png`}
                   className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-medium transition-colors shadow-lg"
                   whileHover={{ scale: 1.05 }}
