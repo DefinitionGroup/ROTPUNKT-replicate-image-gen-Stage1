@@ -27,7 +27,7 @@ const steps = [
       { value: "holz", label: "Holz" },
       { value: "dunkles holz", label: "Dunkles Holz" },
     ],
-    icon: <FaPalette className="text-4xl text-red-400" />,
+    icon: <FaPalette className="w-full  h-full text-red-400" />,
   },
   {
     key: "style",
@@ -38,7 +38,7 @@ const steps = [
       { value: "minimalistisch", label: "Minimalistisch" },
       { value: "klassisch", label: "Klassisch" },
     ],
-    icon: <FaCouch className="text-4xl text-blue-400" />,
+    icon: <FaCouch className="w-full  h-full text-red-400" />,
   },
   {
     key: "kitchenLook",
@@ -49,7 +49,7 @@ const steps = [
       { value: "luxuriös", label: "Luxuriös" },
       { value: "kompakt", label: "Kompakt" },
     ],
-    icon: <FaLayerGroup className="text-4xl text-green-400" />,
+    icon: <FaLayerGroup className="w-full h-full text-red-400" />,
   },
   {
     key: "environment",
@@ -60,7 +60,7 @@ const steps = [
       { value: "urban", label: "Urban" },
       { value: "naturnah", label: "Naturnah" },
     ],
-    icon: <FaTree className="text-4xl text-lime-400" />,
+    icon: <FaTree className="w-full  h-full  text-red-400" />,
   },
   {
     key: "location",
@@ -74,7 +74,7 @@ const steps = [
       { value: "am Stadtrand", label: "Am Stadtrand" },
       { value: "am See", label: "Am See" },
     ],
-    icon: <FaMapMarkerAlt className="text-4xl text-orange-400" />,
+    icon: <FaMapMarkerAlt className="w-full  h-full text-red-400" />,
   },
   {
     key: "time",
@@ -86,7 +86,7 @@ const steps = [
       { value: "Sonnenuntergang", label: "Sonnenuntergang" },
       { value: "Nacht", label: "Nacht" },
     ],
-    icon: <FaRegClock className="text-4xl text-yellow-300" />,
+    icon: <FaRegClock className="w-full  h-full text-red-400" />,
   },
   {
     key: "houseType",
@@ -100,7 +100,7 @@ const steps = [
       { value: "Loft", label: "Loft" },
       { value: "Landhaus", label: "Landhaus" },
     ],
-    icon: <FaHome className="text-4xl text-gray-300" />,
+    icon: <FaHome className="w-full  h-full text-red-400" />,
   },
   {
     key: "background",
@@ -111,7 +111,7 @@ const steps = [
       { value: "Wald", label: "Wald" },
       { value: "Stadtpanorama", label: "Stadtpanorama" },
     ],
-    icon: <FaSun className="text-4xl text-yellow-400" />,
+    icon: <FaSun className="w-full  h-full text-red-400" />,
   },
 ];
 
@@ -315,14 +315,14 @@ export default function KitchenWizard({
                       <h2 className="text-2xl font-extrabold text-white bg-red-500 bg-clip-text tracking-tight drop-shadow-xl">
                         Küchen-Konfigurator
                       </h2>
-                      <p className="text-gray-200 font-semibold tracking-tight text-base max-w-xl">
+                      <p className="text-gray-200  tracking-tight text-sm max-w-xl">
                         Starten Sie jetzt und gestalten Sie Ihre Traumküche
                         Schritt für Schritt.
                       </p>
                     </div>
                     <motion.button
                       onClick={() => setStep(0)}
-                      className="px-8 py-3 rounded-full bg-red-500 text-white text-base font-bold shadow-md hover:scale-105 transition-all"
+                      className="px-8 py-3 rounded-full bg-red-500 text-white text-base font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
                       whileHover={{ scale: 1.07 }}
                       whileTap={{ scale: 0.97 }}
                       autoFocus
@@ -334,15 +334,17 @@ export default function KitchenWizard({
                 {step >= 0 && step < steps.length && (
                   <motion.div
                     key={step}
-                    className="w-full flex flex-col items-center"
+                    className="w-full flex flex-col items-center  justify-center"
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -16 }}
                     transition={{ duration: 0.25 }}
                     style={{ minHeight: 300 }}
                   >
-                    <span className="mb-2">{steps[step].icon}</span>
-                    <h3 className="text-xl font-bold text-white mb-3">
+                    <div className="flex   justify-center flex-column  w-24">
+                      <div className="mb-4 h-8 w-8 ">{steps[step].icon}</div>
+                    </div>
+                    <h3 className="text-2xl tracking-tight text-white mb-12">
                       {steps[step].label} auswählen
                     </h3>
                     <div
@@ -359,19 +361,22 @@ export default function KitchenWizard({
                           <motion.button
                             key={opt.value}
                             className={`
-                              flex items-center justify-center gap-2 px-6 py-3 rounded-xl border text-base h-[48px] min-h-[48px] w-full transition-all duration-200
+                              flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-xs h-[48px] min-h-[48px] w-full
                               ${
                                 state[steps[step].key as keyof WizardState] ===
                                 opt.value
-                                  ? "bg-red-500 border-red-600 text-white scale-105"
-                                  : "bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-800 hover:border-red-400"
+                                  ? "bg-red-500 border-red-600 text-white "
+                                  : "bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-900 hover:text-red-500 hover:border-red-600"
                               }
                               ${isOddLast ? "col-span-2 mx-auto w-2/3" : ""}
                             `}
-                            whileHover={{ scale: 1.07 }}
-                            whileTap={{ scale: 0.98 }}
+                            whileHover={{ scaleX: 1.051 }}
+                            whileTap={{ scaleX: 0.98 }}
                             onClick={() => handleOption(opt.value)}
                             disabled={loading}
+                            transition={{
+                              type: "spring",
+                            }}
                             style={{ minWidth: 0 }}
                           >
                             {opt.label}
@@ -391,20 +396,23 @@ export default function KitchenWizard({
                     transition={{ duration: 0.25 }}
                     style={{ minHeight: 300 }}
                   >
-                    <span className="mb-2">
-                      <FcIdea className="text-4xl text-yellow-400" />
-                    </span>
-                    <div className="flex flex-col items-center mb-4">
-                      <h3 className="text-xl font-bold text-white mb-2">
+                    <div className="flex   justify-center flex-column  w-24">
+                      <div className="mb-4 h-8 w-8 ">
+                        <FcIdea className="w-full h-full text-red-400" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center mb-6 ">
+                      <h3 className="text-2xl tracking-tight text-white mb-2">
                         Zusätzliche Wünsche?
                       </h3>
-                      <p className="text-gray-400 mb-3 text-base">
+                      <p className="text-gray-400 mb-3 text-sm">
                         Hier können Sie weitere Details eingeben (z.B. "große
                         Kücheninsel, viel Licht")
                       </p>
                     </div>
                     <textarea
-                      className="w-full min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-white mb-4 shadow-lg text-base focus:outline-none focus:ring-0"
+                      className="w-full max-w-xl min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-white mb-6 shadow-lg text-base focus:outline-none focus:ring-0"
                       placeholder="Hier können Sie weitere Wünsche beschreiben..."
                       value={extra}
                       onChange={(e) => setExtra(e.target.value)}
@@ -418,9 +426,13 @@ export default function KitchenWizard({
                         setStep(steps.length + 1);
                       }}
                       disabled={loading}
-                      className="w-full py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-all shadow-xl text-lg"
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
+                      className="w-fit py-3 px-8 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600  shadow-xl text-lg"
+                      whileHover={{ scaleX: 1.051 }}
+                      whileTap={{ scaleX: 0.98 }}
+                      transition={{
+                        type: "spring",
+                      }}
+                      style={{ minWidth: 0 }}
                     >
                       Bild erstellen
                     </motion.button>

@@ -81,7 +81,7 @@ export default function PageContent() {
         </div>
       </div>
 
-      <div className="text-center my-8 min-h-[25rem]">
+      <div className="text-center my-8 min-h-[25rem]  flex flex-col items-center justify-center">
         {!wizardOpen && !wizardPrompt && (
           <IntroCard onStart={() => setWizardOpen(true)} />
         )}

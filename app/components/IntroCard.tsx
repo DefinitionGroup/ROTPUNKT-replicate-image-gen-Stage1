@@ -30,7 +30,7 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
           }}
         />
         <motion.h2
-          className="text-3xl font-extrabold text-white bg-red-500 bg-clip-text tracking-tighter drop-shadow-xl text-center mb-3"
+          className="text-2xl font-extrabold text-white bg-red-500 bg-clip-text tracking-tighter drop-shadow-xl text-center mb-3"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24, duration: 0.4 }}
@@ -49,11 +49,10 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
         </motion.p>
         <motion.button
           onClick={onStart}
-          className="px-12 py-4 rounded-full bg-red-500 text-white text-lg font-bold shadow-md hover:scale-105 transition-all"
+          className="px-8 py-3 rounded-full bg-red-500 text-white text-lg font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{
-            delay: 0.54,
             type: "spring",
             stiffness: 200,
             damping: 13,
