@@ -38,7 +38,7 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
           Schaffen Sie sich Ihren neuen Raum
         </motion.h2>
         <motion.p
-          className="text-gray-200 font-semibold tracking-tight text-md max-w-xl text-center mb-8"
+          className="text-gray-200  tracking-tight text-md max-w-xl text-center mb-8"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.37, duration: 0.38 }}
