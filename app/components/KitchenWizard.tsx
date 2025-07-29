@@ -192,12 +192,22 @@ export default function KitchenWizard({
       return;
     }
     const prompt =
-      `Dann eine {${state.color}}, {${state.style}} Küche. {${state.kitchenLook}} aussehend in einer {${state.environment}} Umgebung. Standort ist: {${state.location}}. Die Tageszeit ist {${state.time}}. Das Haus ist {${state.houseType}}. Im Hintergrund sieht man: {${state.background}}.` +
-      (extra.trim() ? ` Zusätzliche Wünsche: {${extra.trim()}}.` : "");
+      `Dann eine ${state.color}, ${state.style}e Küche. ${capitalizeFirst(
+        state.kitchenLook
+      )} aussehend in einer ${state.environment}en Umgebung. Standort ist: ${
+        state.location
+      }. Die Tageszeit ist ${state.time}. Das Haus ist ${
+        state.houseType
+      }. Im Hintergrund sieht man: ${state.background}.` +
+      (extra.trim() ? ` Zusätzliche Wünsche: ${extra.trim()}.` : "");
 
     onPromptReady(prompt);
     if (onClose) onClose();
   };
+  function capitalizeFirst(str: string) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 
   return (
     <AnimatePresence>
