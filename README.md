@@ -83,14 +83,7 @@ The app uses Tailwind CSS for styling. You can customize colors, spacing, and mo
 
 ## Deployment
 
-### Deploy on Vercel
-
-The easiest way to deploy is using [Vercel](https://vercel.com):
-
-1. Push your code to GitHub
-2. Import your repository on Vercel
-3. Add your `REPLICATE_API_TOKEN` environment variable
-4. Deploy!
+More to come here
 
 ## License
 
