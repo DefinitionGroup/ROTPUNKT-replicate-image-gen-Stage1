@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+*.log
+.turbo
+.next
+.turbo/
+.next/
+out/
+node_modules/
+apps/*/.next/
+apps/*/.turbo/
+apps/*/node_modules/

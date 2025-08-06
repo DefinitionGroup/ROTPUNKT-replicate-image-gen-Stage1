@@ -1,7 +1,12 @@
 {
-  "name": "replicate-image-gen",
+  "name": "rotpunkt-image-gen",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.7.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=10"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

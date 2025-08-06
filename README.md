@@ -13,7 +13,8 @@ A modern image generation interface built with Next.js, Tailwind CSS, and Motion
 
 ## Prerequisites
 
-- Node.js 18+ installed
+- Node.js 20+ installed
+- [PNPM](https://pnpm.io/) installed
 - A Replicate account and API token
 
 ## Getting Started
@@ -26,7 +27,7 @@ cd replicate-image-gen
 
 2. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 3. Set up environment variables:
@@ -43,7 +44,7 @@ You can get your API token from [https://replicate.com/account/api-tokens](https
 
 5. Run the development server:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser.
