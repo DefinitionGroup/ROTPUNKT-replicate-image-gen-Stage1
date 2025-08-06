@@ -85,7 +85,7 @@ The app uses Tailwind CSS for styling. You can customize colors, spacing, and mo
 ## Deployment
 
 More to come here
-
+ ... Moving forward for automaed builds!
 ## License
 
 MIT
