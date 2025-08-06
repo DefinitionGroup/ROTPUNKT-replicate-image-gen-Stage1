@@ -84,8 +84,17 @@ The app uses Tailwind CSS for styling. You can customize colors, spacing, and mo
 
 ## Deployment
 
-More to come here
- ... Moving forward for automaed builds!
+This application features automated deployment through our internal Jenkins CI/CD pipeline. When changes are committed to the main branch, Jenkins automatically triggers a deployment process that builds and deploys the application to https://rotpunkt-visions.de/ within 120 seconds.
+
+### Deployment Process
+
+1. Push changes to the `main` branch
+2. Jenkins automatically detects the commit
+3. Build process is initiated
+4. Application is deployed to production
+5. Live within ~2 minutes
+
+The deployment is fully automated and requires no manual intervention.
 ## License
 
 MIT
