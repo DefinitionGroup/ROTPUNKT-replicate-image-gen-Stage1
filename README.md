@@ -13,7 +13,8 @@ A modern image generation interface built with Next.js, Tailwind CSS, and Motion
 
 ## Prerequisites
 
-- Node.js 18+ installed
+- Node.js 20+ installed
+- [PNPM](https://pnpm.io/) installed
 - A Replicate account and API token
 
 ## Getting Started
