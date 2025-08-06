@@ -26,7 +26,7 @@ cd replicate-image-gen
 
 2. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 3. Set up environment variables:
@@ -43,7 +43,7 @@ You can get your API token from [https://replicate.com/account/api-tokens](https
 
 5. Run the development server:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser.
