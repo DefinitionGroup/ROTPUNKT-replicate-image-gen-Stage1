@@ -4,7 +4,7 @@
 IMAGE_NAME="rotpunkt-image-gen"
 CONTAINER_NAME="my-rotpunkt-image-gen"
 DOCKERFILE_PATH="."
-PORT_MAPPING="3000:3000"
+PORT_MAPPING="7000:7000"
 
 # Function to remove old images (optional)
 cleanup_images() {
@@ -37,7 +37,7 @@ build_image() {
 # Function to run the Docker container
 run_container() {
     echo "Running new Docker container..."
-    docker run -d --restart always -p $PORT_MAPPING -e PORT=3000 -e HOST=0.0.0.0 --name $CONTAINER_NAME $IMAGE_NAME
+    docker run -d --restart always -p $PORT_MAPPING -e PORT=7000 -e HOST=0.0.0.0 --name $CONTAINER_NAME $IMAGE_NAME
 }
 
 # Main script execution
