@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Card, CardHeader, CardContent } from "./ui/card";
@@ -127,6 +127,11 @@ type WizardState = {
   extra?: string;
 };
 
+const capitalizeFirst = (text: string) => {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
 interface WizardProps {
   onPromptReady: (prompt: string) => void;
   loading?: boolean;
@@ -148,8 +153,8 @@ export default function KitchenWizard({
   const CARD_WIDTH = 720;
 
   useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape" && onClose) {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape" && onClose) {
         onClose();
       }
     }
@@ -157,8 +162,8 @@ export default function KitchenWizard({
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  function handleOverlayClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (e.target === overlayRef.current && onClose) {
+  function handleOverlayClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    if (event.target === overlayRef.current && onClose) {
       onClose();
     }
   }
@@ -168,32 +173,30 @@ export default function KitchenWizard({
     const key = steps[step].key as keyof WizardState;
     setState((prev) => ({ ...prev, [key]: option }));
     setError("");
-    setTimeout(() => setStep((s) => s + 1), 100);
+    setStep((s) => s + 1)
+    // setTimeout(() =>  , 100);
   };
 
   const handleBack = () => {
     if (step === -1) return;
-    if (step === 0) setStep(-1);
-    else setStep((s) => s - 1);
+    if (step === 0) {
+      setStep(-1);
+      return
+    }
+
+    setStep((s) => s - 1);
   };
 
   const handleSubmit = () => {
-    if (
-      !state.color ||
-      !state.style ||
-      !state.kitchenLook ||
-      !state.environment ||
-      !state.location ||
-      !state.time ||
-      !state.houseType ||
-      !state.background
-    ) {
+    const valuesAreValid = Object.values(state).every(Boolean)
+    if (!valuesAreValid) {
       setError("Bitte alle Schritte ausfüllen.");
       return;
     }
+
     const prompt =
       `Dann eine ${state.color}, ${state.style}e Küche. ${capitalizeFirst(
-        state.kitchenLook
+        state.kitchenLook!
       )} aussehend in einer ${state.environment}en Umgebung. Standort ist: ${
         state.location
       }. Die Tageszeit ist ${state.time}. Das Haus ist ${
@@ -204,10 +207,7 @@ export default function KitchenWizard({
     onPromptReady(prompt);
     if (onClose) onClose();
   };
-  function capitalizeFirst(str: string) {
-    if (!str) return "";
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+
 
   return (
     <AnimatePresence>
@@ -407,8 +407,8 @@ export default function KitchenWizard({
                         Zusätzliche Wünsche?
                       </h3>
                       <p className="text-gray-400 mb-3 text-sm">
-                        Hier können Sie weitere Details eingeben (z.B. "große
-                        Kücheninsel, viel Licht")
+                        Hier können Sie weitere Details eingeben (z.B. &quot;große
+                        Kücheninsel, viel Licht&quot;)
                       </p>
                     </div>
                     <textarea

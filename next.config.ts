@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "replicate.delivery",
       },
+      {
+        protocol: "https",
+        hostname: "api.storage.rotpunkt-visions.de"
+      }
     ],
   },
 };

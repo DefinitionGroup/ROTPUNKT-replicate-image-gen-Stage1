@@ -21,11 +21,11 @@ export function getObjectUrl(objectName: string): string {
 
 const minioClient = new Client({
   endPoint: process.env.MINIO_DOMAIN,
-  port: 80,
-  useSSL: false,
+  port: 443,
+  useSSL: true,
   accessKey: process.env.MINIO_ACCESS_KEY,
   secretKey: process.env.MINIO_SECRET_KEY,
-})
+});
 
 export class Minio_Error extends Error {
   constructor(message: string | undefined) {

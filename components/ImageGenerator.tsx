@@ -1,117 +1,32 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { useStore } from "@nanostores/react";
+import { $prompt } from "../store/prompt";
+import { useQuery } from "@tanstack/react-query";
 
-export default function ImageGenerator({
-  initialPrompt,
-  onBack,
-}: {
-  initialPrompt?: string;
-  onBack?: () => void;
-}) {
-  const [prompt, setPrompt] = useState(initialPrompt || "");
-  const [images, setImages] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function ImageGenerator({ onBack }: {  onBack?: () => void }) {
+  const prompt = useStore($prompt)
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const { data: images, isError, isLoading } = useQuery({
+    queryKey: ['/api/replicate'],
+    queryFn: () => fetch('/api/replicate', {
+      body: JSON.stringify({ prompt }),
+      method: 'POST'
+    }).then(res => res.json() as Promise<string[]>),
+  })
+
   useEffect(() => {
-    if (initialPrompt) {
-      setPrompt(initialPrompt);
-      setTimeout(() => handleGenerate(initialPrompt), 100);
-    }
-  }, [initialPrompt]);
-
-  const handleGenerate = async (promptValue?: string) => {
-    const usedPrompt = promptValue || prompt;
-    if (!usedPrompt.trim()) {
-      setError("No prompt received.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/replicate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: usedPrompt }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("API Response:", data); // Debug log
-        console.log("API Response structure:", JSON.stringify(data, null, 2)); // Debug log
-
-        // Handle different possible response formats
-        let imageUrl = null;
-        if (data.output) {
-          console.log("data.output exists:", data.output);
-          console.log("data.output type:", typeof data.output);
-
-          // If output is an array, take the first item
-          if (Array.isArray(data.output)) {
-            console.log("Output is array, length:", data.output.length);
-            const firstItem = data.output[0];
-            console.log("First item:", firstItem, "type:", typeof firstItem);
-
-            // Check if it's a string URL or an object with a URL property
-            if (typeof firstItem === "string") {
-              imageUrl = firstItem;
-            } else if (firstItem && typeof firstItem === "object") {
-              // Common object properties that might contain the URL
-              imageUrl =
-                firstItem.url ||
-                firstItem.image ||
-                firstItem.src ||
-                firstItem.uri;
-              console.log("Extracted from object:", imageUrl);
-            }
-          } else if (typeof data.output === "string") {
-            // If output is a single URL string
-            console.log("Output is string:", data.output);
-            imageUrl = data.output;
-          } else if (data.output && typeof data.output === "object") {
-            // If output is an object with a URL property
-            console.log("Output is object:", data.output);
-            imageUrl =
-              data.output.url ||
-              data.output.image ||
-              data.output.src ||
-              data.output.uri;
-            console.log("Extracted from output object:", imageUrl);
-          }
-        } else {
-          console.log("No data.output found in response");
-        }
-
-        console.log("Final extracted image URL:", imageUrl); // Debug log
-
-        if (imageUrl && typeof imageUrl === "string") {
-          console.log("Adding image to state:", imageUrl); // Debug log
-          setImages([imageUrl, ...images]);
-          setPrompt("");
-          // Automatically open the newly generated image in popover
-          setSelectedImage(imageUrl);
-        } else {
-          console.error("No valid image URL found in response:", data);
-          setError("No image generated. Please try again.");
-        }
-      } else {
-        setError("Failed to generate image. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error generating image:", error);
-      setError("An error occurred. Please try again.");
-    }
-    setLoading(false);
-  };
+    if (images) setSelectedImage(images[0]!)
+  }, [images])
 
   return (
     <div className="w-full  mx-auto h-full flex flex-col justify-center items-center transition-all duration-300">
-      {onBack && images.length > 0 && !loading && (
+      {onBack && images && images.length > 0 && !isLoading && (
         <button
           onClick={onBack}
           className="mb-10 px-4 py-2 rounded-full bg-gray-800 text-white text-xs hover:bg-red-500 transition-all"
@@ -122,7 +37,7 @@ export default function ImageGenerator({
 
       {/* Loading indicator */}
       <AnimatePresence>
-        {loading && (
+        {isLoading && (
           <div className="w-full max-w-3xl mx-auto flex items-center justify-center min-h-[45rem]">
             <motion.div
               key="loading"
@@ -151,7 +66,7 @@ export default function ImageGenerator({
       </AnimatePresence>
 
       <AnimatePresence>
-        {error && (
+        {isError && (
           <motion.p
             key="error"
             initial={{ opacity: 0, y: -10 }}
@@ -159,13 +74,13 @@ export default function ImageGenerator({
             exit={{ opacity: 0, y: -10 }}
             className="text-red-400 text-center text-base my-4"
           >
-            {error}
+            Failed to generate image. Please try again.
           </motion.p>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
-        {!loading && images.length > 0 && (
+        {!isLoading && images && images.length > 0 && (
           <motion.div
             className="w-full flex flex-col items-center"
             initial={{ opacity: 0, y: 16 }}
@@ -173,11 +88,12 @@ export default function ImageGenerator({
             exit={{ opacity: 0, y: 16 }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {images.map((img, index) => (
+              {images.map((img) => (
                 <div key={img} className="flex items-center justify-center">
                   <img
                     src={img}
                     alt="Generated image"
+                    crossOrigin="anonymous"
                     className="rounded-xl shadow-2xl w-full"
                     onClick={() => setSelectedImage(img)}
                     style={{ cursor: "pointer" }}
@@ -287,8 +203,7 @@ export default function ImageGenerator({
                 >
                   Copy Link
                 </motion.button>
-
-                <motion.button
+              {/* <motion.button
                   className="flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-red-700 text-gray-500 hover:text-white rounded-full text-xs font-medium transition-colors shadow-lg"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -300,7 +215,7 @@ export default function ImageGenerator({
                   }}
                 >
                   Delete Image
-                </motion.button>
+                </motion.button> */}
 
                 <motion.a
                   href={selectedImage}
