@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -173,11 +174,12 @@ export default function ImageGenerator({
             exit={{ opacity: 0, y: 16 }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {images.map((img, index) => (
+              {images.map((img) => (
                 <div key={img} className="flex items-center justify-center">
                   <img
                     src={img}
                     alt="Generated image"
+                    crossOrigin="anonymous"
                     className="rounded-xl shadow-2xl w-full"
                     onClick={() => setSelectedImage(img)}
                     style={{ cursor: "pointer" }}

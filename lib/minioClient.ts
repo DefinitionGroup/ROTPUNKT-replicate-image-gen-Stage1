@@ -7,6 +7,7 @@ import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
 import pRetry from 'p-retry'
 import { Client } from 'minio'
+import * as https from 'https'
 
 type ObjectMetaData = Record<string, string | number>
 
@@ -19,14 +20,20 @@ export function getObjectUrl(objectName: string): string {
   return `https://${process.env.MINIO_DOMAIN}/${BUCKET}/${objectName}`
 }
 
+const insecureAgent = new https.Agent({
+  keepAlive: true,
+  timeout: 10_000,
+  rejectUnauthorized: false,
+});
+
 const minioClient = new Client({
   endPoint: process.env.MINIO_DOMAIN,
-  port: 80,
-  useSSL: false,
+  port: 443,
+  useSSL: true,
   accessKey: process.env.MINIO_ACCESS_KEY,
   secretKey: process.env.MINIO_SECRET_KEY,
-})
-
+  transportAgent: insecureAgent,
+});
 export class Minio_Error extends Error {
   constructor(message: string | undefined) {
     super(message)
