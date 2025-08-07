@@ -13,7 +13,7 @@ export default function ImageGenerator({ onBack }: {  onBack?: () => void }) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const { data: images, isError, isLoading } = useQuery({
-    queryKey: ['/api/replicate', prompt],
+    queryKey: ['/api/replicate'],
     queryFn: () => fetch('/api/replicate', {
       body: JSON.stringify({ prompt }),
       method: 'POST'
