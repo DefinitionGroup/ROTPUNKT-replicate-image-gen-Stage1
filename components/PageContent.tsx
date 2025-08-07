@@ -6,9 +6,9 @@ import TickerExample from "./Ticker";
 import KitchenWizard from "./KitchenWizard";
 import { IntroCard } from "./IntroCard";
 import { useStore } from "@nanostores/react";
-import { $pageStep } from "../store/step";
-import { $showWizard } from "../store/modals";
-import { $prompt } from "../store/prompt";
+import { $pageStep } from "@/store/step";
+import { $showWizard } from "@/store/modals";
+import { $prompt } from "@/store/prompt";
 
 export default function PageContent() {
   const pageStep = useStore($pageStep)

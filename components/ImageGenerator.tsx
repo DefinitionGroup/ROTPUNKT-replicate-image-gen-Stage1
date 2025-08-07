@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
-import { $prompt } from "../store/prompt";
+import { $prompt } from "@/store/prompt";
 import { useQuery } from "@tanstack/react-query";
 
 export default function ImageGenerator({ onBack }: {  onBack?: () => void }) {
