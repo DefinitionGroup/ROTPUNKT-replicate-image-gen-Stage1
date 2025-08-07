@@ -1,14 +1,18 @@
 "use client";
-import { useState } from "react";
+
 import { motion, AnimatePresence } from "motion/react";
 import ImageGenerator from "./ImageGenerator";
 import TickerExample from "./Ticker";
 import KitchenWizard from "./KitchenWizard";
 import { IntroCard } from "./IntroCard";
+import { useStore } from "@nanostores/react";
+import { $pageStep } from "../store/step";
+import { $showWizard } from "../store/modals";
+import { $prompt } from "../store/prompt";
 
 export default function PageContent() {
-  const [wizardOpen, setWizardOpen] = useState(false);
-  const [wizardPrompt, setWizardPrompt] = useState<string | null>(null);
+  const pageStep = useStore($pageStep)
+  const showWizard = useStore($showWizard)
 
   return (
     <>
@@ -82,32 +86,35 @@ export default function PageContent() {
       </div>
 
       <div className="text-center my-8 min-h-[25rem]  flex flex-col items-center justify-center">
-        {!wizardOpen && !wizardPrompt && (
-          <IntroCard onStart={() => setWizardOpen(true)} />
+        {pageStep === 'intro' && (
+          <IntroCard
+            onStart={() => $showWizard.set(true)}
+          />
         )}
-
-        <AnimatePresence>
-          {wizardOpen && !wizardPrompt && (
-            <KitchenWizard
-              onPromptReady={(prompt) => {
-                setWizardPrompt(prompt);
-                setWizardOpen(false);
-              }}
-              onClose={() => setWizardOpen(false)}
-            />
-          )}
-        </AnimatePresence>
-        {wizardPrompt && (
+        {pageStep === 'imagegen' && (
           <div className="w-full max-w-3xl mx-auto min-h-[44rem] flex items-center justify-center">
             <ImageGenerator
-              initialPrompt={wizardPrompt}
               onBack={() => {
-                setWizardPrompt(null);
-                <IntroCard onStart={() => setWizardOpen(true)} />;
+                $prompt.set(null)
+                $pageStep.set('intro')
+                $showWizard.set(true)
               }}
             />
           </div>
         )}
+
+        <AnimatePresence>
+          {showWizard && (
+            <KitchenWizard
+              onPromptReady={(prompt) => {
+                $prompt.set(prompt)
+                $showWizard.set(false)
+                $pageStep.set('imagegen')
+              }}
+              onClose={() => $showWizard.set(false)}
+            />
+          )}
+        </AnimatePresence>
       </div>
       <TickerExample />
     </>

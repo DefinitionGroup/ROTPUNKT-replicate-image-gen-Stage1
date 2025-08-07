@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const image: string | null = result.output
     if (!image) throw new Error('No output received')
     const imageOnMinio =await uploadImages([image])
-    return NextResponse.json({ output: imageOnMinio });
+    return NextResponse.json(imageOnMinio);
   } catch (error) {
     console.error("Replicate API error:", error);
 

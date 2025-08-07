@@ -7,7 +7,6 @@ import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
 import pRetry from 'p-retry'
 import { Client } from 'minio'
-import * as https from 'https'
 
 type ObjectMetaData = Record<string, string | number>
 
