@@ -253,7 +253,7 @@ export default function KitchenWizard({
                   }
                 }}
                 disabled={step === -1 || loading}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border border-red-400 bg-transparent text-red-400 text-sm font-medium shadow hover:bg-red-500/10 transition-all
+                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full border border-red-400 bg-transparent text-red-400 text-sm font-medium shadow hover:bg-red-500/10 transition-all
     ${
       step === -1 || loading
         ? "opacity-0 cursor-not-allowed pointer-events-none"
@@ -294,7 +294,7 @@ export default function KitchenWizard({
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="ml-3 text-gray-500 hover:text-red-400 text-3xl font-bold"
+                  className="cursor-pointer ml-3 text-gray-500 hover:text-red-400 text-3xl font-bold"
                   aria-label="Schließen"
                   tabIndex={0}
                 >
@@ -334,7 +334,7 @@ export default function KitchenWizard({
                     </div>
                     <motion.button
                       onClick={() => setStep(0)}
-                      className="px-8 py-3 rounded-full bg-red-500 text-white text-base font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                      className="cursor-pointer px-8 py-3 rounded-full bg-red-500 text-white text-base font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
                       whileHover={{ scale: 1.07 }}
                       whileTap={{ scale: 0.97 }}
                       autoFocus
@@ -373,7 +373,7 @@ export default function KitchenWizard({
                           <motion.button
                             key={opt.value}
                             className={`
-                              flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-xs h-[48px] min-h-[48px] w-full
+                              cursor-pointer flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-xs h-[48px] min-h-[48px] w-full
                               ${
                                 state[steps[step].key as keyof WizardState] ===
                                 opt.value
@@ -427,7 +427,7 @@ export default function KitchenWizard({
                         <div className="flex items-center gap-3 max-w-lg w-full px-6">
                           <SignInButton mode="modal">
                             <motion.button
-                              className="flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md  min-h-[48px] w-full bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-900 hover:text-red-500 hover:border-red-600"
+                              className="cursor-pointer flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md  min-h-[48px] w-full bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-900 hover:text-red-500 hover:border-red-600"
                               whileHover={{ scaleX: 1.051 }}
                               whileTap={{ scaleX: 0.98 }}
                               transition={{ type: "spring" }}
@@ -437,7 +437,7 @@ export default function KitchenWizard({
                           </SignInButton>
                           <SignUpButton mode="modal">
                             <motion.button
-                              className="flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md  min-h-[48px] w-full bg-red-500 border-red-600 text-white hover:bg-red-600 hover:border-red-700"
+                              className="cursor-pointer flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md  min-h-[48px] w-full bg-red-500 border-red-600 text-white hover:bg-red-600 hover:border-red-700 "
                               whileHover={{ scaleX: 1.051 }}
                               whileTap={{ scaleX: 0.98 }}
                               transition={{ type: "spring" }}
@@ -490,7 +490,7 @@ export default function KitchenWizard({
                             setStep(steps.length + 1);
                           }}
                           disabled={loading}
-                          className={`w-fit py-3 px-8 rounded-full font-semibold shadow-xl text-lg
+                          className={`cursor-pointer w-fit py-3 px-8 rounded-full font-semibold shadow-xl text-lg
             ${
               isSignedIn
                 ? "bg-red-500 text-white hover:bg-red-600"

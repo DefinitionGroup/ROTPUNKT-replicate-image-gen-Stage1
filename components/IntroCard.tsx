@@ -49,7 +49,7 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
         </motion.p>
         <motion.button
           onClick={onStart}
-          className="px-8 py-3 rounded-full bg-red-500 text-white text-lg font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+          className="cursor-pointer px-8 py-3 rounded-full bg-red-500 text-white text-lg font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{
