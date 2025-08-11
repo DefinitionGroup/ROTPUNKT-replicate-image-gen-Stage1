@@ -55,12 +55,12 @@ export default function Navbar() {
         <div className="flex items-center space-x-2 border-l border-neutral-700 pl-4 ml-4 mr-4">
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="px-3 py-1 rounded-full text-sm border border-transparent font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
+              <button className="cursor-pointer px-3 py-1 rounded-full text-sm border border-transparent font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
                 Sign In
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 hover:bg-transparent hover:text-white text-black transition-colors border border-transparent hover:border-white">
+              <button className="cursor-pointer px-3 py-1 rounded-full text-sm font-medium bg-gray-100 hover:bg-transparent hover:text-white text-black transition-colors border border-transparent hover:border-white">
                 Sign Up
               </button>
             </SignUpButton>
