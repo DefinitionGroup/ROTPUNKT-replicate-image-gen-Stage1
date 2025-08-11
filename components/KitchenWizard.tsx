@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Card, CardHeader, CardContent } from "./ui/card";
@@ -14,6 +14,7 @@ import {
   FaArrowLeft,
 } from "react-icons/fa";
 import { FcIdea } from "react-icons/fc";
+import { useAuth, SignInButton, SignUpButton } from "@clerk/nextjs";
 
 const steps = [
   {
@@ -147,6 +148,8 @@ export default function KitchenWizard({
   const [state, setState] = useState<WizardState>({});
   const [extra, setExtra] = useState("");
   const [error, setError] = useState("");
+  const { isSignedIn } = useAuth();
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const CARD_HEIGHT = 600;
@@ -162,7 +165,9 @@ export default function KitchenWizard({
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  function handleOverlayClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function handleOverlayClick(
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) {
     if (event.target === overlayRef.current && onClose) {
       onClose();
     }
@@ -173,7 +178,7 @@ export default function KitchenWizard({
     const key = steps[step].key as keyof WizardState;
     setState((prev) => ({ ...prev, [key]: option }));
     setError("");
-    setStep((s) => s + 1)
+    setStep((s) => s + 1);
     // setTimeout(() =>  , 100);
   };
 
@@ -181,14 +186,14 @@ export default function KitchenWizard({
     if (step === -1) return;
     if (step === 0) {
       setStep(-1);
-      return
+      return;
     }
 
     setStep((s) => s - 1);
   };
 
   const handleSubmit = () => {
-    const valuesAreValid = Object.values(state).every(Boolean)
+    const valuesAreValid = Object.values(state).every(Boolean);
     if (!valuesAreValid) {
       setError("Bitte alle Schritte ausfüllen.");
       return;
@@ -207,7 +212,6 @@ export default function KitchenWizard({
     onPromptReady(prompt);
     if (onClose) onClose();
   };
-
 
   return (
     <AnimatePresence>
@@ -240,21 +244,29 @@ export default function KitchenWizard({
           <Card className="relative w-full h-full min-h-[670px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 rounded-2xl">
             <CardHeader className="relative flex flex-row items-center justify-between w-full px-8   ">
               <button
-                onClick={handleBack}
+                onClick={() => {
+                  if (showAuthPrompt) {
+                    setShowAuthPrompt(false);
+                    setStep(steps.length);
+                  } else {
+                    handleBack();
+                  }
+                }}
                 disabled={step === -1 || loading}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full border border-red-400 bg-transparent text-red-400 text-sm font-medium shadow hover:bg-red-500/10 transition-all
-                  ${
-                    step === -1 || loading
-                      ? "opacity-0 cursor-not-allowed pointer-events-none"
-                      : "hover:scale-105"
-                  }
-                `}
+    ${
+      step === -1 || loading
+        ? "opacity-0 cursor-not-allowed pointer-events-none"
+        : "hover:scale-105"
+    }
+  `}
                 tabIndex={step > -1 ? 0 : -1}
                 style={{ minWidth: 108 }}
               >
                 <FaArrowLeft className="text-base" />
                 Zurück
               </button>
+
               <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 gap-1">
                 {step >= 0 && (
                   <>
@@ -389,53 +401,123 @@ export default function KitchenWizard({
                 {step === steps.length && (
                   <motion.div
                     key="final"
-                    className="w-full flex flex-col items-center"
+                    className="w-full flex flex-col items-center min-h-[300px] justify-center"
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -16 }}
                     transition={{ duration: 0.25 }}
-                    style={{ minHeight: 300 }}
                   >
-                    <div className="flex   justify-center flex-column  w-24">
-                      <div className="mb-4 h-8 w-8 ">
-                        <FcIdea className="w-full h-full text-red-400" />
-                      </div>
-                    </div>
+                    {showAuthPrompt && !isSignedIn ? (
+                      <motion.div
+                        key="auth-card"
+                        className="w-full p-6 text-red-100 flex flex-col items-center gap-6"
+                        initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                      >
+                        <div className="">
+                          <h3 className="text-2xl tracking-tight text-white mb-2">
+                            Du musst eingeloggt sein, um ein Bild zu generieren.
+                          </h3>
+                          <p className="text-gray-400 mb-3 text-sm">
+                            Bitte melde dich an oder registriere dich. Danach
+                            kannst du direkt fortfahren.
+                          </p>
+                        </div>
 
-                    <div className="flex flex-col items-center mb-6 ">
-                      <h3 className="text-2xl tracking-tight text-white mb-2">
-                        Zusätzliche Wünsche?
-                      </h3>
-                      <p className="text-gray-400 mb-3 text-sm">
-                        Hier können Sie weitere Details eingeben (z.B. &quot;große
-                        Kücheninsel, viel Licht&quot;)
-                      </p>
-                    </div>
-                    <textarea
-                      className="w-full max-w-xl min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-white mb-6 shadow-lg text-base focus:outline-none focus:ring-0"
-                      placeholder="Hier können Sie weitere Wünsche beschreiben..."
-                      value={extra}
-                      onChange={(e) => setExtra(e.target.value)}
-                      disabled={loading}
-                      maxLength={300}
-                      tabIndex={-1}
-                    />
-                    <motion.button
-                      onClick={() => {
-                        handleSubmit();
-                        setStep(steps.length + 1);
-                      }}
-                      disabled={loading}
-                      className="w-fit py-3 px-8 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600  shadow-xl text-lg"
-                      whileHover={{ scaleX: 1.051 }}
-                      whileTap={{ scaleX: 0.98 }}
-                      transition={{
-                        type: "spring",
-                      }}
-                      style={{ minWidth: 0 }}
-                    >
-                      Bild erstellen
-                    </motion.button>
+                        <div className="flex items-center gap-3 max-w-lg w-full px-6">
+                          <SignInButton mode="modal">
+                            <motion.button
+                              className="flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md  min-h-[48px] w-full bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-900 hover:text-red-500 hover:border-red-600"
+                              whileHover={{ scaleX: 1.051 }}
+                              whileTap={{ scaleX: 0.98 }}
+                              transition={{ type: "spring" }}
+                            >
+                              Einloggen
+                            </motion.button>
+                          </SignInButton>
+                          <SignUpButton mode="modal">
+                            <motion.button
+                              className="flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md  min-h-[48px] w-full bg-red-500 border-red-600 text-white hover:bg-red-600 hover:border-red-700"
+                              whileHover={{ scaleX: 1.051 }}
+                              whileTap={{ scaleX: 0.98 }}
+                              transition={{ type: "spring" }}
+                            >
+                              Registrieren
+                            </motion.button>
+                          </SignUpButton>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="final-content"
+                        className="w-full flex flex-col items-center"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <div className="flex justify-center w-24">
+                          <div className="mb-4 h-8 w-8 ">
+                            <FcIdea className="w-full h-full text-red-400" />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-center mb-6 ">
+                          <h3 className="text-2xl tracking-tight text-white mb-2">
+                            Zusätzliche Wünsche?
+                          </h3>
+                          <p className="text-gray-400 mb-3 text-sm">
+                            Hier können Sie weitere Details eingeben (z.B.
+                            &quot;große Kücheninsel, viel Licht&quot;)
+                          </p>
+                        </div>
+
+                        <textarea
+                          className="w-full max-w-xl min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-white mb-6 shadow-lg text-base focus:outline-none focus:ring-0"
+                          placeholder="Hier können Sie weitere Wünsche beschreiben..."
+                          value={extra}
+                          onChange={(e) => setExtra(e.target.value)}
+                          disabled={loading}
+                          maxLength={300}
+                          tabIndex={-1}
+                        />
+
+                        <motion.button
+                          onClick={() => {
+                            if (!isSignedIn) {
+                              setShowAuthPrompt(true);
+                              return;
+                            }
+                            handleSubmit();
+                            setStep(steps.length + 1);
+                          }}
+                          disabled={loading}
+                          className={`w-fit py-3 px-8 rounded-full font-semibold shadow-xl text-lg
+            ${
+              isSignedIn
+                ? "bg-red-500 text-white hover:bg-red-600"
+                : "bg-gray-800 text-gray-400"
+            }`}
+                          whileHover={
+                            isSignedIn ? { scaleX: 1.051 } : undefined
+                          }
+                          whileTap={isSignedIn ? { scaleX: 0.98 } : undefined}
+                          transition={{ type: "spring" }}
+                          style={{ minWidth: 0 }}
+                        >
+                          Bild erstellen
+                        </motion.button>
+                      </motion.div>
+                    )}
+
+                    {error && !showAuthPrompt && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="text-red-400 text-center mt-3"
+                      >
+                        {error}
+                      </motion.p>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
