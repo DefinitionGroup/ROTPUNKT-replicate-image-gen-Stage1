@@ -19,12 +19,10 @@ export default function Navbar() {
           "flex items-center justify-between bg-white/80 rounded-full px-8 py-4 shadow-input"
         )}
       >
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <Logo />
         </Link>
 
-        {/* Navigation Links */}
         <div className="flex items-center gap-8">
           <Link
             href="/about"
@@ -44,9 +42,16 @@ export default function Navbar() {
           >
             Contact
           </Link>
+          <SignedIn>
+            <Link
+              href="/my-images"
+              className="text-black dark:text-white hover:text-primary transition"
+            >
+              Meine Bilder
+            </Link>
+          </SignedIn>
         </div>
 
-        {/* Clerk Authentication Buttons */}
         <div className="flex items-center space-x-2 border-l border-neutral-700 pl-4 ml-4 mr-4">
           <SignedOut>
             <SignInButton mode="modal">
