@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ export default function ImageModal({
   onClose: () => void;
 }) {
   const [isMobileEnv, setIsMobileEnv] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     const isMobile = () => {
@@ -39,17 +40,51 @@ export default function ImageModal({
     setIsMobileEnv(isMobile());
   }, []);
 
-  const handleNativeShare = async () => {
+  const normalizedUrl = useMemo(() => {
     try {
-      if (typeof navigator !== "undefined" && (navigator as any).share) {
-        await (navigator as any).share({
-          title: "Generated image",
-          text: "",
-          url: src,
-        });
-      }
+      const base =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "https://example.com";
+      const u = new URL(src, base);
+      return u.href;
     } catch {
-      // user canceled or share failed — ignore
+      return src;
+    }
+  }, [src]);
+
+  const handleShare = async () => {
+    // Only attempt native share on mobile-ish environments
+    if (!isMobileEnv) {
+      setShareOpen(true);
+      return;
+    }
+    try {
+      // Web Share API requires secure context (https) and an absolute URL
+      const isHttps =
+        typeof window !== "undefined" && window.location.protocol === "https:";
+      if (!isHttps) {
+        setShareOpen(true);
+        return;
+      }
+      const payload: any = { url: normalizedUrl };
+      // canShare guard for stricter browsers
+      if (
+        typeof (navigator as any).canShare === "function" &&
+        !(navigator as any).canShare(payload)
+      ) {
+        setShareOpen(true);
+        return;
+      }
+      if (typeof navigator !== "undefined" && (navigator as any).share) {
+        await (navigator as any).share(payload);
+        return;
+      }
+      // Fallback to dropdown menu if share not available
+      setShareOpen(true);
+    } catch {
+      // User canceled or an error occurred -> show fallback menu
+      setShareOpen(true);
     }
   };
 
@@ -105,99 +140,102 @@ export default function ImageModal({
         />
 
         <div className="mt-4 flex gap-3">
-          {isMobileEnv ? (
-            <Button
-              onClick={handleNativeShare}
-              className="rounded-full text-xs font-medium shadow-lg"
-            >
-              Share
-            </Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  className="rounded-full px-6 py-3 text-xs font-medium shadow-lg"
-                  variant="secondary"
-                >
-                  Share
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-50 z-[60] bg-black/60 text-white  shadow-md backdrop-blur-sm border-white/20"
-                side="top"
-                align="start"
-                sideOffset={8}
+          <DropdownMenu open={shareOpen} onOpenChange={setShareOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className="rounded-full px-6 py-3 text-xs font-medium shadow-lg"
+                variant="secondary"
+                onClick={isMobileEnv ? handleShare : undefined}
               >
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={`https://wa.me/?text=${encodeURIComponent(src)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaWhatsapp className="inline mr-2" />
-                    WhatsApp
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={`https://t.me/share/url?url=${encodeURIComponent(
-                      src
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaTelegram className="inline mr-2" />
-                    Telegram
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      src
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaFacebook className="inline mr-2" />
-                    Facebook
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                      src
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaSquareXTwitter className="inline mr-2" />X (Twitter)
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/20" />
-                <DropdownMenuItem asChild>
-                  <Link href={`mailto:?body=${encodeURIComponent(src)}`}>
-                    <MdEmail className="inline mr-2" />
-                    Email{" "}
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator className="bg-white/20" />
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(src)}
+                Share
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-50 z-[60] bg-black/60 text-white shadow-md backdrop-blur-sm border-white/20"
+              side="top"
+              align="start"
+              sideOffset={8}
+            >
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    normalizedUrl
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShareOpen(false)}
                 >
-                  <FaLink className="inline mr-2" />
-                  Copy Link
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                  <FaWhatsapp className="inline mr-2" />
+                  WhatsApp
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`https://t.me/share/url?url=${encodeURIComponent(
+                    normalizedUrl
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShareOpen(false)}
+                >
+                  <FaTelegram className="inline mr-2" />
+                  Telegram
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                    normalizedUrl
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShareOpen(false)}
+                >
+                  <FaFacebook className="inline mr-2" />
+                  Facebook
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                    normalizedUrl
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShareOpen(false)}
+                >
+                  <FaSquareXTwitter className="inline mr-2" />X (Twitter)
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-white/20" />
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`mailto:?body=${encodeURIComponent(normalizedUrl)}`}
+                  onClick={() => setShareOpen(false)}
+                >
+                  <MdEmail className="inline mr-2" />
+                  Email
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-white/20" />
+              <DropdownMenuItem
+                onClick={() => {
+                  navigator.clipboard.writeText(normalizedUrl);
+                  setShareOpen(false);
+                }}
+              >
+                <FaLink className="inline mr-2" />
+                Copy Link
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Button
             asChild
             className="px-6 py-3 text-xs font-medium shadow-lg rounded-full"
           >
             <Link
-              href={src}
+              href={normalizedUrl}
               target="_blank"
               rel="noopener noreferrer"
               download={`generated-image-${Date.now()}.png`}
