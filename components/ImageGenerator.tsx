@@ -7,6 +7,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
 import { $prompt } from "@/store/prompt";
 import { useQuery } from "@tanstack/react-query";
+import ImageModal from "./ImageModal";
 
 type ApiResponse = string[];
 
@@ -153,69 +154,5 @@ function QuickLink() {
     >
       📁 Zu "Meine Bilder"
     </motion.a>
-  );
-}
-
-function ImageModal({ src, onClose }: { src: string; onClose: () => void }) {
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      onClick={onClose}
-    >
-      <motion.div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      />
-
-      <motion.div
-        className="relative rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-800/60"
-        initial={{ opacity: 0, scale: 0.8, y: 50 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.8, y: 50 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <motion.button
-          className="absolute top-2 right-2 z-10 p-2 bg-gray-700/10 hover:bg-gray-600/20 cursor-pointer rounded-full text-white backdrop-blur-sm transition-colors"
-          whileHover={{ scale: 1.2 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={onClose}
-        >
-          ✕
-        </motion.button>
-
-        <motion.img
-          src={src}
-          alt="Generated image - full size"
-          className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
-        />
-
-        <div className="mt-4 flex gap-3">
-          <motion.button
-            className="px-6 py-3 bg-gray-900 hover:bg-blue-700 text-gray-500 hover:text-white rounded-full text-xs font-medium shadow-lg"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigator.clipboard.writeText(src)}
-          >
-            Copy Link
-          </motion.button>
-          <motion.a
-            href={src}
-            target="_blank"
-            download={`generated-image-${Date.now()}.png`}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-medium shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Download
-          </motion.a>
-        </div>
-      </motion.div>
-    </motion.div>
   );
 }
