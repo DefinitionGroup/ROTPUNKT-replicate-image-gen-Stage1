@@ -46,7 +46,7 @@ export default function ImageModal({
       const base =
         typeof window !== "undefined"
           ? window.location.origin
-          : "https://example.com";
+          : "https://rotpunkt-visions.de/";
       const u = new URL(src, base);
       return u.href;
     } catch {
@@ -55,13 +55,11 @@ export default function ImageModal({
   }, [src]);
 
   const handleShare = async () => {
-    // Only attempt native share on mobile-ish environments
     if (!isMobileEnv) {
       setShareOpen(true);
       return;
     }
     try {
-      // Web Share API requires secure context (https) and an absolute URL
       const isHttps =
         typeof window !== "undefined" && window.location.protocol === "https:";
       if (!isHttps) {
@@ -69,7 +67,6 @@ export default function ImageModal({
         return;
       }
       const payload: any = { url: normalizedUrl };
-      // canShare guard for stricter browsers
       if (
         typeof (navigator as any).canShare === "function" &&
         !(navigator as any).canShare(payload)
@@ -81,10 +78,8 @@ export default function ImageModal({
         await (navigator as any).share(payload);
         return;
       }
-      // Fallback to dropdown menu if share not available
       setShareOpen(true);
     } catch {
-      // User canceled or an error occurred -> show fallback menu
       setShareOpen(true);
     }
   };
