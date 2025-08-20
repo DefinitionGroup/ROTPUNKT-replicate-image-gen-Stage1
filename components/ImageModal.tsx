@@ -12,6 +12,7 @@ import Link from "next/link";
 import { FaWhatsapp, FaFacebook, FaTelegram, FaLink } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
+import Image from "next/image";
 export default function ImageModal({
   src,
   onClose,
@@ -45,7 +46,7 @@ export default function ImageModal({
       const base =
         typeof window !== "undefined"
           ? window.location.origin
-          : "https://example.com";
+          : "https://rotpunkt-visions.de/";
       const u = new URL(src, base);
       return u.href;
     } catch {
@@ -54,13 +55,11 @@ export default function ImageModal({
   }, [src]);
 
   const handleShare = async () => {
-    // Only attempt native share on mobile-ish environments
     if (!isMobileEnv) {
       setShareOpen(true);
       return;
     }
     try {
-      // Web Share API requires secure context (https) and an absolute URL
       const isHttps =
         typeof window !== "undefined" && window.location.protocol === "https:";
       if (!isHttps) {
@@ -68,7 +67,6 @@ export default function ImageModal({
         return;
       }
       const payload: any = { url: normalizedUrl };
-      // canShare guard for stricter browsers
       if (
         typeof (navigator as any).canShare === "function" &&
         !(navigator as any).canShare(payload)
@@ -80,10 +78,8 @@ export default function ImageModal({
         await (navigator as any).share(payload);
         return;
       }
-      // Fallback to dropdown menu if share not available
       setShareOpen(true);
     } catch {
-      // User canceled or an error occurred -> show fallback menu
       setShareOpen(true);
     }
   };
@@ -133,13 +129,15 @@ export default function ImageModal({
           <span className="text-lg">×</span>
         </motion.button>
 
-        <motion.img
+        <Image
           src={src}
+          width={800}
+          height={800}
           alt="Generated image - full size"
           className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
         />
 
-        <div className="mt-4 flex gap-3">
+        <div className="mt-4 flex justify-between gap-3">
           <DropdownMenu open={shareOpen} onOpenChange={setShareOpen}>
             <DropdownMenuTrigger asChild>
               <Button
@@ -232,7 +230,7 @@ export default function ImageModal({
 
           <Button
             asChild
-            className="px-6 py-3 text-xs font-medium shadow-lg rounded-full"
+            className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-red-500"
           >
             <Link
               href={normalizedUrl}
