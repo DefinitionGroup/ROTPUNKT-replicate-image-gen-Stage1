@@ -1,5 +1,6 @@
 "use client";
 
+import { TickerGallery as TickerGalleryType } from "@/sanity/sanity.types";
 import { Ticker } from "motion-plus/react";
 import { motion } from "motion/react";
 
@@ -34,25 +35,19 @@ function Box({ src, title }: { src: string; title: string }) {
   );
 }
 
-export default function TickerExample() {
+export default function TickerGallery({ tickerItems }: TickerGalleryType) {
   return (
     <>
       <Ticker
         hoverFactor={0.2}
         velocity={22}
-        items={[
-          <Box src="/tmp3_jymwi5.jpg" title="1" />,
-          <Box src="/tmp4h0jaxcl.jpg" title="2" />,
-          <Box src="/tmpfzpy88xv.jpg" title="3" />,
-          <Box src="/tmpwdynab9d.jpg" title="4" />,
-          <Box src="/tmpa6zqgme2.jpg" title="4" />,
-          <Box src="/tmpy28old9z.jpg" title="4" />,
-          <Box src="/tmpsgpmfvgd.jpg" title="4" />,
+        items={tickerItems ? tickerItems.map((item) => (
           <Box
-            src="/replicate-prediction-qzf4gx436nrma0cr34ya9f8fj4.png"
-            title="4"
-          />,
-        ]}
+            title={item.title!}
+            src={item.imageCloudinary!.secure_url!}
+            key={item.title!} />
+        )) : []
+        }
         style={{
           maskImage:
             "linear-gradient(to right, transparent 5%, black 10%, black 90%, transparent 95%)",

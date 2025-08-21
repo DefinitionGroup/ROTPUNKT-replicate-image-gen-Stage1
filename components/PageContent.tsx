@@ -2,15 +2,16 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import ImageGenerator from "./ImageGenerator";
-import TickerExample from "./Ticker";
+import TickerGallery from "./Ticker";
 import KitchenWizard from "./KitchenWizard";
 import { IntroCard } from "./IntroCard";
 import { useStore } from "@nanostores/react";
 import { $pageStep } from "@/store/step";
 import { $showWizard } from "@/store/modals";
 import { $prompt } from "@/store/prompt";
+import { PropsWithChildren } from "react";
 
-export default function PageContent() {
+export default function PageContent({ children }: PropsWithChildren) {
   const pageStep = useStore($pageStep)
   const showWizard = useStore($showWizard)
 
@@ -116,7 +117,7 @@ export default function PageContent() {
           )}
         </AnimatePresence>
       </div>
-      <TickerExample />
+      {children}
     </>
   );
 }
