@@ -16,6 +16,7 @@ export function PageBuilder({ content }: PageBuilderProps) {
       switch (block._type) {
         case "tickerGallery":
           return <TickerGallery
+            key={block.name}
             {...block}
           />
         default:

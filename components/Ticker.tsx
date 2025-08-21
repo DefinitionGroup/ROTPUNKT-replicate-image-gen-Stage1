@@ -1,41 +1,51 @@
 "use client";
 
-import { TickerGallery as TickerGalleryType } from "@/sanity/sanity.types";
+import { TickerGallery as TickerGalleryType, TickerItem } from "@/sanity/sanity.types";
 import { Ticker } from "motion-plus/react";
 import { motion } from "motion/react";
+import { useState } from "react";
+import TickerItemModal from "./TickerItemModal";
 
-function Box({ src, title }: { src: string; title: string }) {
+function Box(props: TickerItem & {handleClick: () => void}) {
+  const { imageCloudinary, title, handleClick} = props
+
+
   return (
-    <motion.div
-      className="item rounded-2xl  min-w-[300px]"
-      initial="hideInfo"
-      whileHover="showInfo">
-      <motion.img
-        style={{
-          width: "100%",
-
-          height: "100%",
-          objectFit: "cover",
-        }}
-        src={`${src}`}
-        alt={title + " boxart"}
-        variants={{
-          hideInfo: { scale: 1, filter: "blur(0px)", opacity: 1 },
-        }}
-      />
+    <>
       <motion.div
-        className="title"
-        variants={{
-          hideInfo: { opacity: 0, scale: 1.2 },
-          showInfo: { opacity: 1, scale: 1 },
-        }}>
-        {title}
+        className="item rounded-2xl  min-w-[300px]"
+        onClick={handleClick}
+        initial="hideInfo"
+        whileHover="showInfo">
+        <motion.img
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+          src={`${imageCloudinary?.secure_url}`}
+          alt={title + " boxart"}
+          variants={{
+            hideInfo: { scale: 1, filter: "blur(0px)", opacity: 1 },
+          }}
+          />
+        <motion.div
+          className="title"
+          variants={{
+            hideInfo: { opacity: 0, scale: 1.2 },
+            showInfo: { opacity: 1, scale: 1 },
+          }}>
+          {title}
+        </motion.div>
       </motion.div>
-    </motion.div>
+
+    </>
   );
 }
 
 export default function TickerGallery({ tickerItems }: TickerGalleryType) {
+  const [selectedItem, setSelectedItem] = useState<TickerItem|null>(null)
+
   return (
     <>
       <Ticker
@@ -43,9 +53,10 @@ export default function TickerGallery({ tickerItems }: TickerGalleryType) {
         velocity={22}
         items={tickerItems ? tickerItems.map((item) => (
           <Box
-            title={item.title!}
-            src={item.imageCloudinary!.secure_url!}
-            key={item.title!} />
+            handleClick={() => setSelectedItem(item)}
+            key={item.title!}
+            {...item}
+          />
         )) : []
         }
         style={{
@@ -54,6 +65,12 @@ export default function TickerGallery({ tickerItems }: TickerGalleryType) {
         }}
       />
       <Stylesheet />
+      {selectedItem && (
+        <TickerItemModal
+        onClose={() => setSelectedItem(null)}
+        {...selectedItem}
+      />
+      )}
     </>
   );
 }

@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "api.storage.rotpunkt-visions.de"
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com'
       }
     ],
   },
