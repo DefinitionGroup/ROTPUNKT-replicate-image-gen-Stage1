@@ -13,6 +13,57 @@
  */
 
 // Source: schema.json
+export type Wizard = {
+  _type: "wizard";
+  title?: string;
+};
+
+export type Menu = {
+  _id: string;
+  _type: "menu";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  menuType?: "navbar" | "footer";
+  menuItems?: Array<{
+    label?: string;
+    linkType?: "internal" | "external" | "anchor";
+    page?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "page";
+    };
+    externalUrl?: string;
+    anchor?: string;
+    openInNewTab?: boolean;
+    _type: "link";
+    _key: string;
+  }>;
+  footerColumns?: Array<{
+    title?: string;
+    links?: Array<{
+      label?: string;
+      linkType?: "internal" | "external" | "anchor";
+      page?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "page";
+      };
+      externalUrl?: string;
+      anchor?: string;
+      openInNewTab?: boolean;
+      _type: "link";
+      _key: string;
+    }>;
+    _type: "footerColumn";
+    _key: string;
+  }>;
+  footerCopyright?: string;
+  footerNote?: string;
+};
+
 export type RichText = {
   _type: "richText";
   content?: Array<{
@@ -100,11 +151,13 @@ export type TickerGallery = {
 
 export type PageBuilder = Array<{
   _key: string;
-} & TickerGallery | {
-  _key: string;
 } & Header | {
   _key: string;
-} & RichText>;
+} & RichText | {
+  _key: string;
+} & TickerGallery | {
+  _key: string;
+} & Wizard>;
 
 export type Page = {
   _id: string;
@@ -287,5 +340,5 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = RichText | ContentBlock | Header | TickerItem | TickerGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Wizard | Menu | RichText | ContentBlock | Header | TickerItem | TickerGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;

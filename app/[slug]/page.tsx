@@ -1,6 +1,7 @@
 import { PageBuilder } from "@/components/PageBuilder";
+import Navbar from "@/components/ui/navbar";
 import { sanityFetch } from "@/sanity/lib/live";
-import { PAGE_QUERY } from "@/sanity/lib/queries";
+import { NAVBAR_QUERY, PAGE_QUERY } from "@/sanity/lib/queries";
 
 export default async function Page({
   params,
@@ -12,7 +13,24 @@ export default async function Page({
     params: await params,
   });
 
-  console.debug(page)
+  const { data: navbar } = await sanityFetch({
+    query: NAVBAR_QUERY,
+  });
 
-  return page?.content ? <PageBuilder content={page.content} /> : null;
+
+  return (
+    <>
+      {navbar && (
+        <Navbar
+          {...navbar}
+        />
+      )}
+
+      <main>
+        {page?.content ? (
+          <PageBuilder content={page?.content} />
+        ) : null}
+      </main>
+    </>
+  );
 }

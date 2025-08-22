@@ -12,7 +12,13 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Logo from "./logo";
 import { TiThMenu } from "react-icons/ti";
-export default function Navbar() {
+import { Menu as MenuType } from "@/sanity/sanity.types";
+
+type Props = MenuType
+
+// todo: Integrate into Sanity
+
+export default function Navbar({ menuItems }: Props) {
   const [open, setOpen] = useState(false);
   const closeMenu = () => setOpen(false);
 
@@ -67,24 +73,17 @@ export default function Navbar() {
         </button>
 
         <div className="hidden md:flex items-center gap-6 md:gap-8">
-          <Link
-            href="/about"
-            className="text-black dark:text-white hover:text-primary transition"
-          >
-            About
-          </Link>
-          <Link
-            href="/services"
-            className="text-black dark:text-white hover:text-primary transition"
-          >
-            Services
-          </Link>
-          <Link
-            href="/contact"
-            className="text-black dark:text-white hover:text-primary transition"
-          >
-            Contact
-          </Link>
+          {menuItems && menuItems.map((link) => (
+            <Link
+              key={link._key}
+              className="text-black dark:text-white hover:text-primary transition"
+              href={link.externalUrl || `#${link.anchor}`}
+              target={link.externalUrl ? "_blank" : "_self"}
+            >
+              {link.label!}
+            </Link>
+          ))}
+
           <SignedIn>
             <Link
               href="/my-images"
