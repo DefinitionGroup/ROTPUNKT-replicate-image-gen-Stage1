@@ -14,5 +14,9 @@ export default async function Page({
 
   console.debug(page)
 
-  return page?.content ? <PageBuilder content={page.content} /> : null;
+  return page?.content ? (
+    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-30">
+      <PageBuilder content={page.content} />
+    </main>
+  ) : null;
 }
