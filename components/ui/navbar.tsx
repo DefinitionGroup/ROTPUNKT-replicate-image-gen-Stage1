@@ -12,9 +12,15 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Logo from "./logo";
 import { TiThMenu } from "react-icons/ti";
+
 export default function Navbar() {
+  const [isClient, setIsClient] = useState(false);
   const [open, setOpen] = useState(false);
   const closeMenu = () => setOpen(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -43,8 +49,55 @@ export default function Navbar() {
     show: { opacity: 1, y: 0 },
   };
 
+  if (!isClient) {
+    return (
+      <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20 flex justify-center w-full">
+        <nav
+          className={cn(
+            "relative mx-auto w-auto md:w-full max-w-7xl flex gap-6 items-center justify-between rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input bg-white/30 backdrop-blur-sm"
+          )}
+        >
+          <Link href="/" className="flex items-center gap-2">
+            <Logo />
+          </Link>
+
+          <div className="hidden md:flex items-center gap-6 md:gap-8">
+            <Link
+              href="/about"
+              className="text-black dark:text-white hover:text-primary transition"
+            >
+              About
+            </Link>
+            <Link
+              href="/services"
+              className="text-black dark:text-white hover:text-primary transition"
+            >
+              Services
+            </Link>
+            <Link
+              href="/contact"
+              className="text-black dark:text-white hover:text-primary transition"
+            >
+              Contact
+            </Link>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-2 border-l border-neutral-700 pl-4 ml-4 mr-4">
+            {/* Static buttons for server render */}
+            <button className="cursor-pointer px-3 py-1 rounded-full text-sm border border-transparent font-medium text-neutral-400">
+              Sign In
+            </button>
+            <button className="cursor-pointer px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-black border border-transparent">
+              Sign Up
+            </button>
+          </div>
+        </nav>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20  flex justify-center w-full">
+    <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20 flex justify-center w-full">
       <nav
         className={cn(
           "relative mx-auto w-auto md:w-full max-w-7xl flex gap-6 items-center justify-between rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input bg-white/30 backdrop-blur-sm"
@@ -57,7 +110,7 @@ export default function Navbar() {
         {/* Mobile menu toggle */}
         <button
           type="button"
-          className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full  hover:bg-black/5 dark:hover:bg-white/5 transition"
+          className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition"
           aria-label="Toggle menu"
           aria-controls="mobile-nav"
           aria-expanded={open}
