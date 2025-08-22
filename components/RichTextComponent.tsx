@@ -89,15 +89,15 @@ function createComponents({
         if (!href) return <>{children}</>
         const rel = [externalRel, nofollow ? 'nofollow' : undefined].filter(Boolean).join(' ')
         const cls =
-          'underline decoration-2 underline-offset-4 text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 transition dark:text-blue-400 dark:hover:text-blue-300 dark:focus-visible:ring-blue-400'
+          'underline decoration-2 underline-offset-4 text-red-600 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 transition dark:text-blue-400 dark:hover:text-blue-300 dark:focus-visible:ring-blue-400'
         return openInNewTab ? (
-          <a href={href} target="_blank" rel={rel} className={cls}>
+          <Link href={href} target="_blank" rel={rel} className={cls}>
             {children}
-          </a>
+          </Link>
         ) : (
-          <a href={href} rel={rel} className={cls}>
+          <Link href={href} rel={rel} className={cls}>
             {children}
-          </a>
+          </Link>
         )
       },
       // link interno
