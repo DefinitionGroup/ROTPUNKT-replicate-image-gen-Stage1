@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import { useStore } from '@nanostores/react'
 import { useAuth } from '@clerk/nextjs'
 import { Card, CardHeader, CardContent } from '../ui/card'

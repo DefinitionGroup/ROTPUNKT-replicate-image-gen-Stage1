@@ -1,5 +1,5 @@
 import React from 'react'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { FcIdea } from 'react-icons/fc'
 import { SignInButton, SignUpButton } from '@clerk/nextjs'
 
