@@ -6,13 +6,13 @@ import { $pageStep } from "@/app/store/step"
 import { AnimatePresence } from "motion/react"
 import ImageGenerator from "./ImageGenerator"
 import { IntroCard } from "./IntroCard"
-import KitchenWizard from "./KitchenWizard"
 import { useStore } from "@nanostores/react"
+import { KitchenWizardModal } from "./wizard/KitchenWizardModal"
+import { wizardActions } from "@/app/store/wizardStore"
 
 export default function Wizard() {
   const pageStep = useStore($pageStep)
   const showWizard = useStore($showWizard)
-
 
   return (
     <div className="text-center my-8 min-h-[25rem]  flex flex-col items-center justify-center">
@@ -35,13 +35,16 @@ export default function Wizard() {
 
       <AnimatePresence>
         {showWizard && (
-          <KitchenWizard
+          <KitchenWizardModal
             onPromptReady={(prompt) => {
               $prompt.set(prompt)
               $showWizard.set(false)
               $pageStep.set('imagegen')
             }}
-            onClose={() => $showWizard.set(false)}
+            onClose={() => {
+              $showWizard.set(false)
+              wizardActions.reset()
+            }}
           />
         )}
       </AnimatePresence>

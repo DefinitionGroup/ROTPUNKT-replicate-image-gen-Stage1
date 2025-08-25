@@ -1,3 +1,6 @@
-import { atom } from "nanostores";
+import { persistentAtom } from "@nanostores/persistent";
 
-export const $showWizard = atom(false)
+export const $showWizard = persistentAtom('showWizard', false, {
+  encode: JSON.stringify,
+  decode: JSON.parse,
+})
