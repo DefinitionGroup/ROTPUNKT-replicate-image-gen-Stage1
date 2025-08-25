@@ -13,6 +13,127 @@
  */
 
 // Source: schema.json
+export type Wizard = {
+  _type: "wizard";
+  title?: string;
+};
+
+export type Menu = {
+  _id: string;
+  _type: "menu";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  menuType?: "navbar" | "footer";
+  menuItems?: Array<{
+    label?: string;
+    linkType?: "internal" | "external" | "anchor";
+    page?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "page";
+    };
+    externalUrl?: string;
+    anchor?: string;
+    openInNewTab?: boolean;
+    _type: "link";
+    _key: string;
+  }>;
+  footerColumns?: Array<{
+    title?: string;
+    links?: Array<{
+      label?: string;
+      linkType?: "internal" | "external" | "anchor";
+      page?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "page";
+      };
+      externalUrl?: string;
+      anchor?: string;
+      openInNewTab?: boolean;
+      _type: "link";
+      _key: string;
+    }>;
+    _type: "footerColumn";
+    _key: string;
+  }>;
+  footerCopyright?: string;
+  footerNote?: string;
+};
+
+export type RichText = {
+  _type: "richText";
+  content?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      openInNewTab?: boolean;
+      nofollow?: boolean;
+      _type: "link";
+      _key: string;
+    } | {
+      reference?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "page";
+      };
+      _type: "internalLink";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "contentBlock";
+    _key: string;
+  }>;
+};
+
+export type ContentBlock = {
+  _type: "contentBlock";
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  }>;
+  style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+  listItem?: "bullet" | "number";
+  markDefs?: Array<{
+    href?: string;
+    openInNewTab?: boolean;
+    nofollow?: boolean;
+    _type: "link";
+    _key: string;
+  } | {
+    reference?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "page";
+    };
+    _type: "internalLink";
+    _key: string;
+  }>;
+  level?: number;
+};
+
+export type Header = {
+  _type: "header";
+  title?: string;
+  subheadline?: string;
+  description?: string;
+  backgroundImage?: CloudinaryAsset;
+};
+
 export type TickerItem = {
   _type: "tickerItem";
   title?: string;
@@ -30,7 +151,13 @@ export type TickerGallery = {
 
 export type PageBuilder = Array<{
   _key: string;
-} & TickerGallery>;
+} & Header | {
+  _key: string;
+} & RichText | {
+  _key: string;
+} & TickerGallery | {
+  _key: string;
+} & Wizard>;
 
 export type Page = {
   _id: string;
@@ -213,5 +340,5 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = TickerItem | TickerGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Wizard | Menu | RichText | ContentBlock | Header | TickerItem | TickerGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
