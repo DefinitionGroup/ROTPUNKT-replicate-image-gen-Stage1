@@ -1,9 +1,11 @@
 "use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import ImageModal from "./ImageModal";
 
 type Img = { id: string; url: string; created_at: string };
+
 export default function ImagesGalleryClient({ images }: { images: Img[] }) {
   const [selected, setSelected] = useState<string | null>(null);
   return (
@@ -23,7 +25,7 @@ export default function ImagesGalleryClient({ images }: { images: Img[] }) {
               height={800}
               className="w-full h-auto object-cover"
             />
-            <div className="px-4 py-3 text-xs text-gray-400 group-hover:text-gray-200 transition">
+            <div className="px-4 py-3 text-xs text-gray-400 group-hover:text-gray-200 transition" suppressHydrationWarning>
               {new Date(img.created_at).toLocaleString()}
             </div>
           </button>
