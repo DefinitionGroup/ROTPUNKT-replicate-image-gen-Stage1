@@ -15,7 +15,7 @@ export default async function MyImagesPage() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching images:", error);
+    console.error("Error fetching images:", error.message);
     return (
       <main className="max-w-5xl mx-auto px-6 pt-30 pb-10">
         <h1 className="text-2xl font-bold mb-6 text-white">Meine Bilder</h1>
