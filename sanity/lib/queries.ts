@@ -13,3 +13,5 @@ export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current ==
     ...
   }
 }`);
+
+export const NAVBAR_QUERY = defineQuery(`*[_type == "menu" && menuType == "navbar"][0]`)

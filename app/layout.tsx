@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/ui/navbar";
+import { sanityFetch } from "@/sanity/lib/live";
+import { NAVBAR_QUERY } from "@/sanity/lib/queries";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,18 +21,27 @@ export const metadata: Metadata = {
   description: "Generate your dream kitchen images with AI",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { data: navbar } = await sanityFetch({
+    query: NAVBAR_QUERY,
+  });
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <Navbar/>
+          {navbar && (
+            <Navbar
+              {...navbar}
+            />
+          )}
+
           {children}
         </Providers>
       </body>
