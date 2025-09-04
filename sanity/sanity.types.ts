@@ -342,3 +342,67 @@ export type SanityAssetSourceData = {
 
 export type AllSanitySchemaTypes = Wizard | Menu | RichText | ContentBlock | Header | TickerItem | TickerGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
+// Helpers to extract array element types
+type _ArrayElement<T> = T extends Array<infer U> ? U : never;
+
+// Base shapes from generated types
+type _MenuItemBase = _ArrayElement<NonNullable<Menu["menuItems"]>>;
+type _FooterColumnBase = _ArrayElement<NonNullable<Menu["footerColumns"]>>;
+type _FooterLinkBase = _ArrayElement<NonNullable<NonNullable<_FooterColumnBase>["links"]>>;
+
+/**
+ * Navbar link after GROQ projection:
+ * We dereference `page->slug.current` into a simple `slug?: string`.
+ */
+export type NavbarMenuItemProjected = Omit<_MenuItemBase, "page"> & {
+  slug?: string;                // e.g. "about"
+  // Keep other optional fields from schema:
+  label?: string;
+  linkType?: "internal" | "external" | "anchor";
+  externalUrl?: string;
+  anchor?: string;
+  openInNewTab?: boolean;
+  _key: string;
+};
+
+/**
+ * Footer link after GROQ projection (same slug projection).
+ */
+export type FooterLinkProjected = Omit<_FooterLinkBase, "page"> & {
+  slug?: string;
+  label?: string;
+  linkType?: "internal" | "external" | "anchor";
+  externalUrl?: string;
+  anchor?: string;
+  openInNewTab?: boolean;
+  _key: string;
+};
+
+export type FooterColumnProjected = Omit<_FooterColumnBase, "links"> & {
+  links?: FooterLinkProjected[];
+};
+
+/**
+ * Menu document after projecting slugs on both navbar items and footer links.
+ * (Use whichever one you query—navbar or footer.)
+ */
+export type MenuNavbarProjected = Omit<Menu, "menuItems" | "footerColumns"> & {
+  menuType?: "navbar" | "footer";
+  menuItems?: NavbarMenuItemProjected[];
+};
+
+export type MenuFooterProjected = Omit<Menu, "menuItems" | "footerColumns"> & {
+  menuType?: "navbar" | "footer";
+  footerColumns?: FooterColumnProjected[];
+};
+
+/**
+ * Convenience UI types
+ */
+export type NavbarData = {
+  menuItems?: NavbarMenuItemProjected[];
+};
+
+export type FooterData = {
+  footerColumns?: FooterColumnProjected[];
+};

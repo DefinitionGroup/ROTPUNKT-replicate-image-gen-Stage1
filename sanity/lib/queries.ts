@@ -14,4 +14,16 @@ export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current ==
   }
 }`);
 
-export const NAVBAR_QUERY = defineQuery(`*[_type == "menu" && menuType == "navbar"][0]`)
+export const NAVBAR_QUERY = defineQuery(`
+*[_type == "menu" && menuType == "navbar"][0]{
+  menuItems[]{
+    _key,
+    label,
+    linkType,
+    "slug": select(linkType == "internal" => page->slug.current),
+    externalUrl,
+    anchor,
+    openInNewTab
+  }
+}
+`);

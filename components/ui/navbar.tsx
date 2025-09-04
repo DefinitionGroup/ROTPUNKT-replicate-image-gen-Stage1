@@ -12,29 +12,30 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Logo from "./logo";
 import { TiThMenu } from "react-icons/ti";
-import { Menu as MenuType } from "@/sanity/sanity.types";
+import { usePathname } from "next/navigation";
+import type {
+  MenuNavbarProjected,
+  NavbarMenuItemProjected,
+} from "@/sanity/sanity.types";
+import { internalHref } from "@/utils/nav-internal";
 
-type Props = MenuType
-
-// todo: Integrate into Sanity
+type Props = Pick<MenuNavbarProjected, "menuItems">;
 
 export default function Navbar({ menuItems }: Props) {
   const [open, setOpen] = useState(false);
   const closeMenu = () => setOpen(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (open) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") setOpen(false);
-      };
-      window.addEventListener("keydown", onKey);
-      return () => {
-        document.body.style.overflow = prev;
-        window.removeEventListener("keydown", onKey);
-      };
-    }
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const containerVariants = {
@@ -49,11 +50,67 @@ export default function Navbar({ menuItems }: Props) {
     show: { opacity: 1, y: 0 },
   };
 
+  // ---------- link helpers ----------
+  const hrefFor = (item: NavbarMenuItemProjected) => {
+    if (item.linkType === "internal") return internalHref(item);
+    if (item.linkType === "external" && item.externalUrl)
+      return item.externalUrl;
+    if (item.linkType === "anchor" && item.anchor) return `#${item.anchor}`;
+    return "/";
+  };
+
+  const targetFor = (item: NavbarMenuItemProjected) =>
+    item.openInNewTab ? "_blank" : undefined;
+
+  const relFor = (item: NavbarMenuItemProjected) =>
+    item.openInNewTab && item.linkType === "external"
+      ? "noopener noreferrer"
+      : undefined;
+
+  const shouldPrefetch = (item: NavbarMenuItemProjected, href: string) =>
+    item.linkType === "internal" && !href.startsWith("#");
+
+  const isActive = (item: NavbarMenuItemProjected, href: string) => {
+    if (item.linkType !== "internal") return false;
+    const norm = (p: string) => (p !== "/" ? p.replace(/\/+$/, "") : "/");
+    return norm(pathname) === norm(href);
+  };
+
+  const renderLink = (item: NavbarMenuItemProjected, mobile = false) => {
+    const href = hrefFor(item);
+    const active = isActive(item, href);
+
+    return (
+      <Link
+        key={item._key}
+        href={href}
+        target={targetFor(item)}
+        rel={relFor(item)}
+        prefetch={shouldPrefetch(item, href)}
+        onClick={mobile ? closeMenu : undefined}
+        className={
+          mobile
+            ? cn("block text-white text-2xl font-medium tracking-tight")
+            : cn(
+                "text-inherit hover:text-primary transition",
+                active && "text-primary"
+              )
+        }
+      >
+        {item.label}
+      </Link>
+    );
+  };
+  // ----------------------------------------
+
   return (
-    <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20  flex justify-center w-full">
+    <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20 flex justify-center w-full">
       <nav
         className={cn(
-          "relative mx-auto w-auto md:w-full max-w-7xl flex gap-6 items-center justify-between rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input bg-white/30 backdrop-blur-sm"
+          "relative mx-auto w-auto md:w-full max-w-7xl flex gap-6 items-center justify-between",
+          "rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input",
+          "bg-white/30 backdrop-blur-sm",
+          "text-black dark:text-white"
         )}
       >
         <Link href="/" className="flex items-center gap-2">
@@ -63,7 +120,7 @@ export default function Navbar({ menuItems }: Props) {
         {/* Mobile menu toggle */}
         <button
           type="button"
-          className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full  hover:bg-black/5 dark:hover:bg-white/5 transition"
+          className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition"
           aria-label="Toggle menu"
           aria-controls="mobile-nav"
           aria-expanded={open}
@@ -72,53 +129,42 @@ export default function Navbar({ menuItems }: Props) {
           <TiThMenu className="w-6 h-6" />
         </button>
 
+        {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-6 md:gap-8">
-          {menuItems && menuItems.map((link) => (
-            <Link
-              key={link._key}
-              className="text-black dark:text-white hover:text-primary transition"
-              href={link.externalUrl || `#${link.anchor}`}
-              target={link.externalUrl ? "_blank" : "_self"}
-            >
-              {link.label!}
-            </Link>
-          ))}
-
+          {menuItems?.map((item) => renderLink(item))}
           <SignedIn>
             <Link
               href="/my-images"
-              className="text-black dark:text-white hover:text-primary transition"
+              className="text-inherit hover:text-primary transition"
             >
               Meine Bilder
             </Link>
           </SignedIn>
         </div>
 
-        <div className="hidden md:flex items-center space-x-2 border-l border-neutral-700 pl-4 ml-4 mr-4">
+        {/* Desktop auth */}
+        <div className="hidden md:flex items-center space-x-2 border-l border-neutral-700/30 pl-4 ml-4 mr-4">
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="cursor-pointer px-3 py-1 rounded-full text-sm border border-transparent font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
+              <button className="cursor-pointer px-3 py-1 rounded-full text-sm border border-transparent font-medium text-neutral-400 hover:text-inherit hover:bg-neutral-800/10 dark:hover:bg-white/10 transition-colors">
                 Sign In
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button className="cursor-pointer px-3 py-1 rounded-full text-sm font-medium bg-gray-100 hover:bg-transparent hover:text-white text-black transition-colors border border-transparent hover:border-white">
+              <button className="cursor-pointer px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-white transition-colors border border-transparent hover:border-current">
                 Sign Up
               </button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
             <UserButton
-              appearance={{
-                elements: {
-                  userButtonAvatarBox: "w-8 h-8",
-                },
-              }}
+              appearance={{ elements: { userButtonAvatarBox: "w-8 h-8" } }}
             />
           </SignedIn>
         </div>
       </nav>
 
+      {/* Mobile sheet */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -159,7 +205,7 @@ export default function Navbar({ menuItems }: Props) {
                   onClick={closeMenu}
                   className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
                 >
-                  X
+                  ×
                 </button>
               </div>
 
@@ -171,33 +217,11 @@ export default function Navbar({ menuItems }: Props) {
                 exit="hidden"
               >
                 <ul className="space-y-4">
-                  <motion.li variants={itemVariants}>
-                    <Link
-                      href="/about"
-                      onClick={closeMenu}
-                      className="block text-white text-2xl font-medium tracking-tight"
-                    >
-                      About
-                    </Link>
-                  </motion.li>
-                  <motion.li variants={itemVariants}>
-                    <Link
-                      href="/services"
-                      onClick={closeMenu}
-                      className="block text-white text-2xl font-medium tracking-tight"
-                    >
-                      Services
-                    </Link>
-                  </motion.li>
-                  <motion.li variants={itemVariants}>
-                    <Link
-                      href="/contact"
-                      onClick={closeMenu}
-                      className="block text-white text-2xl font-medium tracking-tight"
-                    >
-                      Contact
-                    </Link>
-                  </motion.li>
+                  {menuItems?.map((item) => (
+                    <motion.li key={item._key} variants={itemVariants}>
+                      {renderLink(item, true)}
+                    </motion.li>
+                  ))}
                   <SignedIn>
                     <motion.li variants={itemVariants}>
                       <Link
