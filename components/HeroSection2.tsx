@@ -4,14 +4,14 @@ import React from "react";
 import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 
-import { Header as HeaderType } from "@/sanity/sanity.types";
+import { Header2 as HeaderType2 } from "@/sanity/sanity.types";
 
-type Props = HeaderType & {
+type Props = HeaderType2 & {
   logoImage?: string;
   className?: string;
 };
 
-export default function HeroSection({
+export default function HeroSection2({
   backgroundImage,
   description,
   subheadline,
@@ -74,7 +74,7 @@ export default function HeroSection({
   return (
     <section
       className={cn(
-        `bg-black grid grid-cols-1 grid-rows-1 text-white h-[50vh] min-h-[500px] overflow-hidden items-center justify-center`,
+        `bg-black grid grid-cols-1 grid-rows-1 text-red h-[50vh] min-h-[500px] overflow-hidden items-center justify-center`,
         className
       )}
       aria-labelledby="hero-title"
@@ -95,34 +95,17 @@ export default function HeroSection({
 
       {/* Content Container */}
       <div className="container mx-auto px-4 py-16 items-center flex-wrap flex flex-col justify-center row-start-1 col-start-1 z-10 relative">
-        {/* Logo Section */}
-        <motion.header
-          className="mx-auto px-4 py-16 w-full"
-          variants={logoVariants}
-          initial="initial"
-          animate="animate">
-          <div className="flex justify-center">
-            <img
-              src={logoImage}
-              alt="Rotpunkt Küchen Logo"
-              className="mx-auto mb-2 w-24 max-h-24"
-              width={96}
-              height={96}
-            />
-          </div>
-        </motion.header>
-
         {/* Main Title */}
         <motion.div
           className="mx-auto w-full"
           variants={titleVariants}
           initial="initial"
           animate="animate">
-          <h1
+          <h2
             id="hero-title"
-            className="text-6xl font-medium uppercase tracking-tighter text-center bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent">
+            className="text-6xl font-medium text-white uppercase tracking-tighter text-center bg-gradient-to-br  bg-clip-text ">
             {title}
-          </h1>
+          </h2>
         </motion.div>
 
         {/* Subtitle */}
@@ -132,7 +115,7 @@ export default function HeroSection({
           initial="initial"
           animate="animate">
           <p
-            className="text-center text-lg text-gray-200 max-w-3xl mx-auto font-black tracking-tight mt-4"
+            className="text-center text-lg text-red-500 max-w-3xl mx-auto font-black tracking-tight mt-4"
             role="doc-subtitle">
             {subheadline}
           </p>

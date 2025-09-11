@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  TickerGallery as TickerGalleryType,
-  TickerItem,
+  TickerContentGallery as TickerGalleryType,
+  TickersliderItemContent as TickerItem,
 } from "@/sanity/sanity.types";
 import { Ticker } from "motion-plus/react";
 import { motion } from "motion/react";
@@ -44,7 +44,9 @@ function Box(props: TickerItem & { handleClick: () => void }) {
   );
 }
 
-export default function TickerGallery({ tickerItems }: TickerGalleryType) {
+export default function TickerContentGallery({
+  tickerItems,
+}: TickerGalleryType) {
   const [selectedItem, setSelectedItem] = useState<TickerItem | null>(null);
 
   return (

@@ -95,8 +95,7 @@ export default function Navbar({ menuItems }: Props) {
                 "text-inherit hover:text-primary transition",
                 active && "text-primary"
               )
-        }
-      >
+        }>
         {item.label}
       </Link>
     );
@@ -111,8 +110,7 @@ export default function Navbar({ menuItems }: Props) {
           "rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input",
           "bg-white/30 backdrop-blur-sm",
           "text-black dark:text-white"
-        )}
-      >
+        )}>
         <Link href="/" className="flex items-center gap-2">
           <Logo />
         </Link>
@@ -124,19 +122,22 @@ export default function Navbar({ menuItems }: Props) {
           aria-label="Toggle menu"
           aria-controls="mobile-nav"
           aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
+          onClick={() => setOpen((v) => !v)}>
           <TiThMenu className="w-6 h-6" />
         </button>
 
         {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-6 md:gap-8">
+          <Link
+            href={"reddot"}
+            className="text-inherit hover:text-primary transition">
+            SHOW
+          </Link>{" "}
           {menuItems?.map((item) => renderLink(item))}
           <SignedIn>
             <Link
               href="/my-images"
-              className="text-inherit hover:text-primary transition"
-            >
+              className="text-inherit hover:text-primary transition">
               Meine Bilder
             </Link>
           </SignedIn>
@@ -173,8 +174,7 @@ export default function Navbar({ menuItems }: Props) {
             className="fixed inset-0 z-[60] md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+            exit={{ opacity: 0 }}>
             <motion.button
               aria-label="Close menu"
               onClick={closeMenu}
@@ -189,22 +189,19 @@ export default function Navbar({ menuItems }: Props) {
               initial={{ y: 24, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 24, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 420, damping: 34 }}
-            >
+              transition={{ type: "spring", stiffness: 420, damping: 34 }}>
               <div className="flex items-center justify-between px-6 py-4">
                 <Link
                   href="/"
                   onClick={closeMenu}
-                  className="flex items-center gap-2"
-                >
+                  className="flex items-center gap-2">
                   <Logo />
                 </Link>
                 <button
                   type="button"
                   aria-label="Close menu"
                   onClick={closeMenu}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
-                >
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white">
                   ×
                 </button>
               </div>
@@ -214,8 +211,7 @@ export default function Navbar({ menuItems }: Props) {
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                exit="hidden"
-              >
+                exit="hidden">
                 <ul className="space-y-4">
                   {menuItems?.map((item) => (
                     <motion.li key={item._key} variants={itemVariants}>
@@ -227,8 +223,7 @@ export default function Navbar({ menuItems }: Props) {
                       <Link
                         href="/my-images"
                         onClick={closeMenu}
-                        className="block text-white text-2xl font-medium tracking-tight"
-                      >
+                        className="block text-white text-2xl font-medium tracking-tight">
                         Meine Bilder
                       </Link>
                     </motion.li>
@@ -241,23 +236,20 @@ export default function Navbar({ menuItems }: Props) {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 12 }}
-                transition={{ duration: 0.18 }}
-              >
+                transition={{ duration: 0.18 }}>
                 <SignedOut>
                   <div className="flex gap-2">
                     <SignInButton mode="modal">
                       <button
                         onClick={closeMenu}
-                        className="cursor-pointer px-4 py-2 rounded-full text-base font-medium text-white bg-white/10 hover:bg-white/20"
-                      >
+                        className="cursor-pointer px-4 py-2 rounded-full text-base font-medium text-white bg-white/10 hover:bg-white/20">
                         Sign In
                       </button>
                     </SignInButton>
                     <SignUpButton mode="modal">
                       <button
                         onClick={closeMenu}
-                        className="cursor-pointer px-4 py-2 rounded-full text-base font-medium text-black bg-white hover:bg-white/90"
-                      >
+                        className="cursor-pointer px-4 py-2 rounded-full text-base font-medium text-black bg-white hover:bg-white/90">
                         Sign Up
                       </button>
                     </SignUpButton>

@@ -133,6 +133,13 @@ export type Header = {
   description?: string;
   backgroundImage?: CloudinaryAsset;
 };
+export type Header2 = {
+  _type: "header";
+  title?: string;
+  subheadline?: string;
+  description?: string;
+  backgroundImage?: CloudinaryAsset;
+};
 
 export type TickerItem = {
   _type: "tickerItem";
@@ -140,11 +147,24 @@ export type TickerItem = {
   description?: string;
   imageCloudinary?: CloudinaryAsset;
 };
+export type TickersliderItemContent = {
+  _type: "tickersliderItemContent";
+  title?: string;
+  description?: string;
+  imageCloudinary?: CloudinaryAsset;
+};
 
+export type TickerContentGallery = {
+  _type: "tickerContentGallery";
+  name?: string;
+  tickerItems?: Array<{
+    _key: string;
+  } & TickerItem>;
+};
 export type TickerGallery = {
   _type: "tickerGallery";
   name?: string;
-  tickerItems?: Array<{
+  tickersliderItemContents?: Array<{
     _key: string;
   } & TickerItem>;
 };
@@ -340,7 +360,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Wizard | Menu | RichText | ContentBlock | Header | TickerItem | TickerGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Wizard | Menu | RichText | ContentBlock | Header | Header2| TickerItem | TickerGallery | TickerContentGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Helpers to extract array element types
 type _ArrayElement<T> = T extends Array<infer U> ? U : never;
