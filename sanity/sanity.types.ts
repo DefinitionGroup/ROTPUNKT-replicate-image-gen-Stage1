@@ -142,6 +142,7 @@ export type Header2 = {
 };
 
 export type TickerItem = {
+  _key: string;
   _type: "tickerItem";
   title?: string;
   description?: string;
@@ -169,15 +170,18 @@ export type TickerGallery = {
   } & TickerItem>;
 };
 
-export type PageBuilder = Array<{
-  _key: string;
-} & Header | {
-  _key: string;
-} & RichText | {
-  _key: string;
-} & TickerGallery | {
-  _key: string;
-} & Wizard>;
+export type PageBuilder = Array<
+  ({ _key: string } & Header) |
+  ({ _key: string } & RichText) |
+  ({ _key: string } & TickerGallery) |
+  ({ _key: string } & HeroSection) |
+  ({ _key: string } & MediaHeroSectionProps) |
+  ({ _key: string } & TextHeadlineCombo) |
+  ({ _key: string } & MediaScrollHighlightSection) |
+  ({ _key: string } & ExpandableCards) |
+  ({ _key: string } & Wizard)
+>;
+
 
 export type Page = {
   _id: string;
@@ -360,7 +364,38 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Wizard | Menu | RichText | ContentBlock | Header | Header2| TickerItem | TickerGallery | TickerContentGallery | PageBuilder | Page | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes =
+  | Wizard
+  | Menu
+  | RichText
+  | ContentBlock
+  | Header
+  | Header2
+  | TickerItem
+  | TickerGallery
+  | TickerContentGallery
+  | PageBuilder
+  | Page
+  | CloudinaryAssetContextCustom
+  | CloudinaryAssetDerived
+  | CloudinaryAsset
+  | CloudinaryAssetContext
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageHotspot
+  | SanityImageCrop
+  | SanityFileAsset
+  | SanityImageAsset
+  | SanityImageMetadata
+  | Geopoint
+  | Slug
+  | SanityAssetSourceData
+  | CtaLink
+  | Cta
+  | ExpandableCardItem
+  | ExpandableCards;
+
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Helpers to extract array element types
 type _ArrayElement<T> = T extends Array<infer U> ? U : never;
@@ -425,4 +460,177 @@ export type NavbarData = {
 
 export type FooterData = {
   footerColumns?: FooterColumnProjected[];
+};
+export type HeroSection = {
+  _type: "heroSection";
+  _key?: string;
+  title?: string;
+  subheadline?: string;
+  description?: string;
+  backgroundImage?: CloudinaryAsset;
+  logoImageUrl?: CloudinaryAsset;
+  backgroundAlt?: string;
+};
+export type HeroSectionProjected = {
+  _type: "heroSection";
+  _key?: string;
+
+  title?: string;
+  subheadline?: string;
+  description?: string;
+  backgroundAlt?: string;
+
+  backgroundImageUrl?: string;
+  logoImage?: string;
+};
+export type MediaHeroSectionProps = {
+  _type: "mediaHeroSection";
+  id?: string;
+  className?: string;
+
+  heading?: string;
+  subheading?: string;
+
+  useVideo?: boolean;
+  imageSrc?: string;
+  videoSrc?: string;
+  imageAlt?: string;
+  enableParallax?: boolean;
+  overlayOpacity?: number;
+
+  animation?: {
+    delay?: number;
+    staggerDelay?: number;
+    duration?: number;
+    distance?: number;
+  };
+};
+
+// Reusable enums for style (kept narrow to what the schema allows)
+export type THCAlign = "left" | "center" | "right";
+export type THCSize = "xl" | "lg" | "md" | "sm";
+export type THCSpacing = "tight" | "normal" | "loose";
+
+/**
+ * textHeadlineCombo — raw shape from Sanity (matches your schema)
+ */
+export type TextHeadlineCombo = {
+  _type: "textHeadlineCombo";
+  _key?: string;
+
+  eyebrow?: string;
+  headline?: string;   // required in schema, optional in TS for runtime safety
+  highlight?: string;
+  subhead?: string;
+
+  style?: {
+    align?: THCAlign;       // default "left"
+    size?: THCSize;         // default "xl"
+    animate?: boolean;      // default true
+    spacing?: THCSpacing;   // default "normal"
+  };
+};
+
+/**
+ * Optional projected shape if you flatten style.* in GROQ
+ * (only add/use this if your GROQ returns flattened fields)
+ */
+export type TextHeadlineComboProjected = {
+  _type: "textHeadlineCombo";
+  _key?: string;
+
+  eyebrow?: string;
+  headline?: string;
+  highlight?: string;
+  subhead?: string;
+
+  // Flattened style
+  align?: THCAlign;
+  size?: THCSize;
+  animate?: boolean;
+  spacing?: THCSpacing;
+};
+
+export type ScrollHighlightItem = {
+  name?: string;
+  text?: string;
+};
+
+export type MediaScrollHighlightSection = {
+  _type: "mediaScrollHighlightSection";
+  _key?: string;
+
+  useVideo?: boolean;
+  imageSrc?: string;   // projected
+  videoSrc?: string;   // projected
+  imageAlt?: string;
+  enableParallax?: boolean;
+  overlayOpacity?: number;
+
+  items?: ScrollHighlightItem[];
+
+  viewportMargin?: string;
+  padTopBottomVh?: number;
+  padY?: "sm" | "md" | "lg";
+};
+
+// Reusable CTA link for buttons (internal page OR external URL)
+export type CtaLink = {
+  _type: "ctaLink";
+  linkType?: "internal" | "external";
+  page?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "page";
+  };
+  externalUrl?: string;
+};
+
+// CTA object: text + link
+export type Cta = {
+  _type: "cta";
+  text?: string;
+  link?: CtaLink;
+};
+
+// Single card (raw, as stored in Sanity)
+export type ExpandableCardItem = {
+  _type: "expandableCardItem";
+  _key: string;
+  title?: string;
+  description?: string;
+  image?: CloudinaryAsset;
+  imageAlt?: string;
+  logo?: CloudinaryAsset;
+  ctaButton?: Cta;
+  body?: Array<{ _key: string } & ContentBlock>; // Portable Text blocks
+};
+
+// Section (raw, as stored in Sanity)
+export type ExpandableCards = {
+  _type: "expandableCards";
+  _key?: string;
+  items?: Array<{ _key: string } & ExpandableCardItem>;
+};
+
+
+// One card after GROQ projection (what your component expects)
+export type ExpandableCardItemProjected = {
+  _key?: string;
+  title: string;
+  description?: string;
+  imageSrc: string;   // image.secure_url
+  imageAlt?: string;  // coalesce(image.context.custom.alt, imageAlt)
+  logoSrc?: string;   // logo.secure_url
+  body?: any[];       // Portable Text (projected as-is)
+  ctaText?: string;   // ctaButton.text
+  ctaHref?: string;   // resolved from ctaButton.link (internal/external)
+};
+
+// Section after GROQ projection
+export type ExpandableCardsProjected = {
+  _type: "expandableCards";
+  _key?: string;
+  items?: ExpandableCardItemProjected[];
 };

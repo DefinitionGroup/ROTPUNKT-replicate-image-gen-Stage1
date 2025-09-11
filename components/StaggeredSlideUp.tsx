@@ -156,7 +156,6 @@ const StaggeredSlideUp: React.FC<StaggeredSlideUpProps> = ({
     if (debug) {
       console.warn("StaggeredSlideUp: No valid children provided");
     }
-    // If a single child (ReactNode) was passed, still render container without map
     if (!Array.isArray(children) && children) {
       return (
         <motion.div
@@ -167,11 +166,13 @@ const StaggeredSlideUp: React.FC<StaggeredSlideUpProps> = ({
           animate={shouldAnimate ? "visible" : "hidden"}
           style={
             debug ? { border: "2px dashed red", padding: "4px" } : undefined
-          }>
+          }
+        >
           <div className="relative overflow-hidden">
             <motion.div
               variants={memoizedItemVariants}
-              className="relative z-10">
+              className="relative z-10"
+            >
               {children}
             </motion.div>
             <motion.div
@@ -193,7 +194,8 @@ const StaggeredSlideUp: React.FC<StaggeredSlideUpProps> = ({
       variants={memoizedContainerVariants}
       initial="hidden"
       animate={shouldAnimate ? "visible" : "hidden"}
-      style={debug ? { border: "2px dashed red", padding: "4px" } : undefined}>
+      style={debug ? { border: "2px dashed red", padding: "4px" } : undefined}
+    >
       {debug && (
         <div className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 z-50">
           InView: {isInView ? "Y" : "N"} | Triggered: {hasTriggered ? "Y" : "N"}
@@ -216,50 +218,3 @@ const StaggeredSlideUp: React.FC<StaggeredSlideUpProps> = ({
 };
 
 export default StaggeredSlideUp;
-
-/*
-Example usage:
-<StaggeredSlideUp
-  delay={0.2}
-  staggerDelay={0.15}
-  duration={0.8}
-  distance={80}
-  maskHeight="150%"
-  easing="spring"
-  className="space-y-6"
-  threshold={0.1}
-  triggerOnce={true}
-  debug={false}
-  viewport={{
-    once: true,
-    amount: 0.2,
-    margin: "0px 0px -100px 0px"
-  }}
->
-  {[
-    <div key="1">First element to slide up</div>,
-    <div key="2">Second element to slide up</div>,
-    <div key="3">Third element to slide up</div>,
-  ]}
-</StaggeredSlideUp>
-
-// For better performance on pages with many animations:
-<StaggeredSlideUp
-  threshold={0.05}
-  triggerOnce={true}
-  viewport={{
-    margin: "0px 0px -50px 0px"
-  }}
->
-  {elements}
-</StaggeredSlideUp>
-
-// For debugging animation issues:
-<StaggeredSlideUp
-  debug={true}
-  threshold={0.1}
-  triggerOnce={false}
->
-  {elements}
-</StaggeredSlideUp>
-*/
