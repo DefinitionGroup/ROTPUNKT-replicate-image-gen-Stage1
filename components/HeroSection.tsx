@@ -3,151 +3,169 @@
 import React from "react";
 import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
+import type {
+  HeroSection as HeroSectionType,
+  CloudinaryAsset,
+} from "@/sanity/sanity.types";
 
-import { Header as HeaderType } from "@/sanity/sanity.types";
+type Props = HeroSectionType & { className?: string };
 
-type Props = HeaderType & {
-  logoImage?: string;
-  className?: string;
-};
+function urlFromCloudinary(a?: CloudinaryAsset | null) {
+  return a?.secure_url ?? a?.url ?? undefined;
+}
 
 export default function HeroSection({
   backgroundImage,
+  backgroundAlt,
   description,
   subheadline,
   title,
-  logoImage = "/rotpunkt-kuechen-logo.svg",
+  logoImageUrl,
   className = "",
 }: Props) {
-  const backgroundImageVariants: Variants = {
-    initial: { opacity: 0, y: 40, scale: 0.9 },
+  const bgSrc = urlFromCloudinary(backgroundImage);
+  const logoSrc =
+    urlFromCloudinary(logoImageUrl) ?? "/rotpunkt-kuechen-logo.svg";
+
+  const bgVariants: Variants = {
+    initial: { opacity: 0, scale: 1.04, y: 12 },
     animate: {
-      opacity: 0.4,
-      y: 0,
+      opacity: 1,
       scale: 1,
-      transition: {
-        type: "spring",
-        stiffness: 72,
-        mass: 1,
-        damping: 20,
-        delay: 1.1,
-      },
+      y: 0,
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
     },
   };
-
   const logoVariants: Variants = {
-    initial: { opacity: 0, y: 20 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, delay: 0.25 },
-    },
+    initial: { opacity: 0, y: 6 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.1 } },
   };
-
   const titleVariants: Variants = {
-    initial: { opacity: 0, y: 10 },
+    initial: { opacity: 0, y: 8 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", delay: 1.22 },
+      transition: { type: "spring", delay: 0.22, stiffness: 140, damping: 18 },
     },
   };
-
   const subtitleVariants: Variants = {
-    initial: { opacity: 0, y: 10 },
+    initial: { opacity: 0, y: 8 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", delay: 1.45 },
+      transition: { type: "spring", delay: 0.34, stiffness: 140, damping: 18 },
     },
   };
-
-  const descriptionVariants: Variants = {
-    initial: { opacity: 0, y: 20 },
+  const descVariants: Variants = {
+    initial: { opacity: 0, y: 8 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", delay: 1.7 },
+      transition: { type: "spring", delay: 0.46, stiffness: 140, damping: 20 },
     },
   };
 
   return (
     <section
       className={cn(
-        `bg-black grid grid-cols-1 grid-rows-1 text-white h-[50vh] min-h-[500px] overflow-hidden items-center justify-center`,
+        "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black text-white",
+        "min-h-[40vh] md:min-h-[50vh] lg:min-h-[60vh]",
         className
       )}
       aria-labelledby="hero-title"
-      role="banner">
-      <motion.div
-        className="w-full col-span-1 row-span-1 col-start-1 row-start-1"
-        variants={backgroundImageVariants}
-        initial="initial"
-        animate="animate"
-        aria-hidden="true">
-        <img
-          className="w-full h-full col-span-1 row-span-1 col-start-1 row-start-1 object-cover object-bottom"
-          src={backgroundImage?.secure_url}
-          alt={subheadline}
-          role="presentation"
-        />
-      </motion.div>
-
-      {/* Content Container */}
-      <div className="container mx-auto px-4 py-16 items-center flex-wrap flex flex-col justify-center row-start-1 col-start-1 z-10 relative">
-        {/* Logo Section */}
-        <motion.header
-          className="mx-auto px-4 py-16 w-full"
-          variants={logoVariants}
+      role="banner"
+    >
+      {/* Background image */}
+      {bgSrc && (
+        <motion.div
+          variants={bgVariants}
           initial="initial"
-          animate="animate">
-          <div className="flex justify-center">
-            <img
-              src={logoImage}
-              alt="Rotpunkt Küchen Logo"
-              className="mx-auto mb-2 w-24 max-h-24"
-              width={96}
-              height={96}
-            />
+          animate="animate"
+          aria-hidden="true"
+          className="col-start-1 row-start-1 h-full w-full"
+        >
+          <img
+            src={bgSrc}
+            alt={backgroundAlt ?? subheadline ?? title ?? "Hero background"}
+            className={cn("h-full w-full object-cover", "object-[center_70%]")}
+          />
+        </motion.div>
+      )}
+
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 col-start-1 row-start-1"
+      >
+        {/* left-to-right gradient so left-aligned text pops */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+        {/* subtle top vignette */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
+      </div>
+
+      {/* Content stack (top-left) */}
+      <div className="col-start-1 row-start-1 z-10">
+        <div className=" px-6 sm:px-8 lg:px-12">
+          <div className="max-w-4xl pt-10 sm:pt-12 md:pt-16 lg:pt-20 pb-10 md:pb-14">
+            {logoSrc && (
+              <motion.div
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                className="mb-4"
+              >
+                <img
+                  src={logoSrc}
+                  alt="Brand logo"
+                  className="h-12 w-auto md:h-14 lg:h-16 opacity-95"
+                  loading="eager"
+                />
+              </motion.div>
+            )}
+
+            {/* Title */}
+            <motion.h1
+              id="hero-title"
+              variants={titleVariants}
+              initial="initial"
+              animate="animate"
+              className={cn(
+                "font-semibold tracking-tight",
+                "text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
+              )}
+            >
+              {title}
+            </motion.h1>
+
+            {/* Accent divider + subtitle */}
+            {(subheadline || true) && (
+              <motion.div
+                variants={subtitleVariants}
+                initial="initial"
+                animate="animate"
+                className="mt-4"
+              >
+                <div className="h-[3px] w-24 bg-red-500/80 rounded-full" />
+                {subheadline && (
+                  <p className="mt-3 text-red-500 font-extrabold tracking-tight text-base sm:text-lg md:text-xl">
+                    {subheadline}
+                  </p>
+                )}
+              </motion.div>
+            )}
+
+            {/* Description (further down) */}
+            {description && (
+              <motion.p
+                variants={descVariants}
+                initial="initial"
+                animate="animate"
+                className="mt-8 max-w-3xl text-gray-200/95 leading-relaxed text-sm sm:text-base"
+              >
+                {description}
+              </motion.p>
+            )}
           </div>
-        </motion.header>
-
-        {/* Main Title */}
-        <motion.div
-          className="mx-auto w-full"
-          variants={titleVariants}
-          initial="initial"
-          animate="animate">
-          <h1
-            id="hero-title"
-            className="text-6xl font-medium uppercase tracking-tighter text-center bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent">
-            {title}
-          </h1>
-        </motion.div>
-
-        {/* Subtitle */}
-        <motion.div
-          className="mx-auto w-full"
-          variants={subtitleVariants}
-          initial="initial"
-          animate="animate">
-          <p
-            className="text-center text-lg text-gray-200 max-w-3xl mx-auto font-black tracking-tight mt-4"
-            role="doc-subtitle">
-            {subheadline}
-          </p>
-        </motion.div>
-
-        {/* Description */}
-        <motion.div
-          className="mx-auto max-w-3xl"
-          variants={descriptionVariants}
-          initial="initial"
-          animate="animate">
-          <p className="text-center text-sm text-gray-300 leading-relaxed mb-12 tracking-wide mt-6">
-            {description}
-          </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

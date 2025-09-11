@@ -1,15 +1,29 @@
-import { TickerItem } from "@/sanity/sanity.types";
 import { motion } from "motion/react";
-import Image from 'next/image'
+import Image from "next/image";
+import type { CloudinaryAsset } from "@/sanity/sanity.types";
+
+/** Same minimal shape used in the gallery */
+type RenderableTickerItem = {
+  _key?: string | null;
+  title?: string | null;
+  description?: string | null;
+  imageCloudinary?: CloudinaryAsset | null;
+};
 
 type Props = {
-  onClose: () => void
-} & TickerItem
+  onClose: () => void;
+} & RenderableTickerItem;
 
-export default function TickerItemModal({onClose, imageCloudinary, title, description}: Props ) {
+export default function TickerItemModal({
+  onClose,
+  imageCloudinary,
+  title,
+  description,
+}: Props) {
+  const src = imageCloudinary?.secure_url ?? "/placeholder.svg";
 
   return (
-        <motion.div
+    <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
@@ -27,7 +41,7 @@ export default function TickerItemModal({onClose, imageCloudinary, title, descri
       />
 
       <motion.div
-        className="relative rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-800/60"
+        className="relative rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-800/60 bg-black/60 backdrop-blur-md"
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 50 }}
@@ -45,21 +59,23 @@ export default function TickerItemModal({onClose, imageCloudinary, title, descri
           <span className="text-lg">×</span>
         </motion.button>
 
-
-
         <Image
-          src={imageCloudinary!.secure_url!}
-          width={800}
+          src={src}
+          width={1200}
           height={800}
-          alt="Generated image - full size"
+          alt={title ? `${title} – full size` : "Image"}
           className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
         />
 
         <div className="mt-4 flex flex-col gap-2">
-          <h2 className="text-2xl font-bold text-white leading-loose">{title}</h2>
-          <p className="text-neutral-300">{description}</p>
+          {title && (
+            <h2 className="text-2xl font-bold text-white leading-loose">
+              {title}
+            </h2>
+          )}
+          {description && <p className="text-neutral-300">{description}</p>}
         </div>
       </motion.div>
     </motion.div>
-  )
+  );
 }
