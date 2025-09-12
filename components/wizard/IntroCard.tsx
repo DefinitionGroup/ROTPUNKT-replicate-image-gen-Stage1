@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
+import { Button } from "@/components/ui/button";
 
 export function IntroCard({ onStart }: { onStart: () => void }) {
   return (
@@ -47,22 +48,15 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
           <br />
           Unser AI-Assistent macht daraus ein Bild!
         </motion.p>
-        <motion.button
+        <Button
+          enableMotion
           onClick={onStart}
-          className="cursor-pointer px-8 py-3 rounded-full bg-red-500 text-white text-lg font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            type: "spring",
-            stiffness: 200,
-            damping: 13,
-          }}
-          whileHover={{ scale: 1.07 }}
-          whileTap={{ scale: 0.97 }}
+          variant="red"
+          size="red"
           autoFocus
         >
           Jetzt starten
-        </motion.button>
+        </Button>
       </motion.div>
     </AnimatePresence>
   );

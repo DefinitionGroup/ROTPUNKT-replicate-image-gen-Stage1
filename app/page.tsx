@@ -10,9 +10,7 @@ export default async function Home() {
 
   return (
     <main>
-      {page?.content ? (
-        <PageBuilder content={page?.content} />
-      ) : null}
+      {page?.content ? <PageBuilder content={page?.content} /> : null}
     </main>
   );
 }

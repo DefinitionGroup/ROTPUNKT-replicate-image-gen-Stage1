@@ -1,7 +1,7 @@
 import { PageBuilder } from "@/components/PageBuilder";
 import { sanityFetch } from "@/sanity/lib/live";
 import { PAGE_QUERY } from "@/sanity/lib/queries";
-
+import NotFound from "@/components/ui/not-found";
 export default async function Page({
   params,
 }: {
@@ -14,9 +14,7 @@ export default async function Page({
 
   return (
     <main>
-      {page?.content ? (
-        <PageBuilder content={page?.content} />
-      ) : null}
+      {page?.content ? <PageBuilder content={page?.content} /> : <NotFound />}
     </main>
   );
 }

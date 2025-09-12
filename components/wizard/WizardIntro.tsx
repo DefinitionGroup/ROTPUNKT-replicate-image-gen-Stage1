@@ -1,8 +1,9 @@
-import React from 'react'
-import { motion } from 'motion/react'
+import React from "react";
+import { motion } from "motion/react";
+import { Button } from "../ui/button";
 
 interface WizardIntroProps {
-  onStart: () => void
+  onStart: () => void;
 }
 
 export const WizardIntro: React.FC<WizardIntroProps> = ({ onStart }) => {
@@ -29,19 +30,14 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({ onStart }) => {
           Küchen-Konfigurator
         </h2>
         <p className="text-gray-200 tracking-tight text-sm max-w-xl">
-          Starten Sie jetzt und gestalten Sie Ihre Traumküche Schritt für Schritt.
+          Starten Sie jetzt und gestalten Sie Ihre Traumküche Schritt für
+          Schritt.
         </p>
       </div>
 
-      <motion.button
-        onClick={onStart}
-        className="cursor-pointer px-8 py-3 rounded-full bg-red-500 text-white text-base font-bold shadow-md border border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-        whileHover={{ scale: 1.07 }}
-        whileTap={{ scale: 0.97 }}
-        autoFocus
-      >
+      <Button enableMotion onClick={onStart} variant="red" size="red" autoFocus>
         Jetzt starten
-      </motion.button>
+      </Button>
     </motion.div>
-  )
-}
+  );
+};

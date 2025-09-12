@@ -25,7 +25,10 @@ export default function ImagesGalleryClient({ images }: { images: Img[] }) {
               height={800}
               className="w-full h-auto object-cover"
             />
-            <div className="px-4 py-3 text-xs text-gray-400 group-hover:text-gray-200 transition" suppressHydrationWarning>
+            <div
+              className="px-4 py-3 text-xs text-gray-400 group-hover:text-gray-200 transition"
+              suppressHydrationWarning
+            >
               {new Date(img.created_at).toLocaleString()}
             </div>
           </button>

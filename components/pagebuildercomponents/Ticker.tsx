@@ -8,7 +8,7 @@ import type {
 import { Ticker } from "motion-plus/react";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
-import TickerItemModal from "./TickerItemModal";
+import TickerItemModal from "../TickerItemModal";
 
 type GalleryItem = TickerItem & { _key: string };
 

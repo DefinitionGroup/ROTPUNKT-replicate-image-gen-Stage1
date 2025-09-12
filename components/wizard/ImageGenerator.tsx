@@ -3,11 +3,12 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
 import { $prompt } from "@/store/prompt";
 import { useQuery } from "@tanstack/react-query";
-import ImageModal from "./ImageModal";
+import ImageModal from "@/components/ImageModal";
 
 type ApiResponse = string[];
 
@@ -70,12 +71,12 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
 
 function BackButton({ onClick }: { onClick: () => void }) {
   return (
-    <button
+    <Button
       onClick={onClick}
       className="mb-10 px-4 py-2 rounded-full bg-gray-800 text-white text-xs hover:bg-red-500 transition-all"
     >
       ⇦ Zurück zum Küchen-Wizard
-    </button>
+    </Button>
   );
 }
 

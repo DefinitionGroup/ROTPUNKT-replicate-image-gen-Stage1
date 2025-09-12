@@ -1,23 +1,22 @@
-// components/RichTextComponent.tsx
-import * as React from 'react'
-import Link from 'next/link'
-import { PortableText, PortableTextComponents } from '@portabletext/react'
-import type { RichText as RichTextType } from '@/sanity/sanity.types'
+import * as React from "react";
+import Link from "next/link";
+import { PortableText, PortableTextComponents } from "@portabletext/react";
+import type { RichText as RichTextType } from "@/sanity/sanity.types";
 
 export type RichTextProps = {
-  value: NonNullable<RichTextType['content']> | null | undefined
-  className?: string
-  internalLinkResolver?: (refId: string) => string | undefined
-  externalRel?: string
-}
+  value: NonNullable<RichTextType["content"]> | null | undefined;
+  className?: string;
+  internalLinkResolver?: (refId: string) => string | undefined;
+  externalRel?: string;
+};
 
 // Utility: generate slug for headings
 function slugify(input: string): string {
   return input
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, '-')
+    .replace(/\s+/g, "-");
 }
 
 // Reusable heading component
@@ -26,27 +25,30 @@ const Heading = ({
   children,
   className,
 }: {
-  level: 'h1' | 'h2' | 'h3' | 'h4'
-  children: React.ReactNode
-  className: string
+  level: "h1" | "h2" | "h3" | "h4";
+  children: React.ReactNode;
+  className: string;
 }) => {
-  const text = React.Children.toArray(children).join('')
-  const id = slugify(text)
+  const text = React.Children.toArray(children).join("");
+  const id = slugify(text);
 
-  const Tag = level
+  const Tag = level;
 
   return (
     <Tag id={id} className={className}>
       {children}
     </Tag>
-  )
-}
+  );
+};
 
 // Create components config
 function createComponents({
   internalLinkResolver,
-  externalRel = 'noopener noreferrer',
-}: Pick<RichTextProps, 'internalLinkResolver' | 'externalRel'>): PortableTextComponents {
+  externalRel = "noopener noreferrer",
+}: Pick<
+  RichTextProps,
+  "internalLinkResolver" | "externalRel"
+>): PortableTextComponents {
   return {
     block: {
       normal: ({ children }) => (
@@ -100,25 +102,31 @@ function createComponents({
     },
     listItem: ({ children }) => <li className="pl-1">{children}</li>,
     marks: {
-      strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+      strong: ({ children }) => (
+        <strong className="font-semibold">{children}</strong>
+      ),
       em: ({ children }) => <em className="italic">{children}</em>,
       underline: ({ children }) => <u className="underline">{children}</u>,
-      'strike-through': ({ children }) => <s className="line-through">{children}</s>,
+      "strike-through": ({ children }) => (
+        <s className="line-through">{children}</s>
+      ),
       code: ({ children }) => (
         <code className="rounded-md border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-[0.95em] dark:border-gray-700 dark:bg-gray-800">
           {children}
         </code>
       ),
       link: ({ children, value }) => {
-        const href: string | undefined = value?.href
-        const openInNewTab: boolean | undefined = value?.openInNewTab ?? true
-        const nofollow: boolean | undefined = value?.nofollow
+        const href: string | undefined = value?.href;
+        const openInNewTab: boolean | undefined = value?.openInNewTab ?? true;
+        const nofollow: boolean | undefined = value?.nofollow;
 
-        if (!href) return <>{children}</>
+        if (!href) return <>{children}</>;
 
-        const rel = [externalRel, nofollow ? 'nofollow' : undefined].filter(Boolean).join(' ')
+        const rel = [externalRel, nofollow ? "nofollow" : undefined]
+          .filter(Boolean)
+          .join(" ");
         const cls =
-          'underline decoration-2 underline-offset-4 text-red-600 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 transition dark:text-blue-400 dark:hover:text-blue-300 dark:focus-visible:ring-blue-400'
+          "underline decoration-2 underline-offset-4 text-red-600 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 transition dark:text-blue-400 dark:hover:text-blue-300 dark:focus-visible:ring-blue-400";
 
         return openInNewTab ? (
           <Link href={href} target="_blank" rel={rel} className={cls}>
@@ -128,13 +136,16 @@ function createComponents({
           <Link href={href} rel={rel} className={cls}>
             {children}
           </Link>
-        )
+        );
       },
       internalLink: ({ children, value }) => {
-        const refId: string | undefined = value?.reference?._ref
-        const href = refId && internalLinkResolver ? internalLinkResolver(refId) : undefined
+        const refId: string | undefined = value?.reference?._ref;
+        const href =
+          refId && internalLinkResolver
+            ? internalLinkResolver(refId)
+            : undefined;
 
-        if (!href) return <>{children}</>
+        if (!href) return <>{children}</>;
 
         return (
           <Link
@@ -143,10 +154,10 @@ function createComponents({
           >
             {children}
           </Link>
-        )
+        );
       },
     },
-  }
+  };
 }
 
 export default function RichTextComponent({
@@ -155,25 +166,25 @@ export default function RichTextComponent({
   internalLinkResolver,
   externalRel,
 }: RichTextProps) {
-  if (!value || value.length === 0) return null
+  if (!value || value.length === 0) return null;
 
   const components = React.useMemo(
     () => createComponents({ internalLinkResolver, externalRel }),
     [internalLinkResolver, externalRel]
-  )
+  );
 
   return (
     <div
       className={[
-        'richtext',
-        'space-y-5 md:space-y-6',
-        'text-base leading-relaxed',
+        "richtext",
+        "space-y-5 md:space-y-6",
+        "text-base leading-relaxed",
         className,
       ]
         .filter(Boolean)
-        .join(' ')}
+        .join(" ")}
     >
       <PortableText value={value} components={components} />
     </div>
-  )
+  );
 }

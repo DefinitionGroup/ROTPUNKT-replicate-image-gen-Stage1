@@ -1,14 +1,15 @@
-import React from 'react'
-import { motion } from 'motion/react'
-import { FaArrowLeft } from 'react-icons/fa'
+import React from "react";
+import { motion } from "motion/react";
+import { FaArrowLeft } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
 
 interface WizardHeaderProps {
-  currentStep: number
-  totalSteps: number
-  onBack: () => void
-  onClose?: () => void
-  canGoBack: boolean
-  loading?: boolean
+  currentStep: number;
+  totalSteps: number;
+  onBack: () => void;
+  onClose?: () => void;
+  canGoBack: boolean;
+  loading?: boolean;
 }
 
 export const WizardHeader: React.FC<WizardHeaderProps> = ({
@@ -17,27 +18,30 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
   onBack,
   onClose,
   canGoBack,
-  loading = false
+  loading = false,
 }) => {
   return (
     <header className="relative flex flex-row items-center justify-between w-full px-8">
-      <button
+      <Button
         onClick={onBack}
         disabled={!canGoBack || loading}
-        className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full border border-red-400 bg-transparent text-red-400 text-sm font-medium shadow hover:bg-red-500/10 transition-all
+        variant="redOutline"
+        size="back"
+        enableMotion
+        whileHover={canGoBack && !loading ? { scale: 1.05 } : {}}
+        className={`
           ${
             !canGoBack || loading
               ? "opacity-0 cursor-not-allowed pointer-events-none"
-              : "hover:scale-105"
+              : ""
           }
         `}
         tabIndex={canGoBack ? 0 : -1}
-        style={{ minWidth: 108 }}
         aria-label="Zurück zum vorherigen Schritt"
       >
         <FaArrowLeft className="text-base" />
         Zurück
-      </button>
+      </Button>
 
       <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 gap-1">
         {currentStep >= 0 && (
@@ -48,29 +52,38 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
                 initial={false}
                 animate={{
                   width: `${
-                    ((Math.min(currentStep, totalSteps) + 1) / (totalSteps + 1)) * 100
+                    ((Math.min(currentStep, totalSteps) + 1) /
+                      (totalSteps + 1)) *
+                    100
                   }%`,
                 }}
                 transition={{ duration: 0.3 }}
               />
             </div>
             <span className="text-xs text-gray-400 mt-1">
-              {`Schritt ${Math.min(currentStep + 1, totalSteps + 1)} / ${totalSteps + 1}`}
+              {`Schritt ${Math.min(currentStep + 1, totalSteps + 1)} / ${
+                totalSteps + 1
+              }`}
             </span>
           </>
         )}
       </div>
 
       {onClose && (
-        <button
+        <Button
           onClick={onClose}
-          className="cursor-pointer ml-3 text-gray-500 hover:text-red-400 text-3xl font-bold"
+          variant="close"
+          size="close"
+          enableMotion
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          className="ml-3"
           aria-label="Wizard schließen"
           tabIndex={0}
         >
           ×
-        </button>
+        </Button>
       )}
     </header>
-  )
-}
+  );
+};
