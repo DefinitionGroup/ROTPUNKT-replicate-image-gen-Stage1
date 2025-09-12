@@ -1,4 +1,3 @@
-// app/(site)/[slug]/page.tsx
 import { defineQuery } from "next-sanity";
 import { PageBuilder } from "@/components/PageBuilder";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -16,7 +15,6 @@ export default async function Page({ params }: { params: Params }) {
   return (
     <main>
       {page?.content ? <PageBuilder content={page.content} /> : <NotFound />}
-      {/* Or: if (!page?.content) return notFound(); */}
     </main>
   );
 }

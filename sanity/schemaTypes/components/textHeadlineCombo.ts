@@ -1,4 +1,3 @@
-// /schemas/objects/textHeadlineCombo.ts
 import { defineType, defineField } from "sanity";
 import { FaHeading } from "react-icons/fa6";
 
