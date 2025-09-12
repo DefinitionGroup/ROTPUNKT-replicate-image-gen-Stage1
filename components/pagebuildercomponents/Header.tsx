@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
-
+import Image from "next/image";
 import { Header as HeaderType } from "@/sanity/sanity.types";
 
 type Props = HeaderType & {
@@ -105,7 +105,7 @@ export default function Header({
           animate="animate"
         >
           <div className="flex justify-center">
-            <img
+            <Image
               src={logoImage}
               alt="Rotpunkt Küchen Logo"
               className="mx-auto mb-2 w-24 max-h-24"
@@ -124,7 +124,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-6xl font-medium uppercase tracking-tighter text-center bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent"
+            className="text-6xl font-light  tracking-tighter text-center bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent"
           >
             {title}
           </h1>

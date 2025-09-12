@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "@/app/hooks/use-outside-click";
 import StaggeredSlideUp from "@/components/StaggeredSlideUp";
 import { PortableText, type PortableTextBlock } from "@portabletext/react";
+import { Button } from "@/components/ui/button";
 
 import type {
   ExpandableCards as ExpandableCardsType,
@@ -62,8 +63,8 @@ export default function ExpandableCards({
       description: item.description,
       imageSrc: item.image?.secure_url || "",
       imageAlt: item.image?.context?.custom?.alt || item.imageAlt,
-      logoSrc: item.logo?.secure_url || defaultLogoSrc, // fallback logo
-      body: item.body, // ⬅️ can be ContentBlock[] from Sanity
+      logoSrc: item.logo?.secure_url || defaultLogoSrc,
+      body: item.body,
       ctaText: item.ctaButton?.text,
       ctaHref:
         item.ctaButton?.link?.linkType === "external"
@@ -169,15 +170,21 @@ export default function ExpandableCards({
                   </motion.div>
 
                   {active.ctaHref && active.ctaText && (
-                    <motion.a
+                    <Button
+                      asChild
+                      variant="redCta"
+                      size="cta"
                       layoutId={`button-${active.title}-${id}`}
-                      href={active.ctaHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-8 py-3 text-sm rounded-full font-bold bg-red-500 text-white hover:text-red-500 hover:bg-white transition duration-200 ease-in-out"
+                      enableMotion
                     >
-                      {active.ctaText}
-                    </motion.a>
+                      <a
+                        href={active.ctaHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {active.ctaText}
+                      </a>
+                    </Button>
                   )}
                 </div>
               </div>

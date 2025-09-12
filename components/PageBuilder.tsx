@@ -1,12 +1,12 @@
 import { Page } from "@/sanity/sanity.types";
-import TickerGallery from "./Ticker";
-import Header from "./Header";
-import Wizard from "./Wizard";
-import HeroSection from "./HeroSection";
-import MediaHeroSection from "./MediaHeroSection";
-import TextHeadlineCombo from "./TextHeadlineCombo";
-import MediaScrollHighlightSection from "./MediaScrollHighlightSection";
-import ExpandableCards from "./ExpandableCards";
+import TickerGallery from "@/components/pagebuildercomponents/Ticker";
+import Header from "@/components/pagebuildercomponents/Header";
+import Wizard from "@/components/wizard/Wizard";
+import HeroSection from "@/components/pagebuildercomponents/HeroSection";
+import MediaHeroSection from "@/components/pagebuildercomponents/MediaHeroSection";
+import TextHeadlineCombo from "@/components/pagebuildercomponents/TextHeadlineCombo";
+import MediaScrollHighlightSection from "@/components/pagebuildercomponents/MediaScrollHighlightSection";
+import ExpandableCards from "@/components/pagebuildercomponents/ExpandableCards";
 type PageBuilderProps = {
   content: NonNullable<Page>["content"];
 };
@@ -34,8 +34,8 @@ export function PageBuilder({ content }: PageBuilderProps) {
         return (
           <MediaScrollHighlightSection key={block._key} {...(block as any)} />
         );
-        case "expandableCards":
-  return <ExpandableCards key={block._key} {...block} />;
+      case "expandableCards":
+        return <ExpandableCards key={block._key} {...block} />;
 
       default:
         // This is a fallback for when we don't have a block type

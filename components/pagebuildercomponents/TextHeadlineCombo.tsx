@@ -68,6 +68,28 @@ const spacingMap = {
   loose: "space-y-5",
 } as const;
 
+const stripInvisible = (v?: any) =>
+  typeof v === "string"
+    ? v
+        .replace(
+          /[\u0000-\u0020\u007F-\u009F\u00A0\u200B-\u200F\u2028\u2029\uFEFF]/g,
+          ""
+        )
+        .trim()
+    : "";
+
+const normalizeOption = <T extends string>(
+  value: any,
+  allowed: T[],
+  fallback: T
+): T => {
+  const cleaned = stripInvisible(value).toLowerCase();
+  for (const a of allowed) {
+    if (cleaned === a || cleaned.startsWith(a)) return a;
+  }
+  return fallback;
+};
+
 export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
   const {
     eyebrow,
@@ -86,18 +108,36 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
   } = props;
 
   // Resolve with precedence: flat prop → style.* → default
-  const align = style?.align ?? "left";
-  const size = style?.size ?? "lg";
-  const animate = style?.animate ?? true;
-  const spacing = style?.spacing ?? "normal";
+  // Normalize incoming strings (Sanity can include invisible / zero-width chars)
+  const rawAlign = style?.align ?? "left";
+  const rawSize = style?.size ?? "lg";
+  const rawAnimate = style?.animate;
+  const rawSpacing = style?.spacing ?? "normal";
 
-  const sizes = sizeMap[size];
+  const align = normalizeOption<"left" | "center" | "right">(
+    rawAlign,
+    ["left", "center", "right"],
+    "left"
+  );
+  const sizeKey = normalizeOption<keyof typeof sizeMap>(
+    rawSize,
+    ["xl", "lg", "md", "sm"],
+    "lg"
+  );
+  const animate = typeof rawAnimate === "boolean" ? rawAnimate : true;
+  const spacing = normalizeOption<keyof typeof spacingMap>(
+    rawSpacing,
+    ["tight", "normal", "loose"],
+    "normal"
+  );
+
+  const sizes = sizeMap[sizeKey];
   const wrapperAlign =
     align === "center"
       ? "mx-auto text-center"
       : align === "right"
-      ? "ml-auto text-right"
-      : "text-left";
+        ? "ml-auto text-right"
+        : "text-left";
 
   const easeCurve: [number, number, number, number] = [0.16, 1, 0.3, 1];
   const baseMotion = (d: number) => ({

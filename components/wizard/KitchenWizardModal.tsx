@@ -1,88 +1,101 @@
-"use client"
+"use client";
 
-import React, { useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import { useStore } from '@nanostores/react'
-import { useAuth } from '@clerk/nextjs'
-import { Card, CardHeader, CardContent } from '../ui/card'
-import { wizardStore, wizardActions, WizardState } from '../../app/store/wizardStore'
-import { WizardHeader } from './WizardHeader'
-import { WizardIntro } from './WizardIntro'
-import { WizardStep } from './WizardStep'
-import { WizardFinal } from './WizardFinal'
-import { wizardSteps } from './wizardSteps'
+import React, { useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { useStore } from "@nanostores/react";
+import { useAuth } from "@clerk/nextjs";
+import { Card, CardHeader, CardContent } from "../ui/card";
+import {
+  wizardStore,
+  wizardActions,
+  WizardState,
+} from "../../app/store/wizardStore";
+import { WizardHeader } from "./WizardHeader";
+import { WizardIntro } from "./WizardIntro";
+import { WizardStep } from "./WizardStep";
+import { WizardFinal } from "./WizardFinal";
+import { wizardSteps } from "./wizardSteps";
 
 interface KitchenWizardModalProps {
-  onPromptReady: (prompt: string) => void
-  loading?: boolean
-  onClose?: () => void
+  onPromptReady: (prompt: string) => void;
+  loading?: boolean;
+  onClose?: () => void;
 }
 
 const capitalizeFirst = (text: string) => {
-  if (!text) return ""
-  return text.charAt(0).toUpperCase() + text.slice(1)
-}
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
 
 export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   onPromptReady,
   loading = false,
-  onClose
+  onClose,
 }) => {
-  const wizardState = useStore(wizardStore)
-  const { isSignedIn } = useAuth()
-  const overlayRef = useRef<HTMLDivElement | null>(null)
+  const wizardState = useStore(wizardStore);
+  const { isSignedIn } = useAuth();
+  const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  const CARD_HEIGHT = 600
-  const CARD_WIDTH = 720
+  const CARD_HEIGHT = 600;
+  const CARD_WIDTH = 720;
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
       if (event.key === "Escape" && onClose) {
-        onClose()
+        onClose();
       }
     }
-    window.addEventListener("keydown", handleKey)
-    return () => window.removeEventListener("keydown", handleKey)
-  }, [onClose])
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
 
-  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleOverlayClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     if (event.target === overlayRef.current && onClose) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   const handleOptionSelect = (option: string) => {
-    if (wizardState.currentStep < 0 || wizardState.currentStep >= wizardSteps.length) return
+    if (
+      wizardState.currentStep < 0 ||
+      wizardState.currentStep >= wizardSteps.length
+    )
+      return;
 
-    const currentStepKey = wizardSteps[wizardState.currentStep].key as keyof WizardState['selectedOptions']
-    wizardActions.selectOption(currentStepKey, option)
-    wizardActions.nextStep()
-  }
+    const currentStepKey = wizardSteps[wizardState.currentStep]
+      .key as keyof WizardState["selectedOptions"];
+    wizardActions.selectOption(currentStepKey, option);
+    wizardActions.nextStep();
+  };
 
   const handleSubmit = () => {
-    const { selectedOptions, extraWishes } = wizardState
-    const valuesAreValid = Object.values(selectedOptions).every(Boolean)
+    const { selectedOptions, extraWishes } = wizardState;
+    const valuesAreValid = Object.values(selectedOptions).every(Boolean);
 
     if (!valuesAreValid) {
-      wizardActions.setError("Bitte alle Schritte ausfüllen.")
-      return
+      wizardActions.setError("Bitte alle Schritte ausfüllen.");
+      return;
     }
 
     const prompt = [
       `Dann eine ${selectedOptions.color}, ${selectedOptions.style}e Küche.`,
-      `${capitalizeFirst(selectedOptions.kitchenLook!)} aussehend in einer ${selectedOptions.environment}en Umgebung.`,
+      `${capitalizeFirst(selectedOptions.kitchenLook!)} aussehend in einer ${
+        selectedOptions.environment
+      }en Umgebung.`,
       `Standort ist: ${selectedOptions.location}.`,
       `Die Tageszeit ist ${selectedOptions.time}.`,
       `Das Haus ist ${selectedOptions.houseType}.`,
       `Im Hintergrund sieht man: ${selectedOptions.background}.`,
-      extraWishes.trim() ? ` Zusätzliche Wünsche: ${extraWishes.trim()}.` : ""
-    ].join(" ")
+      extraWishes.trim() ? ` Zusätzliche Wünsche: ${extraWishes.trim()}.` : "",
+    ].join(" ");
 
-    onPromptReady(prompt)
-    if (onClose) onClose()
-  }
+    onPromptReady(prompt);
+    if (onClose) onClose();
+  };
 
-  const canGoBack = wizardState.currentStep > -1
+  const canGoBack = wizardState.currentStep > -1;
 
   return (
     <AnimatePresence>
@@ -136,17 +149,23 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                   />
                 )}
 
-                {wizardState.currentStep >= 0 && wizardState.currentStep < wizardSteps.length && (
-                  <WizardStep
-                    key={wizardState.currentStep}
-                    icon={wizardSteps[wizardState.currentStep].icon}
-                    title={wizardSteps[wizardState.currentStep].label}
-                    options={wizardSteps[wizardState.currentStep].options}
-                    selectedValue={wizardState.selectedOptions[wizardSteps[wizardState.currentStep].key as keyof WizardState['selectedOptions']]}
-                    onSelect={handleOptionSelect}
-                    loading={loading}
-                  />
-                )}
+                {wizardState.currentStep >= 0 &&
+                  wizardState.currentStep < wizardSteps.length && (
+                    <WizardStep
+                      key={wizardState.currentStep}
+                      icon={wizardSteps[wizardState.currentStep].icon}
+                      title={wizardSteps[wizardState.currentStep].label}
+                      options={wizardSteps[wizardState.currentStep].options}
+                      selectedValue={
+                        wizardState.selectedOptions[
+                          wizardSteps[wizardState.currentStep]
+                            .key as keyof WizardState["selectedOptions"]
+                        ]
+                      }
+                      onSelect={handleOptionSelect}
+                      loading={loading}
+                    />
+                  )}
 
                 {wizardState.currentStep === wizardSteps.length && (
                   <WizardFinal
@@ -178,5 +197,5 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
         </motion.div>
       </motion.div>
     </AnimatePresence>
-  )
-}
+  );
+};
