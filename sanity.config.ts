@@ -1,0 +1,35 @@
+'use client'
+import { visionTool } from '@sanity/vision'
+import { defineConfig } from 'sanity'
+import { structureTool } from 'sanity/structure'
+import { cloudinarySchemaPlugin } from 'sanity-plugin-cloudinary'
+import { apiVersion, dataset, projectId } from './sanity/env'
+import { schemaTypes } from './sanity/schemaTypes'
+import { presentationTool } from 'sanity/presentation'
+export default defineConfig({
+  basePath: '/studio',
+  name: 'default',
+  title: 'Rotpunkt Visions',
+  apiVersion: apiVersion,
+  projectId,
+  dataset,
+
+  plugins: [
+    structureTool(),
+    visionTool(),
+    cloudinarySchemaPlugin(),
+    presentationTool({
+      previewUrl: {
+        initial: process.env.SANITY_STUDIO_PREVIEW_ORIGIN,
+        preview: '/',
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+        },
+      },
+    }),
+  ],
+
+  schema: {
+    types: schemaTypes,
+  },
+})
