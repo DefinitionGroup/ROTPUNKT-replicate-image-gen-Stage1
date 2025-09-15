@@ -176,9 +176,10 @@ export default function RichTextComponent({
   return (
     <div
       className={[
-        "richtext",
-        "space-y-5 md:space-y-6",
-        "text-base leading-relaxed",
+        "richtext text-brand-secondary-1 antialiased max-w-5xl mx-auto px-4 sm:px-6 md:px-0 ",
+        "prose prose-invert lg:prose-lg",
+        "space-y-5 md:space-y-6 text-base leading-relaxed tracking-normal",
+        "break-words hyphens-auto selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         className,
       ]
         .filter(Boolean)

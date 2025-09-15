@@ -73,7 +73,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
   return (
     <Button
       onClick={onClick}
-      className="mb-10 px-4 py-2 rounded-full bg-gray-800 text-white text-xs hover:bg-red-500 transition-all"
+      className="mb-10 px-4 py-2 rounded-full bg-gray-800 text-brand-secondary-1 text-xs hover:bg-brand-primary-2 transition-all"
     >
       ⇦ Zurück zum Küchen-Wizard
     </Button>
@@ -97,7 +97,7 @@ function LoadingState() {
             autoplay
           />
         </div>
-        <span className="mt-2 text-lg text-white font-medium text-center">
+        <span className="mt-2 text-lg text-brand-secondary-1 font-medium text-center">
           Ich generiere gerade dein Bild...
         </span>
         <div className="text-xs text-gray-400 mt-2 text-center">
@@ -150,7 +150,7 @@ function QuickLink() {
   return (
     <motion.a
       href="/my-images"
-      className="mt-6 inline-block px-6 py-3 bg-red-500 text-white rounded-full font-semibold shadow hover:bg-red-600 transition"
+      className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-brand-secondary-1 rounded-full font-semibold shadow hover:bg-red-600 transition"
       whileHover={{ scale: 1.05 }}
     >
       📁 Zu "Meine Bilder"

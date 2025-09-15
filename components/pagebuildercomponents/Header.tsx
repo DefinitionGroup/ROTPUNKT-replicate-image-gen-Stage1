@@ -74,7 +74,7 @@ export default function Header({
   return (
     <section
       className={cn(
-        `bg-black grid grid-cols-1 grid-rows-1 text-white h-[50vh] min-h-[500px] overflow-hidden items-center justify-center`,
+        `bg-black grid grid-cols-1 grid-rows-1 text-brand-secondary-1 h-[50vh] min-h-[500px] overflow-hidden items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
         className
       )}
       aria-labelledby="hero-title"

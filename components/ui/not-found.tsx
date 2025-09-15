@@ -10,7 +10,7 @@ export default function NotFound() {
             <div className="text-6xl font-bold text-gray-300 dark:text-gray-700 mb-4">
               404
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-brand-secondary-1 mb-2">
               Seite nicht gefunden
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-8">

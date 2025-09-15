@@ -55,7 +55,7 @@ function ScrollHighlightItemRow({
 export default function ScrollHighlight({
   items,
   viewportMargin = "-28% 0px -68% 0px",
-  padTopBottomVh = 50,
+  padTopBottomVh = 20, // reduced default vertical padding (was 50)
 }: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -88,12 +88,12 @@ function Stylesheet({ padTopBottomVh }: { padTopBottomVh: number }) {
         list-style: none;
         margin: 0; padding: 0;
         color: white;
-        display: flex; flex-direction: column; gap: 20px;
-        padding: ${padTopBottomVh}vh 0;
+        display: flex; flex-direction: column; gap: 32px; /* increased gap between elements */
+        padding: ${padTopBottomVh}vh 0; /* smaller default padTopBottomVh reduces height */
       }
       .skill-item {
         will-change: opacity;
-        font-size: clamp(2rem, 8vw, 6rem);
+        font-size: clamp(1.5rem, 6vw, 3.2rem); /* smaller, more balanced sizes */
         font-weight: 700;
         margin: 0; padding: 0;
         line-height: 0.9;
@@ -103,7 +103,7 @@ function Stylesheet({ padTopBottomVh }: { padTopBottomVh: number }) {
       .skill-name { white-space: nowrap; }
       .skill-description {
         font-size: 1.2rem;
-        min-height: 9.5rem;
+        min-height: 5rem; /* reduced min height to avoid huge gaps */
         font-weight: 400;
         line-height: 1.3;
         margin-top: 0.75rem;

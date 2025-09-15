@@ -96,7 +96,9 @@ export default function Navbar({ menuItems }: Props) {
         onClick={mobile ? closeMenu : undefined}
         className={
           mobile
-            ? cn("block text-white text-2xl font-medium tracking-tight")
+            ? cn(
+                "block text-brand-secondary-1 text-2xl font-medium tracking-tight"
+              )
             : cn(
                 "text-inherit hover:text-primary transition",
                 active && "text-primary"
@@ -116,7 +118,7 @@ export default function Navbar({ menuItems }: Props) {
           "relative mx-auto w-auto md:w-full max-w-7xl flex gap-6 items-center justify-between",
           "rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input",
           "bg-white/30 backdrop-blur-sm",
-          "text-black dark:text-white"
+          "text-black dark:text-brand-secondary-1"
         )}
       >
         <Link href="/" className="flex items-center gap-2">
@@ -161,7 +163,7 @@ export default function Navbar({ menuItems }: Props) {
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="cursor-pointer px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-white transition-colors border border-transparent hover:border-current">
+                  <button className="cursor-pointer px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-brand-secondary-1 transition-colors border border-transparent hover:border-current">
                     Sign Up
                   </button>
                 </SignUpButton>
@@ -221,7 +223,7 @@ export default function Navbar({ menuItems }: Props) {
                   type="button"
                   aria-label="Close menu"
                   onClick={closeMenu}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-brand-secondary-1"
                 >
                   ×
                 </button>
@@ -246,7 +248,7 @@ export default function Navbar({ menuItems }: Props) {
                         <Link
                           href="/my-images"
                           onClick={closeMenu}
-                          className="block text-white text-2xl font-medium tracking-tight"
+                          className="block text-brand-secondary-1 text-2xl font-medium tracking-tight"
                         >
                           Meine Bilder
                         </Link>
@@ -270,7 +272,7 @@ export default function Navbar({ menuItems }: Props) {
                         <SignInButton mode="modal">
                           <button
                             onClick={closeMenu}
-                            className="cursor-pointer px-4 py-2 rounded-full text-base font-medium text-white bg-white/10 hover:bg-white/20"
+                            className="cursor-pointer px-4 py-2 rounded-full text-base font-medium text-brand-secondary-1 bg-white/10 hover:bg-white/20"
                           >
                             Sign In
                           </button>

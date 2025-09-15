@@ -7,7 +7,7 @@ export default async function Page(props: any) {
   const { params } = props as { params: { slug: string } };
   const { data: page } = await sanityFetch({ query: PAGE_QUERY, params });
   return (
-    <main>
+    <main className="pt-20 md:pt-24 lg:pt-28 min-h-screen">
       {page?.content ? <PageBuilder content={page.content} /> : <NotFound />}
     </main>
   );

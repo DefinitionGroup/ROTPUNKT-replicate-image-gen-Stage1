@@ -7,7 +7,7 @@ import { motion, type MotionProps } from "motion/react";
 
 const buttonVariants = cva(
   // Base styles - common to all buttons
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  "inline-flex items-center cursor-pointer  justify-center gap-2 whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   {
     variants: {
       variant: {
@@ -23,14 +23,14 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
 
         // Project-specific variants (actively used in your code)
-        red: "bg-red-500 text-white font-bold border border-transparent hover:bg-red-600 focus-visible:ring-red-500",
+        red: "bg-brand-primary-2 text-brand-secondary-1 font-bold border border-transparent hover:bg-red-600 focus-visible:ring-red-500",
         redCta:
-          "bg-red-500 text-white font-bold hover:bg-white hover:text-red-500 transition-colors duration-200",
+          "bg-brand-primary-2 text-brand-secondary-1 font-bold hover:bg-white hover:text-red-500 transition-colors duration-200",
         redOutline:
-          "bg-transparent text-red-400 border border-red-400 hover:bg-red-500/10 transition-colors",
+          "bg-transparent text-red-400 border border-red-400 hover:bg-brand-primary-2/10 transition-colors",
         close: "text-gray-500 hover:text-red-400 font-bold transition-colors",
         wizardOption:
-          "bg-gray-900 border border-gray-800 text-gray-200 font-bold hover:bg-gray-900 hover:text-red-500 hover:border-red-600 data-[selected=true]:bg-red-500 data-[selected=true]:border-red-600 data-[selected=true]:text-white transition-colors",
+          "bg-gray-900 border border-gray-800 text-gray-200 font-bold hover:bg-gray-900 hover:text-red-500 hover:border-red-600 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-red-600 data-[selected=true]:text-brand-secondary-1 transition-colors",
       },
       size: {
         default: "h-9 px-4 py-2 rounded-md",

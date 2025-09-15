@@ -32,7 +32,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
         <div className="mb-4 h-8 w-8">{icon}</div>
       </div>
 
-      <h3 className="text-2xl tracking-tight text-white mb-12">
+      <h3 className="text-2xl tracking-tight text-brand-secondary-1 mb-12">
         {title} auswählen
       </h3>
 

@@ -197,7 +197,7 @@ const StaggeredSlideUp: React.FC<StaggeredSlideUpProps> = ({
       style={debug ? { border: "2px dashed red", padding: "4px" } : undefined}
     >
       {debug && (
-        <div className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 z-50">
+        <div className="absolute top-0 right-0 bg-brand-primary-2 text-brand-secondary-1 text-xs p-1 z-50">
           InView: {isInView ? "Y" : "N"} | Triggered: {hasTriggered ? "Y" : "N"}
         </div>
       )}

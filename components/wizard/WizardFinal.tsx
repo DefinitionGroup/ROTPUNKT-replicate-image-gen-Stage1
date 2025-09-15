@@ -1,16 +1,16 @@
-import React from 'react'
-import { motion } from 'motion/react'
-import { FcIdea } from 'react-icons/fc'
-import { SignInButton, SignUpButton } from '@clerk/nextjs'
+import React from "react";
+import { motion } from "motion/react";
+import { FcIdea } from "react-icons/fc";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 interface WizardFinalProps {
-  extraWishes: string
-  onExtraWishesChange: (value: string) => void
-  showAuthPrompt: boolean
-  isSignedIn: boolean
-  onSubmit: () => void
-  onAuthRequired: () => void
-  loading?: boolean
+  extraWishes: string;
+  onExtraWishesChange: (value: string) => void;
+  showAuthPrompt: boolean;
+  isSignedIn: boolean;
+  onSubmit: () => void;
+  onAuthRequired: () => void;
+  loading?: boolean;
 }
 
 export const WizardFinal: React.FC<WizardFinalProps> = ({
@@ -20,7 +20,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
   isSignedIn,
   onSubmit,
   onAuthRequired,
-  loading = false
+  loading = false,
 }) => {
   if (showAuthPrompt && !isSignedIn) {
     return (
@@ -31,11 +31,12 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
         animate={{ opacity: 1, y: 0, scale: 1 }}
       >
         <div className="">
-          <h3 className="text-2xl tracking-tight text-white mb-2">
+          <h3 className="text-2xl tracking-tight text-brand-secondary-1 mb-2">
             Du musst eingeloggt sein, um ein Bild zu generieren.
           </h3>
           <p className="text-gray-400 mb-3 text-sm">
-            Bitte melde dich an oder registriere dich. Danach kannst du direkt fortfahren.
+            Bitte melde dich an oder registriere dich. Danach kannst du direkt
+            fortfahren.
           </p>
         </div>
 
@@ -52,7 +53,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
           </SignInButton>
           <SignUpButton mode="modal">
             <motion.button
-              className="cursor-pointer flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md min-h-[48px] w-full bg-red-500 border-red-600 text-white hover:bg-red-600 hover:border-red-700"
+              className="cursor-pointer flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md min-h-[48px] w-full bg-brand-primary-2 border-red-600 text-brand-secondary-1 hover:bg-red-600 hover:border-red-700"
               whileHover={{ scaleX: 1.051 }}
               whileTap={{ scaleX: 0.98 }}
               transition={{ type: "spring" }}
@@ -62,7 +63,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
           </SignUpButton>
         </div>
       </motion.div>
-    )
+    );
   }
 
   return (
@@ -79,16 +80,17 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
       </div>
 
       <div className="flex flex-col items-center mb-6">
-        <h3 className="text-2xl tracking-tight text-white mb-2">
+        <h3 className="text-2xl tracking-tight text-brand-secondary-1 mb-2">
           Zusätzliche Wünsche?
         </h3>
         <p className="text-gray-400 mb-3 text-sm">
-          Hier können Sie weitere Details eingeben (z.B. &quot;große Kücheninsel, viel Licht&quot;)
+          Hier können Sie weitere Details eingeben (z.B. &quot;große
+          Kücheninsel, viel Licht&quot;)
         </p>
       </div>
 
       <textarea
-        className="w-full max-w-xl min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-white mb-6 shadow-lg text-base focus:outline-none focus:ring-0"
+        className="w-full max-w-xl min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-brand-secondary-1 mb-6 shadow-lg text-base focus:outline-none focus:ring-0"
         placeholder="Hier können Sie weitere Wünsche beschreiben..."
         value={extraWishes}
         onChange={(e) => onExtraWishesChange(e.target.value)}
@@ -103,7 +105,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
         className={`cursor-pointer w-fit py-3 px-8 rounded-full font-semibold shadow-xl text-lg
           ${
             isSignedIn
-              ? "bg-red-500 text-white hover:bg-red-600"
+              ? "bg-brand-primary-2 text-brand-secondary-1 hover:bg-red-600"
               : "bg-gray-800 text-gray-400"
           }`}
         whileHover={isSignedIn ? { scaleX: 1.051 } : undefined}
@@ -114,5 +116,5 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
         Bild erstellen
       </motion.button>
     </motion.div>
-  )
-}
+  );
+};

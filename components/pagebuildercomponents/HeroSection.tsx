@@ -68,7 +68,7 @@ export default function HeroSection({
   return (
     <section
       className={cn(
-        "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black text-white",
+        "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black text-brand-secondary-1 selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         "min-h-[40vh] md:min-h-[50vh] lg:min-h-[60vh]",
         className
       )}
@@ -144,7 +144,7 @@ export default function HeroSection({
                 animate="animate"
                 className="mt-4"
               >
-                <div className="h-[3px] w-24 bg-red-500/80 rounded-full" />
+                <div className="h-[3px] w-24 bg-brand-primary-2/80 rounded-full" />
                 {subheadline && (
                   <p className="mt-3 text-red-500 font-extrabold tracking-tight text-base sm:text-lg md:text-xl">
                     {subheadline}
