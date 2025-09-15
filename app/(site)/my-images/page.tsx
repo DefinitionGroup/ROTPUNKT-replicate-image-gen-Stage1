@@ -18,7 +18,9 @@ export default async function MyImagesPage() {
     console.error("Error fetching images:", error.message);
     return (
       <main className="max-w-5xl mx-auto px-6 pt-30 pb-10">
-        <h1 className="text-2xl font-bold mb-6 text-white">Meine Bilder</h1>
+        <h1 className="text-2xl font-bold mb-6 text-brand-secondary-1">
+          Meine Bilder
+        </h1>
         <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-red-400">
           Fehler beim Laden deiner Bilder.
         </div>
@@ -28,7 +30,9 @@ export default async function MyImagesPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-6 pt-30 pb-10">
-      <h1 className="text-2xl font-bold mb-6 text-white">Meine Bilder</h1>
+      <h1 className="text-2xl font-bold mb-6 text-brand-secondary-1">
+        Meine Bilder
+      </h1>
       {!images || images.length === 0 ? (
         <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-gray-300">
           Du hast noch keine Bilder. Erstelle dein erstes Bild im Wizard!

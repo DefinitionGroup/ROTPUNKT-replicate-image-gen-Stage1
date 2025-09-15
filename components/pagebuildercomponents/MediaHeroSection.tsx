@@ -23,7 +23,7 @@ export default function MediaHeroSection({
     <section
       id={id}
       className={cn(
-        "relative grid grid-cols-12 min-h-[90vh] isolate selection:bg-red-500 selection:text-white",
+        "relative grid grid-cols-12 min-h-[90vh] isolate selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         className
       )}
     >

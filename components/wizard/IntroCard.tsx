@@ -31,7 +31,7 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
           }}
         />
         <motion.h2
-          className="text-2xl font-extrabold text-white bg-red-500 bg-clip-text tracking-tighter drop-shadow-xl text-center mb-3"
+          className="text-2xl font-extrabold text-brand-secondary-1 bg-brand-primary-2 bg-clip-text tracking-tighter drop-shadow-xl text-center mb-3"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24, duration: 0.4 }}

@@ -53,7 +53,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
           <>
             <div className="h-2 w-64 rounded-full bg-gray-800 overflow-hidden">
               <motion.div
-                className="h-2 rounded-full bg-red-500"
+                className="h-2 rounded-full bg-brand-primary-2"
                 initial={false}
                 animate={{
                   width: `${

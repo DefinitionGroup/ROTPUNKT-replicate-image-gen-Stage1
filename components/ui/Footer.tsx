@@ -45,7 +45,7 @@ export default function Footer({
   };
 
   return (
-    <footer className=" text-gray-200 selection:bg-red-500 selection:text-white">
+    <footer className=" text-gray-200 selection:bg-brand-primary-2 selection:text-brand-secondary-1">
       <div className="mx-auto px-6 lg:px-8 py-16 sm:py-24 lg:py-32 max-w-7xl">
         <div className="xl:gap-8 border-white/10 xl:grid xl:grid-cols-3 mt-8 pt-8 border-t">
           <div className="px-4 py-2">
@@ -65,7 +65,7 @@ export default function Footer({
             <div className="md:gap-8 md:grid md:grid-cols-4">
               {footerColumns.map((column, index) => (
                 <div key={index} className={index > 0 ? "mt-8 md:mt-0" : ""}>
-                  <h3 className="font-semibold text-sm text-white">
+                  <h3 className="font-semibold text-sm text-brand-secondary-1">
                     {column.title}
                   </h3>
                   <ul role="list" className="space-y-4 mt-6">
@@ -82,7 +82,7 @@ export default function Footer({
                             href={href}
                             target={target}
                             rel={rel}
-                            className="text-gray-400 text-sm hover:text-white"
+                            className="text-gray-400 text-sm hover:text-brand-secondary-1"
                           >
                             {link.label}
                           </Link>

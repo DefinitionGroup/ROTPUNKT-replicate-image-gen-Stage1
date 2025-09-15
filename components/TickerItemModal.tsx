@@ -51,7 +51,7 @@ export default function TickerItemModal({
         <motion.button
           type="button"
           aria-label="Close"
-          className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-black/60 hover:bg-red-500 border border-white/20 text-white shadow-md backdrop-blur-sm transition-colors leading-none"
+          className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-black/60 hover:bg-brand-primary-2 border border-white/20 text-brand-secondary-1 shadow-md backdrop-blur-sm transition-colors leading-none"
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
           onClick={onClose}
@@ -69,7 +69,7 @@ export default function TickerItemModal({
 
         <div className="mt-4 flex flex-col gap-2">
           {title && (
-            <h2 className="text-2xl font-bold text-white leading-loose">
+            <h2 className="text-2xl font-bold text-brand-secondary-1 leading-loose">
               {title}
             </h2>
           )}

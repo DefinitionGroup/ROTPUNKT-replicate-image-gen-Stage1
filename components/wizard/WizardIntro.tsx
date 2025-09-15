@@ -26,7 +26,7 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({ onStart }) => {
       />
 
       <div className="flex flex-col gap-2 mb-3">
-        <h2 className="text-2xl font-extrabold text-white bg-red-500 bg-clip-text tracking-tight drop-shadow-xl">
+        <h2 className="text-2xl font-extrabold text-brand-secondary-1 bg-brand-primary-2 bg-clip-text tracking-tight drop-shadow-xl">
           Küchen-Konfigurator
         </h2>
         <p className="text-gray-200 tracking-tight text-sm max-w-xl">
