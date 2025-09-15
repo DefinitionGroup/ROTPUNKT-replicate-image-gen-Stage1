@@ -7,6 +7,7 @@ import MediaHeroSection from "@/components/pagebuildercomponents/MediaHeroSectio
 import TextHeadlineCombo from "@/components/pagebuildercomponents/TextHeadlineCombo";
 import MediaScrollHighlightSection from "@/components/pagebuildercomponents/MediaScrollHighlightSection";
 import ExpandableCards from "@/components/pagebuildercomponents/ExpandableCards";
+import RichTextComponent from "@/components/pagebuildercomponents/RichTextComponent";
 type PageBuilderProps = {
   content: NonNullable<Page>["content"];
 };
@@ -30,6 +31,8 @@ export function PageBuilder({ content }: PageBuilderProps) {
         return <MediaHeroSection key={block._key} {...block} />;
       case "textHeadlineCombo":
         return <TextHeadlineCombo key={block._key} {...(block as any)} />;
+      case "richText":
+        return <RichTextComponent key={block._key} value={block.content} />;
       case "mediaScrollHighlightSection":
         return (
           <MediaScrollHighlightSection key={block._key} {...(block as any)} />
@@ -38,10 +41,10 @@ export function PageBuilder({ content }: PageBuilderProps) {
         return <ExpandableCards key={block._key} {...block} />;
 
       default:
-        // This is a fallback for when we don't have a block type
+        const unknown = block as any;
         return (
-          <div className="border border-white min-h-[20px]" key={block._key}>
-            Block not found: {block._type}
+          <div className="border border-white min-h-[20px]" key={unknown._key}>
+            Block not found: {unknown._type}
           </div>
         );
     }

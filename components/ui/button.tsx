@@ -7,7 +7,7 @@ import { motion, type MotionProps } from "motion/react";
 
 const buttonVariants = cva(
   // Base styles - common to all buttons
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  "inline-flex items-center cursor-pointer  justify-center gap-2 whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   {
     variants: {
       variant: {

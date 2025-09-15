@@ -7,8 +7,11 @@ import type {
 } from "@/sanity/sanity.types";
 import { Ticker } from "motion-plus/react";
 import { motion } from "motion/react";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import TickerItemModal from "../TickerItemModal";
+
+const MotionImage = motion(Image);
 
 type GalleryItem = TickerItem & { _key: string };
 
@@ -31,10 +34,12 @@ function Box(props: GalleryItem & { handleClick: () => void }) {
       initial="hideInfo"
       whileHover="showInfo"
     >
-      <motion.img
+      <MotionImage
         src={imageCloudinary?.secure_url ?? "/placeholder.svg"}
         alt={`${title ?? "Image"} boxart`}
-        className="w-full h-full object-cover"
+        fill
+        className="object-cover"
+        sizes="(max-width: 640px) 100vw, 300px"
         variants={{ hideInfo: { scale: 1, filter: "blur(0px)", opacity: 1 } }}
       />
       <motion.div
@@ -64,7 +69,7 @@ export default function TickerGallery(props: Props) {
   }, [props]);
 
   return (
-    <>
+    <div className="my-20">
       <Ticker
         hoverFactor={0.2}
         velocity={22}
@@ -89,7 +94,7 @@ export default function TickerGallery(props: Props) {
           {...selectedItem}
         />
       )}
-    </>
+    </div>
   );
 }
 

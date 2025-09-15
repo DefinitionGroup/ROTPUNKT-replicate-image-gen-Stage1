@@ -8,6 +8,8 @@ export default async function Home() {
   });
 
   return (
-    <main>{page?.content ? <PageBuilder content={page.content} /> : null}</main>
+    <main className="pt-20 md:pt-24 lg:pt-28 min-h-screen">
+      {page?.content ? <PageBuilder content={page.content} /> : null}
+    </main>
   );
 }

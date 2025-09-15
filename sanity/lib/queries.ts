@@ -27,3 +27,21 @@ export const NAVBAR_QUERY = defineQuery(`
   }
 }
 `);
+
+export const FOOTER_QUERY = defineQuery(`
+*[_type == "menu" && menuType == "footer"][0]{
+  footerColumns[]{
+    title,
+    links[]{
+      label,
+      linkType,
+      "slug": select(linkType == "internal" => page->slug.current),
+      externalUrl,
+      anchor,
+      openInNewTab
+    }
+  },
+  footerCopyright,
+  footerNote
+}
+`);
