@@ -49,7 +49,7 @@ export default function MediaScrollHighlightSection({
     <section
       id={id}
       className={cn(
-        "relative grid grid-cols-12 font-aspekta isolate",
+        "relative grid grid-cols-12 font-aspekta isolate selection:bg-red-500 selection:text-white",
         className
       )}
     >

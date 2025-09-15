@@ -29,7 +29,7 @@ function Box(props: GalleryItem & { handleClick: () => void }) {
 
   return (
     <motion.div
-      className="item rounded-2xl min-w-[300px] overflow-hidden cursor-pointer"
+      className="item rounded-2xl min-w-[300px] overflow-hidden cursor-pointer selection:bg-red-500 selection:text-white"
       onClick={handleClick}
       initial="hideInfo"
       whileHover="showInfo"
@@ -43,7 +43,7 @@ function Box(props: GalleryItem & { handleClick: () => void }) {
         variants={{ hideInfo: { scale: 1, filter: "blur(0px)", opacity: 1 } }}
       />
       <motion.div
-        className="title"
+        className="title selection:bg-red-500 selection:text-white"
         variants={{
           hideInfo: { opacity: 0, scale: 1.2 },
           showInfo: { opacity: 1, scale: 1 },
@@ -71,6 +71,7 @@ export default function TickerGallery(props: Props) {
   return (
     <div className="my-20">
       <Ticker
+        className="selection:bg-red-500 selection:text-white"
         hoverFactor={0.2}
         velocity={22}
         items={items.map((item) => (

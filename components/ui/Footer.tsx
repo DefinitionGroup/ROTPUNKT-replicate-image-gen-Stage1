@@ -45,7 +45,7 @@ export default function Footer({
   };
 
   return (
-    <footer className=" text-gray-200">
+    <footer className=" text-gray-200 selection:bg-red-500 selection:text-white">
       <div className="mx-auto px-6 lg:px-8 py-16 sm:py-24 lg:py-32 max-w-7xl">
         <div className="xl:gap-8 border-white/10 xl:grid xl:grid-cols-3 mt-8 pt-8 border-t">
           <div className="px-4 py-2">

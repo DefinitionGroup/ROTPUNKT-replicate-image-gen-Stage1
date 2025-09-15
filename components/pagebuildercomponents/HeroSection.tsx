@@ -68,7 +68,7 @@ export default function HeroSection({
   return (
     <section
       className={cn(
-        "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black text-white",
+        "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black text-white selection:bg-red-500 selection:text-white",
         "min-h-[40vh] md:min-h-[50vh] lg:min-h-[60vh]",
         className
       )}

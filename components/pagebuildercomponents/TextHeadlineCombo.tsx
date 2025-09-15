@@ -151,7 +151,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
 
   console.log(props);
   return (
-    <div className="relative container mx-auto my-26 px-4">
+    <div className="relative container mx-auto my-26 px-4 selection:bg-red-500 selection:text-white">
       <div
         className={`relative ${
           bleed ? "w-full" : "max-w-6xl"

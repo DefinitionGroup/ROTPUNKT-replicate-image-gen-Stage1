@@ -25,7 +25,7 @@ export default async function SiteLayout({
 
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className="antialiased selection:bg-red-500 selection:text-white">
         <Providers>
           {navbar && <Navbar {...navbar} />}
           {children}
