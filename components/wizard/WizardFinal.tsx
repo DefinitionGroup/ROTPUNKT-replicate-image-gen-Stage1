@@ -43,7 +43,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
         <div className="flex items-center gap-3 max-w-lg w-full px-6">
           <SignInButton mode="modal">
             <motion.button
-              className="cursor-pointer flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md min-h-[48px] w-full bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-900 hover:text-red-500 hover:border-red-600"
+              className="cursor-pointer flex items-center font-bold justify-center gap-2 px-6 py-3 rounded-full border text-md min-h-[48px] w-full bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-900 hover:text-brand-primary-2 hover:border-red-600"
               whileHover={{ scaleX: 1.051 }}
               whileTap={{ scaleX: 0.98 }}
               transition={{ type: "spring" }}

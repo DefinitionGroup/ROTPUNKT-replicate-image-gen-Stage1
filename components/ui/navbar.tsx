@@ -101,7 +101,7 @@ export default function Navbar({ menuItems }: Props) {
               )
             : cn(
                 "text-inherit hover:text-primary text-md tracking-wider font-bold transition",
-                active && "text-red-500"
+                active && "text-brand-primary-2"
               )
         }
       >

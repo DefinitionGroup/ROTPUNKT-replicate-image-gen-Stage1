@@ -124,7 +124,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-7xl leading-relaxed tracking-tight font-bold  text-center bg-gradient-to-br from-red-500 to-red-600 bg-clip-text text-transparent"
+            className="text-7xl leading-relaxed tracking-tight font-bold  text-center bg-gradient-to-br from-brand-primary-2 to-red-600 bg-clip-text text-transparent"
           >
             {title}
           </h1>

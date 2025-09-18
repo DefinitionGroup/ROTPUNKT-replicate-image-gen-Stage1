@@ -19,23 +19,14 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
       >
 
         <motion.h2
-          className="text-3xl font-bold text-brand-secondary-1 tracking-loose drop-shadow-xl text-center mb-2"
+          className="text-3xl font-bold text-brand-secondary-1 tracking-loose drop-shadow-xl text-center mb-4"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24, duration: 0.4 }}
         >
-          Neue Räume träumen.
+          Neue Räume träumen. Mit unserer KI.
         </motion.h2>
-        <motion.p
-          className="text-gray-200  tracking-wider text-lg max-w-2xl text-center font-bold mb-8"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.37, duration: 0.38 }}
-        >
-          Sammeln Sie Ihre Ideen und Vorstellungen für ein neues Küchendesign.
 
-          Unser KI-Assistent erstellt ein Bild davon – Im Rotpunkt Look.
-        </motion.p>
         <Button
           enableMotion
           onClick={onStart}

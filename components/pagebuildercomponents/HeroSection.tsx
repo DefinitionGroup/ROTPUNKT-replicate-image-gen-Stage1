@@ -159,7 +159,7 @@ export default function HeroSection({
                 variants={descVariants}
                 initial="initial"
                 animate="animate"
-                className="mt-8 max-w-3xl text-red-500 -100 leading-relaxed text-sm sm:text-base"
+                className="mt-8 max-w-3xl text-brand-primary-2 -100 leading-relaxed text-sm sm:text-base"
               >
                 {description}
               </motion.p>

@@ -16,7 +16,7 @@ export default function ImagesGalleryClient({ images }: { images: Img[] }) {
             key={img.id}
             type="button"
             onClick={() => setSelected(img.url)}
-            className="group block text-left rounded-xl overflow-hidden border border-gray-800 bg-gray-950 hover:border-red-500 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+            className="group block text-left rounded-xl overflow-hidden border border-gray-800 bg-gray-950 hover:border-brand-primary-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2"
           >
             <Image
               src={img.url}

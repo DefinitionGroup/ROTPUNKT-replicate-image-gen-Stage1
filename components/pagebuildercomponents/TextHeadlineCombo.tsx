@@ -103,7 +103,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
     bleed = false,
     clamp,
     gradientFrom = "from-red-400",
-    gradientTo = "to-red-500",
+    gradientTo = "to-brand-primary-2",
     className = "",
   } = props;
 
@@ -161,7 +161,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
           {eyebrow && (
             <motion.span
               {...baseMotion(0)}
-              className={`tracking-wide uppercase ${sizes.eyebrow} font-bold text-red-500`}
+              className={`tracking-wide uppercase ${sizes.eyebrow} font-bold text-brand-primary-2`}
             >
               {eyebrow}
             </motion.span>
