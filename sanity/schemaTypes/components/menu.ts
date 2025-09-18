@@ -23,6 +23,23 @@ export default defineType({
       validation: Rule => Rule.required(),
     }),
 
+    // Added: logo for navbar
+    defineField({
+      name: 'navbarLogo',
+      title: 'Navbar Logo (Cloudinary)',
+      type: 'cloudinary.asset',
+      description: 'Optional logo used in the navbar (leave empty to use default).',
+      hidden: ({ document }) => document?.menuType !== 'navbar',
+    }),
+    defineField({
+      name: 'navbarLogoAlt',
+      title: 'Navbar Logo Alt Text',
+      type: 'string',
+      description: 'Alt text for the navbar logo (accessibility).',
+      hidden: ({ document }) => document?.menuType !== 'navbar',
+      validation: Rule => Rule.max(160),
+    }),
+
     // NAVBAR FIELDS
     defineField({
       name: 'menuItems',
@@ -116,6 +133,23 @@ export default defineType({
     }),
 
     // FOOTER FIELDS
+    // Added: logo for footer
+    defineField({
+      name: 'footerLogo',
+      title: 'Footer Logo (Cloudinary)',
+      type: 'cloudinary.asset',
+      description: 'Optional logo used in the footer (leave empty to use default).',
+      hidden: ({ document }) => document?.menuType !== 'footer',
+    }),
+    defineField({
+      name: 'footerLogoAlt',
+      title: 'Footer Logo Alt Text',
+      type: 'string',
+      description: 'Alt text for the footer logo (accessibility).',
+      hidden: ({ document }) => document?.menuType !== 'footer',
+      validation: Rule => Rule.max(160),
+    }),
+
     defineField({
       name: 'footerColumns',
       title: 'Footer Columns',

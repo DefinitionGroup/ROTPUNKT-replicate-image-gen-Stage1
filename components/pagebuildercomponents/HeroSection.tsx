@@ -3,15 +3,38 @@
 import React from "react";
 import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import RichTextComponent from "./RichTextComponent";
 import type {
   HeroSection as HeroSectionType,
   CloudinaryAsset,
+  Cta,
+  RichText,
 } from "@/sanity/sanity.types";
 
 type Props = HeroSectionType & { className?: string };
 
 function urlFromCloudinary(a?: CloudinaryAsset | null) {
   return a?.secure_url ?? a?.url ?? undefined;
+}
+
+function hrefFromLink(link: any) {
+  if (!link) return undefined;
+  if (link.linkType === "external") return link.externalUrl;
+  if (link.linkType === "internal") {
+    const slug = link.page?.slug?.current ?? link.page?.slug;
+    if (slug) return `/${slug}`;
+    return link.page?.url ?? undefined;
+  }
+  return undefined;
+}
+
+// Type guards to narrow additionalContent union
+function isCta(item: any): item is Cta & { _type?: string } {
+  return !!item && item._type === "cta";
+}
+function isRichText(item: any): item is RichText & { _type?: string } {
+  return !!item && item._type === "richText";
 }
 
 export default function HeroSection({
@@ -21,11 +44,18 @@ export default function HeroSection({
   subheadline,
   title,
   logoImageUrl,
+  // changed: accept additionalContent (array of cta | richText)
+  additionalContent,
   className = "",
 }: Props) {
   const bgSrc = urlFromCloudinary(backgroundImage);
   const logoSrc =
     urlFromCloudinary(logoImageUrl) ?? "/rotpunkt-kuechen-logo.svg";
+
+  // collect CTAs and rich text blocks from additionalContent using type guards
+  const items = additionalContent ?? [];
+  const ctas: (Cta & { _type?: string })[] = items.filter(isCta);
+  const richTexts: (RichText & { _type?: string })[] = items.filter(isRichText);
 
   const bgVariants: Variants = {
     initial: { opacity: 0, scale: 1.04, y: 12 },
@@ -163,6 +193,40 @@ export default function HeroSection({
               >
                 {description}
               </motion.p>
+            )}
+
+            {/* Render rich text blocks using existing RichTextComponent */}
+            {richTexts.length > 0 && (
+              <div className="mt-4">
+                {richTexts.map((rt, idx) => (
+                  <div key={(rt as any)._key ?? idx}>
+                    <RichTextComponent value={rt.content ?? null} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* CTA buttons (support multiple) */}
+            {ctas.length > 0 && (
+              <motion.div
+                variants={descVariants}
+                initial="initial"
+                animate="animate"
+                className="mt-6 flex flex-wrap gap-3"
+              >
+                {ctas.map((c, i) => {
+                  const href = hrefFromLink(c.link);
+                  if (!c.text || !href) return null;
+                  // read optional variant/size if present in schema
+                  const variant = (c as any).variant ?? "default";
+                  const size = (c as any).size ?? "default";
+                  return (
+                    <Button key={i} asChild variant={variant} size={size}>
+                      <a href={href}>{c.text}</a>
+                    </Button>
+                  );
+                })}
+              </motion.div>
             )}
           </div>
         </div>

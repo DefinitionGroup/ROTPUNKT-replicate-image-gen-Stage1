@@ -16,6 +16,10 @@ export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current ==
 
 export const NAVBAR_QUERY = defineQuery(`
 *[_type == "menu" && menuType == "navbar"][0]{
+  navbarLogo,
+  // projected direct URL (use secure_url when available)
+  "navbarLogoUrl": navbarLogo.secure_url,
+  navbarLogoAlt,
   menuItems[]{
     _key,
     label,
@@ -30,6 +34,10 @@ export const NAVBAR_QUERY = defineQuery(`
 
 export const FOOTER_QUERY = defineQuery(`
 *[_type == "menu" && menuType == "footer"][0]{
+  footerLogo,
+  // projected direct URL (use secure_url when available)
+  "footerLogoUrl": footerLogo.secure_url,
+  footerLogoAlt,
   footerColumns[]{
     title,
     links[]{
