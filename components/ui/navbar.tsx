@@ -97,11 +97,11 @@ export default function Navbar({ menuItems }: Props) {
         className={
           mobile
             ? cn(
-                "block text-brand-secondary-1 text-2xl font-medium tracking-tight"
+                "block text-brand-secondary-1 text-2xl font-bold tracking-wider"
               )
             : cn(
-                "text-inherit hover:text-primary transition",
-                active && "text-primary"
+                "text-inherit hover:text-primary text-md tracking-wider font-bold transition",
+                active && "text-red-500"
               )
         }
       >
@@ -118,7 +118,7 @@ export default function Navbar({ menuItems }: Props) {
           "relative mx-auto w-auto md:w-full max-w-7xl flex gap-6 items-center justify-between",
           "rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input",
           "bg-white/30 backdrop-blur-sm",
-          "text-black dark:text-brand-secondary-1"
+          "text-white dark:text-brand-secondary-1"
         )}
       >
         <Link href="/" className="flex items-center gap-2">
@@ -158,13 +158,13 @@ export default function Navbar({ menuItems }: Props) {
             <>
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="cursor-pointer px-3 py-1 rounded-full text-sm border border-transparent font-medium text-neutral-400 hover:text-inherit hover:bg-neutral-800/10 dark:hover:bg-white/10 transition-colors">
-                    Sign In
+                  <button className="cursor-pointer px-3 tracking-wider py-1 rounded-full text-sm border border-transparent font-bold text-neutral-200 hover:text-inherit hover:bg-neutral-800/10 dark:hover:bg-white/10 transition-colors">
+                    Anmelden
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="cursor-pointer px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-brand-secondary-1 transition-colors border border-transparent hover:border-current">
-                    Sign Up
+                  <button className="cursor-pointer px-3 py-1 rounded-full text-xs tracking-wider uppercase font-black bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-brand-secondary-1 transition-colors border border-transparent hover:border-current">
+                    Registrieren
                   </button>
                 </SignUpButton>
               </SignedOut>

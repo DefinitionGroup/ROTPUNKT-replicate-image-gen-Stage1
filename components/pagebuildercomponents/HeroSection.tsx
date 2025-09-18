@@ -69,7 +69,7 @@ export default function HeroSection({
     <section
       className={cn(
         "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black text-brand-secondary-1 selection:bg-brand-primary-2 selection:text-brand-secondary-1",
-        "min-h-[40vh] md:min-h-[50vh] lg:min-h-[60vh]",
+        "min-h-[40vh] md:min-h-[50vh] lg:min-h-[20vh] h-[50vh]",
         className
       )}
       aria-labelledby="hero-title"
@@ -97,15 +97,15 @@ export default function HeroSection({
         className="pointer-events-none absolute inset-0 col-start-1 row-start-1"
       >
         {/* left-to-right gradient so left-aligned text pops */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/10 to-transparent" />
         {/* subtle top vignette */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
       </div>
 
       {/* Content stack (top-left) */}
       <div className="col-start-1 row-start-1 z-10">
         <div className=" px-6 sm:px-8 lg:px-12">
-          <div className="max-w-4xl pt-10 sm:pt-12 md:pt-16 lg:pt-20 pb-10 md:pb-14">
+          <div className="max-w-4xl mx-auto pt-10 sm:pt-12 md:pt-16 lg:pt-20 pb-10 md:pb-14">
             {logoSrc && (
               <motion.div
                 variants={logoVariants}
@@ -129,7 +129,7 @@ export default function HeroSection({
               initial="initial"
               animate="animate"
               className={cn(
-                "font-semibold tracking-tight",
+                "font-semibold tracking-wide text-white",
                 "text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
               )}
             >
@@ -144,9 +144,9 @@ export default function HeroSection({
                 animate="animate"
                 className="mt-4"
               >
-                <div className="h-[3px] w-24 bg-brand-primary-2/80 rounded-full" />
+                <div className="h-[8px] w-24  bg-brand-primary-2 rounded-full" />
                 {subheadline && (
-                  <p className="mt-3 text-red-500 font-extrabold tracking-tight text-base sm:text-lg md:text-xl">
+                  <p className="mt-3 text-white font-extrabold tracking-tight text-base sm:text-lg md:text-xl">
                     {subheadline}
                   </p>
                 )}
@@ -159,7 +159,7 @@ export default function HeroSection({
                 variants={descVariants}
                 initial="initial"
                 animate="animate"
-                className="mt-8 max-w-3xl text-gray-200/95 leading-relaxed text-sm sm:text-base"
+                className="mt-8 max-w-3xl text-red-500 -100 leading-relaxed text-sm sm:text-base"
               >
                 {description}
               </motion.p>

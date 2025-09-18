@@ -17,36 +17,24 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
           duration: 0.7,
         }}
       >
-        <motion.img
-          src="/rotpunkt-kuechen-logo.svg"
-          alt="Rotpunkt Küchen Logo"
-          className="mb-6 w-32 h-32"
-          initial={{ opacity: 0, y: 24, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{
-            delay: 0.1,
-            duration: 0.5,
-            type: "spring",
-            stiffness: 120,
-          }}
-        />
+
         <motion.h2
-          className="text-2xl font-extrabold text-brand-secondary-1 bg-brand-primary-2 bg-clip-text tracking-tighter drop-shadow-xl text-center mb-3"
+          className="text-3xl font-bold text-brand-secondary-1 tracking-loose drop-shadow-xl text-center mb-2"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24, duration: 0.4 }}
         >
-          Schaffen Sie sich Ihren neuen Raum
+          Neue Räume träumen.
         </motion.h2>
         <motion.p
-          className="text-gray-200  tracking-tight text-md max-w-xl text-center mb-8"
+          className="text-gray-200  tracking-wider text-lg max-w-2xl text-center font-bold mb-8"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.37, duration: 0.38 }}
         >
-          Stellen Sie sich Ihre Traumküche Schritt für Schritt zusammen.
-          <br />
-          Unser AI-Assistent macht daraus ein Bild!
+          Sammeln Sie Ihre Ideen und Vorstellungen für ein neues Küchendesign.
+
+          Unser KI-Assistent erstellt ein Bild davon – Im Rotpunkt Look.
         </motion.p>
         <Button
           enableMotion

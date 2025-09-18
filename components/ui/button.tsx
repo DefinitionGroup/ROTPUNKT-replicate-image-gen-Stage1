@@ -33,17 +33,17 @@ const buttonVariants = cva(
           "bg-gray-900 border border-gray-800 text-gray-200 font-bold hover:bg-gray-900 hover:text-red-500 hover:border-red-600 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-red-600 data-[selected=true]:text-brand-secondary-1 transition-colors",
       },
       size: {
-        default: "h-9 px-4 py-2 rounded-md",
-        sm: "h-8 px-3 py-1.5 text-xs rounded-md",
-        lg: "h-11 px-6 py-3 rounded-md",
-        icon: "h-9 w-9 rounded-md",
+        default: "h-9 px-4 py-2 rounded-xs",
+        sm: "h-8 px-3 py-1.5 text-xs rounded-xs",
+        lg: "h-11 px-6 py-3 rounded-xs",
+        icon: "h-9 w-9 rounded-xs",
 
         // Project-specific sizes
-        red: "px-8 py-3 text-base rounded-md",
-        cta: "px-8 py-3 text-sm rounded-md",
-        back: "px-4 py-2 text-sm min-w-[108px] rounded-md",
+        red: "px-8 py-3 text-base rounded-xs",
+        cta: "px-8 py-3 text-sm rounded-xs",
+        back: "px-4 py-2 text-sm min-w-[108px] rounded-xs",
         close: "w-auto h-auto p-0 text-3xl rounded-none",
-        wizardOption: "px-6 py-3 text-xs h-12 w-full rounded-md border",
+        wizardOption: "px-6 py-3 text-xs h-12 w-full rounded-xs border",
       },
     },
     defaultVariants: {

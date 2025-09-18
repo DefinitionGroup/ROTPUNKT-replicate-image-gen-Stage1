@@ -124,7 +124,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-6xl font-light  tracking-tighter text-center bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent"
+            className="text-7xl leading-relaxed tracking-tight font-bold  text-center bg-gradient-to-br from-red-500 to-red-600 bg-clip-text text-transparent"
           >
             {title}
           </h1>
@@ -137,8 +137,8 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p
-            className="text-center text-lg text-gray-200 max-w-3xl mx-auto font-black tracking-tight mt-4"
+          <p className="text-white mx-auto tracking-wider text-2xl max-w-2xl text-center font-bold "
+
             role="doc-subtitle"
           >
             {subheadline}
@@ -152,7 +152,8 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-center text-sm text-gray-300 leading-relaxed mb-12 tracking-wide mt-6">
+          <p  className="text-white  tracking-wider text-lg max-w-2xl text-center font-bold mb-8">
+
             {description}
           </p>
         </motion.div>
