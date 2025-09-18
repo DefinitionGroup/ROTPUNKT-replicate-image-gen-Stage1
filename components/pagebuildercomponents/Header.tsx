@@ -74,7 +74,7 @@ export default function Header({
   return (
     <section
       className={cn(
-        `bg-black grid grid-cols-1 grid-rows-1 text-brand-secondary-1 h-[50vh] min-h-[500px] overflow-hidden items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
+        `bg-black grid grid-cols-1 grid-rows-1 text-brand-secondary-1 h-[50vh] min-h-[600px] pb-12 overflow-hidden items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
         className
       )}
       aria-labelledby="hero-title"
@@ -124,7 +124,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-7xl leading-relaxed tracking-tight font-bold  text-center bg-gradient-to-br from-red-500 to-red-600 bg-clip-text text-transparent"
+            className="text-7xl leading-relaxed tracking-tight font-bold  text-center bg-gradient-to-br from-brand-primary-2 to-red-600 bg-clip-text text-transparent"
           >
             {title}
           </h1>

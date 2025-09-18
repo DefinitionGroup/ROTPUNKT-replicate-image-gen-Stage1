@@ -23,14 +23,14 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
 
         // Project-specific variants (actively used in your code)
-        red: "bg-brand-primary-2 text-brand-secondary-1 font-bold border border-transparent hover:bg-red-600 focus-visible:ring-red-500",
+        red: "bg-brand-primary-2 text-brand-secondary-1 font-bold border border-transparent hover:bg-red-600 focus-visible:ring-brand-primary-2",
         redCta:
-          "bg-brand-primary-2 text-brand-secondary-1 font-bold hover:bg-white hover:text-red-500 transition-colors duration-200",
+          "bg-brand-primary-2 text-brand-secondary-1 font-bold hover:bg-white hover:text-brand-primary-2 transition-colors duration-200",
         redOutline:
           "bg-transparent text-red-400 border border-red-400 hover:bg-brand-primary-2/10 transition-colors",
         close: "text-gray-500 hover:text-red-400 font-bold transition-colors",
         wizardOption:
-          "bg-gray-900 border border-gray-800 text-gray-200 font-bold hover:bg-gray-900 hover:text-red-500 hover:border-red-600 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-red-600 data-[selected=true]:text-brand-secondary-1 transition-colors",
+          "bg-gray-900 border border-gray-800 text-gray-200 font-bold hover:bg-gray-900 hover:text-brand-primary-2 hover:border-red-600 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-red-600 data-[selected=true]:text-brand-secondary-1 transition-colors",
       },
       size: {
         default: "h-9 px-4 py-2 rounded-xs",
