@@ -40,6 +40,13 @@ export type Menu = {
     _type: "link";
     _key: string;
   }>;
+  navbarLogo?: CloudinaryAsset;
+  // projected field added by queries: direct URL string
+  navbarLogoUrl?: string;
+  navbarLogoAlt?: string;
+  footerLogo?: CloudinaryAsset;
+  footerLogoUrl?: string;
+  footerLogoAlt?: string;
   footerColumns?: Array<{
     title?: string;
     links?: Array<{
@@ -444,22 +451,32 @@ export type FooterColumnProjected = Omit<_FooterColumnBase, "links"> & {
 export type MenuNavbarProjected = Omit<Menu, "menuItems" | "footerColumns"> & {
   menuType?: "navbar" | "footer";
   menuItems?: NavbarMenuItemProjected[];
+  // include logo fields on projected menu for navbar usage
+  navbarLogo?: CloudinaryAsset;
+  navbarLogoAlt?: string;
 };
 
 export type MenuFooterProjected = Omit<Menu, "menuItems" | "footerColumns"> & {
   menuType?: "navbar" | "footer";
   footerColumns?: FooterColumnProjected[];
+  // include logo fields on projected menu for footer usage
+  footerLogo?: CloudinaryAsset;
+  footerLogoAlt?: string;
 };
 
-/**
- * Convenience UI types
- */
+// Convenience UI types
 export type NavbarData = {
   menuItems?: NavbarMenuItemProjected[];
+  navbarLogo?: CloudinaryAsset;
+  navbarLogoAlt?: string;
 };
 
 export type FooterData = {
   footerColumns?: FooterColumnProjected[];
+  footerLogo?: CloudinaryAsset;
+  footerLogoAlt?: string;
+  footerCopyright?: string;
+  footerNote?: string;
 };
 export type HeroSection = {
   _type: "heroSection";
@@ -470,6 +487,8 @@ export type HeroSection = {
   backgroundImage?: CloudinaryAsset;
   logoImageUrl?: CloudinaryAsset;
   backgroundAlt?: string;
+  // now uses an array field (additionalContent) that can contain cta objects and richText blocks
+  additionalContent?: Array<({ _type?: "cta" } & Cta) | ({ _type?: "richText" } & RichText)>;
 };
 export type HeroSectionProjected = {
   _type: "heroSection";
@@ -482,6 +501,7 @@ export type HeroSectionProjected = {
 
   backgroundImageUrl?: string;
   logoImage?: string;
+  additionalContent?: Array<({ _type?: "cta" } & Cta) | ({ _type?: "richText" } & RichText)>;
 };
 export type MediaHeroSectionProps = {
   _type: "mediaHeroSection";
