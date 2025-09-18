@@ -6,7 +6,7 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
     <AnimatePresence>
       <motion.div
         key="introcard"
-        className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[360px]"
+        className="w-full max-w-5xl mx-auto flex flex-col border border-white/5 rounded-sm items-center justify-center min-h-[360px]"
         initial={{ opacity: 0, y: 30, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -19,12 +19,12 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
       >
 
         <motion.h2
-          className="text-3xl font-bold text-brand-secondary-1 tracking-loose drop-shadow-xl text-center mb-4"
+          className="text-3xl font-bold text-brand-secondary-1 tracking-loose drop-shadow-xl text-center mb-12"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24, duration: 0.4 }}
         >
-          Neue Räume träumen. Mit unserer KI.
+          Neue Räume träumen.
         </motion.h2>
 
         <Button
