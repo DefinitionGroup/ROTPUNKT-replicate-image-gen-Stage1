@@ -35,28 +35,28 @@ const sizeMap = {
   xl: {
     headline: "text-5xl md:text-7xl lg:text-7xl",
     subhead: "text-xl md:text-2xl",
-    eyebrow: "text-[11px]",
+    eyebrow: "text-[16px]",
     kicker: "text-sm",
     gap: "gap-6 md:gap-2",
   },
   lg: {
     headline: "text-4xl md:text-5xl",
     subhead: "text-lg md:text-xl",
-    eyebrow: "text-[11px]",
+    eyebrow: "text-[16px]",
     kicker: "text-sm",
     gap: "gap-5 md:gap-6",
   },
   md: {
     headline: "text-3xl md:text-3xl",
     subhead: "text-base md:text-lg",
-    eyebrow: "text-[10px]",
+    eyebrow: "text-[16px]",
     kicker: "text-xs md:text-sm",
     gap: "gap-4 md:gap-5",
   },
   sm: {
     headline: "text-xl md:text-xl",
     subhead: "text-sm md:text-base",
-    eyebrow: "text-[10px]",
+    eyebrow: "text-[16px]",
     kicker: "text-xs",
     gap: "gap-3 md:gap-4",
   },
@@ -151,7 +151,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
 
   console.log(props);
   return (
-    <div className="relative container mx-auto my-26 px-4 selection:bg-brand-primary-2 selection:text-brand-secondary-1">
+    <div className="relative container max-w-5xl mx-auto my-12 px-4 selection:bg-brand-primary-2 selection:text-brand-secondary-1">
       <div
         className={`relative ${
           bleed ? "w-full" : "max-w-6xl"
@@ -161,7 +161,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
           {eyebrow && (
             <motion.span
               {...baseMotion(0)}
-              className={`tracking-widest uppercase ${sizes.eyebrow} font-semibold text-red-500/90`}
+              className={`tracking-wide uppercase ${sizes.eyebrow} font-bold text-red-500`}
             >
               {eyebrow}
             </motion.span>
@@ -169,7 +169,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
 
           <motion.h1
             {...baseMotion(0.05)}
-            className={`font-semibold tracking-tight text-brand-secondary-1 leading-tight ${sizes.headline}`}
+            className={`font-semibold tracking-tight text-brand-secondary-1 leading-compress ${sizes.headline}`}
           >
             {typeof headline === "string" && highlight ? (
               <>
@@ -190,7 +190,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
               {...baseMotion(0.12)}
               className={`${
                 sizes.subhead
-              } font-medium leading-relaxed text-brand-secondary-1 ${
+              } font-bold tracking-wider   leading-relaxed text-brand-secondary-1 ${
                 clamp ? `line-clamp-${clamp}` : ""
               }`}
             >

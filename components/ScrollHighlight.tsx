@@ -102,13 +102,13 @@ function Stylesheet({ padTopBottomVh }: { padTopBottomVh: number }) {
       }
       .skill-name { white-space: nowrap; }
       .skill-description {
-        font-size: 1.2rem;
+        font-size: 1rem;letter-spacing: 0.05em;
         min-height: 5rem; /* reduced min height to avoid huge gaps */
-        font-weight: 400;
-        line-height: 1.3;
+        font-weight: 700;
+        line-height: 1.75;
         margin-top: 0.75rem;
         text-transform: none;
-        opacity: 0.85;
+        opacity: 1;
         max-width: min(70ch, 90vw);
         white-space: normal;
         overflow-wrap: break-word; word-break: break-word;

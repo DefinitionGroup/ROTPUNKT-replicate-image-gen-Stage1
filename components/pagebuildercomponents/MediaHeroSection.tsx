@@ -23,7 +23,7 @@ export default function MediaHeroSection({
     <section
       id={id}
       className={cn(
-        "relative grid grid-cols-12 min-h-[90vh] isolate selection:bg-brand-primary-2 selection:text-brand-secondary-1",
+        "relative grid grid-cols-12 min-h-[50vh] isolate overflow-hidden selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         className
       )}
     >
@@ -38,18 +38,18 @@ export default function MediaHeroSection({
         opacity={overlayOpacity}
       />
 
-      <div className="z-1  gap-8 col-span-12 py-32 col-start-1 container mx-auto row-start-1 grid-cols-12 px-4">
+      <div className="z-1  gap-8 col-span-12 py-32 col-start-1  row-start-1 grid-cols-12 px-4">
         <StaggeredSlideUp
-          className="flex flex-col items-start mt-64 justify-center "
+          className="flex flex-col items-center mt-64 justify-center container mx-auto text-center "
           delay={animation.delay ?? 0.1}
           staggerDelay={animation.staggerDelay ?? 0.1}
           duration={animation.duration ?? 0.5}
           distance={animation.distance ?? 80}
         >
-          <h2 className="text-9xl leading-compress text-gray-100 max-w-3xl font-normal tracking-tighter leading-tighter mb-8">
+          <h2 className="text-7xl leading-compress text-gray-100 max-w-3xl textg-center font-bold tracking-wider leading-tighter mb-8">
             {heading}
           </h2>
-          <p className="text-3xl text-gray-100 font-medium  max-w-2xs mx-auto">
+          <p className="text-xl text-gray-100 font-bold text-center max-w-2xs mx-auto">
             {subheading}
           </p>
         </StaggeredSlideUp>

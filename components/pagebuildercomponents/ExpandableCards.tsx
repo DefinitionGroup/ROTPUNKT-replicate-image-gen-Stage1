@@ -107,7 +107,7 @@ export default function ExpandableCards({
             <motion.div
               layoutId={`card-${active.title}-${id}`}
               ref={ref}
-              className="w-full max-w-[900px] min-h-[70vh] relative h-full md:h-fit md:max-h-[90%] rounded-xl flex flex-col bg-neutral-900 shadow-2xl overflow-hidden"
+              className="w-full max-w-[900px] min-h-[70vh]  relative h-full md:h-fit md:max-h-[90%] rounded-xl flex flex-col bg-neutral-900 shadow-2xl overflow-hidden"
               role="dialog"
               aria-modal="true"
             >
@@ -140,27 +140,27 @@ export default function ExpandableCards({
                     {active.description && (
                       <motion.p
                         layoutId={`description-${active.description}-${id}`}
-                        className="text-neutral-100 text-5xl dark:text-neutral-200"
+                        className="text-white font-black text-5xl dark:text-neutral-200"
                       >
                         {active.description}
                       </motion.p>
                     )}
                     <motion.h3
                       layoutId={`title-${active.title}-${id}`}
-                      className="text-red-500 text-xl dark:text-neutral-200"
+                      className="text-xl text-white font-bold mt-4 dark:text-neutral-100"
                     >
                       {active.title}
                     </motion.h3>
                   </div>
                 </div>
 
-                <div className="relative px-0 md:px-8">
+                <div className="relative px-0 md:px-8 min-h-full ">
                   <motion.div
                     layout
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="text-brand-secondary-1 text-md md:text-sm lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-300 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
+                    className="text-white text-md md:text-base lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto font-bold dark:text-neutral-300 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                   >
                     {Array.isArray(active.body) ? (
                       <PortableText value={active.body as any} />
@@ -194,7 +194,7 @@ export default function ExpandableCards({
       </AnimatePresence>
 
       {/* Grid */}
-      <ul className={`w-full ${className ?? ""}`}>
+      <ul className={`w-full max-w-5xl mx-auto ${className ?? ""}`}>
         <StaggeredSlideUp className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto w-full">
           {transformedItems.map((card) => (
             <motion.div
