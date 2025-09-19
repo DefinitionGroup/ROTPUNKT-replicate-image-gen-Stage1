@@ -20,21 +20,44 @@ function urlFromCloudinary(a?: CloudinaryAsset | null) {
 
 function hrefFromLink(link: any) {
   if (!link) return undefined;
-  if (link.linkType === "external") return link.externalUrl;
+
+  console.log("Processing link:", link); // Debug log
+
+  if (link.linkType === "external") {
+    return link.externalUrl;
+  }
+
   if (link.linkType === "internal") {
+    // Check if we have a page reference
+    if (link.page?._ref) {
+      // You'll need to resolve this reference to get the actual slug
+      // For now, let's try to use externalUrl as fallback if it exists
+      return link.externalUrl || `#ref-${link.page._ref}`;
+    }
+
+    // Try to get slug from page object
     const slug = link.page?.slug?.current ?? link.page?.slug;
     if (slug) return `/${slug}`;
-    return link.page?.url ?? undefined;
+
+    // Fallback to any URL we can find
+    return link.page?.url ?? link.externalUrl ?? undefined;
   }
-  return undefined;
+
+  if (link.linkType === "anchor") {
+    return link.anchor ? `#${link.anchor}` : undefined;
+  }
+
+  // Fallback: if no linkType but we have URLs
+  return link.externalUrl || link.url || undefined;
 }
 
-// Type guards to narrow additionalContent union
+// Updated type guards to be more flexible
 function isCta(item: any): item is Cta & { _type?: string } {
-  return !!item && item._type === "cta";
+  return !!item && (item._type === "cta" || item.text || item.link);
 }
+
 function isRichText(item: any): item is RichText & { _type?: string } {
-  return !!item && item._type === "richText";
+  return !!item && (item._type === "richText" || item.content);
 }
 
 export default function HeroSection({
@@ -44,7 +67,6 @@ export default function HeroSection({
   subheadline,
   title,
   logoImageUrl,
-  // changed: accept additionalContent (array of cta | richText)
   additionalContent,
   className = "",
 }: Props) {
@@ -52,10 +74,16 @@ export default function HeroSection({
   const logoSrc =
     urlFromCloudinary(logoImageUrl) ?? "/rotpunkt-kuechen-logo.svg";
 
-  // collect CTAs and rich text blocks from additionalContent using type guards
+  // Log for debugging
+  console.log("additionalContent:", additionalContent);
+
+  // collect CTAs and rich text blocks from additionalContent using updated type guards
   const items = additionalContent ?? [];
   const ctas: (Cta & { _type?: string })[] = items.filter(isCta);
   const richTexts: (RichText & { _type?: string })[] = items.filter(isRichText);
+
+  console.log("Filtered CTAs:", ctas);
+  console.log("Filtered RichTexts:", richTexts);
 
   const bgVariants: Variants = {
     initial: { opacity: 0, scale: 1.04, y: 12 },
@@ -92,6 +120,16 @@ export default function HeroSection({
       opacity: 1,
       y: 0,
       transition: { type: "spring", delay: 0.46, stiffness: 140, damping: 20 },
+    },
+  };
+
+  // Add variants for additional content
+  const contentVariants: Variants = {
+    initial: { opacity: 0, y: 8 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { type: "spring", delay: 0.58, stiffness: 140, damping: 20 },
     },
   };
 
@@ -197,31 +235,56 @@ export default function HeroSection({
 
             {/* Render rich text blocks using existing RichTextComponent */}
             {richTexts.length > 0 && (
-              <div className="mt-4">
+              <motion.div
+                variants={contentVariants}
+                initial="initial"
+                animate="animate"
+                className="mt-6 space-y-4"
+              >
                 {richTexts.map((rt, idx) => (
-                  <div key={(rt as any)._key ?? idx}>
-                    <RichTextComponent value={rt.content ?? null} />
+                  <div
+                    key={(rt as any)._key ?? `richtext-${idx}`}
+                    className="prose prose-invert max-w-none"
+                  >
+                    <RichTextComponent value={rt.content ?? []} />
                   </div>
                 ))}
-              </div>
+              </motion.div>
             )}
 
             {/* CTA buttons (support multiple) */}
             {ctas.length > 0 && (
               <motion.div
-                variants={descVariants}
+                variants={contentVariants}
                 initial="initial"
                 animate="animate"
                 className="mt-6 flex flex-wrap gap-3"
               >
                 {ctas.map((c, i) => {
                   const href = hrefFromLink(c.link);
-                  if (!c.text || !href) return null;
+                  console.log(`CTA ${i} - text: ${c.text}, href: ${href}`); // Debug log
+
+                  if (!c.text) {
+                    console.log(`CTA ${i} has no text, skipping`);
+                    return null;
+                  }
+
+                  if (!href) {
+                    console.log(`CTA ${i} has no href, skipping`);
+                    return null;
+                  }
+
                   // read optional variant/size if present in schema
                   const variant = (c as any).variant ?? "default";
                   const size = (c as any).size ?? "default";
+
                   return (
-                    <Button key={i} asChild variant={variant} size={size}>
+                    <Button
+                      key={`cta-${i}`}
+                      asChild
+                      variant={variant}
+                      size={size}
+                    >
                       <a href={href}>{c.text}</a>
                     </Button>
                   );
