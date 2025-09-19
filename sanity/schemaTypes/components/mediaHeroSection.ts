@@ -75,6 +75,14 @@ export default defineType({
       description: "Improves accessibility",
       validation: (Rule) => Rule.max(160),
     }),
+    defineField({
+      name: "additionalContent",
+      title: "Additional Content",
+      type: "array",
+      of: [{ type: "cta" }, { type: "richText" }],
+      description: "Optional additional content such as buttons or rich text",
+      validation: (Rule) => Rule.max(3),
+    }),
 
     // defineField({
     //   name: "overlayOpacity",

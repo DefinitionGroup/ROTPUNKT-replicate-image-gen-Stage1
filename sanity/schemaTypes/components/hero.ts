@@ -29,7 +29,7 @@ export default defineType({
     defineField({
       name: "backgroundImage",
       title: "Background Image (Cloudinary)",
-      type: "cloudinary.asset", 
+      type: "cloudinary.asset",
       validation: (Rule) => Rule.required(),
     }),
 
@@ -48,14 +48,24 @@ export default defineType({
       description: "Improves accessibility; if omitted, the component uses subheadline.",
       validation: (Rule) => Rule.max(160),
     }),
+
+    defineField({
+      name: "additionalContent",
+      title: "Additional Content",
+      type: "array",
+      of: [{ type: "cta" }, { type: "richText" }],
+      description: "Optional additional content such as buttons or rich text",
+      validation: (Rule) => Rule.max(3),
+    }),
   ],
   preview: {
     select: {
       title: "title",
       subtitle: "subheadline",
       media: "icon",
+      ctaText: "cta.text",
     },
-    prepare({ title, subtitle, media }) {
+    prepare({ title, subtitle, media, ctaText }) {
       return {
         title: title || "Hero Section",
         subtitle,

@@ -19,9 +19,27 @@ import type {
 } from "@/sanity/sanity.types";
 import { internalHref } from "@/utils/nav-internal";
 
-type Props = Pick<MenuNavbarProjected, "menuItems">;
+type Props = Pick<
+  MenuNavbarProjected,
+  "menuItems" | "navbarLogo" | "navbarLogoAlt" | "navbarLogoUrl"
+>;
 
-export default function Navbar({ menuItems }: Props) {
+// prefer the projected string URL, fall back to Cloudinary object fields if present
+const logoUrl = (props: { navbarLogoUrl?: string; navbarLogo?: any }) =>
+  props.navbarLogoUrl ??
+  props.navbarLogo?.secure_url ??
+  props.navbarLogo?.url ??
+  undefined;
+
+export default function Navbar({
+  menuItems,
+  navbarLogo,
+  navbarLogoAlt,
+  navbarLogoUrl,
+}: Props) {
+  // use string directly if available
+  const resolvedLogo =
+    navbarLogoUrl ?? navbarLogo?.secure_url ?? navbarLogo?.url;
   const [open, setOpen] = useState(false);
   const closeMenu = () => setOpen(false);
   const pathname = usePathname();
@@ -122,7 +140,15 @@ export default function Navbar({ menuItems }: Props) {
         )}
       >
         <Link href="/" className="flex items-center gap-2">
-          <Logo />
+          {resolvedLogo ? (
+            <img
+              src={resolvedLogo}
+              alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
+              className="h-8 w-auto block"
+            />
+          ) : (
+            <Logo />
+          )}
         </Link>
 
         {/* Mobile menu toggle */}
@@ -175,7 +201,6 @@ export default function Navbar({ menuItems }: Props) {
               </SignedIn>
             </>
           ) : (
-            // Placeholder with same dimensions to prevent layout shift
             <div className="flex items-center space-x-2">
               <div className="w-[60px] h-[32px]" />
               <div className="w-[64px] h-[32px]" />
@@ -217,7 +242,15 @@ export default function Navbar({ menuItems }: Props) {
                   onClick={closeMenu}
                   className="flex items-center gap-2"
                 >
-                  <Logo />
+                  {resolvedLogo ? (
+                    <img
+                      src={resolvedLogo}
+                      alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
+                      className="h-8 w-auto block"
+                    />
+                  ) : (
+                    <Logo />
+                  )}
                 </Link>
                 <button
                   type="button"
@@ -296,7 +329,6 @@ export default function Navbar({ menuItems }: Props) {
                     </SignedIn>
                   </>
                 ) : (
-                  // Placeholder for mobile auth section
                   <div className="flex gap-2">
                     <div className="w-[72px] h-[40px] rounded-full bg-white/10" />
                     <div className="w-[72px] h-[40px] rounded-full bg-white" />
