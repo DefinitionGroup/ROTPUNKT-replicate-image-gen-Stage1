@@ -18,6 +18,7 @@ import type {
   NavbarMenuItemProjected,
 } from "@/sanity/sanity.types";
 import { internalHref } from "@/utils/nav-internal";
+import Image from "next/image";
 
 type Props = Pick<
   MenuNavbarProjected,
@@ -141,13 +142,17 @@ export default function Navbar({
       >
         <Link href="/" className="flex items-center gap-2">
           {resolvedLogo ? (
-            <img
+            <Image
               src={resolvedLogo}
               alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
-              className="h-8 w-auto block"
+              className="h-4 w-auto block text-white"
+              width={240}
+              height={48}
             />
           ) : (
-            <Logo />
+            <span className="block h-4 w-auto text-white">
+              <Logo />
+            </span>
           )}
         </Link>
 
@@ -246,10 +251,12 @@ export default function Navbar({
                     <img
                       src={resolvedLogo}
                       alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
-                      className="h-8 w-auto block"
+                      className="h-4 w-auto block"
                     />
                   ) : (
-                    <Logo />
+                    <span className="block h-4 w-auto text-white">
+                      <Logo />
+                    </span>
                   )}
                 </Link>
                 <button
