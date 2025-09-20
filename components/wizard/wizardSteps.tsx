@@ -10,6 +10,16 @@ import {
 } from "react-icons/fa"
 
 export const wizardSteps = [
+   {
+    key: "kind",
+    label: "Thema auswählen",
+    options: [
+      { value: "kueche", label: "Küche" },
+      { value: "wohnzimmer", label: "Wohnzimmer" },
+
+    ],
+    icon: <FaPalette className="w-full h-full text-red-400" />,
+  },
   {
     key: "color",
     label: "Farbe",
@@ -30,21 +40,13 @@ export const wizardSteps = [
       { value: "elegant", label: "Elegant" },
       { value: "modern", label: "Modern" },
       { value: "minimalistisch", label: "Minimalistisch" },
-      { value: "klassisch", label: "Klassisch" },
-    ],
-    icon: <FaCouch className="w-full h-full text-red-400" />,
-  },
-  {
-    key: "kitchenLook",
-    label: "Aussehen",
-    options: [
-      { value: "modern", label: "Modern" },
-      { value: "offen", label: "Offen" },
+      { value: "klassisch", label: "Klassisch" },    { value: "offen", label: "Offen" },
       { value: "luxuriös", label: "Luxuriös" },
       { value: "kompakt", label: "Kompakt" },
     ],
-    icon: <FaLayerGroup className="w-full h-full text-red-400" />,
+    icon: <FaCouch className="w-full h-full text-red-400" />,
   },
+
   {
     key: "environment",
     label: "Umgebung",
@@ -96,15 +98,5 @@ export const wizardSteps = [
     ],
     icon: <FaHome className="w-full h-full text-red-400" />,
   },
-  {
-    key: "background",
-    label: "Hintergrund",
-    options: [
-      { value: "Ozean, Strand und Palmen", label: "Ozean, Strand und Palmen" },
-      { value: "Berge", label: "Berge" },
-      { value: "Wald", label: "Wald" },
-      { value: "Stadtpanorama", label: "Stadtpanorama" },
-    ],
-    icon: <FaSun className="w-full h-full text-red-400" />,
-  },
+
 ]
