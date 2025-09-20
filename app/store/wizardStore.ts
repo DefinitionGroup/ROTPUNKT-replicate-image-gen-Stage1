@@ -5,6 +5,7 @@ export interface WizardState {
   selectedOptions: {
     color?: string
     style?: string
+    kind?: string
     kitchenLook?: string
     environment?: string
     location?: string
