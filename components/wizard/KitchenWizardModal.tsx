@@ -80,7 +80,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     }
 
     const prompt = [
-      `Dann eine ${selectedOptions.color}, ${selectedOptions.style}e Küche.`,
+      `Dann eine ${selectedOptions.color}, ${selectedOptions.style} ${selectedOptions.kind}.`,
       `${capitalizeFirst(selectedOptions.kitchenLook!)} aussehend in einer ${
         selectedOptions.environment
       }en Umgebung.`,
