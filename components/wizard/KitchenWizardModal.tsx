@@ -216,6 +216,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                   onRequireAuth={() => wizardActions.setAuthPrompt(true)}
                   onJumpToFinal={() => wizardActions.setStep(totalSteps)}
                   onApplyPreset={handlePresetApply}
+                  onJumpToStep={(index) => wizardActions.setStep(index)}
                 />
               </div>
             </CardContent>

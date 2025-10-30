@@ -1,12 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
+import { motion } from "motion/react";
+import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent } from "@/components/ui/card";
 import { wizardSteps } from "./wizardSteps";
 import type { WizardState } from "@/app/store/wizardStore";
 import type { WizardPreset } from "./wizardPresets";
 import { wizardPresets } from "./wizardPresets";
-import { motion } from "motion/react";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -21,6 +25,7 @@ interface WizardSummaryPanelProps {
   onRequireAuth: () => void;
   onJumpToFinal: () => void;
   onApplyPreset: (preset: WizardPreset) => void;
+  onJumpToStep: (index: number) => void;
 }
 
 export function WizardSummaryPanel({
@@ -36,12 +41,15 @@ export function WizardSummaryPanel({
   onRequireAuth,
   onJumpToFinal,
   onApplyPreset,
+  onJumpToStep,
 }: WizardSummaryPanelProps) {
   const [copied, setCopied] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
   const cleanedWishes = extraWishes.trim();
 
   const isComplete = missingKeys.length === 0;
   const isOnFinalStep = currentStep >= totalSteps;
+  const activeIndex = Math.min(currentStep, Math.max(0, totalSteps - 1));
 
   const groupedSelections = useMemo(() => {
     return wizardSteps.map((step) => {
@@ -154,18 +162,14 @@ export function WizardSummaryPanel({
         <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
           Schnelleinstellungen
         </h4>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-1 gap-3">
           {wizardPresets.map((preset) => (
-            <Button
+            <PresetCard
               key={preset.label}
-              variant="ghost"
-              size="sm"
-              className="bg-gray-900/80 text-gray-200 border border-gray-700 hover:bg-brand-primary-2/80 hover:text-brand-secondary-1 hover:border-brand-primary-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70"
-              onClick={() => onApplyPreset(preset)}
+              preset={preset}
+              onSelect={onApplyPreset}
               disabled={loading}
-            >
-              {preset.label}
-            </Button>
+            />
           ))}
         </div>
       </div>
@@ -178,29 +182,40 @@ export function WizardSummaryPanel({
         </h4>
         <div className="flex flex-col gap-3">
           {groupedSelections.map((item, idx) => (
-            <div
+            <button
               key={item.key as string}
-              className={`rounded-xl border p-3 transition-colors ${
-                idx === Math.min(currentStep, totalSteps)
-                  ? "border-brand-primary-2/80 bg-brand-primary-2/10"
-                  : "border-gray-800 bg-gray-900/60"
+              type="button"
+              onClick={() => onJumpToStep(idx)}
+              className={`text-left rounded-lg border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
+                idx === activeIndex
+                  ? "border-emerald-400 bg-emerald-500/10"
+                  : "border-gray-800 bg-gray-900/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5"
               }`}
+              disabled={loading}
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-wide text-gray-400">
+                <span className="text-xxs font-bold uppercase tracking-wide text-gray-600">
                   {idx + 1}. {item.title}
                 </span>
-                <span className="text-[10px] text-gray-500">
-                  {item.selectedLabel ? "ausgewählt" : "offen"}
-                </span>
+                {item.selectedLabel ? (
+                  <span className="flex items-center gap-1 text-xs text-emerald-400">
+                    <FaCheckCircle className="h-3 w-3" />
+                    ausgewählt
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-xs text-red-400">
+                    <FaRegCircle className="h-3 w-3" />
+                    offen
+                  </span>
+                )}
               </div>
-              <p className="text-sm mt-1 text-brand-secondary-1">
+              <p className="text-xs inline-block mt-1 font-bold  text-brand-secondary-1 border rounded-3xl p-1 border-gray-600 px-7">
                 {item.selectedLabel ?? "Noch keine Auswahl"}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 {item.description}
               </p>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -209,30 +224,48 @@ export function WizardSummaryPanel({
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
-            Prompt-Vorschau
-          </h4>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopy}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
+              Prompt-Vorschau
+            </h4>
+            <span className="text-xs text-gray-500">
+              {showPrompt ? "Sichtbar" : "Ausgeblendet"}
+            </span>
+          </div>
+          <Switch
+            checked={showPrompt}
+            onCheckedChange={setShowPrompt}
             disabled={!prompt.length}
-          >
-            {copied ? "Kopiert" : "Prompt kopieren"}
-          </Button>
+            aria-label="Prompt-Vorschau umschalten"
+          />
         </div>
-        <motion.pre
-          className="rounded-xl border border-gray-800 bg-black/70 text-left text-xs text-gray-300 p-4 overflow-y-auto max-h-48 whitespace-pre-wrap"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-        >
-          {prompt}
-        </motion.pre>
-        {cleanedWishes && (
-          <p className="text-xs text-gray-400">
-            Extra-Wünsche: {cleanedWishes}
-          </p>
+
+        {showPrompt && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="flex flex-col gap-3"
+          >
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopy}
+                disabled={!prompt.length}
+              >
+                {copied ? "Kopiert" : "Prompt kopieren"}
+              </Button>
+            </div>
+            <pre className="rounded-xl border border-gray-800 bg-black/70 text-left text-xs text-gray-300 p-4 overflow-y-auto max-h-48 whitespace-pre-wrap">
+              {prompt}
+            </pre>
+            {cleanedWishes && (
+              <p className="text-xs text-gray-400">
+                Extra-Wünsche: {cleanedWishes}
+              </p>
+            )}
+          </motion.div>
         )}
       </div>
 
@@ -243,5 +276,52 @@ export function WizardSummaryPanel({
         </p>
       </div>
     </aside>
+  );
+}
+
+type PresetCardProps = {
+  preset: WizardPreset;
+  onSelect: (preset: WizardPreset) => void;
+  disabled: boolean;
+};
+
+function PresetCard({ preset, onSelect, disabled }: PresetCardProps) {
+  const [imageError, setImageError] = useState(false);
+  const showImage = preset.previewImage && !imageError;
+
+  return (
+    <Card className="overflow-hidden border border-gray-700 bg-gray-900/70 hover:border-brand-primary-2/80 hover:bg-brand-primary-2/10 transition-colors">
+      <button
+        type="button"
+        className="w-full text-left"
+        onClick={() => onSelect(preset)}
+        disabled={disabled}
+      >
+        <div className="relative h-28 w-full">
+          {showImage ? (
+            <Image
+              src={preset.previewImage!}
+              alt={preset.label}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 320px"
+              onError={() => setImageError(true)}
+              priority={false}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <span className="absolute bottom-2 left-3 text-sm font-semibold text-white">
+            {preset.label}
+          </span>
+        </div>
+        <CardContent className="py-3 px-4">
+          <p className="text-xxs text-gray-300 leading-relaxed">
+            {preset.description}
+          </p>
+        </CardContent>
+      </button>
+    </Card>
   );
 }

@@ -3,6 +3,7 @@ import type { WizardState } from "@/app/store/wizardStore";
 export type WizardPreset = {
   label: string;
   description: string;
+  previewImage?: string;
   options: Partial<WizardState["selectedOptions"]>;
   extraWishes?: string;
 };
@@ -11,6 +12,7 @@ export const wizardPresets: WizardPreset[] = [
   {
     label: "Scandi Innenansicht",
     description: "Helle Holzoptik, viel Tageslicht und ein naturnahes Setting.",
+    previewImage: "/wizard-presets/scandi.jpg",
     options: {
       kind: "kueche",
       color: "holz",
@@ -27,6 +29,7 @@ export const wizardPresets: WizardPreset[] = [
   {
     label: "Urban Loft Außen",
     description: "Dunkle, moderne Loft-Architektur mit urbaner Skyline.",
+    previewImage: "/wizard-presets/urban-loft.jpg",
     options: {
       kind: "from the outside",
       color: "schwarz",
@@ -43,6 +46,7 @@ export const wizardPresets: WizardPreset[] = [
   {
     label: "Luxury Evening",
     description: "Burgunderrote Statement-Küche in eleganter Abendstimmung.",
+    previewImage: "/wizard-presets/luxury.jpg",
     options: {
       kind: "kueche",
       color: "burgunderrot",
