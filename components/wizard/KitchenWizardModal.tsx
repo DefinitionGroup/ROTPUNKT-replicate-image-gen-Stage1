@@ -128,7 +128,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
           }}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          <Card className="relative w-full h-full min-h-[670px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 rounded-2xl">
+          <Card className="relative w-full h-full min-h-[670px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/100 via-neutral-950 to-neutral-900/50 border border-gray-800 rounded-2xl">
             <CardHeader>
               <WizardHeader
                 currentStep={wizardState.currentStep}

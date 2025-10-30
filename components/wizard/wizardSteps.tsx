@@ -16,9 +16,11 @@ export const wizardSteps = [
     options: [
       { value: "kueche", label: "Küche" },
       { value: "wohnzimmer", label: "Wohnzimmer" },
+      { value: "from the outside", label: "Aussenansicht" },
+      { value: "flur", label: "Flur" },
 
     ],
-    icon: <FaPalette className="w-full h-full text-red-400" />,
+    icon: <FaPalette className="w-full h-full text-red-600" />,
   },
   {
     key: "color",
@@ -31,7 +33,7 @@ export const wizardSteps = [
       { value: "holz", label: "Holz" },
       { value: "dunkles holz", label: "Dunkles Holz" },
     ],
-    icon: <FaPalette className="w-full h-full text-red-400" />,
+    icon: <FaPalette className="w-full h-full text-red-600" />,
   },
   {
     key: "style",
@@ -44,7 +46,7 @@ export const wizardSteps = [
       { value: "luxuriös", label: "Luxuriös" },
       { value: "kompakt", label: "Kompakt" },
     ],
-    icon: <FaCouch className="w-full h-full text-red-400" />,
+    icon: <FaCouch className="w-full h-full text-red-600" />,
   },
 
   {
@@ -56,7 +58,7 @@ export const wizardSteps = [
       { value: "urban", label: "Urban" },
       { value: "naturnah", label: "Naturnah" },
     ],
-    icon: <FaTree className="w-full h-full text-red-400" />,
+    icon: <FaTree className="w-full h-full text-red-600" />,
   },
   {
     key: "location",
@@ -70,7 +72,7 @@ export const wizardSteps = [
       { value: "am Stadtrand", label: "Am Stadtrand" },
       { value: "am See", label: "Am See" },
     ],
-    icon: <FaMapMarkerAlt className="w-full h-full text-red-400" />,
+    icon: <FaMapMarkerAlt className="w-full h-full text-red-600" />,
   },
   {
     key: "time",
@@ -82,7 +84,7 @@ export const wizardSteps = [
       { value: "Sonnenuntergang", label: "Sonnenuntergang" },
       { value: "Nacht", label: "Nacht" },
     ],
-    icon: <FaRegClock className="w-full h-full text-red-400" />,
+    icon: <FaRegClock className="w-full h-full text-red-600" />,
   },
   {
     key: "houseType",
@@ -96,7 +98,7 @@ export const wizardSteps = [
       { value: "Loft", label: "Loft" },
       { value: "Landhaus", label: "Landhaus" },
     ],
-    icon: <FaHome className="w-full h-full text-red-400" />,
+    icon: <FaHome className="w-full h-full text-red-600" />,
   },
 
 ]
