@@ -49,6 +49,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
 
   const isFinalStep = wizardState.currentStep === totalSteps;
   const isIntro = wizardState.currentStep === -1;
+  const showSummaryPanel = !isIntro;
 
   const startWithPreset = (preset: WizardPreset) => {
     wizardActions.applyPreset({
@@ -211,20 +212,22 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                   )}
                 </div>
 
-                <WizardSummaryPanel
-                  selections={wizardState.selectedOptions}
-                  extraWishes={wizardState.extraWishes}
-                  currentStep={wizardState.currentStep}
-                  totalSteps={totalSteps}
-                  prompt={summaryData.prompt}
-                  missingKeys={missingKeys}
-                  isSignedIn={!!isSignedIn}
-                  loading={loading}
-                  onSubmit={handleSubmit}
-                  onRequireAuth={() => wizardActions.setAuthPrompt(true)}
-                  onJumpToFinal={() => wizardActions.setStep(totalSteps)}
-                  onJumpToStep={(index) => wizardActions.setStep(index)}
-                />
+                {showSummaryPanel && (
+                  <WizardSummaryPanel
+                    selections={wizardState.selectedOptions}
+                    extraWishes={wizardState.extraWishes}
+                    currentStep={wizardState.currentStep}
+                    totalSteps={totalSteps}
+                    prompt={summaryData.prompt}
+                    missingKeys={missingKeys}
+                    isSignedIn={!!isSignedIn}
+                    loading={loading}
+                    onSubmit={handleSubmit}
+                    onRequireAuth={() => wizardActions.setAuthPrompt(true)}
+                    onJumpToFinal={() => wizardActions.setStep(totalSteps)}
+                    onJumpToStep={(index) => wizardActions.setStep(index)}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
