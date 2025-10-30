@@ -20,6 +20,8 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
   canGoBack,
   loading = false,
 }) => {
+  const totalStages = totalSteps + 2;
+  const stageIndex = Math.max(0, Math.min(currentStep + 1, totalStages - 1));
   return (
     <header className="relative flex flex-row items-center justify-between w-full px-8">
       {/* left slot: reserve space even when wizard hasn't started so the close button stays on the right */}
@@ -49,29 +51,17 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
       </div>
 
       <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 gap-1">
-        {currentStep >= 0 && (
-          <>
-            <div className="h-2 w-64 rounded-full bg-gray-800 overflow-hidden">
-              <motion.div
-                className="h-2 rounded-full bg-brand-primary-2"
-                initial={false}
-                animate={{
-                  width: `${
-                    ((Math.min(currentStep, totalSteps) + 1) /
-                      (totalSteps + 1)) *
-                    100
-                  }%`,
-                }}
-                transition={{ duration: 0.3 }}
-              />
-            </div>
-            <span className="text-xs text-gray-400 mt-1">
-              {`Schritt ${Math.min(currentStep + 1, totalSteps + 1)} / ${
-                totalSteps + 1
-              }`}
-            </span>
-          </>
-        )}
+        <div className="h-2 w-64 rounded-full bg-gray-800 overflow-hidden">
+          <motion.div
+            className="h-2 rounded-full bg-brand-primary-2"
+            initial={false}
+            animate={{ width: `${((stageIndex + 1) / totalStages) * 100}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+        <span className="text-xs text-gray-400 mt-1">
+          {`Schritt ${stageIndex + 1} / ${totalStages}`}
+        </span>
       </div>
 
       {onClose && (

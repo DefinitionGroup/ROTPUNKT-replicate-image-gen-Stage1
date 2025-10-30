@@ -50,11 +50,17 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const isFinalStep = wizardState.currentStep === totalSteps;
   const isIntro = wizardState.currentStep === -1;
 
-  const handlePresetApply = (preset: WizardPreset) => {
+  const startWithPreset = (preset: WizardPreset) => {
     wizardActions.applyPreset({
       options: preset.options,
       extraWishes: preset.extraWishes,
     });
+    wizardActions.setStep(0);
+  };
+
+  const startBlank = () => {
+    wizardActions.reset();
+    wizardActions.setStep(0);
   };
 
   useEffect(() => {
@@ -151,7 +157,9 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                     {isIntro && (
                       <WizardIntro
                         key="intro"
-                        onStart={() => wizardActions.setStep(0)}
+                        onPresetSelect={startWithPreset}
+                        onBlankStart={startBlank}
+                        loading={loading}
                       />
                     )}
 
@@ -215,7 +223,6 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                   onSubmit={handleSubmit}
                   onRequireAuth={() => wizardActions.setAuthPrompt(true)}
                   onJumpToFinal={() => wizardActions.setStep(totalSteps)}
-                  onApplyPreset={handlePresetApply}
                   onJumpToStep={(index) => wizardActions.setStep(index)}
                 />
               </div>

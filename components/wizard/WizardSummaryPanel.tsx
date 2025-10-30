@@ -1,16 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-
-import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { wizardSteps } from "./wizardSteps";
 import type { WizardState } from "@/app/store/wizardStore";
-import type { WizardPreset } from "./wizardPresets";
-import { wizardPresets } from "./wizardPresets";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -24,7 +20,6 @@ interface WizardSummaryPanelProps {
   onSubmit: () => void;
   onRequireAuth: () => void;
   onJumpToFinal: () => void;
-  onApplyPreset: (preset: WizardPreset) => void;
   onJumpToStep: (index: number) => void;
 }
 
@@ -40,7 +35,6 @@ export function WizardSummaryPanel({
   onSubmit,
   onRequireAuth,
   onJumpToFinal,
-  onApplyPreset,
   onJumpToStep,
 }: WizardSummaryPanelProps) {
   const [copied, setCopied] = useState(false);
@@ -49,7 +43,10 @@ export function WizardSummaryPanel({
 
   const isComplete = missingKeys.length === 0;
   const isOnFinalStep = currentStep >= totalSteps;
-  const activeIndex = Math.min(currentStep, Math.max(0, totalSteps - 1));
+  const totalStages = totalSteps + 2;
+  const stageIndex = Math.max(0, Math.min(currentStep + 1, totalStages - 1));
+  const displayStage = stageIndex + 1;
+  const activeIndex = currentStep >= 0 ? Math.min(currentStep, totalSteps - 1) : -1;
 
   const groupedSelections = useMemo(() => {
     return wizardSteps.map((step) => {
@@ -141,7 +138,7 @@ export function WizardSummaryPanel({
           Fortschritt
         </h4>
         <span className="text-xs text-gray-300">
-          Schritt {Math.min(currentStep + 1, totalSteps + 1)} / {totalSteps + 1}
+          Schritt {displayStage} / {totalStages}
         </span>
       </div>
       <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
@@ -149,32 +146,11 @@ export function WizardSummaryPanel({
           className="h-full bg-brand-primary-2"
           initial={false}
           animate={{
-            width: `${
-              ((Math.min(currentStep, totalSteps) + 1) / (totalSteps + 1)) *
-              100
-            }%`,
+            width: `${((stageIndex + 1) / totalStages) * 100}%`,
           }}
           transition={{ duration: 0.3 }}
         />
       </div>
-
-      <div className="flex flex-col gap-3">
-        <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
-          Schnelleinstellungen
-        </h4>
-        <div className="grid grid-cols-1 gap-3">
-          {wizardPresets.map((preset) => (
-            <PresetCard
-              key={preset.label}
-              preset={preset}
-              onSelect={onApplyPreset}
-              disabled={loading}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="h-px bg-gray-800/80" />
 
       <div className="flex flex-col gap-3 overflow-y-auto pr-1" style={{ maxHeight: "26rem" }}>
         <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
@@ -276,52 +252,5 @@ export function WizardSummaryPanel({
         </p>
       </div>
     </aside>
-  );
-}
-
-type PresetCardProps = {
-  preset: WizardPreset;
-  onSelect: (preset: WizardPreset) => void;
-  disabled: boolean;
-};
-
-function PresetCard({ preset, onSelect, disabled }: PresetCardProps) {
-  const [imageError, setImageError] = useState(false);
-  const showImage = preset.previewImage && !imageError;
-
-  return (
-    <Card className="overflow-hidden border border-gray-700 bg-gray-900/70 hover:border-brand-primary-2/80 hover:bg-brand-primary-2/10 transition-colors">
-      <button
-        type="button"
-        className="w-full text-left"
-        onClick={() => onSelect(preset)}
-        disabled={disabled}
-      >
-        <div className="relative h-28 w-full">
-          {showImage ? (
-            <Image
-              src={preset.previewImage!}
-              alt={preset.label}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 320px"
-              onError={() => setImageError(true)}
-              priority={false}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <span className="absolute bottom-2 left-3 text-sm font-semibold text-white">
-            {preset.label}
-          </span>
-        </div>
-        <CardContent className="py-3 px-4">
-          <p className="text-xxs text-gray-300 leading-relaxed">
-            {preset.description}
-          </p>
-        </CardContent>
-      </button>
-    </Card>
   );
 }
