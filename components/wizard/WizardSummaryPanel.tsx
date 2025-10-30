@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { wizardSteps } from "./wizardSteps";
 import type { WizardState } from "@/app/store/wizardStore";
