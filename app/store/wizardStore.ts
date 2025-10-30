@@ -12,6 +12,7 @@ export interface WizardState {
     time?: string
     houseType?: string
     background?: string
+    viewpoint?: string
   }
   extraWishes: string
   showAuthPrompt: boolean
@@ -70,7 +71,7 @@ export const wizardActions = {
     const current = wizardStore.get()
     if (current.showAuthPrompt) {
       wizardActions.setAuthPrompt(false)
-      wizardActions.setStep(8) // steps.length
+      wizardActions.setStep(current.currentStep)
     } else if (current.currentStep > -1) {
       wizardActions.setStep(current.currentStep === 0 ? -1 : current.currentStep - 1)
     }

@@ -2,10 +2,9 @@
 
 ## Prompt Construction
 
-- Wizard steps defined in `components/wizard/wizardSteps.tsx` collect structured fields (`kind`, `color`, `style`, `environment`, etc.) and store them in the nanostore-based `wizardStore` state.
-- Final submission at the wizard’s last screen triggers `KitchenWizardModal.tsx` to assemble a German-language paragraph combining every selection plus optional freeform “extra wishes.” The resulting text resembles:
-  `Dann eine rot, modern Küche. Modern aussehend in einer urbanen Umgebung. Standort ist: … Zusätzliche Wünsche: …`
-- Before the prompt is sent to Replicate, the API route prefixes the text with the finetune token `RDTDOT` and sets `finetune_id` to bind requests to the customized FLUX 1.1 Pro model.
+- Wizard steps defined in `components/wizard/wizardSteps.tsx` collect structured fields (`kind`, `color`, `style`, `environment`, `viewpoint`, etc.) and store them in the nanostore-based `wizardStore` state.
+- Final submission at the wizard’s last screen triggers `KitchenWizardModal.tsx` to assemble a multi-line German instruction set that mirrors every selection, reinforces the chosen inside/outside perspective, and appends optional freeform “extra wishes.”
+- Before the prompt is sent to Replicate, the API route prefixes the text with the finetune token `RDTDOT`, sets `finetune_id`, and attaches a curated negative prompt to bind requests to the customized FLUX 1.1 Pro model while filtering duplicate fixtures.
 
 ## Generation Timeline
 

@@ -5,8 +5,7 @@ import {
   FaMapMarkerAlt,
   FaPalette,
   FaCouch,
-  FaSun,
-  FaLayerGroup,
+  FaEye,
 } from "react-icons/fa"
 
 export const wizardSteps = [
@@ -59,6 +58,15 @@ export const wizardSteps = [
       { value: "naturnah", label: "Naturnah" },
     ],
     icon: <FaTree className="w-full h-full text-red-600" />,
+  },
+  {
+    key: "viewpoint",
+    label: "Perspektive",
+    options: [
+      { value: "innenansicht", label: "Innenansicht" },
+      { value: "aussenansicht", label: "Außenansicht" },
+    ],
+    icon: <FaEye className="w-full h-full text-red-600" />,
   },
   {
     key: "location",

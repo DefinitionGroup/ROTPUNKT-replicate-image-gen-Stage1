@@ -9,6 +9,8 @@ const replicate = new Replicate({
 });
 
 const MODEL = "black-forest-labs/flux-1.1-pro-ultra-finetuned";
+const NEGATIVE_PROMPT =
+  "duplicate sinks, double faucets, extra taps, floating lamps, disembodied lighting, distorted structure, warped cabinetry, incorrect perspective";
 
 export async function POST(req: NextRequest) {
   const { userId, getToken } = await getAuth(req);
@@ -30,7 +32,8 @@ export async function POST(req: NextRequest) {
     const prediction = await replicate.predictions.create({
       model: MODEL,
       input: {
-        prompt: `RDTDOT ${prompt}`,
+        prompt: `RDTDOT ${prompt.trim()}`,
+        negative_prompt: NEGATIVE_PROMPT,
         finetune_id: "ef2a1a03-c2d2-4b23-bd94-ae0cf1609f0f",
         num_outputs: 1,
         aspect_ratio: "1:1",

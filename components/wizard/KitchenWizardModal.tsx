@@ -22,11 +22,6 @@ interface KitchenWizardModalProps {
   onClose?: () => void;
 }
 
-const capitalizeFirst = (text: string) => {
-  if (!text) return "";
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
-
 export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   onPromptReady,
   loading = false,
@@ -70,6 +65,17 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     wizardActions.nextStep();
   };
 
+  const labelForOption = (
+    key: keyof WizardState["selectedOptions"],
+    value?: string
+  ) => {
+    if (!value) return "";
+    const entry = wizardSteps.find((step) => step.key === key)?.options.find(
+      (option) => option.value === value
+    );
+    return entry?.label ?? value;
+  };
+
   const handleSubmit = () => {
     const { selectedOptions, extraWishes } = wizardState;
     const valuesAreValid = Object.values(selectedOptions).every(Boolean);
@@ -79,19 +85,37 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       return;
     }
 
-    const prompt = [
-      `Dann eine ${selectedOptions.color}, ${selectedOptions.style} ${selectedOptions.kind}.`,
-      `${capitalizeFirst(selectedOptions.kitchenLook!)} aussehend in einer ${
-        selectedOptions.environment
-      }en Umgebung.`,
-      `Standort ist: ${selectedOptions.location}.`,
-      `Die Tageszeit ist ${selectedOptions.time}.`,
-      `Das Haus ist ${selectedOptions.houseType}.`,
-      `Im Hintergrund sieht man: ${selectedOptions.background}.`,
-      extraWishes.trim() ? ` Zusätzliche Wünsche: ${extraWishes.trim()}.` : "",
-    ].join(" ");
+    const viewpoint = selectedOptions.viewpoint ?? "innenansicht";
+    const viewpointClause =
+      viewpoint === "aussenansicht"
+        ? "Außenperspektive: Die Szene zeigt die Architektur von außen und ermöglicht einen Blick ins Innere durch Fenster."
+        : "Innenperspektive: Betrachtung aus dem Raum heraus mit Fokus auf Arbeitsflächen, Schränke und Ausstattung.";
 
-    onPromptReady(prompt);
+    const promptSections = [
+      "Photorealistische Rotpunkt Küchenvisualisierung, entworfen von einem preisgekrönten Innenarchitekten.",
+      `Raumfokus: ${labelForOption("kind", selectedOptions.kind)} im Stil ${labelForOption(
+        "style",
+        selectedOptions.style
+      )} mit einer ${labelForOption("color", selectedOptions.color)}en Farbpalette.`,
+      `Umgebung & Stimmung: ${labelForOption(
+        "environment",
+        selectedOptions.environment
+      )}e Atmosphäre in einem ${labelForOption(
+        "houseType",
+        selectedOptions.houseType
+      )}, Standort: ${labelForOption(
+        "location",
+        selectedOptions.location
+      )}.`,
+      `Tageszeit: ${labelForOption("time", selectedOptions.time)}.`,
+      `Perspektive: ${viewpointClause}`,
+      "Wichtige Vorgaben: genau ein Spülbecken mit einem einzigen Wasserhahn, alle Leuchten müssen physisch verankert sein (keine schwebenden Lampen), keine doppelten Armaturen, klare Linienführung, konsistente Materialien und Markensprache von Rotpunkt.",
+      extraWishes.trim()
+        ? `Zusätzliche Wünsche des Nutzers: ${extraWishes.trim()}.`
+        : "",
+    ].filter(Boolean);
+
+    onPromptReady(promptSections.join("\n"));
     if (onClose) onClose();
   };
 
