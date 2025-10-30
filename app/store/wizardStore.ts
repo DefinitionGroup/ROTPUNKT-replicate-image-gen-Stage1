@@ -36,7 +36,8 @@ export const wizardStore = persistentAtom<WizardState>('kitchen-wizard', initial
 export const wizardActions = {
   setStep: (step: number) => {
     const current = wizardStore.get()
-    wizardStore.set({ ...current, currentStep: step, error: '' })
+    const targetStep = Number.isFinite(step) ? Math.max(-1, Math.trunc(step)) : current.currentStep
+    wizardStore.set({ ...current, currentStep: targetStep, error: '' })
   },
 
   selectOption: (key: keyof WizardState['selectedOptions'], value: string) => {
@@ -50,7 +51,7 @@ export const wizardActions = {
 
   setExtraWishes: (wishes: string) => {
     const current = wizardStore.get()
-    wizardStore.set({ ...current, extraWishes: wishes })
+    wizardStore.set({ ...current, extraWishes: wishes, error: '' })
   },
 
   setError: (error: string) => {
@@ -61,6 +62,18 @@ export const wizardActions = {
   setAuthPrompt: (show: boolean) => {
     const current = wizardStore.get()
     wizardStore.set({ ...current, showAuthPrompt: show })
+  },
+
+  applyPreset: (payload: { options: Partial<WizardState['selectedOptions']>; extraWishes?: string }) => {
+    const current = wizardStore.get()
+    wizardStore.set({
+      ...current,
+      currentStep: Math.max(0, current.currentStep),
+      selectedOptions: { ...current.selectedOptions, ...payload.options },
+      extraWishes: payload.extraWishes ?? current.extraWishes,
+      showAuthPrompt: false,
+      error: ''
+    })
   },
 
   reset: () => {
@@ -77,8 +90,10 @@ export const wizardActions = {
     }
   },
 
-  nextStep: () => {
+  nextStep: (maxStep?: number) => {
     const current = wizardStore.get()
-    wizardActions.setStep(current.currentStep + 1)
+    const candidate = current.currentStep + 1
+    const clamped = typeof maxStep === 'number' ? Math.min(candidate, maxStep) : candidate
+    wizardActions.setStep(clamped)
   }
 }

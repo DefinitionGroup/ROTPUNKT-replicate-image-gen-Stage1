@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useStore } from "@nanostores/react";
 import { useAuth } from "@clerk/nextjs";
@@ -15,6 +15,9 @@ import { WizardIntro } from "./WizardIntro";
 import { WizardStep } from "./WizardStep";
 import { WizardFinal } from "./WizardFinal";
 import { wizardSteps } from "./wizardSteps";
+import { WizardSummaryPanel } from "./WizardSummaryPanel";
+import { buildPrompt } from "./promptBuilder";
+import type { WizardPreset } from "./wizardPresets";
 
 interface KitchenWizardModalProps {
   onPromptReady: (prompt: string) => void;
@@ -31,8 +34,28 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const { isSignedIn } = useAuth();
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  const CARD_HEIGHT = 600;
-  const CARD_WIDTH = 720;
+  const CARD_HEIGHT = 640;
+  const CARD_WIDTH = 980;
+  const totalSteps = wizardSteps.length;
+
+  const summaryData = useMemo(
+    () =>
+      buildPrompt({
+        selections: wizardState.selectedOptions,
+        extraWishes: wizardState.extraWishes,
+      }),
+    [wizardState.selectedOptions, wizardState.extraWishes]
+  );
+
+  const isFinalStep = wizardState.currentStep === totalSteps;
+  const isIntro = wizardState.currentStep === -1;
+
+  const handlePresetApply = (preset: WizardPreset) => {
+    wizardActions.applyPreset({
+      options: preset.options,
+      extraWishes: preset.extraWishes,
+    });
+  };
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
@@ -62,64 +85,21 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     const currentStepKey = wizardSteps[wizardState.currentStep]
       .key as keyof WizardState["selectedOptions"];
     wizardActions.selectOption(currentStepKey, option);
-    wizardActions.nextStep();
-  };
-
-  const labelForOption = (
-    key: keyof WizardState["selectedOptions"],
-    value?: string
-  ) => {
-    if (!value) return "";
-    const entry = wizardSteps.find((step) => step.key === key)?.options.find(
-      (option) => option.value === value
-    );
-    return entry?.label ?? value;
+    wizardActions.nextStep(totalSteps);
   };
 
   const handleSubmit = () => {
-    const { selectedOptions, extraWishes } = wizardState;
-    const valuesAreValid = Object.values(selectedOptions).every(Boolean);
-
-    if (!valuesAreValid) {
+    if (summaryData.missingKeys.length > 0) {
       wizardActions.setError("Bitte alle Schritte ausfüllen.");
       return;
     }
 
-    const viewpoint = selectedOptions.viewpoint ?? "innenansicht";
-    const viewpointClause =
-      viewpoint === "aussenansicht"
-        ? "Außenperspektive: Die Szene zeigt die Architektur von außen und ermöglicht einen Blick ins Innere durch Fenster."
-        : "Innenperspektive: Betrachtung aus dem Raum heraus mit Fokus auf Arbeitsflächen, Schränke und Ausstattung.";
-
-    const promptSections = [
-      "Photorealistische Rotpunkt Küchenvisualisierung, entworfen von einem preisgekrönten Innenarchitekten.",
-      `Raumfokus: ${labelForOption("kind", selectedOptions.kind)} im Stil ${labelForOption(
-        "style",
-        selectedOptions.style
-      )} mit einer ${labelForOption("color", selectedOptions.color)}en Farbpalette.`,
-      `Umgebung & Stimmung: ${labelForOption(
-        "environment",
-        selectedOptions.environment
-      )}e Atmosphäre in einem ${labelForOption(
-        "houseType",
-        selectedOptions.houseType
-      )}, Standort: ${labelForOption(
-        "location",
-        selectedOptions.location
-      )}.`,
-      `Tageszeit: ${labelForOption("time", selectedOptions.time)}.`,
-      `Perspektive: ${viewpointClause}`,
-      "Wichtige Vorgaben: genau ein Spülbecken mit einem einzigen Wasserhahn, alle Leuchten müssen physisch verankert sein (keine schwebenden Lampen), keine doppelten Armaturen, klare Linienführung, konsistente Materialien und Markensprache von Rotpunkt.",
-      extraWishes.trim()
-        ? `Zusätzliche Wünsche des Nutzers: ${extraWishes.trim()}.`
-        : "",
-    ].filter(Boolean);
-
-    onPromptReady(promptSections.join("\n"));
+    onPromptReady(summaryData.prompt);
     if (onClose) onClose();
   };
 
   const canGoBack = wizardState.currentStep > -1;
+  const missingKeys = summaryData.missingKeys;
 
   return (
     <AnimatePresence>
@@ -164,58 +144,80 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
               />
             </CardHeader>
 
-            <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
-              <AnimatePresence mode="wait" initial={false}>
-                {wizardState.currentStep === -1 && (
-                  <WizardIntro
-                    key="intro"
-                    onStart={() => wizardActions.setStep(0)}
-                  />
-                )}
+            <CardContent className="flex-1 flex flex-col p-6 sm:p-8">
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full">
+                <div className="flex-1 flex flex-col">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {isIntro && (
+                      <WizardIntro
+                        key="intro"
+                        onStart={() => wizardActions.setStep(0)}
+                      />
+                    )}
 
-                {wizardState.currentStep >= 0 &&
-                  wizardState.currentStep < wizardSteps.length && (
-                    <WizardStep
-                      key={wizardState.currentStep}
-                      icon={wizardSteps[wizardState.currentStep].icon}
-                      title={wizardSteps[wizardState.currentStep].label}
-                      options={wizardSteps[wizardState.currentStep].options}
-                      selectedValue={
-                        wizardState.selectedOptions[
-                          wizardSteps[wizardState.currentStep]
-                            .key as keyof WizardState["selectedOptions"]
-                        ]
-                      }
-                      onSelect={handleOptionSelect}
-                      loading={loading}
-                    />
+                    {!isIntro && !isFinalStep && (
+                      <WizardStep
+                        key={wizardState.currentStep}
+                        icon={wizardSteps[wizardState.currentStep].icon}
+                        title={wizardSteps[wizardState.currentStep].label}
+                        description={
+                          wizardSteps[wizardState.currentStep].description
+                        }
+                        options={wizardSteps[wizardState.currentStep].options}
+                        selectedValue={
+                          wizardState.selectedOptions[
+                            wizardSteps[wizardState.currentStep]
+                              .key as keyof WizardState["selectedOptions"]
+                          ]
+                        }
+                        onSelect={handleOptionSelect}
+                        loading={loading}
+                      />
+                    )}
+
+                    {isFinalStep && (
+                      <WizardFinal
+                        key="final"
+                        extraWishes={wizardState.extraWishes}
+                        onExtraWishesChange={wizardActions.setExtraWishes}
+                        showAuthPrompt={wizardState.showAuthPrompt}
+                        isSignedIn={!!isSignedIn}
+                        onSubmit={handleSubmit}
+                        onAuthRequired={() => wizardActions.setAuthPrompt(true)}
+                        loading={loading}
+                        showSubmitButton={true}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {wizardState.error && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="text-red-400 text-center mt-6"
+                      role="alert"
+                    >
+                      {wizardState.error}
+                    </motion.p>
                   )}
+                </div>
 
-                {wizardState.currentStep === wizardSteps.length && (
-                  <WizardFinal
-                    key="final"
-                    extraWishes={wizardState.extraWishes}
-                    onExtraWishesChange={wizardActions.setExtraWishes}
-                    showAuthPrompt={wizardState.showAuthPrompt}
-                    isSignedIn={!!isSignedIn}
-                    onSubmit={handleSubmit}
-                    onAuthRequired={() => wizardActions.setAuthPrompt(true)}
-                    loading={loading}
-                  />
-                )}
-              </AnimatePresence>
-
-              {wizardState.error && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-red-400 text-center mt-3"
-                  role="alert"
-                >
-                  {wizardState.error}
-                </motion.p>
-              )}
+                <WizardSummaryPanel
+                  selections={wizardState.selectedOptions}
+                  extraWishes={wizardState.extraWishes}
+                  currentStep={wizardState.currentStep}
+                  totalSteps={totalSteps}
+                  prompt={summaryData.prompt}
+                  missingKeys={missingKeys}
+                  isSignedIn={!!isSignedIn}
+                  loading={loading}
+                  onSubmit={handleSubmit}
+                  onRequireAuth={() => wizardActions.setAuthPrompt(true)}
+                  onJumpToFinal={() => wizardActions.setStep(totalSteps)}
+                  onApplyPreset={handlePresetApply}
+                />
+              </div>
             </CardContent>
           </Card>
         </motion.div>

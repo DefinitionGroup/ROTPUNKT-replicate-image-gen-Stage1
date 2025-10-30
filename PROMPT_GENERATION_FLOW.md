@@ -4,6 +4,7 @@
 
 - Wizard steps defined in `components/wizard/wizardSteps.tsx` collect structured fields (`kind`, `color`, `style`, `environment`, `viewpoint`, etc.) and store them in the nanostore-based `wizardStore` state.
 - Final submission at the wizard’s last screen triggers `KitchenWizardModal.tsx` to assemble a multi-line German instruction set that mirrors every selection, reinforces the chosen inside/outside perspective, and appends optional freeform “extra wishes.”
+- A persistent summary panel (`components/wizard/WizardSummaryPanel.tsx`) mirrors the selections, offers quick presets, and renders the live prompt so users can review or copy it before generating.
 - Before the prompt is sent to Replicate, the API route prefixes the text with the finetune token `RDTDOT`, sets `finetune_id`, and attaches a curated negative prompt to bind requests to the customized FLUX 1.1 Pro model while filtering duplicate fixtures.
 
 ## Generation Timeline

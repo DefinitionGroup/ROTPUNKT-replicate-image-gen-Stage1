@@ -1,0 +1,93 @@
+import type { WizardState } from "@/app/store/wizardStore";
+import { wizardSteps } from "./wizardSteps";
+
+export type PromptBuildResult = {
+  prompt: string;
+  sections: string[];
+  missingKeys: string[];
+};
+
+const viewpointDescriptions: Record<string, string> = {
+  aussenansicht:
+    "Außenperspektive: Die Szene zeigt die Architektur von außen und ermöglicht einen Blick ins Innere durch Fenster.",
+  innenansicht:
+    "Innenperspektive: Betrachtung aus dem Raum heraus mit Fokus auf Arbeitsflächen, Schränke und Ausstattung.",
+};
+
+function getLabel(
+  key: keyof WizardState["selectedOptions"],
+  value?: string
+): string | undefined {
+  if (!value) return undefined;
+  const step = wizardSteps.find((item) => item.key === key);
+  return step?.options.find((opt) => opt.value === value)?.label ?? value;
+}
+
+export function buildPrompt({
+  selections,
+  extraWishes,
+}: {
+  selections: WizardState["selectedOptions"];
+  extraWishes?: string;
+}): PromptBuildResult {
+  const missingKeys = wizardSteps
+    .map((step) => step.key as keyof WizardState["selectedOptions"])
+    .filter((key) => !selections[key]);
+
+  const sections: string[] = [];
+
+  const kind = getLabel("kind", selections.kind);
+  const style = getLabel("style", selections.style);
+  const color = getLabel("color", selections.color);
+  const environment = getLabel("environment", selections.environment);
+  const houseType = getLabel("houseType", selections.houseType);
+  const location = getLabel("location", selections.location);
+  const time = getLabel("time", selections.time);
+  const viewpoint = selections.viewpoint ?? "innenansicht";
+
+  if (kind || style || color) {
+    const descriptors: string[] = [];
+    if (kind) descriptors.push(kind);
+    if (style) descriptors.push(`im Stil ${style}`);
+    if (color) descriptors.push(`mit einer ${color}en Farbpalette`);
+    sections.push(`Raumfokus: ${descriptors.join(" ")}.`.trim());
+  }
+
+  if (environment || houseType || location) {
+    const descriptors: string[] = [];
+    if (environment) descriptors.push(`${environment}e Atmosphäre`);
+    if (houseType) descriptors.push(`in einem ${houseType}`);
+    if (location) descriptors.push(`Standort: ${location}`);
+    sections.push(`Umgebung & Stimmung: ${descriptors.join(", ")}.`);
+  }
+
+  if (time) {
+    sections.push(`Tageszeit: ${time}.`);
+  }
+
+  sections.push(
+    `Perspektive: ${
+      viewpointDescriptions[viewpoint] ?? viewpointDescriptions.innenansicht
+    }`
+  );
+
+  sections.push(
+    "Wichtige Vorgaben: genau ein Spülbecken mit einem einzigen Wasserhahn, alle Leuchten müssen physisch verankert sein (keine schwebenden Lampen), keine doppelten Armaturen, klare Linienführung, konsistente Materialien und Markensprache von Rotpunkt."
+  );
+
+  const wishes = extraWishes?.trim();
+  if (wishes) {
+    sections.push(`Zusätzliche Wünsche des Nutzers: ${wishes}.`);
+  }
+
+  const prompt = [
+    "Photorealistische Rotpunkt Küchenvisualisierung, entworfen von einem preisgekrönten Innenarchitekten.",
+    ...sections,
+  ].join("\n");
+
+  return {
+    prompt,
+    sections,
+    missingKeys,
+  };
+}

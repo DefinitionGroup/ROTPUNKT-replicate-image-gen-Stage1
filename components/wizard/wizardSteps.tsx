@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   FaHome,
   FaRegClock,
@@ -6,24 +7,41 @@ import {
   FaPalette,
   FaCouch,
   FaEye,
-} from "react-icons/fa"
+} from "react-icons/fa";
 
-export const wizardSteps = [
-   {
+export type WizardOption = {
+  value: string;
+  label: string;
+  hint?: string;
+};
+
+export type WizardStepDefinition = {
+  key: string;
+  label: string;
+  description: string;
+  options: WizardOption[];
+  icon: ReactNode;
+};
+
+export const wizardSteps: WizardStepDefinition[] = [
+  {
     key: "kind",
-    label: "Thema auswählen",
+    label: "Raumfokus",
+    description:
+      "Welche Art von Raum soll visualisiert werden? Wählen Sie den Schwerpunkt für die Szene.",
     options: [
-      { value: "kueche", label: "Küche" },
+      { value: "kueche", label: "Küche", hint: "Standard" },
       { value: "wohnzimmer", label: "Wohnzimmer" },
-      { value: "from the outside", label: "Aussenansicht" },
+      { value: "from the outside", label: "Außenansicht" },
       { value: "flur", label: "Flur" },
-
     ],
     icon: <FaPalette className="w-full h-full text-red-600" />,
   },
   {
     key: "color",
-    label: "Farbe",
+    label: "Farbwelt",
+    description:
+      "Definieren Sie die dominante Farbgebung für Möbel, Fronten und Akzente.",
     options: [
       { value: "schwarz", label: "Schwarz" },
       { value: "rot", label: "Rot" },
@@ -36,21 +54,25 @@ export const wizardSteps = [
   },
   {
     key: "style",
-    label: "Stil",
+    label: "Stilrichtung",
+    description:
+      "Welcher Einrichtungsstil passt am besten? Diese Auswahl bestimmt Linienführung und Materialmix.",
     options: [
       { value: "elegant", label: "Elegant" },
       { value: "modern", label: "Modern" },
       { value: "minimalistisch", label: "Minimalistisch" },
-      { value: "klassisch", label: "Klassisch" },    { value: "offen", label: "Offen" },
+      { value: "klassisch", label: "Klassisch" },
+      { value: "offen", label: "Offen" },
       { value: "luxuriös", label: "Luxuriös" },
       { value: "kompakt", label: "Kompakt" },
     ],
     icon: <FaCouch className="w-full h-full text-red-600" />,
   },
-
   {
     key: "environment",
-    label: "Umgebung",
+    label: "Atmosphäre",
+    description:
+      "Legt die Anmutung des Umfelds fest – von urban bis naturnah.",
     options: [
       { value: "stilvoll", label: "Stilvoll" },
       { value: "modern", label: "Modern" },
@@ -62,6 +84,8 @@ export const wizardSteps = [
   {
     key: "viewpoint",
     label: "Perspektive",
+    description:
+      "Innen- oder Außenansicht? Diese Wahl steuert die Kameraausrichtung.",
     options: [
       { value: "innenansicht", label: "Innenansicht" },
       { value: "aussenansicht", label: "Außenansicht" },
@@ -71,6 +95,8 @@ export const wizardSteps = [
   {
     key: "location",
     label: "Standort",
+    description:
+      "Wo befindet sich das Objekt? Diese Option prägt Lichtstimmung und Ausblick.",
     options: [
       {
         value: "ein Strand auf Gran Canaria",
@@ -85,6 +111,8 @@ export const wizardSteps = [
   {
     key: "time",
     label: "Tageszeit",
+    description:
+      "Beeinflusst Lichtstimmung und Schattenwurf der Szene.",
     options: [
       { value: "Sonnenaufgang", label: "Sonnenaufgang" },
       { value: "Nachmittag", label: "Nachmittag" },
@@ -96,7 +124,9 @@ export const wizardSteps = [
   },
   {
     key: "houseType",
-    label: "Haustyp",
+    label: "Gebäude",
+    description:
+      "Welche Architektur umgibt den Raum? Definiert Rahmen und Außenhülle.",
     options: [
       {
         value: "modernes Holzhaus mit großen Fenstern",
@@ -108,5 +138,4 @@ export const wizardSteps = [
     ],
     icon: <FaHome className="w-full h-full text-red-600" />,
   },
-
-]
+];

@@ -11,6 +11,7 @@ interface WizardFinalProps {
   onSubmit: () => void;
   onAuthRequired: () => void;
   loading?: boolean;
+  showSubmitButton?: boolean;
 }
 
 export const WizardFinal: React.FC<WizardFinalProps> = ({
@@ -21,6 +22,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
   onSubmit,
   onAuthRequired,
   loading = false,
+  showSubmitButton = true,
 }) => {
   if (showAuthPrompt && !isSignedIn) {
     return (
@@ -99,22 +101,24 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
         tabIndex={-1}
       />
 
-      <motion.button
-        onClick={isSignedIn ? onSubmit : onAuthRequired}
-        disabled={loading}
-        className={`cursor-pointer w-fit py-3 px-8 rounded-full font-semibold shadow-xl text-lg
-          ${
-            isSignedIn
-              ? "bg-brand-primary-2 text-brand-secondary-1 hover:bg-red-600"
-              : "bg-gray-800 text-gray-400"
-          }`}
-        whileHover={isSignedIn ? { scaleX: 1.051 } : undefined}
-        whileTap={isSignedIn ? { scaleX: 0.98 } : undefined}
-        transition={{ type: "spring" }}
-        style={{ minWidth: 0 }}
-      >
-        Bild erstellen
-      </motion.button>
+      {showSubmitButton && (
+        <motion.button
+          onClick={isSignedIn ? onSubmit : onAuthRequired}
+          disabled={loading}
+          className={`cursor-pointer w-fit py-3 px-8 rounded-full font-semibold shadow-xl text-lg
+            ${
+              isSignedIn
+                ? "bg-brand-primary-2 text-brand-secondary-1 hover:bg-red-600"
+                : "bg-gray-800 text-gray-400"
+            }`}
+          whileHover={isSignedIn ? { scaleX: 1.051 } : undefined}
+          whileTap={isSignedIn ? { scaleX: 0.98 } : undefined}
+          transition={{ type: "spring" }}
+          style={{ minWidth: 0 }}
+        >
+          Bild erstellen
+        </motion.button>
+      )}
     </motion.div>
   );
 };

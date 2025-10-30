@@ -25,6 +25,7 @@
 - Persistent nanostores (`app/store/*`) remember wizard progress, modal visibility, and prompts across sessions.
 - React Query centralizes async state, with a shared `QueryClient` (`app/get-query-client.ts`).
 - Motion-based transitions and Lottie loading animations keep the wizard flow responsive and on-brand.
+- The updated wizard modal uses a split layout with live prompt preview, quick presets, and a summary sidebar so users see their final request before generating.
 
 ## Key Entry Points
 
