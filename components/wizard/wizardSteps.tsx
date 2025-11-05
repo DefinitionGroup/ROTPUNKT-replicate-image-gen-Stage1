@@ -13,6 +13,7 @@ export type WizardOption = {
   value: string;
   label: string;
   hint?: string;
+  image?: string;
 };
 
 export type WizardStepDefinition = {
@@ -30,10 +31,27 @@ export const wizardSteps: WizardStepDefinition[] = [
     description:
       "Welche Art von Raum soll visualisiert werden? Wählen Sie den Schwerpunkt für die Szene.",
     options: [
-      { value: "kueche", label: "Küche", hint: "Standard" },
-      { value: "wohnzimmer", label: "Wohnzimmer" },
-      { value: "from the outside", label: "Außenansicht" },
-      { value: "flur", label: "Flur" },
+      {
+        value: "kueche",
+        label: "Küche",
+        hint: "Standard",
+        image: "/wizard-presets/kind-kueche.jpg",
+      },
+      {
+        value: "wohnzimmer",
+        label: "Wohnzimmer",
+        image: "/wizard-presets/kind-wohnzimmer.jpg",
+      },
+      {
+        value: "from the outside",
+        label: "Außenansicht",
+        image: "/wizard-presets/kind-aussen.jpg",
+      },
+      {
+        value: "flur",
+        label: "Flur",
+        image: "/wizard-presets/kind-flur.jpg",
+      },
     ],
     icon: <FaPalette className="w-full h-full text-red-600" />,
   },
@@ -58,13 +76,41 @@ export const wizardSteps: WizardStepDefinition[] = [
     description:
       "Welcher Einrichtungsstil passt am besten? Diese Auswahl bestimmt Linienführung und Materialmix.",
     options: [
-      { value: "elegant", label: "Elegant" },
-      { value: "modern", label: "Modern" },
-      { value: "minimalistisch", label: "Minimalistisch" },
-      { value: "klassisch", label: "Klassisch" },
-      { value: "offen", label: "Offen" },
-      { value: "luxuriös", label: "Luxuriös" },
-      { value: "kompakt", label: "Kompakt" },
+      {
+        value: "elegant",
+        label: "Elegant",
+        image: "/wizard-presets/style-elegant.jpg",
+      },
+      {
+        value: "modern",
+        label: "Modern",
+        image: "/wizard-presets/style-modern.jpg",
+      },
+      {
+        value: "minimalistisch",
+        label: "Minimalistisch",
+        image: "/wizard-presets/style-minimalistisch.jpg",
+      },
+      {
+        value: "klassisch",
+        label: "Klassisch",
+        image: "/wizard-presets/style-klassisch.jpg",
+      },
+      {
+        value: "offen",
+        label: "Offen",
+        image: "/wizard-presets/style-offen.jpg",
+      },
+      {
+        value: "luxuriös",
+        label: "Luxuriös",
+        image: "/wizard-presets/style-luxurioes.jpg",
+      },
+      {
+        value: "kompakt",
+        label: "Kompakt",
+        image: "/wizard-presets/style-kompakt.jpg",
+      },
     ],
     icon: <FaCouch className="w-full h-full text-red-600" />,
   },

@@ -71,7 +71,7 @@ export function WizardColorStep({
           {icon}
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl tracking-tight text-brand-secondary-1">
+          <h3 className="text-xl text-left md:text-2xl tracking-tight text-brand-secondary-1">
             {title}
           </h3>
           <p className="text-sm text-gray-400 mt-1 max-w-xl">{description}</p>
@@ -132,7 +132,7 @@ export function WizardColorStep({
           })}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {fenixColors.map((color) => {
             const value = encodeFenixColorValue(color.name);
             const isSelected = selectedValue === value;
@@ -156,10 +156,10 @@ export function WizardColorStep({
                   aria-hidden="true"
                 />
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm font-semibold text-brand-secondary-1">
+                  <span className="text-xs font-semibold text-brand-secondary-1">
                     {color.name}
                   </span>
-                  <span className="text-xxs text-gray-400">{color.hex}</span>
+                  {/* <span className="text-xxs text-gray-400">{color.hex}</span> */}
                 </div>
               </motion.button>
             );

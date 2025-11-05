@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import type { WizardOption } from "./wizardSteps";
@@ -36,10 +37,10 @@ export const WizardStep: React.FC<WizardStepProps> = ({
           {icon}
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl tracking-tight text-brand-secondary-1">
+          <h3 className="text-xl md:text-2xl text-left tracking-tight text-brand-secondary-1">
             {title}
           </h3>
-          <p className="text-sm text-gray-400 mt-1 max-w-xl">
+          <p className="text-sm text-gray-400 w-80 text-left mt-1 max-w-xl">
             {description}
           </p>
         </div>
@@ -48,6 +49,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {options.map((opt) => {
           const isSelected = selectedValue === opt.value;
+          const hasImage = !!opt.image;
           return (
             <Button
               key={opt.value}
@@ -60,14 +62,30 @@ export const WizardStep: React.FC<WizardStepProps> = ({
               onClick={() => onSelect(opt.value)}
               disabled={loading}
               data-selected={isSelected}
-              className="h-auto py-4 px-5 text-left flex-col items-start gap-2 border-gray-800/60 bg-gray-900/70 backdrop-blur rounded-xl"
+              className="group h-auto overflow-hidden py-4 px-5 text-left flex-col items-start gap-3 border-gray-800/60 bg-gray-900/70 backdrop-blur rounded-xl"
             >
-              <span className="text-sm font-semibold text-brand-secondary-1">
-                {opt.label}
-              </span>
-              {opt.hint ? (
-                <span className="text-xs text-gray-400">{opt.hint}</span>
+              {hasImage ? (
+                <div className="relative -mx-1 -mt-1 h-32 w-[calc(100%+0.5rem)] overflow-hidden rounded-lg">
+                  <Image
+                    src={opt.image!}
+                    alt={opt.label}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    sizes="(max-width: 768px) 100vw, 320px"
+                    priority={false}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+                </div>
               ) : null}
+
+              <div className="flex flex-col items-start gap-1 w-full">
+                <span className="text-sm font-semibold text-brand-secondary-1">
+                  {opt.label}
+                </span>
+                {opt.hint ? (
+                  <span className="text-xs text-gray-400">{opt.hint}</span>
+                ) : null}
+              </div>
             </Button>
           );
         })}
