@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { wizardSteps } from "./wizardSteps";
 import type { WizardState } from "@/app/store/wizardStore";
+import { getFenixColorLabel } from "./fenixColors";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -52,9 +53,13 @@ export function WizardSummaryPanel({
     return wizardSteps.map((step) => {
       const key = step.key as keyof WizardState["selectedOptions"];
       const selectedValue = selections[key];
-      const selectedLabel = step.options.find(
+      const baseLabel = step.options.find(
         (opt) => opt.value === selectedValue
       )?.label;
+      const selectedLabel =
+        step.key === "color"
+          ? getFenixColorLabel(selectedValue) ?? baseLabel
+          : baseLabel;
       return {
         key,
         title: step.label,

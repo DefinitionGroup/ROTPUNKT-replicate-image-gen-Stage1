@@ -18,6 +18,7 @@ import { wizardSteps } from "./wizardSteps";
 import { WizardSummaryPanel } from "./WizardSummaryPanel";
 import { buildPrompt } from "./promptBuilder";
 import type { WizardPreset } from "./wizardPresets";
+import { WizardColorStep } from "./WizardColorStep";
 
 interface KitchenWizardModalProps {
   onPromptReady: (prompt: string) => void;
@@ -50,6 +51,11 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const isFinalStep = wizardState.currentStep === totalSteps;
   const isIntro = wizardState.currentStep === -1;
   const showSummaryPanel = !isIntro;
+  const currentStepDefinition =
+    !isIntro && !isFinalStep && wizardState.currentStep >= 0
+      ? wizardSteps[wizardState.currentStep]
+      : undefined;
+  const isColorStep = currentStepDefinition?.key === "color";
 
   const startWithPreset = (preset: WizardPreset) => {
     wizardActions.applyPreset({
@@ -164,24 +170,38 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                       />
                     )}
 
-                    {!isIntro && !isFinalStep && (
-                      <WizardStep
-                        key={wizardState.currentStep}
-                        icon={wizardSteps[wizardState.currentStep].icon}
-                        title={wizardSteps[wizardState.currentStep].label}
-                        description={
-                          wizardSteps[wizardState.currentStep].description
-                        }
-                        options={wizardSteps[wizardState.currentStep].options}
-                        selectedValue={
-                          wizardState.selectedOptions[
-                            wizardSteps[wizardState.currentStep]
-                              .key as keyof WizardState["selectedOptions"]
-                          ]
-                        }
-                        onSelect={handleOptionSelect}
-                        loading={loading}
-                      />
+                    {!isIntro && !isFinalStep && currentStepDefinition && (
+                      isColorStep ? (
+                        <WizardColorStep
+                          key={`${wizardState.currentStep}-color`}
+                          icon={currentStepDefinition.icon}
+                          title={currentStepDefinition.label}
+                          description={currentStepDefinition.description}
+                          options={currentStepDefinition.options}
+                          selectedValue={
+                            wizardState.selectedOptions[
+                              currentStepDefinition.key as keyof WizardState["selectedOptions"]
+                            ]
+                          }
+                          onSelect={handleOptionSelect}
+                          loading={loading}
+                        />
+                      ) : (
+                        <WizardStep
+                          key={wizardState.currentStep}
+                          icon={currentStepDefinition.icon}
+                          title={currentStepDefinition.label}
+                          description={currentStepDefinition.description}
+                          options={currentStepDefinition.options}
+                          selectedValue={
+                            wizardState.selectedOptions[
+                              currentStepDefinition.key as keyof WizardState["selectedOptions"]
+                            ]
+                          }
+                          onSelect={handleOptionSelect}
+                          loading={loading}
+                        />
+                      )
                     )}
 
                     {isFinalStep && (

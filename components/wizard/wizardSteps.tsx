@@ -41,7 +41,7 @@ export const wizardSteps: WizardStepDefinition[] = [
     key: "color",
     label: "Farbwelt",
     description:
-      "Definieren Sie die dominante Farbgebung für Möbel, Fronten und Akzente.",
+      "Definieren Sie die dominante Farbgebung für Möbel, Fronten und Akzente – wahlweise aus der Rotpunkt Palette oder originalen FENIX NTM® Farbtönen.",
     options: [
       { value: "schwarz", label: "Schwarz" },
       { value: "rot", label: "Rot" },
@@ -99,12 +99,30 @@ export const wizardSteps: WizardStepDefinition[] = [
       "Wo befindet sich das Objekt? Diese Option prägt Lichtstimmung und Ausblick.",
     options: [
       {
-        value: "ein Strand auf Gran Canaria",
-        label: "Ein Strand auf Gran Canaria",
+        value: "mediterrane Küstenstadt",
+        label: "Mediterrane Küstenstadt",
+        hint: "Warme Farbtöne, Meeresreflexionen",
       },
-      { value: "in den Bergen", label: "In den Bergen" },
-      { value: "am Stadtrand", label: "Am Stadtrand" },
-      { value: "am See", label: "Am See" },
+      {
+        value: "historisches altstadtviertel",
+        label: "Historisches Altstadtviertel",
+        hint: "Kopfsteinpflaster, warmes Abendlicht",
+      },
+      {
+        value: "nordisches fjordhaus",
+        label: "Nordisches Fjordhaus",
+        hint: "Viel Glas, kühle Farbtemperatur",
+      },
+      {
+        value: "dachterrasse metropole",
+        label: "Dachterrasse in einer Metropole",
+        hint: "Skyline, urbanes Lichtspiel",
+      },
+      {
+        value: "tropischer regenwald bungalow",
+        label: "Tropischer Regenwald-Bungalow",
+        hint: "Sattes Grün, diffuse Feuchtigkeit",
+      },
     ],
     icon: <FaMapMarkerAlt className="w-full h-full text-red-600" />,
   },
@@ -131,10 +149,31 @@ export const wizardSteps: WizardStepDefinition[] = [
       {
         value: "modernes Holzhaus mit großen Fenstern",
         label: "Modernes Holzhaus mit großen Fenstern",
+        hint: "Skandinavisch inspiriert, viel Tageslicht",
       },
       { value: "Stadtwohnung", label: "Stadtwohnung" },
       { value: "Loft", label: "Loft" },
       { value: "Landhaus", label: "Landhaus" },
+      {
+        value: "penthouse mit dachterrasse",
+        label: "Penthouse mit Dachterrasse",
+        hint: "Panoramablick, Glas und Stahl",
+      },
+      {
+        value: "historische villa",
+        label: "Historische Villa",
+        hint: "Hohe Decken, Stuck und Parkett",
+      },
+      {
+        value: "reihenhaus mit garten",
+        label: "Reihenhaus mit Garten",
+        hint: "Familienfreundlich, grüne Oase",
+      },
+      {
+        value: "architektenhaus aus sichtbeton",
+        label: "Architektenhaus aus Sichtbeton",
+        hint: "Brutalistische Klarheit, starke Linien",
+      },
     ],
     icon: <FaHome className="w-full h-full text-red-600" />,
   },

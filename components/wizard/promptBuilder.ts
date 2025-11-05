@@ -1,5 +1,6 @@
 import type { WizardState } from "@/app/store/wizardStore";
 import { wizardSteps } from "./wizardSteps";
+import { getFenixColorByValue, isFenixColorValue } from "./fenixColors";
 
 export type PromptBuildResult = {
   prompt: string;
@@ -38,18 +39,29 @@ export function buildPrompt({
 
   const kind = getLabel("kind", selections.kind);
   const style = getLabel("style", selections.style);
-  const color = getLabel("color", selections.color);
+  const colorSelection = selections.color;
+  const isFenix = isFenixColorValue(colorSelection);
+  const fenixColor = isFenix ? getFenixColorByValue(colorSelection) : undefined;
+  const colorLabel = !isFenix ? getLabel("color", colorSelection) : undefined;
   const environment = getLabel("environment", selections.environment);
   const houseType = getLabel("houseType", selections.houseType);
   const location = getLabel("location", selections.location);
   const time = getLabel("time", selections.time);
   const viewpoint = selections.viewpoint ?? "innenansicht";
 
-  if (kind || style || color) {
+  const colorDescriptor = isFenix
+    ? fenixColor
+      ? `mit der FENIX Farbwelt "${fenixColor.name}" (${fenixColor.hex})`
+      : undefined
+    : colorLabel
+    ? `mit einer Farbpalette in ${colorLabel}`
+    : undefined;
+
+  if (kind || style || colorDescriptor) {
     const descriptors: string[] = [];
     if (kind) descriptors.push(kind);
     if (style) descriptors.push(`im Stil ${style}`);
-    if (color) descriptors.push(`mit einer ${color}en Farbpalette`);
+    if (colorDescriptor) descriptors.push(colorDescriptor);
     sections.push(`Raumfokus: ${descriptors.join(" ")}.`.trim());
   }
 
