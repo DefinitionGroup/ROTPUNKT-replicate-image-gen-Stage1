@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    const insertPayload = minioUrls.map((url) => ({ url }));
+    const insertPayload = minioUrls.map((url) => ({ url, imageprompt: prompt }));
     const { error: dbError } = await supabase
       .from("images")
       .insert(insertPayload);

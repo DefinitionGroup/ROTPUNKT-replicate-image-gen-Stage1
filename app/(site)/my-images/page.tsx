@@ -11,7 +11,7 @@ export default async function MyImagesPage() {
   const supabase = createSupabaseServerClient();
   const { data: images, error } = await supabase
     .from("images")
-    .select("id, url, created_at")
+    .select("id, url, created_at, imageprompt")
     .order("created_at", { ascending: false });
 
   if (error) {
