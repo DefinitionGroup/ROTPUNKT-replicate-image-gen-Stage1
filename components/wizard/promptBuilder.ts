@@ -51,7 +51,7 @@ export function buildPrompt({
 
   const colorDescriptor = isFenix
     ? fenixColor
-      ? `mit der FENIX Farbwelt "${fenixColor.name}" (${fenixColor.hex})`
+      ? `mit der FENIX Farbwelt "${fenixColor.name}" (${fenixColor.hex}) - ${fenixColor.description}`
       : undefined
     : colorLabel
     ? `mit einer Farbpalette in ${colorLabel}`
@@ -92,10 +92,18 @@ export function buildPrompt({
     sections.push(`Zusätzliche Wünsche des Nutzers: ${wishes}.`);
   }
 
+  const emphasisLine =
+    isFenix && fenixColor
+      ? `Wichtig: Möbel in ${fenixColor.description} (FENIX ${fenixColor.name}, ${fenixColor.hex}).`
+      : undefined;
+
   const prompt = [
+    emphasisLine,
     "Photorealistische Rotpunkt Küchenvisualisierung, entworfen von einem preisgekrönten Innenarchitekten.",
     ...sections,
-  ].join("\n");
+  ]
+    .filter((line): line is string => Boolean(line))
+    .join("\n");
 
   return {
     prompt,

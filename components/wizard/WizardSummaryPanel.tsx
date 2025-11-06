@@ -157,7 +157,9 @@ export function WizardSummaryPanel({
         />
       </div>
 
-      <div className="flex flex-col gap-3 overflow-y-auto pr-1" style={{ maxHeight: "26rem" }}>
+      <div className="flex flex-col gap-3 overflow-y-auto pr-1" 
+      // style={{ maxHeight: "26rem" }}
+      >
         <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
           Auswahlüberblick
         </h4>
