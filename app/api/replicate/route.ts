@@ -8,7 +8,7 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
 });
 
-const MODEL = "black-forest-labs/flux-1.1-pro-ultra-finetuned";
+const MODEL = "mainframeai/rddt-finetune-dec-2025:9620255525bcbad26f909dd62b2820aaae39aa99d0d9de5933c4a39465c6ff83";
 const NEGATIVE_PROMPT =
   "duplicate sinks, double faucets, extra taps, floating lamps, disembodied lighting, distorted structure, warped cabinetry, incorrect perspective";
 
@@ -29,26 +29,35 @@ export async function POST(req: NextRequest) {
     }
     console.log("Received prompt:", prompt);
 
-    const prediction = await replicate.predictions.create({
-      model: MODEL,
+    const output = await replicate.run(MODEL, {
       input: {
-        prompt: `RDTDOT ${prompt.trim()}`,
-        negative_prompt: NEGATIVE_PROMPT,
-        finetune_id: "ef2a1a03-c2d2-4b23-bd94-ae0cf1609f0f",
-        num_outputs: 1,
-        aspect_ratio: "1:1",
-        output_format: "png",
+        prompt: prompt.trim(),
+        go_fast: true,
+        guidance: 3,
+        strength: 0.9,
+        image_size: "optimize_for_quality",
+        lora_scale: 1,
+        aspect_ratio: "16:9",
+        output_format: "webp",
+        enhance_prompt: true,
         output_quality: 80,
+        negative_prompt: NEGATIVE_PROMPT,
+        num_inference_steps: 30,
       },
     });
 
-    if ((prediction as any)?.error) {
-      throw new Error("Prediction failed");
+    // Extract URLs from the FileOutput objects
+    const generatedUrls: string[] = [];
+    if (Array.isArray(output)) {
+      for (const item of output) {
+        if (item && typeof item.url === "function") {
+          // .url() returns a URL object, convert to string
+          generatedUrls.push(item.url().href);
+        } else if (typeof item === "string") {
+          generatedUrls.push(item);
+        }
+      }
     }
-
-    const result = await replicate.wait(prediction);
-    const out = (result as any)?.output as string | string[] | null | undefined;
-    const generatedUrls = Array.isArray(out) ? out : out ? [out] : [];
     if (generatedUrls.length === 0) throw new Error("No output received");
 
     const minioUrls = await uploadImages(generatedUrls);
