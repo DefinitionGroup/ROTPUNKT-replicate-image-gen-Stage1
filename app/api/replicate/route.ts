@@ -13,10 +13,15 @@ const NEGATIVE_PROMPT =
   "duplicate sinks, double faucets, extra taps, floating lamps, disembodied lighting, distorted structure, warped cabinetry, incorrect perspective";
 
 export async function POST(req: NextRequest) {
+  const requestId = crypto.randomUUID().slice(0, 8);
+  console.log(`[${requestId}] 🚀 New generation request received`);
+
   const { userId, getToken } = await getAuth(req);
   if (!userId) {
+    console.log(`[${requestId}] ❌ Unauthorized`);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  console.log(`[${requestId}] 👤 User: ${userId}`);
 
   try {
     const { prompt } = await req.json();
@@ -27,11 +32,14 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    console.log("Received prompt:", prompt);
+    console.log(`[${requestId}] 📝 Prompt: ${prompt.slice(0, 50)}...`);
 
+    const finalPrompt = `RDTDOT ${prompt.trim()}`;
+
+    const startTime = Date.now();
     const output = await replicate.run(MODEL, {
       input: {
-        prompt: prompt.trim(),
+        prompt: finalPrompt,
         go_fast: true,
         guidance: 3,
         strength: 0.9,
@@ -43,21 +51,36 @@ export async function POST(req: NextRequest) {
         output_quality: 80,
         negative_prompt: NEGATIVE_PROMPT,
         num_inference_steps: 30,
+        num_outputs: 1,
       },
     });
+    const totalTime = Date.now() - startTime;
+
+    // Cold start typically > 20s, warm < 10s
+    const isColdStart = totalTime > 20000;
+    console.log(`[${requestId}] ⏱️ Replicate generation took ${(totalTime / 1000).toFixed(1)}s — ${isColdStart ? '🥶 COLD START' : '🔥 WARM'}`);
 
     // Extract URLs from the FileOutput objects
     const generatedUrls: string[] = [];
+    const processItem = (item: any) => {
+      if (item && typeof item.url === "function") {
+        return item.url().href;
+      } else if (typeof item === "string") {
+        return item;
+      }
+      return null;
+    };
+
     if (Array.isArray(output)) {
       for (const item of output) {
-        if (item && typeof item.url === "function") {
-          // .url() returns a URL object, convert to string
-          generatedUrls.push(item.url().href);
-        } else if (typeof item === "string") {
-          generatedUrls.push(item);
-        }
+        const url = processItem(item);
+        if (url) generatedUrls.push(url);
       }
+    } else {
+      const url = processItem(output);
+      if (url) generatedUrls.push(url);
     }
+
     if (generatedUrls.length === 0) throw new Error("No output received");
 
     const minioUrls = await uploadImages(generatedUrls);

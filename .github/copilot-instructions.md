@@ -180,57 +180,30 @@ user_id     UUID                -- From Clerk (via RLS)
 
 ---
 
-## Environment Variables Required
+## Critical Developer Workflows
 
-```env
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
+### Development & Build
+- **Start Dev Server:** `pnpm dev` (uses Turbopack)
+- **Build Project:** `pnpm build`
+- **Linting:** `pnpm lint`
+- **Auto-fix Linting:** `pnpm fix`
 
-# Replicate
-REPLICATE_API_TOKEN=
-
-# MinIO
-MINIO_DOMAIN=
-MINIO_ACCESS_KEY=
-MINIO_SECRET_KEY=
-
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-
-# Sanity
-NEXT_PUBLIC_SANITY_PROJECT_ID=
-NEXT_PUBLIC_SANITY_DATASET=
-SANITY_API_READ_TOKEN=
-```
-
----
-
-## Wizard Steps Configuration
-
-Defined in [components/wizard/wizardSteps.tsx](components/wizard/wizardSteps.tsx):
-
-1. **Raumfokus (kind):** Kitchen, Living Room, Exterior, Hallway
-2. **Farbwelt (color):** Color palette + FENIX NTM colors
-3. **Stilrichtung (style):** Elegant, Modern, Minimalist, Classic, Open
-4. **Umgebung (environment):** Urban, Rural, Suburban
-5. **Haustyp (houseType):** Apartment, House, Loft, Villa
-6. **Standort (location):** Germany, Austria, Switzerland, Other
-7. **Tageszeit (time):** Morning, Noon, Evening, Night
-8. **Perspektive (viewpoint):** Interior or Exterior view
+### Deployment
+- **Automated:** Jenkins CI/CD triggers on `main` branch push.
+- **Production URL:** `https://rotpunkt-visions.de/`
+- **Docker:** `Dockerfile` and `dockerDeployment.sh` are available for manual containerization.
 
 ---
 
 ## Code Conventions
 
-- **Language:** German for user-facing text, English for code/comments
-- **Components:** Functional with hooks, co-located styles
-- **Exports:** Named exports preferred, default for pages
-- **Imports:** Use `@/` path alias for absolute imports
-- **Server Components:** Default in App Router; add `"use client"` when needed
-- **API Routes:** Use Route Handlers (`route.ts`) with Next.js patterns
+- **Language:** German for user-facing text, English for code/comments.
+- **Prompt Engineering:** German prompts are built in `promptBuilder.ts` with specific brand constraints (e.g., "genau ein Spülbecken", "Rotpunkt Markensprache").
+- **Components:** Functional with hooks, co-located styles.
+- **Exports:** Named exports preferred, default for pages.
+- **Imports:** Use `@/` path alias for absolute imports.
+- **Server Components:** Default in App Router; add `"use client"` when needed.
+- **API Routes:** Use Route Handlers (`route.ts`) with Next.js patterns.
 
 ---
 
@@ -256,17 +229,28 @@ Use `persistentAtom` from `@nanostores/persistent` in `app/store/`.
 
 ---
 
-## Testing & Debugging
+## Environment Variables Required
 
-- **Dev Server:** `pnpm dev` (uses Turbopack)
-- **Lint:** `pnpm lint` / `pnpm fix`
-- **Sanity Studio:** Available at `/studio` route
-- **API Debugging:** Check server logs for Replicate/MinIO errors
+```env
+# Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
 
----
+# Replicate
+REPLICATE_API_TOKEN=
 
-## Deployment
+# MinIO
+MINIO_DOMAIN=
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
 
-- **Docker:** `Dockerfile` and `dockerDeployment.sh` provided
-- **Build:** `pnpm build` → `pnpm start`
-- **Prerequisites:** Node ≥20, pnpm ≥10
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Sanity
+NEXT_PUBLIC_SANITY_PROJECT_ID=
+NEXT_PUBLIC_SANITY_DATASET=
+SANITY_API_READ_TOKEN=
+```

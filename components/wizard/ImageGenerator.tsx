@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
 import { $prompt } from "@/store/prompt";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 
 type ApiResponse = string[];
@@ -15,19 +15,29 @@ type ApiResponse = string[];
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const hasTriggered = useRef<string | null>(null);
 
   const {
+    mutate: generateImage,
     data: images,
     isError,
-    isLoading,
-  } = useQuery<ApiResponse>({
-    queryKey: ["/api/replicate", prompt],
-    queryFn: () =>
+    isPending: isLoading,
+  } = useMutation<ApiResponse, Error, string>({
+    mutationFn: (p) =>
       fetch("/api/replicate", {
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt: p }),
         method: "POST",
       }).then((res) => res.json()),
   });
+
+  useEffect(() => {
+    // Guard: only trigger once per unique prompt
+    if (prompt && hasTriggered.current !== prompt) {
+      hasTriggered.current = prompt;
+      console.log("[ImageGenerator] Triggering generation for prompt");
+      generateImage(prompt);
+    }
+  }, [prompt, generateImage]);
 
   useEffect(() => {
     if (images?.length) setSelectedImage(images[0]);
