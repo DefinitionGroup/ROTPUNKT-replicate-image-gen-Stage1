@@ -15,15 +15,18 @@ type ApiResponse = string[];
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const hasTriggered = useRef<string | null>(null);
 
   const {
     mutate: generateImage,
-    data: images,
     isError,
-    isPending: isLoading,
+    error,
   } = useMutation<ApiResponse, Error, string>({
     mutationFn: async (p) => {
+      console.log("[ImageGenerator] Starting fetch...");
+      setIsGenerating(true);
       // 5 minute timeout for extreme cold starts
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 300_000);
@@ -37,13 +40,30 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         clearTimeout(timeoutId);
 
         if (!res.ok) {
+          const errorText = await res.text();
+          console.error("[ImageGenerator] Response not OK:", res.status, errorText);
           throw new Error(`Generation failed: ${res.status}`);
         }
-        return res.json();
+        const data = await res.json();
+        console.log("[ImageGenerator] Received data:", data);
+        return data;
       } catch (error) {
         clearTimeout(timeoutId);
+        console.error("[ImageGenerator] Fetch error:", error);
         throw error;
       }
+    },
+    onSuccess: (data) => {
+      console.log("[ImageGenerator] ✅ onSuccess called with:", data);
+      setIsGenerating(false);
+      if (Array.isArray(data) && data.length > 0) {
+        setGeneratedImages(data);
+        setSelectedImage(data[0]);
+      }
+    },
+    onError: (err) => {
+      console.error("[ImageGenerator] ❌ onError called:", err);
+      setIsGenerating(false);
     },
   });
 
@@ -56,29 +76,32 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     }
   }, [prompt, generateImage]);
 
-  useEffect(() => {
-    if (images?.length) setSelectedImage(images[0]);
-  }, [images]);
-  const hasImages = Array.isArray(images) && images.length > 0;
+  const hasImages = Array.isArray(generatedImages) && generatedImages.length > 0;
+
+  console.log("[ImageGenerator] Render state:", { isGenerating, isError, hasImages, generatedImages, selectedImage });
+
   return (
     <div className="w-full mx-auto h-full flex flex-col justify-center items-center">
-      {onBack && images && !isLoading && <BackButton onClick={onBack} />}
+      {onBack && hasImages && !isGenerating && <BackButton onClick={onBack} />}
 
-      <AnimatePresence>{isLoading && <LoadingState />}</AnimatePresence>
+      <AnimatePresence mode="wait">
+        {isGenerating && !hasImages && <LoadingState key="loading" />}
 
-      <AnimatePresence>
-        {isError && (
-          <ErrorState message="Fehler beim Erstellen des Bildes. Bitte erneut versuchen." />
+        {!isGenerating && isError && !hasImages && (
+          <ErrorState
+            key="error"
+            message={`Fehler beim Erstellen des Bildes: ${error?.message || "Unbekannter Fehler"}. Bitte erneut versuchen.`}
+          />
         )}
-      </AnimatePresence>
 
-      <AnimatePresence>
-        {!isLoading && hasImages && (
+        {!isGenerating && hasImages && (
           <motion.div
+            key="images"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
           >
-            <ImagesGrid images={images!} onImageClick={setSelectedImage} />
+            <ImagesGrid images={generatedImages!} onImageClick={setSelectedImage} />
             <QuickLink />
           </motion.div>
         )}
