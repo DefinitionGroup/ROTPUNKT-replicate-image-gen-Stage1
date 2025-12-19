@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,15 +13,20 @@ import { FaWhatsapp, FaFacebook, FaTelegram, FaLink } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
 import Image from "next/image";
+import UpscaleModal from "@/components/UpscaleModal";
+
 export default function ImageModal({
   src,
   onClose,
+  prompt,
 }: {
   src: string;
   onClose: () => void;
+  prompt?: string;
 }) {
   const [isMobileEnv, setIsMobileEnv] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [showUpscale, setShowUpscale] = useState(false);
 
   useEffect(() => {
     const isMobile = () => {
@@ -228,21 +233,39 @@ export default function ImageModal({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button
-            asChild
-            className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-brand-primary-2"
-          >
-            <Link
-              href={normalizedUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              download={`generated-image-${Date.now()}.png`}
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setShowUpscale(true)}
+              className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
-              Download
-            </Link>
-          </Button>
+              ✨ High-Res
+            </Button>
+            <Button
+              asChild
+              className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-brand-primary-2"
+            >
+              <Link
+                href={normalizedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download={`generated-image-${Date.now()}.png`}
+              >
+                Download
+              </Link>
+            </Button>
+          </div>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {showUpscale && (
+          <UpscaleModal
+            src={src}
+            prompt={prompt}
+            onClose={() => setShowUpscale(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

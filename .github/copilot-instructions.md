@@ -33,7 +33,9 @@ This document describes the architecture, conventions, and key integration point
 │   │   └── my-images/       # Authenticated user gallery
 │   ├── (studio)/            # Sanity Studio (embedded)
 │   ├── api/
-│   │   ├── replicate/       # AI image generation endpoint
+│   │   ├── replicate/       # AI image generation endpoints
+│   │   │   ├── route.ts     # Base image generation
+│   │   │   └── upscale/     # High-res upscaling endpoint
 │   │   └── clerk-user-webhook/  # Clerk webhook handler
 │   ├── store/               # Nanostore atoms
 │   │   ├── modals.ts        # Modal visibility state
@@ -45,6 +47,8 @@ This document describes the architecture, conventions, and key integration point
 ├── components/
 │   ├── wizard/              # AI generation wizard components
 │   ├── pagebuildercomponents/  # Sanity page builder blocks
+│   ├── ImageModal.tsx       # Image preview with sharing & upscale
+│   ├── UpscaleModal.tsx     # High-res upscaling UI
 │   └── ui/                  # Shadcn/Radix UI primitives
 ├── lib/
 │   ├── minioClient.ts       # MinIO upload utilities (server-only)
@@ -89,9 +93,48 @@ This document describes the architecture, conventions, and key integration point
 - [app/api/replicate/route.ts](app/api/replicate/route.ts) – Server-side generation orchestration
 - [lib/minioClient.ts](lib/minioClient.ts) – Downloads from Replicate, uploads to MinIO
 
-### 2. Replicate Model Configuration
+### 2. High-Res Upscaling Pipeline (Optional)
 
-**Current Model:** `mainframeai/rddt-finetune-dec-2025:9620255525bcbad26f909dd62b2820aaae39aa99d0d9de5933c4a39465c6ff83`
+After base image generation, users can optionally upscale images to 2x resolution:
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   ImageModal    │───▶│  UpscaleModal    │───▶│ POST /api/      │
+│  (✨ High-Res)  │    │    .tsx          │    │ replicate/upscale│
+└─────────────────┘    └──────────────────┘    └────────┬────────┘
+                                                        │
+                       ┌────────────────────────────────┼────────────────────────────────┐
+                       ▼                                ▼                                ▼
+               Replicate API                     MinIO Upload                    Supabase Insert
+               (philz1337x/                      (vision-images                  (is_upscaled=true)
+                clarity-upscaler)                 bucket)
+```
+
+**Upscaler Model:** `philz1337x/clarity-upscaler:dfad41707589d68ecdccd1dfa600d55a208f9310748e44bfe35b4a6291453d5e`
+
+**Input Parameters:**
+```typescript
+{
+  seed: 1337,
+  image: string,              // Source image URL
+  prompt: string,             // Enhancement prompt
+  dynamic: 6,
+  scale_factor: 2,            // 2x upscale
+  output_format: "png",
+  creativity: 0.35,
+  resemblance: 0.6,
+  num_inference_steps: 18
+}
+```
+
+**Files involved:**
+- [components/ImageModal.tsx](components/ImageModal.tsx) – "✨ High-Res" button trigger
+- [components/UpscaleModal.tsx](components/UpscaleModal.tsx) – Upscale UI with loading states
+- [app/api/replicate/upscale/route.ts](app/api/replicate/upscale/route.ts) – Server-side upscale orchestration
+
+### 3. Replicate Model Configuration
+
+**Base Generation Model:** `mainframeai/rddt-finetune-dec-2025:9620255525bcbad26f909dd62b2820aaae39aa99d0d9de5933c4a39465c6ff83`
 
 **Input Parameters:**
 ```typescript
@@ -113,7 +156,7 @@ This document describes the architecture, conventions, and key integration point
 
 **Output:** Array of `FileOutput` objects – use `.url().href` to get string URL.
 
-### 3. State Management (Nanostores)
+### 4. State Management (Nanostores)
 
 | Store | File | Purpose |
 |-------|------|---------|
@@ -142,7 +185,7 @@ interface WizardState {
 }
 ```
 
-### 4. Sanity Page Builder
+### 5. Sanity Page Builder
 
 Content editors create pages using composable blocks. The `PageBuilder` component maps `_type` to React components:
 
@@ -158,7 +201,7 @@ Content editors create pages using composable blocks. The `PageBuilder` componen
 | `richText` | `RichTextComponent.tsx` | Portable Text |
 | `mediaScrollHighlightSection` | `MediaScrollHighlightSection.tsx` | Scroll-triggered media |
 
-### 5. Authentication & Authorization
+### 6. Authentication & Authorization
 
 - **Middleware:** `middleware.ts` uses `clerkMiddleware()` to protect routes
 - **API Routes:** Use `getAuth(req)` to verify user and get tokens
@@ -171,11 +214,13 @@ Content editors create pages using composable blocks. The `PageBuilder` componen
 
 ### `images` Table
 ```sql
-id          UUID PRIMARY KEY
-url         TEXT NOT NULL       -- MinIO permanent URL
-imageprompt TEXT                -- Original prompt used
-created_at  TIMESTAMPTZ         -- Auto-generated
-user_id     UUID                -- From Clerk (via RLS)
+id                 UUID PRIMARY KEY
+url                TEXT NOT NULL       -- MinIO permanent URL
+imageprompt        TEXT                -- Original prompt used
+created_at         TIMESTAMPTZ         -- Auto-generated
+user_id            UUID                -- From Clerk (via RLS)
+is_upscaled        BOOLEAN DEFAULT FALSE  -- Whether this is a high-res version
+original_image_url TEXT                -- Reference to original image (for upscaled)
 ```
 
 ---

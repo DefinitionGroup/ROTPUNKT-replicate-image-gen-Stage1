@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
@@ -112,6 +112,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
           <ImageModal
             src={selectedImage}
             onClose={() => setSelectedImage(null)}
+            prompt={prompt ?? undefined}
           />
         )}
       </AnimatePresence>
@@ -272,7 +273,7 @@ function QuickLink() {
       className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-brand-secondary-1 rounded-full font-semibold shadow hover:bg-red-600 transition"
       whileHover={{ scale: 1.05 }}
     >
-      📁 Zu "Meine Bilder"
+      📁 Zu &quot;Meine Bilder&quot;
     </motion.a>
   );
 }
