@@ -23,11 +23,28 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     isError,
     isPending: isLoading,
   } = useMutation<ApiResponse, Error, string>({
-    mutationFn: (p) =>
-      fetch("/api/replicate", {
-        body: JSON.stringify({ prompt: p }),
-        method: "POST",
-      }).then((res) => res.json()),
+    mutationFn: async (p) => {
+      // 5 minute timeout for extreme cold starts
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300_000);
+
+      try {
+        const res = await fetch("/api/replicate", {
+          body: JSON.stringify({ prompt: p }),
+          method: "POST",
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          throw new Error(`Generation failed: ${res.status}`);
+        }
+        return res.json();
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    },
   });
 
   useEffect(() => {
@@ -91,6 +108,38 @@ function BackButton({ onClick }: { onClick: () => void }) {
 }
 
 function LoadingState() {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsed((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return mins > 0 ? `${mins}:${secs.toString().padStart(2, "0")}` : `${secs}s`;
+  };
+
+  const getMessage = () => {
+    if (elapsed < 15) return "Ich generiere gerade dein Bild...";
+    if (elapsed < 30) return "Die KI arbeitet an deinem Design...";
+    if (elapsed < 60) return "Das dauert heute etwas länger – bitte hab noch einen Moment Geduld...";
+    if (elapsed < 90) return "Die Server wachen gerade erst auf ☕ – fast geschafft!";
+    if (elapsed < 120) return "Dein Bild wird mit extra viel Liebe generiert... 💫";
+    if (elapsed < 180) return "Noch ein kleines bisschen – gute Dinge brauchen Zeit! 🎨";
+    return "Das KI-Modell startet gerade neu – danke für deine Geduld! 🚀";
+  };
+
+  const getSubMessage = () => {
+    if (elapsed < 30) return "Die Bilder werden in aller Regel innerhalb von 30\u00A0s generiert.";
+    if (elapsed < 60) return "Bei hoher Auslastung kann es bis zu 1-2 Minuten dauern.";
+    if (elapsed < 120) return "Manchmal muss das KI-Modell erst aufgewärmt werden.";
+    return "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!";
+  };
+
   return (
     <div className="w-full max-w-3xl mx-auto flex items-center justify-center min-h-[45rem]">
       <motion.div
@@ -107,12 +156,49 @@ function LoadingState() {
             autoplay
           />
         </div>
-        <span className="mt-2 text-lg text-brand-secondary-1 font-medium text-center">
-          Ich generiere gerade dein Bild...
-        </span>
-        <div className="text-xs text-gray-400 mt-2 text-center">
-          Die Bilder werden in aller Regel innerhalb von 30&nbsp;s generiert.
+
+        {/* Timer */}
+        <div className="mb-3 px-4 py-1.5 rounded-full bg-gray-800/50 border border-gray-700">
+          <span className="text-sm font-mono text-gray-300">⏱️ {formatTime(elapsed)}</span>
         </div>
+
+        {/* Main message - animated on change */}
+        <motion.span
+          key={getMessage()}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-2 text-lg text-brand-secondary-1 font-medium text-center"
+        >
+          {getMessage()}
+        </motion.span>
+
+        {/* Sub message */}
+        <motion.div
+          key={getSubMessage()}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-xs text-gray-400 mt-2 text-center max-w-md"
+        >
+          {getSubMessage()}
+        </motion.div>
+
+        {/* Progress bar for visual feedback */}
+        {elapsed >= 30 && (
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            className="mt-6 w-full max-w-xs"
+          >
+            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-brand-primary-2 to-red-400"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 120, ease: "linear" }}
+              />
+            </div>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );
