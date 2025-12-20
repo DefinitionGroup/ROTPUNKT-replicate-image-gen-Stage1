@@ -23,13 +23,18 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     mutate: generateImage,
     isError,
     error,
+    reset: resetMutation,
   } = useMutation<ApiResponse, Error, string>({
     mutationFn: async (p) => {
       console.log("[ImageGenerator] Starting fetch...");
       setIsGenerating(true);
-      // 5 minute timeout for extreme cold starts
+      // 10 minute timeout for extreme cold starts + queue time
+      // Replicate can queue for 2-3 min + generate for 30-60s
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 300_000);
+      const timeoutId = setTimeout(() => {
+        console.log("[ImageGenerator] ⏰ Request timeout after 10 minutes");
+        controller.abort();
+      }, 600_000);
 
       try {
         const res = await fetch("/api/replicate", {
@@ -47,19 +52,26 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         const data = await res.json();
         console.log("[ImageGenerator] Received data:", data);
         return data;
-      } catch (error) {
+      } catch (err) {
         clearTimeout(timeoutId);
-        console.error("[ImageGenerator] Fetch error:", error);
-        throw error;
+        // Provide better error messages
+        if (err instanceof Error) {
+          if (err.name === 'AbortError') {
+            console.error("[ImageGenerator] Request aborted (timeout)");
+            throw new Error("Die Anfrage hat zu lange gedauert. Bitte versuche es erneut.");
+          }
+        }
+        console.error("[ImageGenerator] Fetch error:", err);
+        throw err;
       }
     },
     onSuccess: (data) => {
       console.log("[ImageGenerator] ✅ onSuccess called with:", data);
-      setIsGenerating(false);
       if (Array.isArray(data) && data.length > 0) {
         setGeneratedImages(data);
         setSelectedImage(data[0]);
       }
+      setIsGenerating(false);
     },
     onError: (err) => {
       console.error("[ImageGenerator] ❌ onError called:", err);
@@ -90,7 +102,14 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         {!isGenerating && isError && !hasImages && (
           <ErrorState
             key="error"
-            message={`Fehler beim Erstellen des Bildes: ${error?.message || "Unbekannter Fehler"}. Bitte erneut versuchen.`}
+            message={error?.message || "Unbekannter Fehler"}
+            onRetry={() => {
+              resetMutation();
+              hasTriggered.current = null;
+              if (prompt) {
+                generateImage(prompt);
+              }
+            }}
           />
         )}
 
@@ -154,14 +173,18 @@ function LoadingState() {
     if (elapsed < 90) return "Die Server wachen gerade erst auf ☕ – fast geschafft!";
     if (elapsed < 120) return "Dein Bild wird mit extra viel Liebe generiert... 💫";
     if (elapsed < 180) return "Noch ein kleines bisschen – gute Dinge brauchen Zeit! 🎨";
-    return "Das KI-Modell startet gerade neu – danke für deine Geduld! 🚀";
+    if (elapsed < 240) return "Das KI-Modell startet gerade neu – danke für deine Geduld! 🚀";
+    if (elapsed < 300) return "Dein Bild ist in der Warteschlange – gleich geht's los! ⏳";
+    return "Fast da – dein Design wird finalisiert! ✨";
   };
 
   const getSubMessage = () => {
     if (elapsed < 30) return "Die Bilder werden in aller Regel innerhalb von 30\u00A0s generiert.";
     if (elapsed < 60) return "Bei hoher Auslastung kann es bis zu 1-2 Minuten dauern.";
     if (elapsed < 120) return "Manchmal muss das KI-Modell erst aufgewärmt werden.";
-    return "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!";
+    if (elapsed < 180) return "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!";
+    if (elapsed < 300) return "Bei hoher Nachfrage wird dein Bild in die Warteschlange gestellt.";
+    return "Maximale Wartezeit: ca. 5 Minuten. Dein Bild kommt garantiert!";
   };
 
   return (
@@ -228,17 +251,26 @@ function LoadingState() {
   );
 }
 
-function ErrorState({ message }: { message: string }) {
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <motion.p
+    <motion.div
       key="error"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="text-red-400 text-center text-base my-4"
+      className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 shadow-2xl rounded-2xl"
     >
-      {message}
-    </motion.p>
+      <div className="text-4xl mb-4">😕</div>
+      <p className="text-red-400 text-center text-base mb-6 max-w-md">
+        {message}
+      </p>
+      <Button
+        onClick={onRetry}
+        className="px-6 py-3 text-sm font-medium shadow-lg rounded-full bg-brand-primary-2 hover:bg-red-600"
+      >
+        🔄 Erneut versuchen
+      </Button>
+    </motion.div>
   );
 }
 
