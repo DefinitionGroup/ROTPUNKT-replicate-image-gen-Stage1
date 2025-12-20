@@ -116,12 +116,12 @@ export default function Navbar({
         className={
           mobile
             ? cn(
-                "block text-brand-secondary-1 text-2xl font-bold tracking-wider"
-              )
+              "block text-brand-secondary-1 text-2xl  tracking-wider"
+            )
             : cn(
-                "text-inherit hover:text-primary text-md tracking-wider font-bold transition",
-                active && "text-brand-primary-2"
-              )
+              "text-inherit hover:text-primary text-sm  tracking-wider  transition",
+              active && "text-brand-primary-2"
+            )
         }
       >
         {item.label}
@@ -134,13 +134,13 @@ export default function Navbar({
     <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20 flex justify-center w-full">
       <nav
         className={cn(
-          "relative mx-auto w-auto md:w-full max-w-7xl flex gap-6 items-center justify-between",
-          "rounded-full px-4 md:px-6 py-3 md:py-4 shadow-input",
-          "bg-white/30 backdrop-blur-sm",
+          "relative mx-auto w-auto md:w-full max-w-4xl flex  items-center justify-between",
+          "rounded-full pl-4 md:pl-4 py-2 md:py-2 shadow-input",
+          "bg-white/10 backdrop-blur-sm",
           "text-white dark:text-brand-secondary-1"
         )}
       >
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center ">
           {resolvedLogo ? (
             <Image
               src={resolvedLogo}
@@ -150,7 +150,7 @@ export default function Navbar({
               height={48}
             />
           ) : (
-            <span className="block h-4 w-auto text-white">
+            <span className="block h-2 w-auto text-white">
               <Logo />
             </span>
           )}
@@ -263,7 +263,7 @@ export default function Navbar({
                   type="button"
                   aria-label="Close menu"
                   onClick={closeMenu}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-brand-secondary-1"
+                  className="inline-flex items-center justify-center w-10 h-10  rounded-full bg-white/10 hover:bg-white/20 text-brand-secondary-1"
                 >
                   ×
                 </button>
@@ -276,7 +276,7 @@ export default function Navbar({
                 animate="show"
                 exit="hidden"
               >
-                <ul className="space-y-4">
+                <ul className="space-y-1">
                   {menuItems?.map((item) => (
                     <motion.li key={item._key} variants={itemVariants}>
                       {renderLink(item, true)}
@@ -288,7 +288,7 @@ export default function Navbar({
                         <Link
                           href="/my-images"
                           onClick={closeMenu}
-                          className="block text-brand-secondary-1 text-2xl font-medium tracking-tight"
+                          className="block text-brand-secondary-1 text-xl font-medium tracking-tight"
                         >
                           Meine Bilder
                         </Link>

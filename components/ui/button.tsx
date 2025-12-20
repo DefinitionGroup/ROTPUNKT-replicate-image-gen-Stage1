@@ -23,7 +23,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
 
         // Project-specific variants (actively used in your code)
-        red: "bg-brand-primary-2 text-brand-secondary-1 font-bold border border-transparent hover:bg-red-600 focus-visible:ring-brand-primary-2",
+        red: "bg-brand-primary-2 text-brand-secondary-1 rounded-full font- border border-transparent hover:bg-red-600 focus-visible:ring-brand-primary-2",
         redCta:
           "bg-brand-primary-2 text-brand-secondary-1 font-bold hover:bg-white hover:text-brand-primary-2 transition-colors duration-200",
         redOutline:
@@ -33,17 +33,17 @@ const buttonVariants = cva(
           "bg-gray-900 border border-gray-800 text-gray-200 font-bold hover:bg-gray-900 hover:text-brand-primary-2 hover:border-red-600 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-red-600 data-[selected=true]:text-brand-secondary-1 transition-colors",
       },
       size: {
-        default: "h-9 px-4 py-2 rounded-xs",
-        sm: "h-8 px-3 py-1.5 text-xs rounded-xs",
-        lg: "h-11 px-6 py-3 rounded-xs",
-        icon: "h-9 w-9 rounded-xs",
+        default: "h-9 px-4 py-2 rounded-full",
+        sm: "h-8 px-3 py-1.5 text-xs rounded-full",
+        lg: "h-11 px-6 py-3 rounded-full",
+        icon: "h-9 w-9 rounded-full",
 
         // Project-specific sizes
-        red: "px-8 py-3 text-base rounded-xs",
-        cta: "px-8 py-3 text-sm rounded-xs",
-        back: "px-4 py-2 text-sm min-w-[108px] rounded-xs",
+        red: "px-8 py-3 text-base rounded-full",
+        cta: "px-8 py-3 text-sm rounded-full", 
+        back: "px-4 py-2 text-sm min-w-[108px] rounded-full",
         close: "w-auto h-auto p-0 text-3xl rounded-none",
-        wizardOption: "px-6 py-3 text-xs h-12 w-full rounded-xs border",
+        wizardOption: "px-6 py-3 text-xs h-12 w-full rounded-full border",
       },
     },
     defaultVariants: {
@@ -87,33 +87,33 @@ function Button({
   // Default motion animations
   const motionDefaults = hasMotionProps
     ? {
-        initial: initial ?? { opacity: 0, scale: 0.95 },
-        animate: animate ?? { opacity: 1, scale: 1 },
-        transition: transition ?? {
-          type: "spring",
-          stiffness: 200,
-          damping: 13,
-        },
-        whileHover: whileHover ?? { scale: 1.05 },
-        whileTap: whileTap ?? { scale: 0.98 },
-      }
+      initial: initial ?? { opacity: 0, scale: 0.95 },
+      animate: animate ?? { opacity: 1, scale: 1 },
+      transition: transition ?? {
+        type: "spring",
+        stiffness: 200,
+        damping: 13,
+      },
+      whileHover: whileHover ?? { scale: 1.05 },
+      whileTap: whileTap ?? { scale: 0.98 },
+    }
     : {};
 
   // Motion-optimized styles
   const motionStyle = hasMotionProps
     ? {
-        transformOrigin: "center" as const,
-        backfaceVisibility: "hidden" as const,
-        willChange: "transform, opacity" as const,
-        ...(style as React.CSSProperties),
-      }
+      transformOrigin: "center" as const,
+      backfaceVisibility: "hidden" as const,
+      willChange: "transform, opacity" as const,
+      ...(style as React.CSSProperties),
+    }
     : style;
 
   const safeClassName = hasMotionProps
     ? cn(buttonVariants({ variant, size }), className).replace(
-        /transition-\w+/g,
-        ""
-      )
+      /transition-\w+/g,
+      ""
+    )
     : cn(buttonVariants({ variant, size }), className);
 
   if (hasMotionProps) {
