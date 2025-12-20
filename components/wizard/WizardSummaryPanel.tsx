@@ -157,7 +157,7 @@ export function WizardSummaryPanel({
         />
       </div>
 
-      <div className="flex flex-col gap-3 overflow-y-auto pr-1" 
+      <div className="flex flex-col gap-3 overflow-y-auto pr-1"
       // style={{ maxHeight: "26rem" }}
       >
         <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
@@ -169,11 +169,10 @@ export function WizardSummaryPanel({
               key={item.key as string}
               type="button"
               onClick={() => onJumpToStep(idx)}
-              className={`text-left rounded-lg border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
-                idx === activeIndex
-                  ? "border-emerald-400 bg-emerald-500/10"
-                  : "border-gray-800 bg-gray-900/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5"
-              }`}
+              className={`text-left rounded-lg border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${idx === activeIndex
+                ? "border-emerald-400 bg-emerald-500/10"
+                : "border-gray-800 bg-gray-900/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5"
+                }`}
               disabled={loading}
             >
               <div className="flex items-center justify-between">
@@ -205,52 +204,6 @@ export function WizardSummaryPanel({
 
       <div className="h-px bg-gray-800/80" />
 
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
-              Prompt-Vorschau
-            </h4>
-            <span className="text-xs text-gray-500">
-              {showPrompt ? "Sichtbar" : "Ausgeblendet"}
-            </span>
-          </div>
-          <Switch
-            checked={showPrompt}
-            onCheckedChange={setShowPrompt}
-            disabled={!prompt.length}
-            aria-label="Prompt-Vorschau umschalten"
-          />
-        </div>
-
-        {showPrompt && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            className="flex flex-col gap-3"
-          >
-            <div className="flex justify-end">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopy}
-                disabled={!prompt.length}
-              >
-                {copied ? "Kopiert" : "Prompt kopieren"}
-              </Button>
-            </div>
-            <pre className="rounded-xl border border-gray-800 bg-black/70 text-left text-xs text-gray-300 p-4 overflow-y-auto max-h-48 whitespace-pre-wrap">
-              {prompt}
-            </pre>
-            {cleanedWishes && (
-              <p className="text-xs text-gray-400">
-                Extra-Wünsche: {cleanedWishes}
-              </p>
-            )}
-          </motion.div>
-        )}
-      </div>
 
       <div className="mt-auto flex flex-col gap-2">
         {renderPrimaryAction()}
