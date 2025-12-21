@@ -10,7 +10,7 @@ const replicate = new Replicate({
 
 const MODEL = "mainframeai/rddt-finetune-dec-2025:9620255525bcbad26f909dd62b2820aaae39aa99d0d9de5933c4a39465c6ff83";
 const NEGATIVE_PROMPT =
-  "duplicate sinks, double faucets, extra taps, floating lamps, disembodied lighting, distorted structure, warped cabinetry, incorrect perspective";
+  "duplicate sinks, double faucets, extra taps, floating lamps, disembodied lighting,text on surfaces, text, typography, distorted structure, warped cabinetry, incorrect perspective";
 
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);

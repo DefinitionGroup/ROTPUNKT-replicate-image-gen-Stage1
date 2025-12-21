@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
@@ -10,142 +10,110 @@ import { $prompt } from "@/store/prompt";
 import { useMutation } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 
-const isDev = process.env.NODE_ENV === "development";
-
 type ApiResponse = string[];
-
-interface GenerationParams {
-  prompt: string;
-  signal: AbortSignal;
-}
-
-async function generateImageApi({ prompt, signal }: GenerationParams): Promise<ApiResponse> {
-  const res = await fetch("/api/replicate", {
-    body: JSON.stringify({ prompt }),
-    method: "POST",
-    signal,
-  });
-
-  if (!res.ok) {
-    // Try to extract error message from response
-    const errorData = await res.json().catch(() => ({ error: `Server error: ${res.status}` }));
-    throw new Error(errorData.error || `Generierung fehlgeschlagen: ${res.status}`);
-  }
-
-  return res.json();
-}
 
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
-
-  // Refs for cleanup and double-call prevention
+  const [isGenerating, setIsGenerating] = useState(false);
   const hasTriggered = useRef<string | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   const {
     mutate: generateImage,
-    isPending,
     isError,
     error,
     reset: resetMutation,
   } = useMutation<ApiResponse, Error, string>({
     mutationFn: async (p) => {
-      if (isDev) console.log("[ImageGenerator] Starting generation...");
-
-      // Cancel any existing request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      // Create new abort controller
-      abortControllerRef.current = new AbortController();
+      console.log("[ImageGenerator] Starting fetch...");
+      setIsGenerating(true);
+      // 10 minute timeout for extreme cold starts + queue time
+      // Replicate can queue for 2-3 min + generate for 30-60s
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log("[ImageGenerator] ⏰ Request timeout after 10 minutes");
+        controller.abort();
+      }, 600_000);
 
       try {
-        const data = await generateImageApi({
-          prompt: p,
-          signal: abortControllerRef.current.signal,
+        const res = await fetch("/api/replicate", {
+          body: JSON.stringify({ prompt: p }),
+          method: "POST",
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
 
-        if (isDev) console.log("[ImageGenerator] Received data:", data);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("[ImageGenerator] Response not OK:", res.status, errorText);
+          throw new Error(`Generation failed: ${res.status}`);
+        }
+        const data = await res.json();
+        console.log("[ImageGenerator] Received data:", data);
         return data;
       } catch (err) {
-        // Provide user-friendly error messages
+        clearTimeout(timeoutId);
+        // Provide better error messages
         if (err instanceof Error) {
-          if (err.name === "AbortError") {
-            if (isDev) console.log("[ImageGenerator] Request aborted");
-            throw new Error("Die Anfrage wurde abgebrochen.");
+          if (err.name === 'AbortError') {
+            console.error("[ImageGenerator] Request aborted (timeout)");
+            throw new Error("Die Anfrage hat zu lange gedauert. Bitte versuche es erneut.");
           }
         }
-        if (isDev) console.error("[ImageGenerator] Error:", err);
+        console.error("[ImageGenerator] Fetch error:", err);
         throw err;
       }
     },
     onSuccess: (data) => {
-      if (isDev) console.log("[ImageGenerator] ✅ Success:", data);
+      console.log("[ImageGenerator] ✅ onSuccess called with:", data);
       if (Array.isArray(data) && data.length > 0) {
         setGeneratedImages(data);
         setSelectedImage(data[0]);
       }
+      setIsGenerating(false);
     },
     onError: (err) => {
-      if (isDev) console.error("[ImageGenerator] ❌ Error:", err);
+      console.error("[ImageGenerator] ❌ onError called:", err);
+      setIsGenerating(false);
     },
-    // Retry configuration for transient failures
-    retry: 1,
-    retryDelay: 3000,
   });
 
-  // Stable retry handler
-  const handleRetry = useCallback(() => {
-    resetMutation();
-    hasTriggered.current = null;
-    if (prompt) {
-      generateImage(prompt);
-    }
-  }, [resetMutation, prompt, generateImage]);
-
-  // Trigger generation on prompt change
   useEffect(() => {
+    // Guard: only trigger once per unique prompt
     if (prompt && hasTriggered.current !== prompt) {
       hasTriggered.current = prompt;
-      if (isDev) console.log("[ImageGenerator] Triggering generation");
+      console.log("[ImageGenerator] Triggering generation for prompt");
       generateImage(prompt);
     }
   }, [prompt, generateImage]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
-
   const hasImages = Array.isArray(generatedImages) && generatedImages.length > 0;
 
-  if (isDev) {
-    console.log("[ImageGenerator] State:", { isPending, isError, hasImages });
-  }
+  console.log("[ImageGenerator] Render state:", { isGenerating, isError, hasImages, generatedImages, selectedImage });
 
   return (
     <div className="w-full mx-auto h-full flex flex-col justify-center items-center">
-      {onBack && hasImages && !isPending && <BackButton onClick={onBack} />}
+      {onBack && hasImages && !isGenerating && <BackButton onClick={onBack} />}
 
       <AnimatePresence mode="wait">
-        {isPending && !hasImages && <LoadingState key="loading" />}
+        {isGenerating && !hasImages && <LoadingState key="loading" />}
 
-        {!isPending && isError && !hasImages && (
+        {!isGenerating && isError && !hasImages && (
           <ErrorState
             key="error"
-            message={error?.message || "Ein unbekannter Fehler ist aufgetreten."}
-            onRetry={handleRetry}
+            message={error?.message || "Unbekannter Fehler"}
+            onRetry={() => {
+              resetMutation();
+              hasTriggered.current = null;
+              if (prompt) {
+                generateImage(prompt);
+              }
+            }}
           />
         )}
 
-        {!isPending && hasImages && (
+        {!isGenerating && hasImages && (
           <motion.div
             key="images"
             initial={{ opacity: 0, y: 16 }}
@@ -207,8 +175,7 @@ function LoadingState() {
     if (elapsed < 180) return "Noch ein kleines bisschen – gute Dinge brauchen Zeit! 🎨";
     if (elapsed < 240) return "Das KI-Modell startet gerade neu – danke für deine Geduld! 🚀";
     if (elapsed < 300) return "Dein Bild ist in der Warteschlange – gleich geht's los! ⏳";
-    if (elapsed < 420) return "Fast da – dein Design wird finalisiert! ✨";
-    return "Noch einen kleinen Moment – wir geben nicht auf! 💪";
+    return "Fast da – dein Design wird finalisiert! ✨";
   };
 
   const getSubMessage = () => {
@@ -217,8 +184,7 @@ function LoadingState() {
     if (elapsed < 120) return "Manchmal muss das KI-Modell erst aufgewärmt werden.";
     if (elapsed < 180) return "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!";
     if (elapsed < 300) return "Bei hoher Nachfrage wird dein Bild in die Warteschlange gestellt.";
-    if (elapsed < 420) return "Maximale Wartezeit: ca. 5-7 Minuten. Dein Bild kommt garantiert!";
-    return "Ungewöhnlich lange Wartezeit – bitte nicht die Seite verlassen!";
+    return "Maximale Wartezeit: ca. 5 Minuten. Dein Bild kommt garantiert!";
   };
 
   return (
@@ -230,7 +196,7 @@ function LoadingState() {
         exit={{ opacity: 0, y: 16 }}
         className="flex flex-col items-center justify-center w-full max-w-3xl min-h-[600px] bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 shadow-2xl rounded-2xl p-8"
       >
-        <div className="flex items-center justify-center w-48 h-48 mb-4">
+        <div className="flex items-center justify-center w-48 h-48 mb-4 ">
           <DotLottieReact
             src="/UI/LoadingImageAnimation.lottie"
             loop
@@ -275,7 +241,7 @@ function LoadingState() {
                 className="h-full bg-gradient-to-r from-brand-primary-2 to-red-400"
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
-                transition={{ duration: 300, ease: "linear" }}
+                transition={{ duration: 120, ease: "linear" }}
               />
             </div>
           </motion.div>
@@ -295,10 +261,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 shadow-2xl rounded-2xl"
     >
       <div className="text-4xl mb-4">😕</div>
-      <h3 className="text-lg font-medium text-brand-secondary-1 mb-2">
-        Etwas ist schiefgelaufen
-      </h3>
-      <p className="text-red-400 text-center text-sm mb-6 max-w-md">
+      <p className="text-red-400 text-center text-base mb-6 max-w-md">
         {message}
       </p>
       <Button
@@ -326,7 +289,7 @@ function ImagesGrid({
             src={img}
             alt="Generated image"
             crossOrigin="anonymous"
-            className="rounded-xl shadow-2xl w-full cursor-pointer hover:scale-[1.02] transition-transform"
+            className="rounded-xl shadow-2xl w-full cursor-pointer"
             onClick={() => onImageClick(img)}
           />
         </div>

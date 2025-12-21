@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
         output_format: "png",
         tiling_height: 144,
         custom_sd_model: "",
-        negative_prompt: "(worst quality, low quality, normal quality:2) JuggernautNegative-neg",
+        negative_prompt: "(text-elements, typography, worst quality, low quality, normal quality:2) JuggernautNegative-neg",
         num_inference_steps: 18,
         downscaling_resolution: 768
       },

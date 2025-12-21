@@ -189,12 +189,12 @@ export default function Navbar({
             <>
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="cursor-pointer px-3 tracking-wider py-1 rounded-full text-sm border border-transparent font-bold text-neutral-200 hover:text-inherit hover:bg-neutral-800/10 dark:hover:bg-white/10 transition-colors">
+                  <button className="cursor-pointer px-3 tracking-wider py-1 rounded-full text-xxs border border-transparent font-bold uppercase text-neutral-200 hover:text-inherit hover:bg-neutral-800/10 dark:hover:bg-white/10 transition-colors">
                     Anmelden
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="cursor-pointer px-3 py-1 rounded-full text-xs tracking-wider uppercase font-black bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-brand-secondary-1 transition-colors border border-transparent hover:border-current">
+                  <button className="cursor-pointer px-3 py-1 font-bold rounded-full text-xxs tracking-wid uppercase  bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-brand-secondary-1 transition-colors border border-transparent hover:border-current">
                     Registrieren
                   </button>
                 </SignUpButton>
