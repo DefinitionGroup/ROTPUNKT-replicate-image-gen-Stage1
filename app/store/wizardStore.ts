@@ -1,4 +1,4 @@
-import { persistentAtom } from '@nanostores/persistent'
+import { atom, onMount } from 'nanostores'
 
 export interface WizardState {
   currentStep: number
@@ -27,10 +27,37 @@ const initialState: WizardState = {
   error: ''
 }
 
-export const wizardStore = persistentAtom<WizardState>('kitchen-wizard', initialState, {
-  encode: JSON.stringify,
-  decode: JSON.parse,
-})
+const STORAGE_KEY = 'kitchen-wizard'
+
+// Use regular atom to avoid SSR issues with persistentAtom
+export const wizardStore = atom<WizardState>(initialState)
+
+// Handle persistence on client side only
+if (typeof window !== 'undefined') {
+  // Hydrate from localStorage on mount
+  onMount(wizardStore, () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        wizardStore.set(parsed)
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+
+    // Subscribe to changes and persist
+    const unsubscribe = wizardStore.subscribe((value) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+      } catch {
+        // Ignore localStorage errors
+      }
+    })
+
+    return unsubscribe
+  })
+}
 
 // Wizard actions
 export const wizardActions = {

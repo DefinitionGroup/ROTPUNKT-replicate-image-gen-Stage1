@@ -1,6 +1,5 @@
-import { persistentAtom } from "@nanostores/persistent";
+import { atom } from "nanostores";
 
-export const $showWizard = persistentAtom('showWizard', false, {
-  encode: JSON.stringify,
-  decode: JSON.parse,
-})
+// Use regular atom instead of persistentAtom to avoid SSR hydration issues
+// Wizard modal visibility shouldn't persist across page refreshes anyway
+export const $showWizard = atom(false)
