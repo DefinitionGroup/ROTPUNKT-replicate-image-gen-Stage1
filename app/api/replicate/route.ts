@@ -3,6 +3,9 @@ import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { uploadImages } from "@/lib/minioClient";
 import { createClient } from "@supabase/supabase-js";
+import { Info } from "lucide-react";
+import { info } from "console";
+import { FaCircleXmark } from "react-icons/fa6";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
@@ -99,6 +102,7 @@ export async function POST(req: NextRequest) {
         },
       }
     );
+
 
     const insertPayload = minioUrls.map((url) => ({ url, imageprompt: prompt }));
     const { error: dbError } = await supabase
