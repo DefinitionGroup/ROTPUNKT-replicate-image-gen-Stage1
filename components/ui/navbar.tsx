@@ -116,15 +116,22 @@ export default function Navbar({
         className={
           mobile
             ? cn(
-              "block text-brand-secondary-1 text-2xl  tracking-wider"
+              "block text-brand-secondary-1 text-2xl tracking-wider font-light"
             )
             : cn(
-              "text-inherit hover:text-primary text-sm  tracking-wider  transition",
-              active && "text-brand-primary-2"
+              "text-sm font-medium tracking-wide transition-all duration-300 relative group",
+              "text-neutral-300 hover:text-white",
+              active && "text-white"
             )
         }
       >
         {item.label}
+        {!mobile && (
+          <span className={cn(
+            "absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-primary-2 transition-all duration-300 group-hover:w-full",
+             active && "w-full"
+          )} />
+        )}
       </Link>
     );
   };
@@ -134,10 +141,10 @@ export default function Navbar({
     <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20 flex justify-center w-full">
       <nav
         className={cn(
-          "relative mx-auto w-auto md:w-full max-w-4xl flex  items-center justify-between",
-          "rounded-full pl-4 md:pl-4 py-2 md:py-2 shadow-input",
-          "bg-white/10 backdrop-blur-sm",
-          "text-white dark:text-brand-secondary-1"
+          "relative mx-auto w-auto md:w-full max-w-4xl flex items-center justify-between",
+          "rounded-full pl-4 md:pl-6 py-2 md:py-3 shadow-lg",
+          "bg-white/5 backdrop-blur-md border border-white/10",
+          "text-white dark:text-brand-secondary-1 transition-all duration-300"
         )}
       >
         <Link href="/" className="flex items-center ">
