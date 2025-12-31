@@ -11,39 +11,39 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Core variants (keeping these as they're likely used)
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        // Core variants
+        default: "bg-white text-black hover:bg-neutral-200 shadow-sm hover:shadow-md transition-all duration-300",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-white/20 bg-transparent hover:bg-white/10 hover:text-white transition-all duration-300",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300",
+        ghost: "hover:bg-white/5 hover:text-white transition-all duration-300",
+        link: "text-white underline-offset-4 hover:underline",
 
-        // Project-specific variants (actively used in your code)
-        red: "bg-brand-primary-2 text-brand-secondary-1 rounded-full font- border border-transparent hover:bg-red-600 focus-visible:ring-brand-primary-2",
+        // Project-specific variants
+        red: "bg-brand-primary-2 text-white shadow-lg shadow-brand-primary-2/20 hover:shadow-brand-primary-2/40 hover:bg-red-600 border border-transparent transition-all duration-300 scale-100 hover:scale-[1.02]",
         redCta:
-          "bg-brand-primary-2 text-brand-secondary-1 font-bold hover:bg-white hover:text-brand-primary-2 transition-colors duration-200",
+          "bg-brand-primary-2 text-white font-bold tracking-wide shadow-lg shadow-brand-primary-2/25 hover:bg-red-600 hover:shadow-brand-primary-2/50 transition-all duration-300",
         redOutline:
-          "bg-transparent text-red-400 border border-red-400 hover:bg-brand-primary-2/10 transition-colors",
-        close: "text-gray-500 hover:text-red-400 font-bold transition-colors",
+          "bg-transparent text-brand-primary-2 border border-brand-primary-2/50 hover:bg-brand-primary-2/10 hover:border-brand-primary-2 transition-all duration-300",
+        close: "text-neutral-400 hover:text-white transition-colors duration-200",
         wizardOption:
-          "bg-gray-900 border border-gray-800 text-gray-200 font-bold hover:bg-gray-900 hover:text-brand-primary-2 hover:border-red-600 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-red-600 data-[selected=true]:text-brand-secondary-1 transition-colors",
+          "bg-neutral-900/50 border border-white/10 text-neutral-400 font-medium hover:bg-neutral-900 hover:text-white hover:border-white/30 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-brand-primary-2 data-[selected=true]:text-white transition-all duration-300 shadow-sm",
       },
       size: {
-        default: "h-9 px-4 py-2 rounded-full",
-        sm: "h-8 px-3 py-1.5 text-xs rounded-full",
-        lg: "h-11 px-6 py-3 rounded-full",
-        icon: "h-9 w-9 rounded-full",
+        default: "h-10 px-6 py-2 rounded-full",
+        sm: "h-8 px-4 py-1.5 text-xs rounded-full",
+        lg: "h-12 px-8 py-3 rounded-full text-base",
+        icon: "h-10 w-10 rounded-full",
 
         // Project-specific sizes
         red: "px-8 py-3 text-base rounded-full",
-        cta: "px-8 py-3 text-sm rounded-full", 
-        back: "px-4 py-2 text-sm min-w-[108px] rounded-full",
-        close: "w-auto h-auto p-0 text-3xl rounded-none",
-        wizardOption: "px-6 py-3 text-xs h-12 w-full rounded-full border",
+        cta: "px-10 py-4 text-base rounded-full", 
+        back: "px-6 py-2 text-sm min-w-[120px] rounded-full",
+        close: "w-10 h-10 p-0 text-2xl rounded-full flex items-center justify-center",
+        wizardOption: "px-6 py-4 text-sm h-auto w-full rounded-xl border",
       },
     },
     defaultVariants: {
