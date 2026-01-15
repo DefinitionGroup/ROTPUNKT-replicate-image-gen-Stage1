@@ -54,8 +54,8 @@ export function buildPrompt({
       ? `mit der FENIX Farbwelt "${fenixColor.name}" (${fenixColor.hex}) - ${fenixColor.description}`
       : undefined
     : colorLabel
-    ? `mit einer Farbpalette in ${colorLabel}`
-    : undefined;
+      ? `mit einer Farbpalette in ${colorLabel}`
+      : undefined;
 
   if (kind || style || colorDescriptor) {
     const descriptors: string[] = [];
@@ -77,9 +77,20 @@ export function buildPrompt({
     sections.push(`Tageszeit: ${time}.`);
   }
 
+  // Floor selection
+  const floor = getLabel("floor", selections.floor);
+  if (floor) {
+    sections.push(`Bodenbelag: ${selections.floor}.`);
+  }
+
+  // Accessories (multi-select)
+  const accessories = selections.accessories;
+  if (accessories && accessories.length > 0) {
+    sections.push(`Accessoires & Dekoration: ${accessories.join(", ")}.`);
+  }
+
   sections.push(
-    `Perspektive: ${
-      viewpointDescriptions[viewpoint] ?? viewpointDescriptions.innenansicht
+    `Perspektive: ${viewpointDescriptions[viewpoint] ?? viewpointDescriptions.innenansicht
     }`
   );
 

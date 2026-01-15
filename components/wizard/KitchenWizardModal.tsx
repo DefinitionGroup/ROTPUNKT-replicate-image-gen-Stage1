@@ -13,6 +13,7 @@ import {
 import { WizardHeader } from "./WizardHeader";
 import { WizardIntro } from "./WizardIntro";
 import { WizardStep } from "./WizardStep";
+import { WizardMultiSelectStep } from "./WizardMultiSelectStep";
 import { WizardFinal } from "./WizardFinal";
 import { wizardSteps } from "./wizardSteps";
 import { WizardSummaryPanel } from "./WizardSummaryPanel";
@@ -56,6 +57,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       ? wizardSteps[wizardState.currentStep]
       : undefined;
   const isColorStep = currentStepDefinition?.key === "color";
+  const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
 
   const startWithPreset = (preset: WizardPreset) => {
     wizardActions.applyPreset({
@@ -98,6 +100,14 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     const currentStepKey = wizardSteps[wizardState.currentStep]
       .key as keyof WizardState["selectedOptions"];
     wizardActions.selectOption(currentStepKey, option);
+    wizardActions.nextStep(totalSteps);
+  };
+
+  const handleMultiSelectToggle = (option: string) => {
+    wizardActions.toggleMultiOption("accessories", option);
+  };
+
+  const handleMultiSelectContinue = () => {
     wizardActions.nextStep(totalSteps);
   };
 
@@ -181,11 +191,24 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           description={currentStepDefinition.description}
                           options={currentStepDefinition.options}
                           selectedValue={
-                            wizardState.selectedOptions[
-                              currentStepDefinition.key as keyof WizardState["selectedOptions"]
-                            ]
+                            wizardState.selectedOptions.color
                           }
                           onSelect={handleOptionSelect}
+                          loading={loading}
+                        />
+                      ) : isMultiSelectStep ? (
+                        <WizardMultiSelectStep
+                          key={`${wizardState.currentStep}-multiselect`}
+                          icon={currentStepDefinition.icon}
+                          title={currentStepDefinition.label}
+                          description={currentStepDefinition.description}
+                          options={currentStepDefinition.options}
+                          optionGroups={currentStepDefinition.optionGroups}
+                          selectedValues={
+                            wizardState.selectedOptions.accessories || []
+                          }
+                          onToggle={handleMultiSelectToggle}
+                          onContinue={handleMultiSelectContinue}
                           loading={loading}
                         />
                       ) : (
@@ -197,8 +220,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           options={currentStepDefinition.options}
                           selectedValue={
                             wizardState.selectedOptions[
-                              currentStepDefinition.key as keyof WizardState["selectedOptions"]
-                            ]
+                              currentStepDefinition.key as Exclude<keyof WizardState["selectedOptions"], "accessories">
+                            ] as string | undefined
                           }
                           onSelect={handleOptionSelect}
                           loading={loading}
