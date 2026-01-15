@@ -107,7 +107,7 @@ function Stylesheet() {
     <style>{`
       #sandbox { align-items: stretch; }
 
-      .container {
+      .container-flex {
         display: flex;
         flex-direction: row;
         gap: 20px;

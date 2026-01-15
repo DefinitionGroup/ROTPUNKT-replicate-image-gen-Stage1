@@ -1,25 +1,100 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import ImageModal from "./ImageModal";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getPaginatedImages, type ImageRow } from "@/lib/actions/images";
+import { Loader2 } from "lucide-react";
+import { motion } from "motion/react";
 
-type Img = {
-  id: string;
-  url: string;
-  created_at: string;
-  imageprompt?: string;
-  is_upscaled?: boolean;
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.8, y: 50 },
+  visible: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.05,
+      duration: 0.5,
+      type: "spring" as const,
+      stiffness: 260,
+      damping: 20
+    }
+  }),
 };
 
-export default function ImagesGalleryClient({ images }: { images: Img[] }) {
-  const [selected, setSelected] = useState<Img | null>(null);
+export default function ImagesGalleryClient() {
+  const [selected, setSelected] = useState<ImageRow | null>(null);
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["images"],
+    queryFn: ({ pageParam = 0 }) => getPaginatedImages(pageParam),
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
+  });
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  if (status === "pending") {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="w-8 h-8 text-brand-primary-2 animate-spin" />
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-red-400">
+        Fehler beim Laden deiner Bilder.
+      </div>
+    );
+  }
+
+  const allImages = data?.pages.flatMap((page) => page.images) || [];
+
+  if (allImages.length === 0) {
+    return (
+      <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-gray-300">
+        Du hast noch keine Bilder. Erstelle dein erstes Bild im Wizard!
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {images.map((img) => (
-          <button
+        {allImages.map((img, index) => (
+          <motion.button
             key={img.id}
+            variants={itemVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            custom={index % 12}
             type="button"
             onClick={() => setSelected(img)}
             className="group relative block text-left rounded-xl overflow-hidden border border-gray-800 bg-gray-950 hover:border-brand-primary-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2"
@@ -42,14 +117,26 @@ export default function ImagesGalleryClient({ images }: { images: Img[] }) {
             >
               {new Date(img.created_at).toLocaleString()}
             </div>
-          </button>
+          </motion.button>
         ))}
       </div>
+
+      {/* Loading target for Infinite Scroll */}
+      <div ref={observerTarget} className="flex justify-center items-center py-10 mt-6 min-h-20">
+        {isFetchingNextPage ? (
+          <Loader2 className="w-6 h-6 text-brand-primary-2 animate-spin" />
+        ) : hasNextPage ? (
+          <span className="text-xs text-gray-500">Scrolle weiter für mehr Bilder</span>
+        ) : (
+          <span className="text-xs text-gray-500">Das sind alle deine Bilder ✨</span>
+        )}
+      </div>
+
       {selected && (
         <ImageModal
           src={selected.url}
           onClose={() => setSelected(null)}
-          prompt={selected.imageprompt}
+          prompt={selected.imageprompt || ""}
         />
       )}
     </>

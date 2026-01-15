@@ -41,19 +41,34 @@ export async function POST(req: NextRequest) {
 
     const startTime = Date.now();
     const output = await replicate.run(MODEL, {
+      // input: {
+      //   prompt: finalPrompt,
+      //   go_fast: true,
+      //   guidance: 3,
+      //   strength: 0.9,
+      //   image_size: "optimize_for_quality",
+      //   lora_scale: 1,
+      //   aspect_ratio: "16:9",
+      //   output_format: "webp",
+      //   enhance_prompt: true,
+      //   output_quality: 80,
+      //   negative_prompt: NEGATIVE_PROMPT,
+      //   num_inference_steps: 30,
+      //   num_outputs: 1,
+      // },
       input: {
         prompt: finalPrompt,
-        go_fast: true,
-        guidance: 3,
+        go_fast: false,
+        guidance: 5,
         strength: 0.9,
-        image_size: "optimize_for_quality",
+        image_size: "optimize_for_speed",
         lora_scale: 1,
         aspect_ratio: "16:9",
         output_format: "webp",
         enhance_prompt: true,
         output_quality: 80,
         negative_prompt: NEGATIVE_PROMPT,
-        num_inference_steps: 30,
+        num_inference_steps: 24,
         num_outputs: 1,
       },
     });

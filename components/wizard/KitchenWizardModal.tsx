@@ -125,7 +125,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         tabIndex={-1}
-        onMouseDown={handleOverlayClick}
+        // [[fix]]  Disabled onClick to prevent closing modal when clicking on overlay
+        // onClick={handleOverlayClick} 
         role="dialog"
         aria-modal="true"
         aria-labelledby="wizard-title"
@@ -144,6 +145,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
             maxHeight: "96vh",
           }}
           onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
           <Card className="relative w-full h-full min-h-[670px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/100 via-neutral-950 to-neutral-900/50 border border-gray-800 rounded-2xl">
             <CardHeader>
