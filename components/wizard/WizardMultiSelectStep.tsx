@@ -39,15 +39,14 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
 
   return (
     <motion.div
-      className="w-full flex flex-col"
+      className="w-full flex flex-col h-full min-h-0"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.25 }}
-      style={{ minHeight: 320 }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-4 shrink-0">
         <div className="h-9 w-9 shrink-0 rounded-full bg-red-900/30 border border-red-700/40 flex items-center justify-center text-red-400">
           {icon}
         </div>
@@ -55,14 +54,14 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
           <h3 className="text-xl md:text-2xl text-left tracking-tight text-brand-secondary-1">
             {title}
           </h3>
-          <p className="text-sm text-gray-400 w-80 text-left mt-1 max-w-xl">
+          <p className="text-sm text-gray-400 text-left mt-1 max-w-xl">
             {description}
           </p>
         </div>
       </div>
 
       {/* Selection counter */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 shrink-0">
         <span className="text-sm text-gray-400">
           {selectedValues.length === 0
             ? "Keine Auswahl"
@@ -80,7 +79,8 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
       </div>
 
       {/* Grouped options */}
-      <div className="space-y-6 overflow-y-auto max-h-[320px] pr-2">
+      <div className="flex-1 overflow-y-auto min-h-0 pr-2">
+        <div className="space-y-6 pb-4">
         {groupedOptions.map(({ name, options: groupOptions }) => (
           <div key={name || "default"}>
             {name && (
@@ -129,6 +129,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Selected items preview */}

@@ -157,7 +157,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
-          <Card className="relative w-full h-full min-h-[670px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/100 via-neutral-950 to-neutral-900/50 border border-gray-800 rounded-2xl">
+          <Card className="relative w-full h-full min-h-[500px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/100 via-neutral-950 to-neutral-900/50 border border-gray-800 rounded-2xl overflow-hidden">
             <CardHeader>
               <WizardHeader
                 currentStep={wizardState.currentStep}
@@ -169,9 +169,9 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
               />
             </CardHeader>
 
-            <CardContent className="flex-1 flex flex-col p-6 sm:p-8">
-              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full">
-                <div className="flex-1 flex flex-col">
+            <CardContent className="flex-1 flex flex-col p-6 sm:p-8 overflow-hidden">
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full overflow-hidden">
+                <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
                   <AnimatePresence mode="wait" initial={false}>
                     {isIntro && (
                       <WizardIntro
