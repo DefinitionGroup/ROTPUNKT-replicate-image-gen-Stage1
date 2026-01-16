@@ -87,6 +87,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       if (Array.isArray(data) && data.length > 0) {
         setGeneratedImages(data);
         setSelectedImage(data[0]);
+        // Clear the prompt after successful generation to prevent re-triggering
+        // when component remounts or user navigates back
+        $prompt.set(null);
       }
     },
     onError: (err) => {
