@@ -136,7 +136,7 @@ export default function HeroSection({
   return (
     <section
       className={cn(
-        "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black   text-brand-secondary-1 selection:bg-brand-primary-2 selection:text-brand-secondary-1",
+        "relative grid grid-cols-1 grid-rows-1 overflow-hidden bg-black container  mt-12 rounded-2xl mx-auto text-brand-secondary-1 selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         "min-h-[40vh] md:min-h-[50vh] lg:min-h-[20vh] h-[50vh]",
         className
       )}
@@ -165,15 +165,15 @@ export default function HeroSection({
         className="pointer-events-none absolute inset-0 col-start-1 row-start-1"
       >
         {/* Subtle gradient for text readability at the bottom/left */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
       </div>
 
       {/* Content stack (top-left) */}
-      <div className="col-start-1 row-start-1 z-10 flex flex-col justify-center">
+      <div className="col-start-1 row-start-1 flex flex-col  justify-center">
         <div className="px-6 sm:px-8 lg:px-12 w-full">
           <div className="max-w-4xl pt-20 pb-10">
-            {logoSrc && (
+            {/* {logoSrc && (
               <motion.div
                 variants={logoVariants}
                 initial="initial"
@@ -187,22 +187,22 @@ export default function HeroSection({
                   loading="eager"
                 />
               </motion.div>
-            )}
+            )} */}
 
             {/* Title */}
-            <motion.h1
+            <motion.h2
               id="hero-title"
               variants={titleVariants}
               initial="initial"
               animate="animate"
               className={cn(
-                "font-bold tracking-tight text-white",
-                "text-5xl sm:text-6xl md:text-7xl lg:text-8xl",
+                "font-normal tracking-tight text-white",
+                "text-5xl sm:text-6xl md:text-5xl lg:text-5xl",
                 "drop-shadow-lg"
               )}
             >
               {title}
-            </motion.h1>
+            </motion.h2>
 
             {/* Accent divider + subtitle */}
             {(subheadline || true) && (

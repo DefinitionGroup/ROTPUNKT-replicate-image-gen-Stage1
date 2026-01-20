@@ -87,6 +87,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       if (Array.isArray(data) && data.length > 0) {
         setGeneratedImages(data);
         setSelectedImage(data[0]);
+        // Clear the prompt after successful generation to prevent re-triggering
+        // when component remounts or user navigates back
+        $prompt.set(null);
       }
     },
     onError: (err) => {
@@ -131,7 +134,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="w-full mx-auto h-full flex flex-col justify-center items-center">
+    <div className="w-full mx-autoflex flex-col justify-center items-center">
       {onBack && hasImages && !isPending && <BackButton onClick={onBack} />}
 
       <AnimatePresence mode="wait">

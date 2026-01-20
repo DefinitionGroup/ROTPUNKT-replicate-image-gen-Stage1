@@ -53,18 +53,36 @@ export function WizardSummaryPanel({
     return wizardSteps.map((step) => {
       const key = step.key as keyof WizardState["selectedOptions"];
       const selectedValue = selections[key];
+      
+      // Handle accessories as array
+      if (step.key === "accessories" && Array.isArray(selectedValue)) {
+        const selectedLabels = selectedValue.map((val) => 
+          step.options.find((opt) => opt.value === val)?.label ?? val
+        );
+        return {
+          key,
+          title: step.label,
+          description: step.description,
+          selectedLabel: selectedLabels.length > 0 ? selectedLabels.join(", ") : undefined,
+          isMulti: true,
+          count: selectedLabels.length,
+        };
+      }
+      
       const baseLabel = step.options.find(
         (opt) => opt.value === selectedValue
       )?.label;
       const selectedLabel =
         step.key === "color"
-          ? getFenixColorLabel(selectedValue) ?? baseLabel
+          ? getFenixColorLabel(selectedValue as string) ?? baseLabel
           : baseLabel;
       return {
         key,
         title: step.label,
         description: step.description,
         selectedLabel,
+        isMulti: false,
+        count: selectedLabel ? 1 : 0,
       };
     });
   }, [selections]);

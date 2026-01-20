@@ -108,7 +108,7 @@ function Stylesheet() {
           align-items: stretch;
         }
 
-        .container {
+        .container-flex {
           display: flex;
           flex-direction: row;
           gap: 20px;

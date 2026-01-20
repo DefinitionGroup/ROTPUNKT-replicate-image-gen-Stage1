@@ -142,7 +142,7 @@ export default function Navbar({
       <nav
         className={cn(
           "relative mx-auto w-auto md:w-full max-w-4xl flex items-center justify-between",
-          "rounded-full pl-4 md:pl-6 py-2 md:py-3 shadow-lg",
+          "rounded-full pl-4 md:pl-6 py-12 md:py-3 shadow-lg",
           "bg-white/5 backdrop-blur-md border border-white/10",
           "text-white dark:text-brand-secondary-1 transition-all duration-300"
         )}
@@ -152,9 +152,9 @@ export default function Navbar({
             <Image
               src={resolvedLogo}
               alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
-              className="h-4 w-auto block text-white"
+              className="h-12 w-auto block text-white"
               width={240}
-              height={48}
+              height={80}
             />
           ) : (
             <span className="block h-2 w-auto text-white">

@@ -13,6 +13,7 @@ import {
 import { WizardHeader } from "./WizardHeader";
 import { WizardIntro } from "./WizardIntro";
 import { WizardStep } from "./WizardStep";
+import { WizardMultiSelectStep } from "./WizardMultiSelectStep";
 import { WizardFinal } from "./WizardFinal";
 import { wizardSteps } from "./wizardSteps";
 import { WizardSummaryPanel } from "./WizardSummaryPanel";
@@ -56,6 +57,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       ? wizardSteps[wizardState.currentStep]
       : undefined;
   const isColorStep = currentStepDefinition?.key === "color";
+  const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
 
   const startWithPreset = (preset: WizardPreset) => {
     wizardActions.applyPreset({
@@ -101,6 +103,14 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     wizardActions.nextStep(totalSteps);
   };
 
+  const handleMultiSelectToggle = (option: string) => {
+    wizardActions.toggleMultiOption("accessories", option);
+  };
+
+  const handleMultiSelectContinue = () => {
+    wizardActions.nextStep(totalSteps);
+  };
+
   const handleSubmit = () => {
     if (summaryData.missingKeys.length > 0) {
       wizardActions.setError("Bitte alle Schritte ausfüllen.");
@@ -125,7 +135,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         tabIndex={-1}
-        onMouseDown={handleOverlayClick}
+        // [[fix]]  Disabled onClick to prevent closing modal when clicking on overlay
+        // onClick={handleOverlayClick} 
         role="dialog"
         aria-modal="true"
         aria-labelledby="wizard-title"
@@ -144,8 +155,9 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
             maxHeight: "96vh",
           }}
           onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
-          <Card className="relative w-full h-full min-h-[670px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/100 via-neutral-950 to-neutral-900/50 border border-gray-800 rounded-2xl">
+          <Card className="relative w-full h-full min-h-[500px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/100 via-neutral-950 to-neutral-900/50 border border-gray-800 rounded-2xl overflow-hidden">
             <CardHeader>
               <WizardHeader
                 currentStep={wizardState.currentStep}
@@ -157,9 +169,9 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
               />
             </CardHeader>
 
-            <CardContent className="flex-1 flex flex-col p-6 sm:p-8">
-              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full">
-                <div className="flex-1 flex flex-col">
+            <CardContent className="flex-1 flex flex-col p-6 sm:p-8 overflow-hidden">
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full overflow-hidden">
+                <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
                   <AnimatePresence mode="wait" initial={false}>
                     {isIntro && (
                       <WizardIntro
@@ -179,11 +191,24 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           description={currentStepDefinition.description}
                           options={currentStepDefinition.options}
                           selectedValue={
-                            wizardState.selectedOptions[
-                              currentStepDefinition.key as keyof WizardState["selectedOptions"]
-                            ]
+                            wizardState.selectedOptions.color
                           }
                           onSelect={handleOptionSelect}
+                          loading={loading}
+                        />
+                      ) : isMultiSelectStep ? (
+                        <WizardMultiSelectStep
+                          key={`${wizardState.currentStep}-multiselect`}
+                          icon={currentStepDefinition.icon}
+                          title={currentStepDefinition.label}
+                          description={currentStepDefinition.description}
+                          options={currentStepDefinition.options}
+                          optionGroups={currentStepDefinition.optionGroups}
+                          selectedValues={
+                            wizardState.selectedOptions.accessories || []
+                          }
+                          onToggle={handleMultiSelectToggle}
+                          onContinue={handleMultiSelectContinue}
                           loading={loading}
                         />
                       ) : (
@@ -195,8 +220,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           options={currentStepDefinition.options}
                           selectedValue={
                             wizardState.selectedOptions[
-                              currentStepDefinition.key as keyof WizardState["selectedOptions"]
-                            ]
+                              currentStepDefinition.key as Exclude<keyof WizardState["selectedOptions"], "accessories">
+                            ] as string | undefined
                           }
                           onSelect={handleOptionSelect}
                           loading={loading}

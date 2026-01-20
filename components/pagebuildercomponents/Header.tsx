@@ -5,7 +5,15 @@ import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Header as HeaderType } from "@/sanity/sanity.types";
-
+import { $showWizard } from "@/app/store/modals";
+import { $prompt } from "@/app/store/prompt";
+import { $pageStep } from "@/app/store/step";
+import { AnimatePresence } from "motion/react";
+import { IntroCard } from "@/components/wizard/IntroCard";
+import { useStore } from "@nanostores/react";
+import { KitchenWizardModal } from "@/components/wizard/KitchenWizardModal";
+import { wizardActions } from "@/app/store/wizardStore";
+import ImageGenerator from "@/components/wizard/ImageGenerator";
 type Props = HeaderType & {
   logoImage?: string;
   className?: string;
@@ -34,6 +42,8 @@ export default function Header({
       },
     },
   };
+ const pageStep = useStore($pageStep);
+  const showWizard = useStore($showWizard);
 
   const logoVariants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -74,21 +84,21 @@ export default function Header({
   return (
     <section
       className={cn(
-        `bg-black grid grid-cols-1 grid-rows-1 text-brand-secondary-1 h-[50vh] min-h-[600px] pb-12 overflow-hidden items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
+        `grid grid-cols-1 grid-rows-1  h-[70vh] min-h-[700px] rounded-2xl   container  mx-auto  overflow-hidden items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
         className
       )}
       aria-labelledby="hero-title"
       role="banner"
     >
       <motion.div
-        className="w-full col-span-1 row-span-1 col-start-1 row-start-1"
+        className="w-full   col-span-1 min-h-full  row-span-1 col-start-1 row-start-1"
         variants={backgroundImageVariants}
         initial="initial"
         animate="animate"
         aria-hidden="true"
       >
         <img
-          className="w-full h-full col-span-1 row-span-1 col-start-1 row-start-1 object-cover object-bottom"
+          className="w-full h-full"
           src={backgroundImage?.secure_url}
           alt={subheadline}
           role="presentation"
@@ -96,24 +106,7 @@ export default function Header({
       </motion.div>
 
       {/* Content Container */}
-      <div className="container mx-auto px-4 py-16 items-center flex-wrap flex flex-col justify-center row-start-1 col-start-1 z-10 relative">
-        {/* Logo Section */}
-        <motion.header
-          className="mx-auto px-4 py-16 w-full"
-          variants={logoVariants}
-          initial="initial"
-          animate="animate"
-        >
-          <div className="flex justify-center">
-            <Image
-              src={logoImage}
-              alt="Rotpunkt Küchen Logo"
-              className="mx-auto mb-2 w-24 max-h-24"
-              width={96}
-              height={96}
-            />
-          </div>
-        </motion.header>
+      <div className=" col-span-1  z-10 flex flex-col justify-center row-span-1 col-start-1 row-start-1">
 
         {/* Main Title */}
         <motion.div
@@ -124,7 +117,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-7xl leading-relaxed tracking-tight font-bold  text-center bg-gradient-to-br from-brand-primary-2 to-red-600 bg-clip-text text-transparent"
+            className="text-7xl leading-relaxed tracking-tight font-medium  text-center  text-white"
           >
             {title}
           </h1>
@@ -147,17 +140,51 @@ export default function Header({
 
         {/* Description */}
         <motion.div
-          className="mx-auto max-w-3xl"
+          className="mx-auto max-w-3xl "
           variants={descriptionVariants}
           initial="initial"
           animate="animate"
         >
-          <p  className="text-white  tracking-wider text-lg max-w-2xl text-center font-bold mb-8">
+          <p  className="text-white  tracking-wider text-md max-w-2xl text-center  ">
 
             {description}
           </p>
         </motion.div>
-      </div>
+         <div className="text-center  flex flex-col items-center justify-center">
+            {pageStep === "intro" && (
+              <IntroCard onStart={() => $showWizard.set(true)} />
+            )}
+            {pageStep === "imagegen" && (
+              <div className="">
+                <ImageGenerator
+                  onBack={() => {
+                    $prompt.set(null);
+                    $pageStep.set("intro");
+                    $showWizard.set(true);
+                  }}
+                />
+              </div>
+            )}
+      
+            <AnimatePresence>
+              {showWizard && (
+                <KitchenWizardModal
+                  onPromptReady={(prompt) => {
+                    $prompt.set(prompt);
+                    $showWizard.set(false);
+                    $pageStep.set("imagegen");
+                  }}
+                  onClose={() => {
+                    $showWizard.set(false);
+                    wizardActions.reset();
+                  }}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+      </div>  
+      
+     
     </section>
   );
 }

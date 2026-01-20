@@ -13,6 +13,8 @@ export interface WizardState {
     houseType?: string
     background?: string
     viewpoint?: string
+    floor?: string
+    accessories?: string[]
   }
   extraWishes: string
   showAuthPrompt: boolean
@@ -72,6 +74,19 @@ export const wizardActions = {
     wizardStore.set({
       ...current,
       selectedOptions: { ...current.selectedOptions, [key]: value },
+      error: ''
+    })
+  },
+
+  toggleMultiOption: (key: 'accessories', value: string) => {
+    const current = wizardStore.get()
+    const currentValues = current.selectedOptions[key] || []
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter(v => v !== value)
+      : [...currentValues, value]
+    wizardStore.set({
+      ...current,
+      selectedOptions: { ...current.selectedOptions, [key]: newValues },
       error: ''
     })
   },
