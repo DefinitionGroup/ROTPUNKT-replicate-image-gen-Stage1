@@ -155,6 +155,7 @@ export default function Navbar({
               className="h-12 w-auto block text-white"
               width={240}
               height={80}
+              unoptimized
             />
           ) : (
             <span className="block h-2 w-auto text-white">

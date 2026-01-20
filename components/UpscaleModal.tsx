@@ -153,6 +153,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
                 width={1200}
                 height={800}
                 alt="Upscaled high-res image"
+                unoptimized
                 className="w-full h-auto max-h-[60vh] object-contain rounded-xl"
               />
 

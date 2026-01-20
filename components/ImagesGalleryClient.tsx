@@ -109,6 +109,7 @@ export default function ImagesGalleryClient() {
               alt="Generated"
               width={800}
               height={800}
+              unoptimized
               className="w-full h-auto object-cover"
             />
             <div

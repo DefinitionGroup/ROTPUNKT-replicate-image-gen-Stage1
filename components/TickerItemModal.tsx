@@ -64,6 +64,7 @@ export default function TickerItemModal({
           width={1200}
           height={800}
           alt={title ? `${title} – full size` : "Image"}
+          unoptimized
           className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
         />
 
