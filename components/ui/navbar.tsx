@@ -138,7 +138,7 @@ export default function Navbar({
   // ----------------------------------------
 
   return (
-    <div className="fixed top-4 inset-x-0 z-50 px-10 md:px-20 flex justify-center w-full">
+    <div className="fixed top-4 inset-x-0 z-10 px-10 md:px-20 flex justify-center w-full">
       <nav
         className={cn(
           "relative mx-auto w-auto md:w-full max-w-4xl flex items-center justify-between",
