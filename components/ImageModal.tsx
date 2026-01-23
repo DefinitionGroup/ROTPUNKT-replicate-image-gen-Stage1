@@ -139,6 +139,7 @@ export default function ImageModal({
           width={800}
           height={800}
           alt="Generated image - full size"
+          unoptimized
           className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
         />
 
