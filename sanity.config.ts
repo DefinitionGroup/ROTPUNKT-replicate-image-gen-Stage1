@@ -6,6 +6,7 @@ import { cloudinarySchemaPlugin } from 'sanity-plugin-cloudinary'
 import { documentInternationalization } from '@sanity/document-internationalization'
 import { apiVersion, dataset, projectId } from './sanity/env'
 import { schemaTypes } from './sanity/schemaTypes'
+import { structure } from './sanity/structure'
 import { presentationTool } from 'sanity/presentation'
 
 export default defineConfig({
@@ -17,7 +18,7 @@ export default defineConfig({
   dataset,
 
   plugins: [
-    structureTool(),
+    structureTool({ structure }),
     visionTool(),
     cloudinarySchemaPlugin(),
     presentationTool({

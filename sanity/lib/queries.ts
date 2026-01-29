@@ -6,14 +6,22 @@ export const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slu
   ...,
   content[]{
     ...
+  },
+  "translations": *[_type == "translation.metadata" && references(^._id)][0].translations[].value->{
+    language,
+    "slug": slug.current
   }
 }`);
 
 // Home page query with optional language filter
-export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == "home" && (language == $locale || !defined(language))][0]{
+export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current in ["home", "home-en"] && (language == $locale || !defined(language))][0]{
   ...,
   content[]{
     ...
+  },
+  "translations": *[_type == "translation.metadata" && references(^._id)][0].translations[].value->{
+    language,
+    "slug": slug.current
   }
 }`);
 
@@ -28,7 +36,10 @@ export const NAVBAR_QUERY = defineQuery(`
     _key,
     label,
     linkType,
-    "slug": select(linkType == "internal" => page->slug.current),
+    "slug": select(linkType == "internal" => coalesce(
+      *[_type == "translation.metadata" && references(^.page._ref)][0].translations[_key == $locale][0].value->slug.current,
+      page->slug.current
+    )),
     externalUrl,
     anchor,
     openInNewTab
@@ -48,7 +59,10 @@ export const FOOTER_QUERY = defineQuery(`
     links[]{
       label,
       linkType,
-      "slug": select(linkType == "internal" => page->slug.current),
+      "slug": select(linkType == "internal" => coalesce(
+      *[_type == "translation.metadata" && references(^.page._ref)][0].translations[_key == $locale][0].value->slug.current,
+      page->slug.current
+    )),
       externalUrl,
       anchor,
       openInNewTab

@@ -32,7 +32,8 @@
       "title": "Wählen Sie einen Startpunkt",
       "description": "Beginnen Sie mit einer unserer kuratierten Vorlagen oder stellen Sie Ihre eigene Kombination zusammen. Alle Einstellungen können anschließend noch angepasst werden.",
       "customCombination": "Eigene Kombination",
-      "customDescription": "Starten Sie mit einer leeren Auswahl und bestimmen Sie jeden Schritt individuell."
+      "customDescription": "Starten Sie mit einer leeren Auswahl und bestimmen Sie jeden Schritt individuell.",
+      "startNow": "Jetzt starten"
     },
     "header": {
       "back": "Zurück",

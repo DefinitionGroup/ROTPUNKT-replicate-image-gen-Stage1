@@ -32,7 +32,8 @@
       "title": "Choose a Starting Point",
       "description": "Start with one of our curated templates or create your own combination. All settings can be adjusted afterwards.",
       "customCombination": "Custom Combination",
-      "customDescription": "Start with an empty selection and determine each step individually."
+      "customDescription": "Start with an empty selection and determine each step individually.",
+      "startNow": "Start now"
     },
     "header": {
       "back": "Back",

@@ -8,6 +8,8 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+import { TranslationSetter } from "@/components/TranslationSetter";
+
 export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -17,8 +19,16 @@ export default async function Home({ params }: Props) {
     params: { locale },
   });
 
+  const translations = page?.translations?.reduce((acc: Record<string, string>, curr: any) => {
+    if (curr?.language && curr?.slug) {
+      acc[curr.language] = curr.slug;
+    }
+    return acc;
+  }, {});
+  
   return (
     <main className="pt-20 md:pt-24 lg:pt-28 min-h-screen">
+      <TranslationSetter translations={translations || {}} />
       {page?.content ? <PageBuilder content={page.content} /> : null}
     </main>
   );
