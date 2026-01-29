@@ -7,6 +7,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface UpscaleModalProps {
   src: string;
@@ -17,6 +18,8 @@ interface UpscaleModalProps {
 type ApiResponse = string[];
 
 export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps) {
+  const t = useTranslations('upscale');
+  const tCommon = useTranslations('common');
   const [upscaledImage, setUpscaledImage] = useState<string | null>(null);
   const hasTriggered = useRef(false);
 
@@ -108,7 +111,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
       >
         <motion.button
           type="button"
-          aria-label="Close"
+          aria-label={tCommon('close')}
           className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-black/60 hover:bg-brand-primary-2 border border-white/20 text-brand-secondary-1 shadow-md backdrop-blur-sm transition-colors leading-none"
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
@@ -125,7 +128,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
           {!isUpscaling && isError && !upscaledImage && (
             <ErrorState
               key="error"
-              message={`Fehler beim Hochskalieren: ${error?.message || "Unbekannter Fehler"}`}
+              message={`${t('error.title')}: ${error?.message || t('error.unknown')}`}
               onRetry={() => upscaleImage({ imageUrl: src, prompt })}
               onClose={onClose}
             />
@@ -141,10 +144,10 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
             >
               <div className="mb-4 text-center">
                 <h2 className="text-xl font-semibold text-brand-secondary-1">
-                  ✨ High-Res Version erstellt!
+                  ✨ {t('success.title')}
                 </h2>
                 <p className="text-sm text-gray-400 mt-1">
-                  Dein Bild wurde erfolgreich in hoher Auflösung generiert und gespeichert.
+                  {t('success.description')}
                 </p>
               </div>
 
@@ -168,7 +171,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
                     rel="noopener noreferrer"
                     download={`high-res-image-${Date.now()}.png`}
                   >
-                    📥 High-Res Download
+                    📥 {t('download')}
                   </Link>
                 </Button>
                 <Button
@@ -176,7 +179,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
                   className="px-6 py-3 text-xs font-medium shadow-lg rounded-full"
                   variant="secondary"
                 >
-                  Schließen
+                  {tCommon('close')}
                 </Button>
               </div>
             </motion.div>
@@ -188,6 +191,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
 }
 
 function UpscaleLoadingState() {
+  const t = useTranslations('upscale.loading');
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -204,12 +208,12 @@ function UpscaleLoadingState() {
   };
 
   const getMessage = () => {
-    if (elapsed < 10) return "Starte Hochskalierung...";
-    if (elapsed < 30) return "Die KI verbessert dein Bild...";
-    if (elapsed < 60) return "Details werden herausgearbeitet...";
-    if (elapsed < 90) return "Fast fertig – dein High-Res Bild entsteht! ✨";
-    if (elapsed < 120) return "Das KI-Modell arbeitet mit voller Kraft... 🚀";
-    return "Noch ein kleiner Moment – Perfektion braucht Zeit! 💫";
+    if (elapsed < 10) return t('messages.starting');
+    if (elapsed < 30) return t('messages.improving');
+    if (elapsed < 60) return t('messages.details');
+    if (elapsed < 90) return t('messages.almostDone');
+    if (elapsed < 120) return t('messages.fullPower');
+    return t('messages.perfection');
   };
 
   return (
@@ -254,7 +258,7 @@ function UpscaleLoadingState() {
         animate={{ opacity: 1 }}
         className="text-xs text-gray-400 mt-2 text-center max-w-md"
       >
-        Das Hochskalieren dauert in der Regel 30–60 Sekunden.
+        {t('subMessage')}
       </motion.div>
 
       {/* Progress bar */}
@@ -287,6 +291,8 @@ function ErrorState({
   onRetry: () => void;
   onClose: () => void;
 }) {
+  const t = useTranslations('upscale.error');
+  const tCommon = useTranslations('common');
   return (
     <motion.div
       key="error"
@@ -302,14 +308,14 @@ function ErrorState({
           onClick={onRetry}
           className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-brand-primary-2"
         >
-          Erneut versuchen
+          {t('retry')}
         </Button>
         <Button
           onClick={onClose}
           className="px-6 py-3 text-xs font-medium shadow-lg rounded-full"
           variant="secondary"
         >
-          Schließen
+          {tCommon('close')}
         </Button>
       </div>
     </motion.div>

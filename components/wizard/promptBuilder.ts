@@ -21,7 +21,7 @@ function getLabel(
 ): string | undefined {
   if (!value) return undefined;
   const step = wizardSteps.find((item) => item.key === key);
-  return step?.options.find((opt) => opt.value === value)?.label ?? value;
+  return step?.options.find((opt) => opt.value === value)?.germanLabel ?? value;
 }
 
 export function buildPrompt({
@@ -83,10 +83,17 @@ export function buildPrompt({
     sections.push(`Bodenbelag: ${selections.floor}.`);
   }
 
-  // Accessories (multi-select)
+  // Accessories (multi-select) - handle both array and object formats for backwards compatibility
   const accessories = selections.accessories;
-  if (accessories && accessories.length > 0) {
-    sections.push(`Accessoires & Dekoration: ${accessories.join(", ")}.`);
+  if (accessories) {
+    // Convert to array if it's an object (e.g., {item1: true, item2: true})
+    const accessoriesArray = Array.isArray(accessories)
+      ? accessories
+      : Object.keys(accessories).filter(key => (accessories as Record<string, boolean>)[key]);
+
+    if (accessoriesArray.length > 0) {
+      sections.push(`Accessoires & Dekoration: ${accessoriesArray.join(", ")}.`);
+    }
   }
 
   sections.push(

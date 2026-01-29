@@ -14,6 +14,7 @@ import { FaSquareXTwitter } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
 import Image from "next/image";
 import UpscaleModal from "@/components/UpscaleModal";
+import { useTranslations } from "next-intl";
 
 export default function ImageModal({
   src,
@@ -24,6 +25,8 @@ export default function ImageModal({
   onClose: () => void;
   prompt?: string;
 }) {
+  const t = useTranslations('imageModal');
+  const tCommon = useTranslations('common');
   const [isMobileEnv, setIsMobileEnv] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [showUpscale, setShowUpscale] = useState(false);
@@ -125,7 +128,7 @@ export default function ImageModal({
       >
         <motion.button
           type="button"
-          aria-label="Close"
+          aria-label={tCommon('close')}
           className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-black/60 hover:bg-brand-primary-2 border border-white/20 text-brand-secondary-1 shadow-md backdrop-blur-sm transition-colors leading-none"
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
@@ -151,7 +154,7 @@ export default function ImageModal({
                 variant="secondary"
                 onClick={isMobileEnv ? handleShare : undefined}
               >
-                Share
+                {t('share')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -229,7 +232,7 @@ export default function ImageModal({
                 }}
               >
                 <FaLink className="inline mr-2" />
-                Copy Link
+                {t('copyLink')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -239,7 +242,7 @@ export default function ImageModal({
               onClick={() => setShowUpscale(true)}
               className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
-              ✨ High-Res
+              ✨ {t('upscale')}
             </Button>
             <Button
               asChild
@@ -251,7 +254,7 @@ export default function ImageModal({
                 rel="noopener noreferrer"
                 download={`generated-image-${Date.now()}.png`}
               >
-                Download
+                {tCommon('download')}
               </Link>
             </Button>
           </div>

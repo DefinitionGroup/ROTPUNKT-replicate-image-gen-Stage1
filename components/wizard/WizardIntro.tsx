@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { FaRegCompass } from "react-icons/fa";
 import type { WizardPreset } from "./wizardPresets";
 import { wizardPresets } from "./wizardPresets";
+import { useTranslations } from "next-intl";
 
 interface WizardIntroProps {
   onPresetSelect: (preset: WizardPreset) => void;
@@ -16,6 +17,8 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
   onBlankStart,
   loading = false,
 }) => {
+  const t = useTranslations('wizard.intro');
+
   return (
     <motion.div
       className="w-full flex flex-col gap-6"
@@ -39,10 +42,10 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
         </motion.div>
         <div className="flex flex-col gap-1 text-left">
           <h2 className="text-3xl font-semibold text-brand-secondary-1">
-            Wählen Sie einen Startpunkt
+            {t('title')}
           </h2>
           <p className="text-sm text-gray-400 max-w-2xl">
-            Beginnen Sie mit einer unserer kuratierten Vorlagen oder stellen Sie Ihre eigene Kombination zusammen. Alle Einstellungen können anschließend noch angepasst werden.
+            {t('description')}
           </p>
         </div>
       </div>
@@ -70,10 +73,10 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
           </div>
           <div className="flex flex-col gap-1">
             <span className="text-base font-semibold text-brand-secondary-1">
-              Eigene Kombination
+              {t('customCombination')}
             </span>
             <p className="text-xxs text-gray-300 leading-relaxed">
-              Starten Sie mit einer leeren Auswahl und bestimmen Sie jeden Schritt individuell.
+              {t('customDescription')}
             </p>
           </div>
         </motion.button>

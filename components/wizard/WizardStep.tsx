@@ -2,13 +2,13 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
-import type { WizardOption } from "./wizardSteps";
+import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 
 interface WizardStepProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  options: WizardOption[];
+  options: TranslatedWizardOption[];
   selectedValue?: string;
   onSelect: (value: string) => void;
   loading?: boolean;

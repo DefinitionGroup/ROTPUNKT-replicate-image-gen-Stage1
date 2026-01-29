@@ -1,21 +1,25 @@
 import { defineQuery } from "next-sanity";
 
-export const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slug][0]{
+// Page query with optional language filter
+// Falls back to any document if no language-specific version exists
+export const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slug && (language == $locale || !defined(language))][0]{
   ...,
   content[]{
     ...
   }
 }`);
 
-export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == "home"][0]{
+// Home page query with optional language filter
+export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == "home" && (language == $locale || !defined(language))][0]{
   ...,
   content[]{
     ...
   }
 }`);
 
+// Navbar query with optional language filter
 export const NAVBAR_QUERY = defineQuery(`
-*[_type == "menu" && menuType == "navbar"][0]{
+*[_type == "menu" && menuType == "navbar" && (language == $locale || !defined(language))][0]{
   navbarLogo,
   // projected direct URL (use secure_url when available)
   "navbarLogoUrl": navbarLogo.secure_url,
@@ -32,8 +36,9 @@ export const NAVBAR_QUERY = defineQuery(`
 }
 `);
 
+// Footer query with optional language filter
 export const FOOTER_QUERY = defineQuery(`
-*[_type == "menu" && menuType == "footer"][0]{
+*[_type == "menu" && menuType == "footer" && (language == $locale || !defined(language))][0]{
   footerLogo,
   // projected direct URL (use secure_url when available)
   "footerLogoUrl": footerLogo.secure_url,

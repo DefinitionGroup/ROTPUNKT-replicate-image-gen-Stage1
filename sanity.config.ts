@@ -3,9 +3,11 @@ import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { cloudinarySchemaPlugin } from 'sanity-plugin-cloudinary'
+import { documentInternationalization } from '@sanity/document-internationalization'
 import { apiVersion, dataset, projectId } from './sanity/env'
 import { schemaTypes } from './sanity/schemaTypes'
 import { presentationTool } from 'sanity/presentation'
+
 export default defineConfig({
   basePath: '/studio',
   name: 'default',
@@ -26,6 +28,13 @@ export default defineConfig({
           enable: '/api/draft-mode/enable',
         },
       },
+    }),
+    documentInternationalization({
+      supportedLanguages: [
+        { id: 'de', title: 'Deutsch' },
+        { id: 'en', title: 'English' },
+      ],
+      schemaTypes: ['page', 'menu'],
     }),
   ],
 

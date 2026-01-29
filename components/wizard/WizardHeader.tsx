@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "motion/react";
 import { FaArrowLeft } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface WizardHeaderProps {
   currentStep: number;
@@ -20,6 +21,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
   canGoBack,
   loading = false,
 }) => {
+  const t = useTranslations('wizard.header');
   const totalStages = totalSteps + 2;
   const stageIndex = Math.max(0, Math.min(currentStep + 1, totalStages - 1));
   return (
@@ -35,17 +37,16 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
             enableMotion
             whileHover={canGoBack && !loading ? { scale: 1.05 } : {}}
             className={`
-              ${
-                !canGoBack || loading
-                  ? "opacity-0 cursor-not-allowed pointer-events-none"
-                  : ""
+              ${!canGoBack || loading
+                ? "opacity-0 cursor-not-allowed pointer-events-none"
+                : ""
               }
             `}
             tabIndex={canGoBack ? 0 : -1}
-            aria-label="Zurück zum vorherigen Schritt"
+            aria-label={t('backAriaLabel')}
           >
             <FaArrowLeft className="text-base" />
-            Zurück
+            {t('back')}
           </Button>
         ) : null}
       </div>
@@ -60,7 +61,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
           />
         </div>
         <span className="text-xs text-gray-400 mt-1">
-          {`Schritt ${stageIndex + 1} / ${totalStages}`}
+          {t('step', { current: stageIndex + 1, total: totalStages })}
         </span>
       </div>
 
@@ -73,7 +74,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           className="ml-3"
-          aria-label="Wizard schließen"
+          aria-label={t('closeAriaLabel')}
           tabIndex={0}
         >
           ×

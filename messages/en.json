@@ -1,0 +1,264 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "generate": "Generate",
+    "download": "Download",
+    "share": "Share",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "myImages": "My Images",
+    "toHomepage": "Go to Homepage",
+    "contact": "Contact",
+    "login": "Log In",
+    "register": "Register"
+  },
+  "metadata": {
+    "title": "Rotpunkt Kitchen AI Image Generator",
+    "description": "Generate your dream kitchen with AI"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "code": "404",
+    "description": "The requested page does not exist or has been moved."
+  },
+  "wizard": {
+    "title": "Kitchen Configurator",
+    "backToWizard": "Back to Kitchen Wizard",
+    "intro": {
+      "title": "Choose a Starting Point",
+      "description": "Start with one of our curated templates or create your own combination. All settings can be adjusted afterwards.",
+      "customCombination": "Custom Combination",
+      "customDescription": "Start with an empty selection and determine each step individually."
+    },
+    "header": {
+      "back": "Back",
+      "backAriaLabel": "Back to previous step",
+      "closeAriaLabel": "Close wizard",
+      "step": "Step {current} / {total}"
+    },
+    "steps": {
+      "kind": {
+        "label": "Room Focus",
+        "description": "What type of room should be visualized? Choose the focus for the scene."
+      },
+      "color": {
+        "label": "Color World",
+        "description": "Define the dominant color scheme for furniture, fronts and accents – choose from the Rotpunkt palette or original FENIX NTM® color tones."
+      },
+      "style": {
+        "label": "Style Direction",
+        "description": "Which interior style fits best? This selection determines lines and material mix."
+      },
+      "environment": {
+        "label": "Atmosphere",
+        "description": "Sets the ambiance of the environment – from urban to nature-inspired."
+      },
+      "viewpoint": {
+        "label": "Perspective",
+        "description": "Choose the camera perspective and focus for your visualization."
+      },
+      "location": {
+        "label": "Location",
+        "description": "Where is the property located? This option shapes lighting mood and view."
+      },
+      "time": {
+        "label": "Time",
+        "description": "Influences the lighting mood and shadow casting of the scene."
+      },
+      "floor": {
+        "label": "Floor",
+        "description": "What flooring should be used in the scene?"
+      },
+      "accessories": {
+        "label": "Accessories & Decoration",
+        "description": "Choose plants and decorative elements for the scene. Multiple selection possible."
+      },
+      "houseType": {
+        "label": "Building",
+        "description": "What architecture surrounds the room? Defines frame and exterior shell."
+      }
+    },
+    "options": {
+      "kueche": "Kitchen",
+      "wohnzimmer": "Living Room",
+      "fromTheOutside": "Exterior View",
+      "flur": "Hallway",
+      "schwarz": "Black",
+      "rot": "Red",
+      "burgunderrot": "Burgundy Red",
+      "weiss": "White",
+      "holz": "Wood",
+      "dunklesHolz": "Dark Wood",
+      "modern": "Modern",
+      "zeitlos": "Timeless",
+      "natuerlich": "Natural",
+      "urban": "Urban",
+      "elegant": "Elegant",
+      "kreativ": "Creative",
+      "puristisch": "Purist",
+      "gemuetlich": "Cozy",
+      "minimalistisch": "Minimalist",
+      "stilvoll": "Stylish",
+      "naturnah": "Nature-inspired",
+      "augenhoehe": "Eye Level",
+      "froschperspektive": "Low Angle",
+      "vogelperspektive": "High Angle",
+      "hollaendischerWinkel": "Dutch Angle",
+      "totale": "Wide Shot",
+      "halbtotale": "Medium Shot",
+      "nahaufnahme": "Close-up",
+      "ganzerRaum": "Full Room",
+      "detailaufnahme": "Detail Shot",
+      "geringeTiefenschaerfe": "Shallow Depth of Field",
+      "tiefenschaerfe": "Deep Focus",
+      "weicherFokus": "Soft Focus",
+      "mediteraneKuestenstadt": "Mediterranean Coastal Town",
+      "historischesAltstadtviertel": "Historic Old Town District",
+      "nordischesFjordhaus": "Nordic Fjord House",
+      "dachterrasseMetropole": "Rooftop Terrace in a Metropolis",
+      "tropischerRegenwaldBungalow": "Tropical Rainforest Bungalow",
+      "frueherMorgen": "Early Morning",
+      "spaeterVormittag": "Late Morning",
+      "mittag": "Noon",
+      "nachmittag": "Afternoon",
+      "goldeneStunde": "Golden Hour",
+      "abenddaemmerung": "Dusk",
+      "abend": "Evening",
+      "nacht": "Night",
+      "hartholzboden": "Hardwood Floor",
+      "fischgraetparkett": "Herringbone Parquet",
+      "terrazzo": "Terrazzo",
+      "marmor": "Marble",
+      "beton": "Concrete",
+      "terrakotta": "Terracotta",
+      "schiefer": "Slate",
+      "teppichboden": "Carpet",
+      "zimmerpflanzen": "Houseplants",
+      "trockenblumen": "Dried Flowers",
+      "frischeBlumen": "Fresh Flowers",
+      "haengepflanzen": "Hanging Plants",
+      "buecher": "Books",
+      "keramikvasen": "Ceramic Vases",
+      "toepfePfannen": "Pots & Pans",
+      "kerzen": "Candles",
+      "spiegel": "Mirror",
+      "modernesHolzhaus": "Modern Wooden House with Large Windows",
+      "stadtwohnung": "City Apartment",
+      "loft": "Loft",
+      "landhaus": "Country House",
+      "penthouse": "Penthouse with Rooftop Terrace",
+      "historischeVilla": "Historic Villa",
+      "reihenhaus": "Townhouse with Garden",
+      "architektenhaus": "Architect House in Exposed Concrete"
+    },
+    "optionGroups": {
+      "pflanzen": "Plants",
+      "dekoration": "Decoration"
+    },
+    "hints": {
+      "standard": "Standard",
+      "skandinavisch": "Scandinavian-inspired, lots of daylight",
+      "warmeFarben": "Warm tones, ocean reflections",
+      "kopfsteinpflaster": "Cobblestones, warm evening light",
+      "vielGlas": "Lots of glass, cool color temperature",
+      "skyline": "Skyline, urban light play",
+      "sattesGruen": "Lush green, diffuse humidity",
+      "panoramablick": "Panoramic view, glass and steel",
+      "hoheDecken": "High ceilings, stucco and parquet",
+      "familienfreundlich": "Family-friendly, green oasis",
+      "brutalismus": "Brutalist clarity, strong lines"
+    },
+    "final": {
+      "extraWishesTitle": "Additional Wishes?",
+      "extraWishesDescription": "Here you can enter additional details (e.g. \"large kitchen island, lots of light\")",
+      "extraWishesPlaceholder": "Describe your additional wishes here...",
+      "generateButton": "Create Image"
+    },
+    "auth": {
+      "title": "You must be logged in to generate an image.",
+      "description": "Please sign in or register. Afterwards you can continue directly."
+    }
+  },
+  "imageGenerator": {
+    "backToWizard": "Back to Kitchen Wizard",
+    "goToMyImages": "Go to \"My Images\"",
+    "generatedImageAlt": "Generated image",
+    "loading": {
+      "messages": {
+        "generating": "Generating your image...",
+        "aiWorking": "The AI is working on your design...",
+        "takingLonger": "This is taking a bit longer today – please be patient...",
+        "serverWakingUp": "The servers are just waking up ☕ – almost there!",
+        "extraLove": "Your image is being generated with extra love... 💫",
+        "goodThingsTakeTime": "Just a little more – good things take time! 🎨",
+        "modelRestarting": "The AI model is restarting – thank you for your patience! 🚀",
+        "inQueue": "Your image is in the queue – starting soon! ⏳",
+        "almostThere": "Almost there – your design is being finalized! ✨",
+        "neverGiveUp": "Just one more moment – we won't give up! 💪"
+      },
+      "subMessages": {
+        "usually30s": "Images are usually generated within 30 seconds.",
+        "highLoad": "During high load, it can take up to 1-2 minutes.",
+        "warmingUp": "Sometimes the AI model needs to warm up first.",
+        "coldStart": "A cold start can take up to 3 minutes – but it's worth it!",
+        "queued": "During high demand, your image will be queued.",
+        "maxWait": "Maximum wait time: approx. 5-7 minutes. Your image is guaranteed!",
+        "unusualWait": "Unusually long wait time – please don't leave the page!"
+      }
+    },
+    "error": {
+      "title": "Something went wrong",
+      "unknown": "An unknown error occurred.",
+      "aborted": "The request was aborted.",
+      "retry": "Try again"
+    }
+  },
+  "imageGallery": {
+    "title": "My Generated Images",
+    "loading": "Loading images...",
+    "error": "Error loading your images.",
+    "empty": "You don't have any images yet. Create your first image in the Wizard!",
+    "generatedImageAlt": "Generated image",
+    "scrollMore": "Scroll for more images",
+    "allImages": "That's all your images ✨"
+  },
+  "imageModal": {
+    "closeAriaLabel": "Close",
+    "share": "Share",
+    "copyLink": "Copy Link",
+    "download": "Download",
+    "upscale": "High-Res",
+    "fullSizeAlt": "Generated image - full size"
+  },
+  "upscale": {
+    "title": "Upscale",
+    "download": "High-Res Download",
+    "success": {
+      "title": "High-Res Version Created!",
+      "description": "Your image has been successfully generated in high resolution and saved."
+    },
+    "loading": {
+      "messages": {
+        "starting": "Starting upscaling...",
+        "improving": "The AI is improving your image...",
+        "details": "Details are being worked out...",
+        "almostDone": "Almost done – your High-Res image is being created! ✨",
+        "fullPower": "The AI model is working at full power... 🚀",
+        "perfection": "Just a moment more – perfection takes time! 💫"
+      },
+      "subMessage": "Upscaling usually takes 30–60 seconds."
+    },
+    "error": {
+      "title": "Error during upscaling",
+      "unknown": "Unknown error",
+      "retry": "Try again"
+    }
+  },
+  "languageSwitcher": {
+    "label": "Select language"
+  }
+}

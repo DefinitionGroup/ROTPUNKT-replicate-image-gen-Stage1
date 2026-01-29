@@ -1,6 +1,29 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import createIntlMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
+import { NextResponse } from "next/server";
 
-export default clerkMiddleware();
+const intlMiddleware = createIntlMiddleware(routing);
+
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/:locale',
+  '/:locale/(.*)',
+  '/api/(.*)',
+  '/studio(.*)',
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  const { pathname } = req.nextUrl;
+
+  // Skip i18n middleware for API routes and studio
+  if (pathname.startsWith('/api') || pathname.startsWith('/studio')) {
+    return NextResponse.next();
+  }
+
+  // Apply internationalization middleware
+  return intlMiddleware(req);
+});
 
 export const config = {
   matcher: [

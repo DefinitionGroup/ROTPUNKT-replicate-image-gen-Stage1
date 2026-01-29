@@ -4,13 +4,13 @@ import React from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-import type { WizardOption } from "./wizardSteps";
+import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 
 interface WizardMultiSelectStepProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  options: WizardOption[];
+  options: TranslatedWizardOption[];
   optionGroups?: string[];
   selectedValues: string[];
   onToggle: (value: string) => void;
@@ -24,17 +24,24 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
   description,
   options,
   optionGroups,
-  selectedValues,
+  selectedValues: rawSelectedValues,
   onToggle,
   onContinue,
   loading = false,
 }) => {
+  // Normalize selectedValues to always be an array (handle object format from old localStorage)
+  const selectedValues = Array.isArray(rawSelectedValues)
+    ? rawSelectedValues
+    : typeof rawSelectedValues === 'object' && rawSelectedValues !== null
+      ? Object.keys(rawSelectedValues).filter(key => (rawSelectedValues as Record<string, boolean>)[key])
+      : [];
+
   // Group options by their group property
   const groupedOptions = optionGroups
     ? optionGroups.map((group) => ({
-        name: group,
-        options: options.filter((opt) => opt.group === group),
-      }))
+      name: group,
+      options: options.filter((opt) => opt.group === group),
+    }))
     : [{ name: "", options }];
 
   return (
@@ -81,54 +88,52 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
       {/* Grouped options */}
       <div className="flex-1 overflow-y-auto min-h-0 pr-2">
         <div className="space-y-6 pb-4">
-        {groupedOptions.map(({ name, options: groupOptions }) => (
-          <div key={name || "default"}>
-            {name && (
-              <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
-                <span className="h-px flex-1 bg-gray-700" />
-                <span>{name}</span>
-                <span className="h-px flex-1 bg-gray-700" />
-              </h4>
-            )}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {groupOptions.map((opt) => {
-                const isSelected = selectedValues.includes(opt.value);
-                return (
-                  <Button
-                    key={opt.value}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onToggle(opt.value)}
-                    disabled={loading}
-                    className={`
+          {groupedOptions.map(({ name, options: groupOptions }) => (
+            <div key={name || "default"}>
+              {name && (
+                <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                  <span className="h-px flex-1 bg-gray-700" />
+                  <span>{name}</span>
+                  <span className="h-px flex-1 bg-gray-700" />
+                </h4>
+              )}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {groupOptions.map((opt) => {
+                  const isSelected = selectedValues.includes(opt.value);
+                  return (
+                    <Button
+                      key={opt.value}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onToggle(opt.value)}
+                      disabled={loading}
+                      className={`
                       relative h-auto py-3 px-4 text-left justify-start gap-3
                       border transition-all duration-200
-                      ${
-                        isSelected
+                      ${isSelected
                           ? "border-red-500 bg-red-500/10 text-white"
                           : "border-gray-700 bg-gray-900/50 text-gray-300 hover:border-gray-600 hover:bg-gray-800/50"
-                      }
+                        }
                     `}
-                  >
-                    <div
-                      className={`
+                    >
+                      <div
+                        className={`
                         h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors
-                        ${
-                          isSelected
+                        ${isSelected
                             ? "bg-red-500 border-red-500"
                             : "border-gray-600 bg-transparent"
-                        }
+                          }
                       `}
-                    >
-                      {isSelected && <Check className="h-3.5 w-3.5 text-white" />}
-                    </div>
-                    <span className="text-sm">{opt.label}</span>
-                  </Button>
-                );
-              })}
+                      >
+                        {isSelected && <Check className="h-3.5 w-3.5 text-white" />}
+                      </div>
+                      <span className="text-sm">{opt.label}</span>
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </div>
 

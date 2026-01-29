@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
-import type { WizardOption } from "./wizardSteps";
+import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 import {
   encodeFenixColorValue,
   fenixColors,
@@ -13,7 +13,7 @@ interface WizardColorStepProps {
   icon: ReactNode;
   title: string;
   description: string;
-  options: WizardOption[];
+  options: TranslatedWizardOption[];
   selectedValue?: string;
   onSelect: (value: string) => void;
   loading?: boolean;
@@ -85,11 +85,10 @@ export function WizardColorStep({
               <button
                 key={tab.id}
                 type="button"
-                className={`px-4 py-1.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${
-                  isActive
+                className={`px-4 py-1.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isActive
                     ? "bg-brand-primary-2 text-black shadow"
                     : "hover:text-white"
-                }`}
+                  }`}
                 onClick={() => setActiveTab(tab.id)}
                 disabled={loading}
                 aria-pressed={isActive}

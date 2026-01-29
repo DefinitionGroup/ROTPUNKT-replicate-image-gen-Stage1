@@ -9,21 +9,24 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link, usePathname } from "@/i18n/routing";
 import Logo from "./logo";
 import { TiThMenu } from "react-icons/ti";
-import { usePathname } from "next/navigation";
 import type {
   MenuNavbarProjected,
   NavbarMenuItemProjected,
 } from "@/sanity/sanity.types";
 import { internalHref } from "@/utils/nav-internal";
 import Image from "next/image";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useTranslations } from "next-intl";
 
 type Props = Pick<
   MenuNavbarProjected,
   "menuItems" | "navbarLogo" | "navbarLogoAlt" | "navbarLogoUrl"
->;
+> & {
+  currentLocale?: string;
+};
 
 // prefer the projected string URL, fall back to Cloudinary object fields if present
 const logoUrl = (props: { navbarLogoUrl?: string; navbarLogo?: any }) =>
@@ -37,7 +40,9 @@ export default function Navbar({
   navbarLogo,
   navbarLogoAlt,
   navbarLogoUrl,
+  currentLocale,
 }: Props) {
+  const t = useTranslations('common');
   // use string directly if available
   const resolvedLogo =
     navbarLogoUrl ?? navbarLogo?.secure_url ?? navbarLogo?.url;
@@ -129,7 +134,7 @@ export default function Navbar({
         {!mobile && (
           <span className={cn(
             "absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-primary-2 transition-all duration-300 group-hover:w-full",
-             active && "w-full"
+            active && "w-full"
           )} />
         )}
       </Link>
@@ -185,7 +190,7 @@ export default function Navbar({
                 href="/my-images"
                 className="text-inherit hover:text-primary transition"
               >
-                Meine Bilder
+                {t('myImages')}
               </Link>
             </SignedIn>
           )}
@@ -193,17 +198,18 @@ export default function Navbar({
 
         {/* Desktop auth */}
         <div className="hidden md:flex items-center space-x-2 border-l border-neutral-700/30 pl-4 ml-4 mr-4">
+          <LanguageSwitcher />
           {mounted ? (
             <>
               <SignedOut>
                 <SignInButton mode="modal">
                   <button className="cursor-pointer px-3 tracking-wider py-1 rounded-full text-xxs border border-transparent font-bold uppercase text-neutral-200 hover:text-inherit hover:bg-neutral-800/10 dark:hover:bg-white/10 transition-colors">
-                    Anmelden
+                    {t('signIn')}
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
                   <button className="cursor-pointer px-3 py-1 font-bold rounded-full text-xxs tracking-wid uppercase  bg-gray-100 dark:bg-white/10 hover:bg-transparent hover:text-inherit text-black dark:text-brand-secondary-1 transition-colors border border-transparent hover:border-current">
-                    Registrieren
+                    {t('signUp')}
                   </button>
                 </SignUpButton>
               </SignedOut>
@@ -298,11 +304,14 @@ export default function Navbar({
                           onClick={closeMenu}
                           className="block text-brand-secondary-1 text-xl font-medium tracking-tight"
                         >
-                          Meine Bilder
+                          {t('myImages')}
                         </Link>
                       </motion.li>
                     </SignedIn>
                   )}
+                  <motion.li variants={itemVariants} className="pt-4">
+                    <LanguageSwitcher />
+                  </motion.li>
                 </ul>
               </motion.nav>
 
