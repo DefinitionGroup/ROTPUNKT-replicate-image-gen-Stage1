@@ -14,7 +14,7 @@ export const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slu
 }`);
 
 // Home page query with optional language filter
-export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == "home" && (language == $locale || !defined(language))][0]{
+export const HOME_PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current in ["home", "home-en"] && (language == $locale || !defined(language))][0]{
   ...,
   content[]{
     ...
