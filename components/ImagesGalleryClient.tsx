@@ -7,6 +7,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPaginatedImages, type ImageRow } from "@/lib/actions/images";
 import { Loader2 } from "lucide-react";
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8, y: 50 },
@@ -25,6 +26,7 @@ const itemVariants = {
 };
 
 export default function ImagesGalleryClient() {
+  const t = useTranslations('imageGallery');
   const [selected, setSelected] = useState<ImageRow | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -69,7 +71,7 @@ export default function ImagesGalleryClient() {
   if (status === "error") {
     return (
       <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-red-400">
-        Fehler beim Laden deiner Bilder.
+        {t('error')}
       </div>
     );
   }
@@ -79,7 +81,7 @@ export default function ImagesGalleryClient() {
   if (allImages.length === 0) {
     return (
       <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-gray-300">
-        Du hast noch keine Bilder. Erstelle dein erstes Bild im Wizard!
+        {t('empty')}
       </div>
     );
   }
@@ -127,9 +129,9 @@ export default function ImagesGalleryClient() {
         {isFetchingNextPage ? (
           <Loader2 className="w-6 h-6 text-brand-primary-2 animate-spin" />
         ) : hasNextPage ? (
-          <span className="text-xs text-gray-500">Scrolle weiter für mehr Bilder</span>
+          <span className="text-xs text-gray-500">{t('scrollMore')}</span>
         ) : (
-          <span className="text-xs text-gray-500">Das sind alle deine Bilder ✨</span>
+          <span className="text-xs text-gray-500">{t('allImages')}</span>
         )}
       </div>
 

@@ -16,6 +16,7 @@ import { WizardStep } from "./WizardStep";
 import { WizardMultiSelectStep } from "./WizardMultiSelectStep";
 import { WizardFinal } from "./WizardFinal";
 import { wizardSteps } from "./wizardSteps";
+import { useTranslatedWizardSteps } from "./useTranslatedWizardSteps";
 import { WizardSummaryPanel } from "./WizardSummaryPanel";
 import { buildPrompt } from "./promptBuilder";
 import type { WizardPreset } from "./wizardPresets";
@@ -35,6 +36,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const wizardState = useStore(wizardStore);
   const { isSignedIn } = useAuth();
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const translatedSteps = useTranslatedWizardSteps();
 
   const CARD_HEIGHT = 640;
   const CARD_WIDTH = 980;
@@ -54,7 +56,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const showSummaryPanel = !isIntro;
   const currentStepDefinition =
     !isIntro && !isFinalStep && wizardState.currentStep >= 0
-      ? wizardSteps[wizardState.currentStep]
+      ? translatedSteps[wizardState.currentStep]
       : undefined;
   const isColorStep = currentStepDefinition?.key === "color";
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
@@ -222,7 +224,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           options={currentStepDefinition.options}
                           selectedValue={
                             wizardState.selectedOptions[
-                              currentStepDefinition.key as Exclude<keyof WizardState["selectedOptions"], "accessories">
+                            currentStepDefinition.key as Exclude<keyof WizardState["selectedOptions"], "accessories">
                             ] as string | undefined
                           }
                           onSelect={handleOptionSelect}

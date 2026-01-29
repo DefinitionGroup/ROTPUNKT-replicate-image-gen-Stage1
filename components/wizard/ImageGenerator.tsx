@@ -9,6 +9,7 @@ import { useStore } from "@nanostores/react";
 import { $prompt } from "@/store/prompt";
 import { useMutation } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
+import { useTranslations } from "next-intl";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -37,6 +38,7 @@ async function generateImageApi({ prompt, signal }: GenerationParams): Promise<A
 
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
+  const t = useTranslations('imageGenerator');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
 
@@ -135,7 +137,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="w-full mx-autoflex flex-col justify-center items-center">
-      {onBack && hasImages && !isPending && <BackButton onClick={onBack} />}
+      {onBack && hasImages && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
 
       <AnimatePresence mode="wait">
         {isPending && !hasImages && <LoadingState key="loading" />}
@@ -143,7 +145,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         {!isPending && isError && !hasImages && (
           <ErrorState
             key="error"
-            message={error?.message || "Ein unbekannter Fehler ist aufgetreten."}
+            message={error?.message || t('error.unknown')}
             onRetry={handleRetry}
           />
         )}
@@ -174,18 +176,19 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   );
 }
 
-function BackButton({ onClick }: { onClick: () => void }) {
+function BackButton({ onClick, backLabel }: { onClick: () => void; backLabel: string }) {
   return (
     <Button
       onClick={onClick}
       className="mb-10 px-4 py-2 rounded-full bg-gray-800 text-brand-secondary-1 text-xs hover:bg-brand-primary-2 transition-all"
     >
-      ⇦ Zurück zum Küchen-Wizard
+      ⇦ {backLabel}
     </Button>
   );
 }
 
 function LoadingState() {
+  const t = useTranslations('imageGenerator.loading');
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -202,26 +205,26 @@ function LoadingState() {
   };
 
   const getMessage = () => {
-    if (elapsed < 15) return "Ich generiere gerade dein Bild...";
-    if (elapsed < 30) return "Die KI arbeitet an deinem Design...";
-    if (elapsed < 60) return "Das dauert heute etwas länger – bitte hab noch einen Moment Geduld...";
-    if (elapsed < 90) return "Die Server wachen gerade erst auf ☕ – fast geschafft!";
-    if (elapsed < 120) return "Dein Bild wird mit extra viel Liebe generiert... 💫";
-    if (elapsed < 180) return "Noch ein kleines bisschen – gute Dinge brauchen Zeit! 🎨";
-    if (elapsed < 240) return "Das KI-Modell startet gerade neu – danke für deine Geduld! 🚀";
-    if (elapsed < 300) return "Dein Bild ist in der Warteschlange – gleich geht's los! ⏳";
-    if (elapsed < 420) return "Fast da – dein Design wird finalisiert! ✨";
-    return "Noch einen kleinen Moment – wir geben nicht auf! 💪";
+    if (elapsed < 15) return t('messages.generating');
+    if (elapsed < 30) return t('messages.aiWorking');
+    if (elapsed < 60) return t('messages.takingLonger');
+    if (elapsed < 90) return t('messages.serverWakingUp');
+    if (elapsed < 120) return t('messages.extraLove');
+    if (elapsed < 180) return t('messages.goodThingsTakeTime');
+    if (elapsed < 240) return t('messages.modelRestarting');
+    if (elapsed < 300) return t('messages.inQueue');
+    if (elapsed < 420) return t('messages.almostThere');
+    return t('messages.neverGiveUp');
   };
 
   const getSubMessage = () => {
-    if (elapsed < 30) return "Die Bilder werden in aller Regel innerhalb von 30\u00A0s generiert.";
-    if (elapsed < 60) return "Bei hoher Auslastung kann es bis zu 1-2 Minuten dauern.";
-    if (elapsed < 120) return "Manchmal muss das KI-Modell erst aufgewärmt werden.";
-    if (elapsed < 180) return "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!";
-    if (elapsed < 300) return "Bei hoher Nachfrage wird dein Bild in die Warteschlange gestellt.";
-    if (elapsed < 420) return "Maximale Wartezeit: ca. 5-7 Minuten. Dein Bild kommt garantiert!";
-    return "Ungewöhnlich lange Wartezeit – bitte nicht die Seite verlassen!";
+    if (elapsed < 30) return t('subMessages.usually30s');
+    if (elapsed < 60) return t('subMessages.highLoad');
+    if (elapsed < 120) return t('subMessages.warmingUp');
+    if (elapsed < 180) return t('subMessages.coldStart');
+    if (elapsed < 300) return t('subMessages.queued');
+    if (elapsed < 420) return t('subMessages.maxWait');
+    return t('subMessages.unusualWait');
   };
 
   return (
@@ -289,6 +292,7 @@ function LoadingState() {
 }
 
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  const t = useTranslations('imageGenerator.error');
   return (
     <motion.div
       key="error"
@@ -299,7 +303,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
     >
       <div className="text-4xl mb-4">😕</div>
       <h3 className="text-lg font-medium text-brand-secondary-1 mb-2">
-        Etwas ist schiefgelaufen
+        {t('title')}
       </h3>
       <p className="text-red-400 text-center text-sm mb-6 max-w-md">
         {message}
@@ -308,7 +312,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
         onClick={onRetry}
         className="px-6 py-3 text-sm font-medium shadow-lg rounded-full bg-brand-primary-2 hover:bg-red-600"
       >
-        🔄 Erneut versuchen
+        🔄 {t('retry')}
       </Button>
     </motion.div>
   );
@@ -339,13 +343,14 @@ function ImagesGrid({
 }
 
 function QuickLink() {
+  const t = useTranslations('imageGenerator');
   return (
     <motion.a
       href="/my-images"
       className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-brand-secondary-1 rounded-full font-semibold shadow hover:bg-red-600 transition"
       whileHover={{ scale: 1.05 }}
     >
-      📁 Zu &quot;Meine Bilder&quot;
+      📁 {t('goToMyImages')}
     </motion.a>
   );
 }

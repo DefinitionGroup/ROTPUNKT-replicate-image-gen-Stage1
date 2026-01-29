@@ -13,48 +13,52 @@ import {
 
 export type WizardOption = {
   value: string;
-  label: string;
-  hint?: string;
+  labelKey: string;  // Translation key for UI
+  germanLabel: string; // German label for AI prompt generation (always German for Replicate model)
+  hintKey?: string;  // Translation key for hint
   image?: string;
   group?: string;
 };
 
 export type WizardStepDefinition = {
   key: string;
-  label: string;
-  description: string;
+  labelKey: string;       // Translation key
+  descriptionKey: string; // Translation key
   options: WizardOption[];
   icon: ReactNode;
   multiSelect?: boolean;
-  optionGroups?: string[];
+  optionGroupKeys?: string[]; // Translation keys for groups
 };
 
 export const wizardSteps: WizardStepDefinition[] = [
   {
     key: "kind",
-    label: "Raumfokus",
-    description:
-      "Welche Art von Raum soll visualisiert werden? Wählen Sie den Schwerpunkt für die Szene.",
+    labelKey: "wizard.steps.kind.label",
+    descriptionKey: "wizard.steps.kind.description",
     options: [
       {
         value: "kueche",
-        label: "Küche",
-        hint: "Standard",
+        labelKey: "wizard.options.kueche",
+        germanLabel: "Küche",
+        hintKey: "wizard.hints.standard",
         image: "/wizard-presets/kind-kueche.jpg",
       },
       {
         value: "wohnzimmer",
-        label: "Wohnzimmer",
+        labelKey: "wizard.options.wohnzimmer",
+        germanLabel: "Wohnzimmer",
         image: "/wizard-presets/kind-wohnzimmer.jpg",
       },
       {
         value: "from the outside",
-        label: "Außenansicht",
+        labelKey: "wizard.options.fromTheOutside",
+        germanLabel: "von Außen",
         image: "/wizard-presets/kind-aussen.jpg",
       },
       {
         value: "flur",
-        label: "Flur",
+        labelKey: "wizard.options.flur",
+        germanLabel: "Flur",
         image: "/wizard-presets/kind-flur.jpg",
       },
     ],
@@ -62,68 +66,75 @@ export const wizardSteps: WizardStepDefinition[] = [
   },
   {
     key: "color",
-    label: "Farbwelt",
-    description:
-      "Definieren Sie die dominante Farbgebung für Möbel, Fronten und Akzente – wahlweise aus der Rotpunkt Palette oder originalen FENIX NTM® Farbtönen.",
+    labelKey: "wizard.steps.color.label",
+    descriptionKey: "wizard.steps.color.description",
     options: [
-      { value: "schwarz", label: "Schwarz" },
-      { value: "rot", label: "Rot" },
-      { value: "burgunderrot", label: "Burgunderrot" },
-      { value: "weiß", label: "Weiß" },
-      { value: "holz", label: "Holz" },
-      { value: "dunkles holz", label: "Dunkles Holz" },
+      { value: "schwarz", labelKey: "wizard.options.schwarz", germanLabel: "Schwarz" },
+      { value: "rot", labelKey: "wizard.options.rot", germanLabel: "Rot" },
+      { value: "burgunderrot", labelKey: "wizard.options.burgunderrot", germanLabel: "Burgunderrot" },
+      { value: "weiß", labelKey: "wizard.options.weiss", germanLabel: "Weiß" },
+      { value: "holz", labelKey: "wizard.options.holz", germanLabel: "Holz" },
+      { value: "dunkles holz", labelKey: "wizard.options.dunklesHolz", germanLabel: "Dunkles Holz" },
     ],
     icon: <FaPalette className="w-full h-full text-red-600" />,
   },
   {
     key: "style",
-    label: "Stilrichtung",
-    description:
-      "Welcher Einrichtungsstil passt am besten? Diese Auswahl bestimmt Linienführung und Materialmix.",
+    labelKey: "wizard.steps.style.label",
+    descriptionKey: "wizard.steps.style.description",
     options: [
       {
         value: "modern",
-        label: "Modern",
+        labelKey: "wizard.options.modern",
+        germanLabel: "Modern",
         image: "/wizard-presets/style-modern.jpg",
       },
       {
         value: "zeitlos",
-        label: "Zeitlos",
+        labelKey: "wizard.options.zeitlos",
+        germanLabel: "Zeitlos",
         image: "/wizard-presets/style-zeitlos.jpg",
       },
       {
         value: "natürlich",
-        label: "Natürlich",
+        labelKey: "wizard.options.natuerlich",
+        germanLabel: "Natürlich",
         image: "/wizard-presets/style-natuerlich.jpg",
       },
       {
         value: "urban",
-        label: "Urban",
+        labelKey: "wizard.options.urban",
+        germanLabel: "Urban",
         image: "/wizard-presets/style-urban.jpg",
       },
       {
         value: "elegant",
-        label: "Elegant",
+        labelKey: "wizard.options.elegant",
+        germanLabel: "Elegant",
         image: "/wizard-presets/style-elegant.jpg",
       },
       {
         value: "kreativ",
-        label: "Kreativ",
+        labelKey: "wizard.options.kreativ",
+        germanLabel: "Kreativ",
         image: "/wizard-presets/style-kreativ.jpg",
       },
       {
         value: "puristisch",
-        label: "Puristisch",
+        labelKey: "wizard.options.puristisch",
+        germanLabel: "Puristisch",
         image: "/wizard-presets/style-puristisch.jpg",
       },
       {
         value: "gemütlich",
-        label: "Gemütlich",
+        labelKey: "wizard.options.gemuetlich",
+        germanLabel: "Gemütlich",
         image: "/wizard-presets/style-gemuetlich.jpg",
       },
       {
         value: "minimalistisch",
-        label: "Minimalistisch",
+        labelKey: "wizard.options.minimalistisch",
+        germanLabel: "Minimalistisch",
         image: "/wizard-presets/style-minimalistisch.jpg",
       },
     ],
@@ -131,81 +142,91 @@ export const wizardSteps: WizardStepDefinition[] = [
   },
   {
     key: "environment",
-    label: "Atmosphäre",
-    description:
-      "Legt die Anmutung des Umfelds fest – von urban bis naturnah.",
+    labelKey: "wizard.steps.environment.label",
+    descriptionKey: "wizard.steps.environment.description",
     options: [
-      { value: "stilvoll", label: "Stilvoll" },
-      { value: "modern", label: "Modern" },
-      { value: "urban", label: "Urban" },
-      { value: "naturnah", label: "Naturnah" },
+      { value: "stilvoll", labelKey: "wizard.options.stilvoll", germanLabel: "Stilvoll" },
+      { value: "modern", labelKey: "wizard.options.modern", germanLabel: "Modern" },
+      { value: "urban", labelKey: "wizard.options.urban", germanLabel: "Urban" },
+      { value: "naturnah", labelKey: "wizard.options.naturnah", germanLabel: "Naturnah" },
     ],
     icon: <FaTree className="w-full h-full text-red-600" />,
   },
   {
     key: "viewpoint",
-    label: "Perspektive",
-    description:
-      "Wählen Sie die Kameraperspektive und den Fokus für Ihre Visualisierung.",
+    labelKey: "wizard.steps.viewpoint.label",
+    descriptionKey: "wizard.steps.viewpoint.description",
     options: [
       {
         value: "eye level shot",
-        label: "Augenhöhe",
+        labelKey: "wizard.options.augenhoehe",
+        germanLabel: "Augenhöhe",
         image: "/wizard-presets/viewpoint-augenhoehe.jpg",
       },
       {
         value: "low angle shot, worm's eye view",
-        label: "Froschperspektive",
+        labelKey: "wizard.options.froschperspektive",
+        germanLabel: "Froschperspektive",
         image: "/wizard-presets/viewpoint-frosch.jpg",
       },
       {
         value: "high angle shot, bird's eye view",
-        label: "Vogelperspektive",
+        labelKey: "wizard.options.vogelperspektive",
+        germanLabel: "Vogelperspektive",
         image: "/wizard-presets/viewpoint-vogel.jpg",
       },
       {
         value: "dutch angle, tilted frame",
-        label: "Holländischer Winkel",
+        labelKey: "wizard.options.hollaendischerWinkel",
+        germanLabel: "Holländischer Winkel",
         image: "/wizard-presets/viewpoint-dutch.jpg",
       },
       {
         value: "wide shot, long shot, establishing shot",
-        label: "Totale",
+        labelKey: "wizard.options.totale",
+        germanLabel: "Totale",
         image: "/wizard-presets/viewpoint-totale.jpg",
       },
       {
         value: "medium shot, mid shot",
-        label: "Halbtotale",
+        labelKey: "wizard.options.halbtotale",
+        germanLabel: "Halbtotale",
         image: "/wizard-presets/viewpoint-halbtotale.jpg",
       },
       {
         value: "close-up shot",
-        label: "Nahaufnahme",
+        labelKey: "wizard.options.nahaufnahme",
+        germanLabel: "Nahaufnahme",
         image: "/wizard-presets/viewpoint-nahaufnahme.jpg",
       },
       {
         value: "full room view, interior panorama",
-        label: "Ganzer Raum",
+        labelKey: "wizard.options.ganzerRaum",
+        germanLabel: "Ganzer Raum",
         image: "/wizard-presets/viewpoint-ganzerraum.jpg",
       },
       {
         value: "extreme close-up, detail shot, macro",
-        label: "Detailaufnahme",
+        labelKey: "wizard.options.detailaufnahme",
+        germanLabel: "Detailaufnahme",
         image: "/wizard-presets/viewpoint-detail.jpg",
       },
       {
         value: "shallow depth of field, bokeh background",
-        label: "Geringe Tiefenschärfe",
+        labelKey: "wizard.options.geringeTiefenschaerfe",
+        germanLabel: "Geringe Tiefenschärfe",
         image: "/wizard-presets/viewpoint-shallow-dof.jpg",
       },
       {
         value: "deep depth of field, everything in focus",
-        label: "Tiefenschärfe",
+        labelKey: "wizard.options.tiefenschaerfe",
+        germanLabel: "Tiefenschärfe",
         image: "/wizard-presets/viewpoint-deep-dof.jpg",
       },
       {
         value: "soft focus, dreamy blur",
-        label: "Weicher Fokus",
+        labelKey: "wizard.options.weicherFokus",
+        germanLabel: "Weicher Fokus",
         image: "/wizard-presets/viewpoint-soft-focus.jpg",
       },
     ],
@@ -213,82 +234,93 @@ export const wizardSteps: WizardStepDefinition[] = [
   },
   {
     key: "location",
-    label: "Standort",
-    description:
-      "Wo befindet sich das Objekt? Diese Option prägt Lichtstimmung und Ausblick.",
+    labelKey: "wizard.steps.location.label",
+    descriptionKey: "wizard.steps.location.description",
     options: [
       {
         value: "mediterrane Küstenstadt",
-        label: "Mediterrane Küstenstadt",
-        hint: "Warme Farbtöne, Meeresreflexionen",
+        labelKey: "wizard.options.mediteraneKuestenstadt",
+        germanLabel: "Mediterrane Küstenstadt",
+        hintKey: "wizard.hints.warmeFarben",
       },
       {
         value: "historisches altstadtviertel",
-        label: "Historisches Altstadtviertel",
-        hint: "Kopfsteinpflaster, warmes Abendlicht",
+        labelKey: "wizard.options.historischesAltstadtviertel",
+        germanLabel: "Historisches Altstadtviertel",
+        hintKey: "wizard.hints.kopfsteinpflaster",
       },
       {
         value: "nordisches fjordhaus",
-        label: "Nordisches Fjordhaus",
-        hint: "Viel Glas, kühle Farbtemperatur",
+        labelKey: "wizard.options.nordischesFjordhaus",
+        germanLabel: "Nordisches Fjordhaus",
+        hintKey: "wizard.hints.vielGlas",
       },
       {
         value: "dachterrasse metropole",
-        label: "Dachterrasse in einer Metropole",
-        hint: "Skyline, urbanes Lichtspiel",
+        labelKey: "wizard.options.dachterrasseMetropole",
+        germanLabel: "Dachterrasse Metropole",
+        hintKey: "wizard.hints.skyline",
       },
       {
         value: "tropischer regenwald bungalow",
-        label: "Tropischer Regenwald-Bungalow",
-        hint: "Sattes Grün, diffuse Feuchtigkeit",
+        labelKey: "wizard.options.tropischerRegenwaldBungalow",
+        germanLabel: "Tropischer Regenwald Bungalow",
+        hintKey: "wizard.hints.sattesGruen",
       },
     ],
     icon: <FaLocationDot className="w-full h-full text-red-600" />,
   },
   {
     key: "time",
-    label: "Zeit",
-    description:
-      "Beeinflusst Lichtstimmung und Schattenwurf der Szene.",
+    labelKey: "wizard.steps.time.label",
+    descriptionKey: "wizard.steps.time.description",
     options: [
       {
         value: "early morning, dawn light, first light of day",
-        label: "Früher Morgen",
+        labelKey: "wizard.options.frueherMorgen",
+        germanLabel: "Früher Morgen",
         image: "/wizard-presets/time-fruehmorgen.jpg",
       },
       {
         value: "late morning, mid-morning sunlight",
-        label: "Später Vormittag",
+        labelKey: "wizard.options.spaeterVormittag",
+        germanLabel: "Später Vormittag",
         image: "/wizard-presets/time-spaetervormittag.jpg",
       },
       {
         value: "noon, midday, high sun, harsh shadows",
-        label: "Mittag",
+        labelKey: "wizard.options.mittag",
+        germanLabel: "Mittag",
         image: "/wizard-presets/time-mittag.jpg",
       },
       {
         value: "afternoon, warm afternoon light",
-        label: "Nachmittag",
+        labelKey: "wizard.options.nachmittag",
+        germanLabel: "Nachmittag",
         image: "/wizard-presets/time-nachmittag.jpg",
       },
       {
         value: "golden hour, magic hour, warm orange sunlight",
-        label: "Goldene Stunde",
+        labelKey: "wizard.options.goldeneStunde",
+        germanLabel: "Goldene Stunde",
         image: "/wizard-presets/time-goldenestunde.jpg",
       },
       {
         value: "dusk, twilight, blue hour",
-        label: "Abenddämmerung",
+        labelKey: "wizard.options.abenddaemmerung",
+        germanLabel: "Abenddämmerung",
         image: "/wizard-presets/time-abenddaemmerung.jpg",
       },
       {
         value: "evening, interior lighting, ambient lamps",
-        label: "Abend",
+        labelKey: "wizard.options.abend",
+        germanLabel: "Abend",
         image: "/wizard-presets/time-abend.jpg",
       },
       {
         value: "night, nighttime, dark exterior, interior lights glowing",
-        label: "Nacht",
+        labelKey: "wizard.options.nacht",
+        germanLabel: "Nacht",
         image: "/wizard-presets/time-nacht.jpg",
       },
     ],
@@ -296,48 +328,55 @@ export const wizardSteps: WizardStepDefinition[] = [
   },
   {
     key: "floor",
-    label: "Boden",
-    description:
-      "Welcher Bodenbelag soll in der Szene verwendet werden?",
+    labelKey: "wizard.steps.floor.label",
+    descriptionKey: "wizard.steps.floor.description",
     options: [
       {
         value: "hardwood floor, oak wood flooring",
-        label: "Hartholzboden",
+        labelKey: "wizard.options.hartholzboden",
+        germanLabel: "Hartholzboden",
         image: "/wizard-presets/floor-hartholz.jpg",
       },
       {
         value: "herringbone parquet floor",
-        label: "Fischgrätparkett",
+        labelKey: "wizard.options.fischgraetparkett",
+        germanLabel: "Fischgrätparkett",
         image: "/wizard-presets/floor-fischgraet.jpg",
       },
       {
         value: "terrazzo floor, speckled stone",
-        label: "Terrazzo",
+        labelKey: "wizard.options.terrazzo",
+        germanLabel: "Terrazzo",
         image: "/wizard-presets/floor-terrazzo.jpg",
       },
       {
         value: "marble floor, polished marble tiles",
-        label: "Marmor",
+        labelKey: "wizard.options.marmor",
+        germanLabel: "Marmor",
         image: "/wizard-presets/floor-marmor.jpg",
       },
       {
         value: "polished concrete floor",
-        label: "Beton",
+        labelKey: "wizard.options.beton",
+        germanLabel: "Beton",
         image: "/wizard-presets/floor-beton.jpg",
       },
       {
         value: "terracotta tiles, clay floor tiles",
-        label: "Terrakotta",
+        labelKey: "wizard.options.terrakotta",
+        germanLabel: "Terrakotta",
         image: "/wizard-presets/floor-terrakotta.jpg",
       },
       {
         value: "slate floor, natural slate tiles",
-        label: "Schiefer",
+        labelKey: "wizard.options.schiefer",
+        germanLabel: "Schiefer",
         image: "/wizard-presets/floor-schiefer.jpg",
       },
       {
         value: "carpet flooring, soft carpet",
-        label: "Teppichboden",
+        labelKey: "wizard.options.teppichboden",
+        germanLabel: "Teppichboden",
         image: "/wizard-presets/floor-teppich.jpg",
       },
     ],
@@ -345,93 +384,105 @@ export const wizardSteps: WizardStepDefinition[] = [
   },
   {
     key: "accessories",
-    label: "Accessoires & Dekoration",
-    description:
-      "Wählen Sie Pflanzen und Dekorationselemente für die Szene. Mehrfachauswahl möglich.",
+    labelKey: "wizard.steps.accessories.label",
+    descriptionKey: "wizard.steps.accessories.description",
     multiSelect: true,
-    optionGroups: ["Pflanzen", "Dekoration"],
+    optionGroupKeys: ["wizard.optionGroups.pflanzen", "wizard.optionGroups.dekoration"],
     options: [
       {
         value: "indoor plants, houseplants, potted plants",
-        label: "Zimmerpflanzen",
-        group: "Pflanzen",
+        labelKey: "wizard.options.zimmerpflanzen",
+        germanLabel: "Zimmerpflanzen",
+        group: "wizard.optionGroups.pflanzen",
       },
       {
         value: "dried flowers, dried botanicals",
-        label: "Trockenblumen",
-        group: "Pflanzen",
+        labelKey: "wizard.options.trockenblumen",
+        germanLabel: "Trockenblumen",
+        group: "wizard.optionGroups.pflanzen",
       },
       {
         value: "fresh flowers, flower bouquet in vase",
-        label: "Frische Blumen",
-        group: "Pflanzen",
+        labelKey: "wizard.options.frischeBlumen",
+        germanLabel: "Frische Blumen",
+        group: "wizard.optionGroups.pflanzen",
       },
       {
         value: "hanging plants, trailing plants from ceiling",
-        label: "Hängepflanzen",
-        group: "Pflanzen",
+        labelKey: "wizard.options.haengepflanzen",
+        germanLabel: "Hängepflanzen",
+        group: "wizard.optionGroups.pflanzen",
       },
       {
         value: "decorative books, coffee table books",
-        label: "Bücher",
-        group: "Dekoration",
+        labelKey: "wizard.options.buecher",
+        germanLabel: "Bücher",
+        group: "wizard.optionGroups.dekoration",
       },
       {
         value: "ceramic vases, decorative pottery",
-        label: "Keramikvasen",
-        group: "Dekoration",
+        labelKey: "wizard.options.keramikvasen",
+        germanLabel: "Keramikvasen",
+        group: "wizard.optionGroups.dekoration",
       },
       {
         value: "copper pots and pans, hanging cookware",
-        label: "Töpfe & Pfannen",
-        group: "Dekoration",
+        labelKey: "wizard.options.toepfePfannen",
+        germanLabel: "Töpfe & Pfannen",
+        group: "wizard.optionGroups.dekoration",
       },
       {
         value: "candles, decorative candles, candlesticks",
-        label: "Kerzen",
-        group: "Dekoration",
+        labelKey: "wizard.options.kerzen",
+        germanLabel: "Kerzen",
+        group: "wizard.optionGroups.dekoration",
       },
       {
         value: "decorative mirror, wall mirror",
-        label: "Spiegel",
-        group: "Dekoration",
+        labelKey: "wizard.options.spiegel",
+        germanLabel: "Spiegel",
+        group: "wizard.optionGroups.dekoration",
       },
     ],
     icon: <FaLeaf className="w-full h-full text-red-600" />,
   },
   {
     key: "houseType",
-    label: "Gebäude",
-    description:
-      "Welche Architektur umgibt den Raum? Definiert Rahmen und Außenhülle.",
+    labelKey: "wizard.steps.houseType.label",
+    descriptionKey: "wizard.steps.houseType.description",
     options: [
       {
         value: "modernes Holzhaus mit großen Fenstern",
-        label: "Modernes Holzhaus mit großen Fenstern",
-        hint: "Skandinavisch inspiriert, viel Tageslicht",
+        labelKey: "wizard.options.modernesHolzhaus",
+        germanLabel: "Modernes Holzhaus",
+        hintKey: "wizard.hints.skandinavisch",
       },
-      { value: "Stadtwohnung", label: "Stadtwohnung" },
-      { value: "Loft", label: "Loft" },
-      { value: "Landhaus", label: "Landhaus" },
+      { value: "Stadtwohnung", labelKey: "wizard.options.stadtwohnung", germanLabel: "Stadtwohnung" },
+      { value: "Loft", labelKey: "wizard.options.loft", germanLabel: "Loft" },
+      { value: "Landhaus", labelKey: "wizard.options.landhaus", germanLabel: "Landhaus" },
       {
         value: "penthouse mit dachterrasse",
-        label: "Penthouse mit Dachterrasse",
-        hint: "Panoramablick, Glas und Stahl",
+        labelKey: "wizard.options.penthouse",
+        germanLabel: "Penthouse",
+        hintKey: "wizard.hints.panoramablick",
       },
       {
         value: "historische villa",
-        label: "Historische Villa",
-        hint: "Hohe Decken, Stuck und Parkett",
+        labelKey: "wizard.options.historischeVilla",
+        germanLabel: "Historische Villa",
+        hintKey: "wizard.hints.hoheDecken",
       },
       {
         value: "reihenhaus mit garten",
-        label: "Reihenhaus mit Garten",
-        hint: "Familienfreundlich, grüne Oase",
+        labelKey: "wizard.options.reihenhaus",
+        germanLabel: "Reihenhaus",
+        hintKey: "wizard.hints.familienfreundlich",
       },
       {
         value: "architektenhaus aus sichtbeton",
-        label: "Architektenhaus aus Sichtbeton",
-        hint: "Brutalistische Klarheit, starke Linien",
+        labelKey: "wizard.options.architektenhaus",
+        germanLabel: "Architektenhaus",
+        hintKey: "wizard.hints.brutalismus",
       },
     ],
     icon: <FaHouse className="w-full h-full text-red-600" />,

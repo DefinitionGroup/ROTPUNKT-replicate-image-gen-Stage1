@@ -1,0 +1,264 @@
+{
+  "common": {
+    "loading": "Lädt...",
+    "error": "Ein Fehler ist aufgetreten",
+    "close": "Schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "generate": "Generieren",
+    "download": "Herunterladen",
+    "share": "Teilen",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "myImages": "Meine Bilder",
+    "toHomepage": "Zur Startseite",
+    "contact": "Kontakt",
+    "login": "Einloggen",
+    "register": "Registrieren"
+  },
+  "metadata": {
+    "title": "Rotpunkt Küchen AI Bildgenerator",
+    "description": "Generieren Sie Ihre Traumküche mit KI"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "code": "404",
+    "description": "Die angeforderte Seite existiert nicht oder wurde verschoben."
+  },
+  "wizard": {
+    "title": "Küchen-Konfigurator",
+    "backToWizard": "Zurück zum Küchen-Wizard",
+    "intro": {
+      "title": "Wählen Sie einen Startpunkt",
+      "description": "Beginnen Sie mit einer unserer kuratierten Vorlagen oder stellen Sie Ihre eigene Kombination zusammen. Alle Einstellungen können anschließend noch angepasst werden.",
+      "customCombination": "Eigene Kombination",
+      "customDescription": "Starten Sie mit einer leeren Auswahl und bestimmen Sie jeden Schritt individuell."
+    },
+    "header": {
+      "back": "Zurück",
+      "backAriaLabel": "Zurück zum vorherigen Schritt",
+      "closeAriaLabel": "Wizard schließen",
+      "step": "Schritt {current} / {total}"
+    },
+    "steps": {
+      "kind": {
+        "label": "Raumfokusxxxx",
+        "description": "Welche Art von Raum soll visualisiert werden? Wählen Sie den Schwerpunkt für die Szene.xxxx"
+      },
+      "color": {
+        "label": "Farbwelt",
+        "description": "Definieren Sie die dominante Farbgebung für Möbel, Fronten und Akzente – wahlweise aus der Rotpunkt Palette oder originalen FENIX NTM® Farbtönen."
+      },
+      "style": {
+        "label": "Stilrichtung",
+        "description": "Welcher Einrichtungsstil passt am besten? Diese Auswahl bestimmt Linienführung und Materialmix."
+      },
+      "environment": {
+        "label": "Atmosphäre",
+        "description": "Legt die Anmutung des Umfelds fest – von urban bis naturnah."
+      },
+      "viewpoint": {
+        "label": "Perspektive",
+        "description": "Wählen Sie die Kameraperspektive und den Fokus für Ihre Visualisierung."
+      },
+      "location": {
+        "label": "Standort",
+        "description": "Wo befindet sich das Objekt? Diese Option prägt Lichtstimmung und Ausblick."
+      },
+      "time": {
+        "label": "Zeit",
+        "description": "Beeinflusst Lichtstimmung und Schattenwurf der Szene."
+      },
+      "floor": {
+        "label": "Boden",
+        "description": "Welcher Bodenbelag soll in der Szene verwendet werden?"
+      },
+      "accessories": {
+        "label": "Accessoires & Dekoration",
+        "description": "Wählen Sie Pflanzen und Dekorationselemente für die Szene. Mehrfachauswahl möglich."
+      },
+      "houseType": {
+        "label": "Gebäude",
+        "description": "Welche Architektur umgibt den Raum? Definiert Rahmen und Außenhülle."
+      }
+    },
+    "options": {
+      "kueche": "Küche",
+      "wohnzimmer": "Wohnzimmer",
+      "fromTheOutside": "Außenansicht",
+      "flur": "Flur",
+      "schwarz": "Schwarz",
+      "rot": "Rot",
+      "burgunderrot": "Burgunderrot",
+      "weiss": "Weiß",
+      "holz": "Holz",
+      "dunklesHolz": "Dunkles Holz",
+      "modern": "Modern",
+      "zeitlos": "Zeitlos",
+      "natuerlich": "Natürlich",
+      "urban": "Urban",
+      "elegant": "Elegant",
+      "kreativ": "Kreativ",
+      "puristisch": "Puristisch",
+      "gemuetlich": "Gemütlich",
+      "minimalistisch": "Minimalistisch",
+      "stilvoll": "Stilvoll",
+      "naturnah": "Naturnah",
+      "augenhoehe": "Augenhöhe",
+      "froschperspektive": "Froschperspektive",
+      "vogelperspektive": "Vogelperspektive",
+      "hollaendischerWinkel": "Holländischer Winkel",
+      "totale": "Totale",
+      "halbtotale": "Halbtotale",
+      "nahaufnahme": "Nahaufnahme",
+      "ganzerRaum": "Ganzer Raum",
+      "detailaufnahme": "Detailaufnahme",
+      "geringeTiefenschaerfe": "Geringe Tiefenschärfe",
+      "tiefenschaerfe": "Tiefenschärfe",
+      "weicherFokus": "Weicher Fokus",
+      "mediteraneKuestenstadt": "Mediterrane Küstenstadt",
+      "historischesAltstadtviertel": "Historisches Altstadtviertel",
+      "nordischesFjordhaus": "Nordisches Fjordhaus",
+      "dachterrasseMetropole": "Dachterrasse in einer Metropole",
+      "tropischerRegenwaldBungalow": "Tropischer Regenwald-Bungalow",
+      "frueherMorgen": "Früher Morgen",
+      "spaeterVormittag": "Später Vormittag",
+      "mittag": "Mittag",
+      "nachmittag": "Nachmittag",
+      "goldeneStunde": "Goldene Stunde",
+      "abenddaemmerung": "Abenddämmerung",
+      "abend": "Abend",
+      "nacht": "Nacht",
+      "hartholzboden": "Hartholzboden",
+      "fischgraetparkett": "Fischgrätparkett",
+      "terrazzo": "Terrazzo",
+      "marmor": "Marmor",
+      "beton": "Beton",
+      "terrakotta": "Terrakotta",
+      "schiefer": "Schiefer",
+      "teppichboden": "Teppichboden",
+      "zimmerpflanzen": "Zimmerpflanzen",
+      "trockenblumen": "Trockenblumen",
+      "frischeBlumen": "Frische Blumen",
+      "haengepflanzen": "Hängepflanzen",
+      "buecher": "Bücher",
+      "keramikvasen": "Keramikvasen",
+      "toepfePfannen": "Töpfe & Pfannen",
+      "kerzen": "Kerzen",
+      "spiegel": "Spiegel",
+      "modernesHolzhaus": "Modernes Holzhaus mit großen Fenstern",
+      "stadtwohnung": "Stadtwohnung",
+      "loft": "Loft",
+      "landhaus": "Landhaus",
+      "penthouse": "Penthouse mit Dachterrasse",
+      "historischeVilla": "Historische Villa",
+      "reihenhaus": "Reihenhaus mit Garten",
+      "architektenhaus": "Architektenhaus aus Sichtbeton"
+    },
+    "optionGroups": {
+      "pflanzen": "Pflanzen",
+      "dekoration": "Dekoration"
+    },
+    "hints": {
+      "standard": "Standard",
+      "skandinavisch": "Skandinavisch inspiriert, viel Tageslicht",
+      "warmeFarben": "Warme Farbtöne, Meeresreflexionen",
+      "kopfsteinpflaster": "Kopfsteinpflaster, warmes Abendlicht",
+      "vielGlas": "Viel Glas, kühle Farbtemperatur",
+      "skyline": "Skyline, urbanes Lichtspiel",
+      "sattesGruen": "Sattes Grün, diffuse Feuchtigkeit",
+      "panoramablick": "Panoramablick, Glas und Stahl",
+      "hoheDecken": "Hohe Decken, Stuck und Parkett",
+      "familienfreundlich": "Familienfreundlich, grüne Oase",
+      "brutalismus": "Brutalistische Klarheit, starke Linien"
+    },
+    "final": {
+      "extraWishesTitle": "Zusätzliche Wünsche?",
+      "extraWishesDescription": "Hier können Sie weitere Details eingeben (z.B. \"große Kücheninsel, viel Licht\")",
+      "extraWishesPlaceholder": "Hier können Sie weitere Wünsche beschreiben...",
+      "generateButton": "Bild erstellen"
+    },
+    "auth": {
+      "title": "Du musst eingeloggt sein, um ein Bild zu generieren.",
+      "description": "Bitte melde dich an oder registriere dich. Danach kannst du direkt fortfahren."
+    }
+  },
+  "imageGenerator": {
+    "backToWizard": "Zurück zum Küchen-Wizard",
+    "goToMyImages": "Zu \"Meine Bilder\"",
+    "generatedImageAlt": "Generiertes Bild",
+    "loading": {
+      "messages": {
+        "generating": "Ich generiere gerade dein Bild...",
+        "aiWorking": "Die KI arbeitet an deinem Design...",
+        "takingLonger": "Das dauert heute etwas länger – bitte hab noch einen Moment Geduld...",
+        "serverWakingUp": "Die Server wachen gerade erst auf ☕ – fast geschafft!",
+        "extraLove": "Dein Bild wird mit extra viel Liebe generiert... 💫",
+        "goodThingsTakeTime": "Noch ein kleines bisschen – gute Dinge brauchen Zeit! 🎨",
+        "modelRestarting": "Das KI-Modell startet gerade neu – danke für deine Geduld! 🚀",
+        "inQueue": "Dein Bild ist in der Warteschlange – gleich geht's los! ⏳",
+        "almostThere": "Fast da – dein Design wird finalisiert! ✨",
+        "neverGiveUp": "Noch einen kleinen Moment – wir geben nicht auf! 💪"
+      },
+      "subMessages": {
+        "usually30s": "Die Bilder werden in aller Regel innerhalb von 30\u00A0s generiert.",
+        "highLoad": "Bei hoher Auslastung kann es bis zu 1-2 Minuten dauern.",
+        "warmingUp": "Manchmal muss das KI-Modell erst aufgewärmt werden.",
+        "coldStart": "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!",
+        "queued": "Bei hoher Nachfrage wird dein Bild in die Warteschlange gestellt.",
+        "maxWait": "Maximale Wartezeit: ca. 5-7 Minuten. Dein Bild kommt garantiert!",
+        "unusualWait": "Ungewöhnlich lange Wartezeit – bitte nicht die Seite verlassen!"
+      }
+    },
+    "error": {
+      "title": "Etwas ist schiefgelaufen",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten.",
+      "aborted": "Die Anfrage wurde abgebrochen.",
+      "retry": "Erneut versuchen"
+    }
+  },
+  "imageGallery": {
+    "title": "Meine generierten Bilder",
+    "loading": "Bilder werden geladen...",
+    "error": "Fehler beim Laden deiner Bilder.",
+    "empty": "Du hast noch keine Bilder. Erstelle dein erstes Bild im Wizard!",
+    "generatedImageAlt": "Generiertes Bild",
+    "scrollMore": "Scrolle weiter für mehr Bilder",
+    "allImages": "Das sind alle deine Bilder ✨"
+  },
+  "imageModal": {
+    "closeAriaLabel": "Schließen",
+    "share": "Share",
+    "copyLink": "Link kopieren",
+    "download": "Download",
+    "upscale": "High-Res",
+    "fullSizeAlt": "Generiertes Bild - Vollgröße"
+  },
+  "upscale": {
+    "title": "Hochskalieren",
+    "download": "High-Res Download",
+    "success": {
+      "title": "High-Res Version erstellt!",
+      "description": "Dein Bild wurde erfolgreich in hoher Auflösung generiert und gespeichert."
+    },
+    "loading": {
+      "messages": {
+        "starting": "Starte Hochskalierung...",
+        "improving": "Die KI verbessert dein Bild...",
+        "details": "Details werden herausgearbeitet...",
+        "almostDone": "Fast fertig – dein High-Res Bild entsteht! ✨",
+        "fullPower": "Das KI-Modell arbeitet mit voller Kraft... 🚀",
+        "perfection": "Noch ein kleiner Moment – Perfektion braucht Zeit! 💫"
+      },
+      "subMessage": "Das Hochskalieren dauert in der Regel 30–60 Sekunden."
+    },
+    "error": {
+      "title": "Fehler beim Hochskalieren",
+      "unknown": "Unbekannter Fehler",
+      "retry": "Erneut versuchen"
+    }
+  },
+  "languageSwitcher": {
+    "label": "Sprache wählen"
+  }
+}

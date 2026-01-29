@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "motion/react";
 import { FcIdea } from "react-icons/fc";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { useTranslations } from "next-intl";
 
 interface WizardFinalProps {
   extraWishes: string;
@@ -24,6 +25,9 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
   loading = false,
   showSubmitButton = true,
 }) => {
+  const t = useTranslations('wizard');
+  const tCommon = useTranslations('common');
+
   if (showAuthPrompt && !isSignedIn) {
     return (
       <motion.div
@@ -34,11 +38,10 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
       >
         <div className="">
           <h3 className="text-2xl tracking-tight text-brand-secondary-1 mb-2">
-            Du musst eingeloggt sein, um ein Bild zu generieren.
+            {t('auth.title')}
           </h3>
           <p className="text-gray-400 mb-3 text-sm">
-            Bitte melde dich an oder registriere dich. Danach kannst du direkt
-            fortfahren.
+            {t('auth.description')}
           </p>
         </div>
 
@@ -50,7 +53,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
               whileTap={{ scaleX: 0.98 }}
               transition={{ type: "spring" }}
             >
-              Einloggen
+              {tCommon('login')}
             </motion.button>
           </SignInButton>
           <SignUpButton mode="modal">
@@ -60,7 +63,7 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
               whileTap={{ scaleX: 0.98 }}
               transition={{ type: "spring" }}
             >
-              Registrieren
+              {tCommon('register')}
             </motion.button>
           </SignUpButton>
         </div>
@@ -83,17 +86,16 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
 
       <div className="flex flex-col items-center mb-6">
         <h3 className="text-2xl tracking-tight text-brand-secondary-1 mb-2">
-          Zusätzliche Wünsche?
+          {t('final.extraWishesTitle')}
         </h3>
         <p className="text-gray-400 mb-3 text-sm">
-          Hier können Sie weitere Details eingeben (z.B. &quot;große
-          Kücheninsel, viel Licht&quot;)
+          {t('final.extraWishesDescription')}
         </p>
       </div>
 
       <textarea
         className="w-full max-w-xl min-h-[80px] rounded-xl p-3 border border-gray-700 bg-gray-950 text-brand-secondary-1 mb-6 shadow-lg text-base focus:outline-none focus:ring-0"
-        placeholder="Hier können Sie weitere Wünsche beschreiben..."
+        placeholder={t('final.extraWishesPlaceholder')}
         value={extraWishes}
         onChange={(e) => onExtraWishesChange(e.target.value)}
         disabled={loading}
@@ -106,17 +108,16 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
           onClick={isSignedIn ? onSubmit : onAuthRequired}
           disabled={loading}
           className={`cursor-pointer w-fit py-3 px-8 rounded-full font-semibold shadow-xl text-lg
-            ${
-              isSignedIn
-                ? "bg-brand-primary-2 text-brand-secondary-1 hover:bg-red-600"
-                : "bg-gray-800 text-gray-400"
+            ${isSignedIn
+              ? "bg-brand-primary-2 text-brand-secondary-1 hover:bg-red-600"
+              : "bg-gray-800 text-gray-400"
             }`}
           whileHover={isSignedIn ? { scaleX: 1.051 } : undefined}
           whileTap={isSignedIn ? { scaleX: 0.98 } : undefined}
           transition={{ type: "spring" }}
           style={{ minWidth: 0 }}
         >
-          Bild erstellen
+          {t('final.generateButton')}
         </motion.button>
       )}
     </motion.div>

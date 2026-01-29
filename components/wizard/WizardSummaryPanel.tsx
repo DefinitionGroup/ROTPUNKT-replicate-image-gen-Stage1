@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { wizardSteps } from "./wizardSteps";
+import { useTranslatedWizardSteps } from "./useTranslatedWizardSteps";
 import type { WizardState } from "@/app/store/wizardStore";
 import { getFenixColorLabel } from "./fenixColors";
 
@@ -41,6 +41,7 @@ export function WizardSummaryPanel({
   const [copied, setCopied] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
   const cleanedWishes = extraWishes.trim();
+  const translatedSteps = useTranslatedWizardSteps();
 
   const isComplete = missingKeys.length === 0;
   const isOnFinalStep = currentStep >= totalSteps;
@@ -50,13 +51,13 @@ export function WizardSummaryPanel({
   const activeIndex = currentStep >= 0 ? Math.min(currentStep, totalSteps - 1) : -1;
 
   const groupedSelections = useMemo(() => {
-    return wizardSteps.map((step) => {
+    return translatedSteps.map((step) => {
       const key = step.key as keyof WizardState["selectedOptions"];
       const selectedValue = selections[key];
-      
+
       // Handle accessories as array
       if (step.key === "accessories" && Array.isArray(selectedValue)) {
-        const selectedLabels = selectedValue.map((val) => 
+        const selectedLabels = selectedValue.map((val) =>
           step.options.find((opt) => opt.value === val)?.label ?? val
         );
         return {
@@ -68,7 +69,7 @@ export function WizardSummaryPanel({
           count: selectedLabels.length,
         };
       }
-      
+
       const baseLabel = step.options.find(
         (opt) => opt.value === selectedValue
       )?.label;
@@ -85,7 +86,7 @@ export function WizardSummaryPanel({
         count: selectedLabel ? 1 : 0,
       };
     });
-  }, [selections]);
+  }, [selections, translatedSteps]);
 
   const handleCopy = async () => {
     try {
