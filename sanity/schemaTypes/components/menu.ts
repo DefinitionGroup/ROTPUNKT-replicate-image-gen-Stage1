@@ -10,6 +10,12 @@ export default defineType({
 
   fields: [
     defineField({
+      name: 'language',
+      type: 'string',
+      readOnly: true,
+      hidden: true,
+    }),
+    defineField({
       name: 'menuType',
       title: 'Menu Type',
       type: 'string',

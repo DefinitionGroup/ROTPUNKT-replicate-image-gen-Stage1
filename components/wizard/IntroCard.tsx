@@ -1,7 +1,10 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export function IntroCard({ onStart }: { onStart: () => void }) {
+  const t = useTranslations("wizard.intro");
+
   return (
     <AnimatePresence>
       <motion.div
@@ -34,7 +37,7 @@ export function IntroCard({ onStart }: { onStart: () => void }) {
           size="red"
           autoFocus
         >
-          Jetzt starten
+          {t("startNow")}
         </Button>
       </motion.div>
     </AnimatePresence>

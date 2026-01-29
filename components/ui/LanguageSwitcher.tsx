@@ -1,6 +1,8 @@
 "use client";
 
 import { useLocale, useTranslations } from 'next-intl';
+import { useStore } from '@nanostores/react';
+import { $translations } from '@/store/translations';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { locales, localeNames, localeFlags, type Locale } from '@/i18n/config';
 import {
@@ -17,9 +19,15 @@ export function LanguageSwitcher() {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
+  const translations = useStore($translations);
 
   const switchLocale = (newLocale: Locale) => {
-    router.replace(pathname, { locale: newLocale });
+    const translatedSlug = translations[newLocale];
+    if (translatedSlug) {
+      router.replace(`/${translatedSlug}`, { locale: newLocale });
+    } else {
+      router.replace(pathname, { locale: newLocale });
+    }
   };
 
   return (
