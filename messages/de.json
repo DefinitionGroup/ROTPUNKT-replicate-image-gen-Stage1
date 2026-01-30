@@ -182,6 +182,26 @@
     "auth": {
       "title": "Du musst eingeloggt sein, um ein Bild zu generieren.",
       "description": "Bitte melde dich an oder registriere dich. Danach kannst du direkt fortfahren."
+    },
+    "summary": {
+      "progress": "Fortschritt",
+      "step": "Schritt {current} / {total}",
+      "overview": "Auswahlüberblick",
+      "selected": "ausgewählt",
+      "open": "offen",
+      "noSelection": "Noch keine Auswahl",
+      "selectAllOptions": "Wählen Sie alle Optionen aus",
+      "continueToWishes": "Weiter zu \"Zusätzliche Wünsche\"",
+      "loginToGenerate": "Einloggen, um zu generieren",
+      "generating": "Erzeuge Bild...",
+      "createImage": "Bild erstellen",
+      "autoPromptNote": "Zusätzliche Wünsche werden automatisch in den Prompt eingefügt."
+    },
+    "multiselect": {
+      "noSelection": "Keine Auswahl",
+      "selected": "{count} ausgewählt",
+      "continue": "Weiter →",
+      "remove": "Entfernen"
     }
   },
   "imageGenerator": {

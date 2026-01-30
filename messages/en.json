@@ -182,6 +182,26 @@
     "auth": {
       "title": "You must be logged in to generate an image.",
       "description": "Please sign in or register. Afterwards you can continue directly."
+    },
+    "summary": {
+      "progress": "Progress",
+      "step": "Step {current} / {total}",
+      "overview": "Selection Overview",
+      "selected": "selected",
+      "open": "open",
+      "noSelection": "No selection yet",
+      "selectAllOptions": "Select all options",
+      "continueToWishes": "Continue to \"Additional Wishes\"",
+      "loginToGenerate": "Log in to generate",
+      "generating": "Generating image...",
+      "createImage": "Create image",
+      "autoPromptNote": "Additional wishes will be automatically added to the prompt."
+    },
+    "multiselect": {
+      "noSelection": "No selection",
+      "selected": "{count} selected",
+      "continue": "Continue →",
+      "remove": "Remove"
     }
   },
   "imageGenerator": {
