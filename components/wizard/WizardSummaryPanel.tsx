@@ -6,6 +6,7 @@ import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useTranslatedWizardSteps } from "./useTranslatedWizardSteps";
+import { useTranslations } from "next-intl";
 import type { WizardState } from "@/app/store/wizardStore";
 import { getFenixColorLabel } from "./fenixColors";
 
@@ -40,6 +41,7 @@ export function WizardSummaryPanel({
 }: WizardSummaryPanelProps) {
   const [copied, setCopied] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  const t = useTranslations("wizard.summary");
   const cleanedWishes = extraWishes.trim();
   const translatedSteps = useTranslatedWizardSteps();
 
@@ -107,7 +109,7 @@ export function WizardSummaryPanel({
           className="w-full justify-center"
           disabled
         >
-          Wählen Sie alle Optionen aus
+          {t("selectAllOptions")}
         </Button>
       );
     }
@@ -121,7 +123,7 @@ export function WizardSummaryPanel({
           onClick={onJumpToFinal}
           enableMotion
         >
-          Weiter zu "Zusätzliche Wünsche"
+          {t("continueToWishes")}
         </Button>
       );
     }
@@ -136,7 +138,7 @@ export function WizardSummaryPanel({
           enableMotion
           disabled={loading}
         >
-          Einloggen, um zu generieren
+          {t("loginToGenerate")}
         </Button>
       );
     }
@@ -150,7 +152,7 @@ export function WizardSummaryPanel({
         enableMotion
         disabled={loading}
       >
-        {loading ? "Erzeuge Bild..." : "Bild erstellen"}
+        {loading ? t("generating") : t("createImage")}
       </Button>
     );
   };
@@ -159,10 +161,10 @@ export function WizardSummaryPanel({
     <aside className="bg-gray-950/70 border border-gray-800 rounded-2xl p-5 shadow-inner flex flex-col gap-5 w-full lg:max-w-sm max-h-[calc(96vh-6rem)]">
       <div className="flex justify-between items-center">
         <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-          Fortschritt
+          {t("progress")}
         </h4>
         <span className="text-xs text-gray-300">
-          Schritt {displayStage} / {totalStages}
+          {t("step", { current: displayStage, total: totalStages })}
         </span>
       </div>
       <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
@@ -180,7 +182,7 @@ export function WizardSummaryPanel({
       // style={{ maxHeight: "26rem" }}
       >
         <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
-          Auswahlüberblick
+          {t("overview")}
         </h4>
         <div className="flex flex-col gap-3">
           {groupedSelections.map((item, idx) => (
@@ -201,17 +203,17 @@ export function WizardSummaryPanel({
                 {item.selectedLabel ? (
                   <span className="flex items-center gap-1 text-xs text-emerald-400">
                     <FaCheckCircle className="h-3 w-3" />
-                    ausgewählt
+                    {t("selected")}
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-xs text-red-400">
                     <FaRegCircle className="h-3 w-3" />
-                    offen
+                    {t("open")}
                   </span>
                 )}
               </div>
               <p className="text-xs inline-block mt-1 font-bold  text-brand-secondary-1 border rounded-3xl p-1 border-gray-600 px-7">
-                {item.selectedLabel ?? "Noch keine Auswahl"}
+                {item.selectedLabel ?? t("noSelection")}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 {item.description}
@@ -227,7 +229,7 @@ export function WizardSummaryPanel({
       <div className="mt-auto flex flex-col gap-2">
         {renderPrimaryAction()}
         <p className="text-xs text-gray-500">
-          Zusätzliche Wünsche werden automatisch in den Prompt eingefügt.
+          {t("autoPromptNote")}
         </p>
       </div>
     </aside>

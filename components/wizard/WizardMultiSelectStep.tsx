@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 
 interface WizardMultiSelectStepProps {
@@ -29,6 +30,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
   onContinue,
   loading = false,
 }) => {
+  const t = useTranslations("wizard.multiselect");
   // Normalize selectedValues to always be an array (handle object format from old localStorage)
   const selectedValues = Array.isArray(rawSelectedValues)
     ? rawSelectedValues
@@ -71,8 +73,8 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
       <div className="flex items-center justify-between mb-4 shrink-0">
         <span className="text-sm text-gray-400">
           {selectedValues.length === 0
-            ? "Keine Auswahl"
-            : `${selectedValues.length} ausgewählt`}
+            ? t("noSelection")
+            : t("selected", { count: selectedValues.length })}
         </span>
         <Button
           variant="default"
@@ -81,7 +83,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
           disabled={loading}
           className="bg-red-600 hover:bg-red-700 text-white"
         >
-          Weiter →
+          {t("continue")}
         </Button>
       </div>
 
@@ -156,7 +158,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
                   <button
                     onClick={() => onToggle(value)}
                     className="hover:text-red-100 transition-colors"
-                    aria-label={`Remove ${option?.label || value}`}
+                    aria-label={t("remove")}
                   >
                     ×
                   </button>
