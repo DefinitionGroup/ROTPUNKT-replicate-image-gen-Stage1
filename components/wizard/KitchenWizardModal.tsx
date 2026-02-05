@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useStore } from "@nanostores/react";
 import { useAuth } from "@clerk/nextjs";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { Card, CardHeader, CardContent } from "../ui/card";
 import {
   wizardStore,
@@ -21,6 +22,7 @@ import { WizardSummaryPanel } from "./WizardSummaryPanel";
 import { buildPrompt } from "./promptBuilder";
 import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
+import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
   onPromptReady: (prompt: string) => void;
@@ -33,9 +35,11 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   loading = false,
   onClose,
 }) => {
+  const tSummary = useTranslations("wizard.summary");
   const wizardState = useStore(wizardStore);
   const { isSignedIn } = useAuth();
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false);
   const translatedSteps = useTranslatedWizardSteps();
 
   const CARD_HEIGHT = 640;
@@ -100,14 +104,6 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     };
   }, []);
 
-  const handleOverlayClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    if (event.target === overlayRef.current && onClose) {
-      onClose();
-    }
-  };
-
   const handleOptionSelect = (option: string) => {
     if (
       wizardState.currentStep < 0 ||
@@ -153,8 +149,6 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         tabIndex={-1}
-        // [[fix]]  Disabled onClick to prevent closing modal when clicking on overlay
-        // onClick={handleOverlayClick} 
         role="dialog"
         aria-modal="true"
         aria-labelledby="wizard-title"
@@ -190,6 +184,32 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
             </CardHeader>
 
             <CardContent className="flex-1 flex flex-col p-6 sm:p-8 overflow-hidden">
+              {showSummaryPanel && (
+                <div className="mb-3 flex justify-end shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsSummaryCollapsed((value) => !value)}
+                    className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/70 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                    aria-label={
+                      isSummaryCollapsed
+                        ? tSummary("showDetails")
+                        : tSummary("hideDetails")
+                    }
+                  >
+                    {isSummaryCollapsed ? (
+                      <PanelRightOpen className="h-3.5 w-3.5" />
+                    ) : (
+                      <PanelRightClose className="h-3.5 w-3.5" />
+                    )}
+                    <span>
+                      {isSummaryCollapsed
+                        ? tSummary("showDetails")
+                        : tSummary("hideDetails")}
+                    </span>
+                  </button>
+                </div>
+              )}
+
               <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full overflow-hidden">
                 <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
                   <AnimatePresence mode="wait" initial={false}>
@@ -277,22 +297,33 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                   )}
                 </div>
 
-                {showSummaryPanel && (
-                  <WizardSummaryPanel
-                    selections={wizardState.selectedOptions}
-                    extraWishes={wizardState.extraWishes}
-                    currentStep={wizardState.currentStep}
-                    totalSteps={totalSteps}
-                    prompt={summaryData.prompt}
-                    missingKeys={missingKeys}
-                    isSignedIn={!!isSignedIn}
-                    loading={loading}
-                    onSubmit={handleSubmit}
-                    onRequireAuth={() => wizardActions.setAuthPrompt(true)}
-                    onJumpToFinal={() => wizardActions.setStep(totalSteps)}
-                    onJumpToStep={(index) => wizardActions.setStep(index)}
-                  />
-                )}
+                <AnimatePresence initial={false}>
+                  {showSummaryPanel && !isSummaryCollapsed && (
+                    <motion.div
+                      key="wizard-summary-panel"
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 24 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full lg:max-w-sm"
+                    >
+                      <WizardSummaryPanel
+                        selections={wizardState.selectedOptions}
+                        extraWishes={wizardState.extraWishes}
+                        currentStep={wizardState.currentStep}
+                        totalSteps={totalSteps}
+                        prompt={summaryData.prompt}
+                        missingKeys={missingKeys}
+                        isSignedIn={!!isSignedIn}
+                        loading={loading}
+                        onSubmit={handleSubmit}
+                        onRequireAuth={() => wizardActions.setAuthPrompt(true)}
+                        onJumpToFinal={() => wizardActions.setStep(totalSteps)}
+                        onJumpToStep={(index) => wizardActions.setStep(index)}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </CardContent>
           </Card>

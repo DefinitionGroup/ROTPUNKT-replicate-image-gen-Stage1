@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
-import LogoBig from "./LogoBig";
+import { useThemeAwareRotpunktLogo } from "@/components/theme/useRotpunktLogo";
 
 type LinkItem = {
   label: string;
@@ -20,7 +22,17 @@ type FooterData = {
   footerColumns?: FooterColumn[];
   footerCopyright?: string;
   footerNote?: string;
-  footerLogo?: any;
+  footerLogo?: {
+    secure_url?: string;
+    secureUrl?: string;
+    url?: string;
+    original_url?: string;
+    path?: string;
+    asset?: {
+      secure_url?: string;
+      url?: string;
+    };
+  };
   footerLogoAlt?: string;
 };
 
@@ -31,13 +43,29 @@ export default function Footer({
   data?: FooterData;
   currentLocale?: string;
 }) {
+  function getCloudinaryUrl(logo?: FooterData["footerLogo"]) {
+    if (!logo) return undefined;
+    return (
+      logo.secure_url ||
+      logo.secureUrl ||
+      logo.url ||
+      logo.original_url ||
+      logo.path ||
+      logo.asset?.secure_url ||
+      logo.asset?.url
+    );
+  }
+
+  const logoUrl = useThemeAwareRotpunktLogo(getCloudinaryUrl(data?.footerLogo), {
+    fallbackToThemeLogo: true,
+  });
+
   if (!data) return null;
 
   const {
     footerColumns = [],
     footerCopyright,
     footerNote,
-    footerLogo,
     footerLogoAlt,
   } = data;
 
@@ -52,35 +80,17 @@ export default function Footer({
     return "#";
   };
 
-  function getCloudinaryUrl(logo: any) {
-    if (!logo) return undefined;
-    return (
-      logo.secure_url ||
-      logo.secureUrl ||
-      logo.url ||
-      logo.original_url ||
-      logo.path ||
-      (logo.asset && (logo.asset.secure_url || logo.asset.url))
-    );
-  }
-
-  const logoUrl = getCloudinaryUrl(footerLogo);
-
   return (
     <footer className="bg-background text-muted-foreground selection:bg-brand-primary-2 selection:text-brand-secondary-1">
       <div className="mx-auto px-6 lg:px-8 py-16 sm:py-24 lg:py-32 max-w-7xl">
         <div className="xl:gap-8 border-border/70 xl:grid xl:grid-cols-3 mt-8 pt-8 border-t">
           <div className="px-4 py-2">
             <Link href="/" aria-label="Rotpunkt Küchen">
-              {logoUrl ? (
-                <img
-                  src={logoUrl}
-                  alt={footerLogoAlt ?? "Rotpunkt Küchen"}
-                  className="w-20 sm:w-22 md:w-24 lg:w-28 h-auto inline-block"
-                />
-              ) : (
-                <LogoBig className="w-20 sm:w-22 md:w-24 lg:w-28 h-auto inline-block" />
-              )}
+              <img
+                src={logoUrl}
+                alt={footerLogoAlt ?? "Rotpunkt Küchen"}
+                className="w-20 sm:w-22 md:w-24 lg:w-28 h-auto inline-block"
+              />
             </Link>
 
             {footerNote ? (

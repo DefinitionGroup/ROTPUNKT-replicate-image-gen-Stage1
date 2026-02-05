@@ -187,6 +187,8 @@
       "progress": "Progress",
       "step": "Step {current} / {total}",
       "overview": "Selection Overview",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
       "selected": "selected",
       "open": "open",
       "noSelection": "No selection yet",

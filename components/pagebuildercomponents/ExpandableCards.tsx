@@ -7,10 +7,10 @@ import StaggeredSlideUp from "@/components/StaggeredSlideUp";
 import { PortableText, type PortableTextBlock } from "@portabletext/react";
 import { Button } from "@/components/ui/button";
 import {
-  ROTPUNKT_LOGO_DARK_MODE,
-  ROTPUNKT_LOGO_LIGHT_MODE,
+  resolveRotpunktLogoSrc,
   useRotpunktLogoSrc,
 } from "@/components/theme/useRotpunktLogo";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 import type {
   ExpandableCards as ExpandableCardsType,
@@ -49,13 +49,15 @@ export default function ExpandableCards({
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
   const themeLogoSrc = useRotpunktLogoSrc();
+  const { resolvedTheme } = useTheme();
 
-  const resolvedDefaultLogoSrc =
-    defaultLogoSrc &&
-    defaultLogoSrc !== ROTPUNKT_LOGO_DARK_MODE &&
-    defaultLogoSrc !== ROTPUNKT_LOGO_LIGHT_MODE
-      ? defaultLogoSrc
-      : themeLogoSrc;
+  const resolvedDefaultLogoSrc = resolveRotpunktLogoSrc(
+    defaultLogoSrc,
+    resolvedTheme,
+    {
+      fallbackSrc: themeLogoSrc,
+    }
+  );
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -76,7 +78,9 @@ export default function ExpandableCards({
       description: item.description,
       imageSrc: item.image?.secure_url || "",
       imageAlt: item.image?.context?.custom?.alt || item.imageAlt,
-      logoSrc: item.logo?.secure_url || resolvedDefaultLogoSrc,
+      logoSrc: resolveRotpunktLogoSrc(item.logo?.secure_url, resolvedTheme, {
+        fallbackSrc: resolvedDefaultLogoSrc,
+      }) as string,
       body: item.body,
       ctaText: item.ctaButton?.text,
       ctaHref:
@@ -176,7 +180,7 @@ export default function ExpandableCards({
                     className="text-muted-foreground text-md md:text-base lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto font-bold [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                   >
                     {Array.isArray(active.body) ? (
-                      <PortableText value={active.body as any} />
+                      <PortableText value={active.body as PortableTextBlock[]} />
                     ) : typeof active.body === "string" ? (
                       <p>{active.body}</p>
                     ) : null}

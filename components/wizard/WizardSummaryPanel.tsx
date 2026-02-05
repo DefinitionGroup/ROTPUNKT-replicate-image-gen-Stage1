@@ -9,6 +9,7 @@ import { useTranslatedWizardSteps } from "./useTranslatedWizardSteps";
 import { useTranslations } from "next-intl";
 import type { WizardState } from "@/app/store/wizardStore";
 import { getFenixColorLabel } from "./fenixColors";
+import { getWizardProgress } from "./wizardProgress";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -47,9 +48,10 @@ export function WizardSummaryPanel({
 
   const isComplete = missingKeys.length === 0;
   const isOnFinalStep = currentStep >= totalSteps;
-  const totalStages = totalSteps + 2;
-  const stageIndex = Math.max(0, Math.min(currentStep + 1, totalStages - 1));
-  const displayStage = stageIndex + 1;
+  const { totalStages, currentStage, progressPercent } = getWizardProgress(
+    currentStep,
+    totalSteps
+  );
   const activeIndex = currentStep >= 0 ? Math.min(currentStep, totalSteps - 1) : -1;
 
   const groupedSelections = useMemo(() => {
@@ -164,7 +166,7 @@ export function WizardSummaryPanel({
           {t("progress")}
         </h4>
         <span className="text-xs text-muted-foreground">
-          {t("step", { current: displayStage, total: totalStages })}
+          {t("step", { current: currentStage, total: totalStages })}
         </span>
       </div>
       <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
@@ -172,7 +174,7 @@ export function WizardSummaryPanel({
           className="h-full bg-brand-primary-2"
           initial={false}
           animate={{
-            width: `${((stageIndex + 1) / totalStages) * 100}%`,
+            width: `${progressPercent}%`,
           }}
           transition={{ duration: 0.3 }}
         />

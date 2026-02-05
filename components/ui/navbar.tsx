@@ -10,7 +10,6 @@ import {
 } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
-import Logo from "./logo";
 import { TiThMenu } from "react-icons/ti";
 import type {
   MenuNavbarProjected,
@@ -21,6 +20,7 @@ import Image from "next/image";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useTranslations } from "next-intl";
+import { useThemeAwareRotpunktLogo } from "@/components/theme/useRotpunktLogo";
 
 type Props = Pick<
   MenuNavbarProjected,
@@ -29,24 +29,18 @@ type Props = Pick<
   currentLocale?: string;
 };
 
-// prefer the projected string URL, fall back to Cloudinary object fields if present
-const logoUrl = (props: { navbarLogoUrl?: string; navbarLogo?: any }) =>
-  props.navbarLogoUrl ??
-  props.navbarLogo?.secure_url ??
-  props.navbarLogo?.url ??
-  undefined;
-
 export default function Navbar({
   menuItems,
   navbarLogo,
   navbarLogoAlt,
   navbarLogoUrl,
-  currentLocale,
 }: Props) {
   const t = useTranslations('common');
   // use string directly if available
-  const resolvedLogo =
-    navbarLogoUrl ?? navbarLogo?.secure_url ?? navbarLogo?.url;
+  const logoSource = navbarLogoUrl ?? navbarLogo?.secure_url ?? navbarLogo?.url;
+  const resolvedLogo = useThemeAwareRotpunktLogo(logoSource, {
+    fallbackToThemeLogo: true,
+  });
   const [open, setOpen] = useState(false);
   const closeMenu = () => setOpen(false);
   const pathname = usePathname();
@@ -154,20 +148,14 @@ export default function Navbar({
         )}
       >
         <Link href="/" className="flex items-center ">
-          {resolvedLogo ? (
-            <Image
-              src={resolvedLogo}
-              alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
-              className="h-12 w-auto block text-foreground"
-              width={240}
-              height={80}
-              unoptimized
-            />
-          ) : (
-            <span className="block h-2 w-auto text-foreground">
-              <Logo />
-            </span>
-          )}
+          <Image
+            src={resolvedLogo}
+            alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
+            className="h-12 w-auto block text-foreground"
+            width={240}
+            height={80}
+            unoptimized
+          />
         </Link>
 
         {/* Mobile menu toggle */}
@@ -263,17 +251,11 @@ export default function Navbar({
                   onClick={closeMenu}
                   className="flex items-center gap-2"
                 >
-                  {resolvedLogo ? (
-                    <img
-                      src={resolvedLogo}
-                      alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
-                      className="h-4 w-auto block"
-                    />
-                  ) : (
-                    <span className="block h-4 w-auto text-foreground">
-                      <Logo />
-                    </span>
-                  )}
+                  <img
+                    src={resolvedLogo}
+                    alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
+                    className="h-4 w-auto block"
+                  />
                 </Link>
                 <button
                   type="button"
