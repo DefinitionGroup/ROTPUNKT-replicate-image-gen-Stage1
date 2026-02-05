@@ -30,6 +30,18 @@ export type WizardStepDefinition = {
 
 export const wizardSteps: WizardStepDefinition[] = [
   {
+    key: "environment",
+    labelKey: "wizard.steps.environment.label",
+    descriptionKey: "wizard.steps.environment.description",
+    options: [
+      { value: "stilvoll", labelKey: "wizard.options.stilvoll", germanLabel: "Stilvoll" },
+      { value: "modern", labelKey: "wizard.options.modern", germanLabel: "Modern" },
+      { value: "urban", labelKey: "wizard.options.urban", germanLabel: "Urban" },
+      { value: "naturnah", labelKey: "wizard.options.naturnah", germanLabel: "Naturnah" },
+    ],
+    icon: <FaTree className="w-full h-full text-red-600" />,
+  },
+  {
     key: "kind",
     labelKey: "wizard.steps.kind.label",
     descriptionKey: "wizard.steps.kind.description",
@@ -137,18 +149,6 @@ export const wizardSteps: WizardStepDefinition[] = [
       },
     ],
     icon: <FaCouch className="w-full h-full text-red-600" />,
-  },
-  {
-    key: "environment",
-    labelKey: "wizard.steps.environment.label",
-    descriptionKey: "wizard.steps.environment.description",
-    options: [
-      { value: "stilvoll", labelKey: "wizard.options.stilvoll", germanLabel: "Stilvoll" },
-      { value: "modern", labelKey: "wizard.options.modern", germanLabel: "Modern" },
-      { value: "urban", labelKey: "wizard.options.urban", germanLabel: "Urban" },
-      { value: "naturnah", labelKey: "wizard.options.naturnah", germanLabel: "Naturnah" },
-    ],
-    icon: <FaTree className="w-full h-full text-red-600" />,
   },
   {
     key: "viewpoint",
