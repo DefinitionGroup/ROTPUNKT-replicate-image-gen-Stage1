@@ -52,7 +52,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
       </div>
 
       <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 gap-1">
-        <div className="h-2 w-64 rounded-full bg-gray-800 overflow-hidden">
+        <div className="h-2 w-64 rounded-full bg-muted overflow-hidden">
           <motion.div
             className="h-2 rounded-full bg-brand-primary-2"
             initial={false}
@@ -60,7 +60,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
             transition={{ duration: 0.3 }}
           />
         </div>
-        <span className="text-xs text-gray-400 mt-1">
+        <span className="text-xs text-muted-foreground mt-1">
           {t('step', { current: stageIndex + 1, total: totalStages })}
         </span>
       </div>

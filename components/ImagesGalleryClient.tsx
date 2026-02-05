@@ -70,7 +70,7 @@ export default function ImagesGalleryClient() {
 
   if (status === "error") {
     return (
-      <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-red-400">
+      <div className="rounded-xl border border-border bg-card p-8 text-destructive">
         {t('error')}
       </div>
     );
@@ -80,7 +80,7 @@ export default function ImagesGalleryClient() {
 
   if (allImages.length === 0) {
     return (
-      <div className="rounded-xl border border-gray-800 bg-gray-950 p-8 text-gray-300">
+      <div className="rounded-xl border border-border bg-card p-8 text-muted-foreground">
         {t('empty')}
       </div>
     );
@@ -99,7 +99,7 @@ export default function ImagesGalleryClient() {
             custom={index % 12}
             type="button"
             onClick={() => setSelected(img)}
-            className="group relative block text-left rounded-xl overflow-hidden border border-gray-800 bg-gray-950 hover:border-brand-primary-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2"
+            className="group relative block text-left rounded-xl overflow-hidden border border-border bg-card hover:border-brand-primary-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2"
           >
             {img.is_upscaled && (
               <div className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-[10px] font-medium text-white">
@@ -115,7 +115,7 @@ export default function ImagesGalleryClient() {
               className="w-full h-auto object-cover"
             />
             <div
-              className="px-4 py-3 text-xs text-gray-400 group-hover:text-gray-200 transition"
+              className="px-4 py-3 text-xs text-muted-foreground group-hover:text-foreground transition"
               suppressHydrationWarning
             >
               {new Date(img.created_at).toLocaleString()}
@@ -129,9 +129,9 @@ export default function ImagesGalleryClient() {
         {isFetchingNextPage ? (
           <Loader2 className="w-6 h-6 text-brand-primary-2 animate-spin" />
         ) : hasNextPage ? (
-          <span className="text-xs text-gray-500">{t('scrollMore')}</span>
+          <span className="text-xs text-muted-foreground">{t('scrollMore')}</span>
         ) : (
-          <span className="text-xs text-gray-500">{t('allImages')}</span>
+          <span className="text-xs text-muted-foreground">{t('allImages')}</span>
         )}
       </div>
 

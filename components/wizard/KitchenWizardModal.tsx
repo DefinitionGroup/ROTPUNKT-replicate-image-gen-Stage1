@@ -131,7 +131,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       <motion.div
         key="wizard-popover"
         ref={overlayRef}
-        className="fixed inset-0 z-9999990 flex items-center justify-center bg-black/80 backdrop-blur-sm absolute"
+        className="fixed inset-0 z-9999990 flex items-center justify-center bg-background/80 backdrop-blur-sm absolute"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -161,7 +161,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
-          <Card className="relative w-full h-full min-h-[500px] max-h-[96vh] flex flex-col shadow-2xl bg-gradient-to-br from-black/100 via-neutral-950 to-neutral-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+          <Card className="relative w-full h-full min-h-[500px] max-h-[96vh] flex flex-col shadow-2xl bg-card/95 border border-border rounded-2xl overflow-hidden">
             <CardHeader>
               <WizardHeader
                 currentStep={wizardState.currentStep}
@@ -253,7 +253,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="text-red-400 text-center mt-6"
+                      className="text-destructive text-center mt-6"
                       role="alert"
                     >
                       {wizardState.error}

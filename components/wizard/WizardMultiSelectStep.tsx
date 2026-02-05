@@ -56,14 +56,14 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-4 shrink-0">
-        <div className="h-9 w-9 shrink-0 rounded-full bg-red-900/30 border border-red-700/40 flex items-center justify-center text-red-400">
+        <div className="h-9 w-9 shrink-0 rounded-full bg-brand-primary-2/15 border border-brand-primary-2/40 flex items-center justify-center text-brand-primary-2">
           {icon}
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl text-left tracking-tight text-brand-secondary-1">
+          <h3 className="text-xl md:text-2xl text-left tracking-tight text-foreground">
             {title}
           </h3>
-          <p className="text-sm text-gray-400 text-left mt-1 max-w-xl">
+          <p className="text-sm text-muted-foreground text-left mt-1 max-w-xl">
             {description}
           </p>
         </div>
@@ -71,17 +71,16 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
 
       {/* Selection counter */}
       <div className="flex items-center justify-between mb-4 shrink-0">
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-muted-foreground">
           {selectedValues.length === 0
             ? t("noSelection")
             : t("selected", { count: selectedValues.length })}
         </span>
         <Button
-          variant="default"
+          variant="red"
           size="sm"
           onClick={onContinue}
           disabled={loading}
-          className="bg-red-600 hover:bg-red-700 text-white"
         >
           {t("continue")}
         </Button>
@@ -93,10 +92,10 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
           {groupedOptions.map(({ name, options: groupOptions }) => (
             <div key={name || "default"}>
               {name && (
-                <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
-                  <span className="h-px flex-1 bg-gray-700" />
+                <h4 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                  <span className="h-px flex-1 bg-border" />
                   <span>{name}</span>
-                  <span className="h-px flex-1 bg-gray-700" />
+                  <span className="h-px flex-1 bg-border" />
                 </h4>
               )}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -113,8 +112,8 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
                       relative h-auto py-3 px-4 text-left justify-start gap-3
                       border transition-all duration-200
                       ${isSelected
-                          ? "border-red-500 bg-red-500/10 text-white"
-                          : "border-gray-700 bg-gray-900/50 text-gray-300 hover:border-gray-600 hover:bg-gray-800/50"
+                          ? "border-brand-primary-2 bg-brand-primary-2/10 text-foreground"
+                          : "border-border bg-muted/60 text-muted-foreground hover:border-border/90 hover:bg-muted"
                         }
                     `}
                     >
@@ -122,8 +121,8 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
                         className={`
                         h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors
                         ${isSelected
-                            ? "bg-red-500 border-red-500"
-                            : "border-gray-600 bg-transparent"
+                            ? "bg-brand-primary-2 border-brand-primary-2"
+                            : "border-border bg-transparent"
                           }
                       `}
                       >
@@ -144,7 +143,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          className="mt-4 pt-4 border-t border-gray-800"
+          className="mt-4 pt-4 border-t border-border"
         >
           <div className="flex flex-wrap gap-2">
             {selectedValues.map((value) => {
@@ -152,12 +151,12 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
               return (
                 <span
                   key={value}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/30 text-sm text-red-300"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-primary-2/15 border border-brand-primary-2/30 text-sm text-brand-primary-2"
                 >
                   {option?.label || value}
                   <button
                     onClick={() => onToggle(value)}
-                    className="hover:text-red-100 transition-colors"
+                    className="hover:text-brand-primary-2 transition-colors"
                     aria-label={t("remove")}
                   >
                     ×

@@ -87,7 +87,7 @@ function Stylesheet({ padTopBottomVh }: { padTopBottomVh: number }) {
       .skills-list {
         list-style: none;
         margin: 0; padding: 0;
-        color: white;
+        color: var(--foreground);
         display: flex; flex-direction: column; gap: 32px; /* increased gap between elements */
         padding: ${padTopBottomVh}vh 0; /* smaller default padTopBottomVh reduces height */
       }

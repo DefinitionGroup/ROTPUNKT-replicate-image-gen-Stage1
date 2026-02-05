@@ -41,10 +41,10 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
           />
         </motion.div>
         <div className="flex flex-col gap-1 text-left">
-          <h2 className="text-3xl font-semibold text-brand-secondary-1">
+          <h2 className="text-3xl font-semibold text-foreground">
             {t('title')}
           </h2>
-          <p className="text-sm text-gray-400 max-w-2xl">
+          <p className="text-sm text-muted-foreground max-w-2xl">
             {t('description')}
           </p>
         </div>
@@ -62,7 +62,7 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
 
         <motion.button
           type="button"
-          className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-dashed border-gray-700 bg-gray-950/80 p-6 text-left transition hover:border-brand-primary-2/80 hover:bg-brand-primary-2/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/60"
+          className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-dashed border-border bg-card/80 p-6 text-left transition hover:border-brand-primary-2/80 hover:bg-brand-primary-2/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/60"
           whileHover={{ translateY: -2 }}
           whileTap={{ scale: 0.99 }}
           onClick={onBlankStart}
@@ -72,10 +72,10 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
             <FaRegCompass className="h-6 w-6" />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-base font-semibold text-brand-secondary-1">
+            <span className="text-base font-semibold text-foreground">
               {t('customCombination')}
             </span>
-            <p className="text-xxs text-gray-300 leading-relaxed">
+            <p className="text-xxs text-muted-foreground leading-relaxed">
               {t('customDescription')}
             </p>
           </div>
@@ -99,7 +99,7 @@ function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCard
   return (
     <motion.button
       type="button"
-      className="group overflow-hidden rounded-2xl border border-gray-800 bg-gray-950/80 text-left transition hover:border-brand-primary-2/80 hover:bg-brand-primary-2/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/60"
+      className="group overflow-hidden rounded-2xl border border-border bg-card/80 text-left transition hover:border-brand-primary-2/80 hover:bg-brand-primary-2/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/60"
       whileHover={{ translateY: -2 }}
       whileTap={{ scale: 0.99 }}
       onClick={onSelect}
@@ -117,15 +117,15 @@ function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCard
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900" />
+          <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-background" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <span className="absolute bottom-3 left-4 text-base font-semibold text-white drop-shadow">
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/30 to-transparent" />
+        <span className="absolute bottom-3 left-4 text-base font-semibold text-foreground drop-shadow">
           {preset.label}
         </span>
       </div>
       <div className="p-4">
-        <p className="text-xxs text-gray-300 leading-relaxed">
+        <p className="text-xxs text-muted-foreground leading-relaxed">
           {preset.description}
         </p>
       </div>

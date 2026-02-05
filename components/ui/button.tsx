@@ -12,15 +12,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         // Core variants
-        default: "bg-white text-black hover:bg-neutral-200 shadow-sm hover:shadow-md transition-all duration-300",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-300",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
         outline:
-          "border border-white/20 bg-transparent hover:bg-white/10 hover:text-white transition-all duration-300",
+          "border border-border bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300",
         secondary:
-          "bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300",
-        ghost: "hover:bg-white/5 hover:text-white transition-all duration-300",
-        link: "text-white underline-offset-4 hover:underline",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 backdrop-blur-sm transition-all duration-300",
+        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300",
+        link: "text-primary underline-offset-4 hover:underline",
 
         // Project-specific variants
         red: "bg-brand-primary-2 text-white shadow-lg shadow-brand-primary-2/20 hover:shadow-brand-primary-2/40 hover:bg-red-600 border border-transparent transition-all duration-300 scale-100 hover:scale-[1.02]",
@@ -28,9 +29,9 @@ const buttonVariants = cva(
           "bg-brand-primary-2 text-white font-bold tracking-wide shadow-lg shadow-brand-primary-2/25 hover:bg-red-600 hover:shadow-brand-primary-2/50 transition-all duration-300",
         redOutline:
           "bg-transparent text-brand-primary-2 border border-brand-primary-2/50 hover:bg-brand-primary-2/10 hover:border-brand-primary-2 transition-all duration-300",
-        close: "text-neutral-400 hover:text-white transition-colors duration-200",
+        close: "text-muted-foreground hover:text-foreground transition-colors duration-200",
         wizardOption:
-          "bg-neutral-900/50 border border-white/10 text-neutral-400 font-medium hover:bg-neutral-900 hover:text-white hover:border-white/30 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-brand-primary-2 data-[selected=true]:text-white transition-all duration-300 shadow-sm",
+          "bg-muted/70 border border-border text-muted-foreground font-medium hover:bg-muted hover:text-foreground hover:border-border/70 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-brand-primary-2 data-[selected=true]:text-white transition-all duration-300 shadow-sm",
       },
       size: {
         default: "h-10 px-6 py-2 rounded-full",

@@ -158,16 +158,16 @@ export function WizardSummaryPanel({
   };
 
   return (
-    <aside className="bg-gray-950/70 border border-gray-800 rounded-2xl p-5 shadow-inner flex flex-col gap-5 w-full lg:max-w-sm max-h-[calc(96vh-6rem)]">
+    <aside className="bg-card/80 border border-border rounded-2xl p-5 shadow-inner flex flex-col gap-5 w-full lg:max-w-sm max-h-[calc(96vh-6rem)]">
       <div className="flex justify-between items-center">
-        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
           {t("progress")}
         </h4>
-        <span className="text-xs text-gray-300">
+        <span className="text-xs text-muted-foreground">
           {t("step", { current: displayStage, total: totalStages })}
         </span>
       </div>
-      <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-brand-primary-2"
           initial={false}
@@ -181,7 +181,7 @@ export function WizardSummaryPanel({
       <div className="flex flex-col gap-3 overflow-y-auto pr-1"
       // style={{ maxHeight: "26rem" }}
       >
-        <h4 className="text-sm font-semibold text-gray-200 uppercase tracking-wide">
+        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
           {t("overview")}
         </h4>
         <div className="flex flex-col gap-3">
@@ -192,12 +192,12 @@ export function WizardSummaryPanel({
               onClick={() => onJumpToStep(idx)}
               className={`text-left rounded-lg border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${idx === activeIndex
                 ? "border-emerald-400 bg-emerald-500/10"
-                : "border-gray-800 bg-gray-900/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5"
+                : "border-border bg-muted/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5"
                 }`}
               disabled={loading}
             >
               <div className="flex items-center justify-between">
-                <span className="text-xxs font-bold uppercase tracking-wide text-gray-600">
+                <span className="text-xxs font-bold uppercase tracking-wide text-muted-foreground">
                   {idx + 1}. {item.title}
                 </span>
                 {item.selectedLabel ? (
@@ -212,10 +212,10 @@ export function WizardSummaryPanel({
                   </span>
                 )}
               </div>
-              <p className="text-xs inline-block mt-1 font-bold  text-brand-secondary-1 border rounded-3xl p-1 border-gray-600 px-7">
+              <p className="text-xs inline-block mt-1 font-bold text-foreground border rounded-3xl p-1 border-border px-7">
                 {item.selectedLabel ?? t("noSelection")}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {item.description}
               </p>
             </button>
@@ -223,12 +223,12 @@ export function WizardSummaryPanel({
         </div>
       </div>
 
-      <div className="h-px bg-gray-800/80" />
+      <div className="h-px bg-border/70" />
 
 
       <div className="mt-auto flex flex-col gap-2">
         {renderPrimaryAction()}
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           {t("autoPromptNote")}
         </p>
       </div>

@@ -99,14 +99,14 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
       onClick={onClose}
     >
       <motion.div
-        className="absolute inset-0 bg-black/90 backdrop-blur-md"
+        className="absolute inset-0 bg-background/85 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       />
 
       <motion.div
-        className="relative rounded-2xl p-6 max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-800/60 bg-gradient-to-br from-black/95 via-gray-900/95 to-gray-950/95"
+        className="relative rounded-2xl p-6 max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border border-border/60 bg-card/95 backdrop-blur-md"
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 50 }}
@@ -116,7 +116,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
         <motion.button
           type="button"
           aria-label={tCommon('close')}
-          className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-black/60 hover:bg-brand-primary-2 border border-white/20 text-brand-secondary-1 shadow-md backdrop-blur-sm transition-colors leading-none"
+          className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-background/80 hover:bg-brand-primary-2 border border-border/60 text-foreground shadow-md backdrop-blur-sm transition-colors leading-none"
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
           onClick={onClose}
@@ -147,10 +147,10 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
               className="flex flex-col items-center"
             >
               <div className="mb-4 text-center">
-                <h2 className="text-xl font-semibold text-brand-secondary-1">
+                <h2 className="text-xl font-semibold text-foreground">
                   ✨ {t('success.title')}
                 </h2>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {t('success.description')}
                 </p>
               </div>
@@ -237,8 +237,8 @@ function UpscaleLoadingState() {
       </div>
 
       {/* Timer */}
-      <div className="mb-3 px-4 py-1.5 rounded-full bg-gray-800/50 border border-gray-700">
-        <span className="text-sm font-mono text-gray-300">⏱️ {formatTime(elapsed)}</span>
+      <div className="mb-3 px-4 py-1.5 rounded-full bg-muted/60 border border-border">
+        <span className="text-sm font-mono text-muted-foreground">⏱️ {formatTime(elapsed)}</span>
       </div>
 
       {/* Badge */}
@@ -251,7 +251,7 @@ function UpscaleLoadingState() {
         key={getMessage()}
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mt-2 text-lg text-brand-secondary-1 font-medium text-center"
+        className="mt-2 text-lg text-foreground font-medium text-center"
       >
         {getMessage()}
       </motion.span>
@@ -260,7 +260,7 @@ function UpscaleLoadingState() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="text-xs text-gray-400 mt-2 text-center max-w-md"
+        className="text-xs text-muted-foreground mt-2 text-center max-w-md"
       >
         {t('subMessage')}
       </motion.div>
@@ -272,7 +272,7 @@ function UpscaleLoadingState() {
           animate={{ opacity: 1, scaleX: 1 }}
           className="mt-6 w-full max-w-xs"
         >
-          <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-1 bg-muted rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
               initial={{ width: "0%" }}
@@ -306,7 +306,7 @@ function ErrorState({
       className="flex flex-col items-center justify-center min-w-[400px] min-h-[300px] p-8"
     >
       <div className="text-4xl mb-4">😕</div>
-      <p className="text-red-400 text-center text-base mb-6">{message}</p>
+      <p className="text-destructive text-center text-base mb-6">{message}</p>
       <div className="flex gap-3">
         <Button
           onClick={onRetry}

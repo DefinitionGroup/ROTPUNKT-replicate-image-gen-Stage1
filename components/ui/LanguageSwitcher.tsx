@@ -36,7 +36,7 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="sm"
-          className="gap-2 text-gray-200 hover:text-brand-secondary-1 hover:bg-gray-800/50"
+          className="gap-2 text-muted-foreground hover:text-foreground hover:bg-accent"
           aria-label={t('label')}
         >
           <Globe className="h-4 w-4" />
@@ -46,15 +46,15 @@ export function LanguageSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="bg-gray-950/95 border-gray-800 backdrop-blur-sm"
+        className="bg-popover/95 border-border backdrop-blur-sm"
       >
         {locales.map((loc) => (
           <DropdownMenuItem
             key={loc}
             onClick={() => switchLocale(loc)}
             className={`cursor-pointer gap-2 ${loc === locale
-                ? 'bg-brand-primary-2/20 text-brand-secondary-1'
-                : 'text-gray-300 hover:text-brand-secondary-1'
+                ? 'bg-accent text-accent-foreground'
+                : 'text-muted-foreground hover:text-foreground'
               }`}
           >
             <span>{localeFlags[loc]}</span>

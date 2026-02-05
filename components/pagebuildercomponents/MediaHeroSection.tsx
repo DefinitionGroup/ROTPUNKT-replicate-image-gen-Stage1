@@ -121,10 +121,10 @@ export default function MediaHeroSection({
           duration={animation.duration ?? 0.5}
           distance={animation.distance ?? 80}
         >
-          <h2 className="text-7xl leading-compress text-gray-100 max-w-3xl text-center font-bold tracking-wider leading-tighter mb-8">
+          <h2 className="text-7xl leading-compress text-foreground max-w-3xl text-center font-bold tracking-wider leading-tighter mb-8">
             {heading}
           </h2>
-          <p className="text-xl text-gray-100 font-bold text-center max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground font-bold text-center max-w-2xl mx-auto">
             {subheading}
           </p>
 
@@ -134,7 +134,7 @@ export default function MediaHeroSection({
               {richTexts.map((rt, i) => (
                 <div
                   key={(rt as any)._key ?? `richtext-${i}`}
-                  className="prose prose-invert mx-auto text-center"
+                  className="prose dark:prose-invert mx-auto text-center"
                 >
                   <RichTextComponent value={rt.content ?? []} />
                 </div>

@@ -121,11 +121,11 @@ function Stylesheet() {
         height: 255px;
         overflow: hidden;
         position: relative;
-        background: #0a0a0a;
+        background: var(--card);
       }
 
       .title {
-        color: #f5f5f5;
+        color: var(--foreground);
         padding: 10px;
         font-size: 16px;
         font-weight: 600;
@@ -135,8 +135,8 @@ function Stylesheet() {
         justify-content: center;
         position: absolute;
         inset: 0;
-        text-shadow: 1px 1px 0px #000;
-        background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.5) 100%);
+        text-shadow: 1px 1px 0px color-mix(in oklab, var(--background) 70%, transparent);
+        background: linear-gradient(180deg, transparent 40%, color-mix(in oklab, var(--background) 70%, transparent) 100%);
       }
     `}</style>
   );

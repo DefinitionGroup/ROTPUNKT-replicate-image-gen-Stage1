@@ -183,7 +183,7 @@ function BackButton({ onClick, backLabel }: { onClick: () => void; backLabel: st
   return (
     <Button
       onClick={onClick}
-      className="mb-10 px-4 py-2 rounded-full bg-gray-800 text-brand-secondary-1 text-xs hover:bg-brand-primary-2 transition-all"
+      className="mb-10 px-4 py-2 rounded-full bg-accent text-foreground text-xs hover:bg-accent/80 transition-all"
     >
       ⇦ {backLabel}
     </Button>
@@ -237,7 +237,7 @@ function LoadingState() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 16 }}
-        className="flex flex-col items-center justify-center w-full max-w-3xl min-h-[600px] bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 shadow-2xl rounded-2xl p-8"
+        className="flex flex-col items-center justify-center w-full max-w-3xl min-h-[600px] bg-card/95 border border-border shadow-2xl rounded-2xl p-8"
       >
         <div className="flex items-center justify-center w-48 h-48 mb-4">
           <DotLottieReact
@@ -248,8 +248,8 @@ function LoadingState() {
         </div>
 
         {/* Timer */}
-        <div className="mb-3 px-4 py-1.5 rounded-full bg-gray-800/50 border border-gray-700">
-          <span className="text-sm font-mono text-gray-300">⏱️ {formatTime(elapsed)}</span>
+        <div className="mb-3 px-4 py-1.5 rounded-full bg-muted/60 border border-border">
+          <span className="text-sm font-mono text-muted-foreground">⏱️ {formatTime(elapsed)}</span>
         </div>
 
         {/* Main message - animated on change */}
@@ -257,7 +257,7 @@ function LoadingState() {
           key={getMessage()}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-2 text-lg text-brand-secondary-1 font-medium text-center"
+          className="mt-2 text-lg text-foreground font-medium text-center"
         >
           {getMessage()}
         </motion.span>
@@ -267,7 +267,7 @@ function LoadingState() {
           key={getSubMessage()}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-xs text-gray-400 mt-2 text-center max-w-md"
+          className="text-xs text-muted-foreground mt-2 text-center max-w-md"
         >
           {getSubMessage()}
         </motion.div>
@@ -277,11 +277,11 @@ function LoadingState() {
           <motion.div
             initial={{ opacity: 0, scaleX: 0 }}
             animate={{ opacity: 1, scaleX: 1 }}
-            className="mt-6 w-full max-w-xs"
-          >
-            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-brand-primary-2 to-red-400"
+          className="mt-6 w-full max-w-xs"
+        >
+          <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-brand-primary-2 to-red-400"
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 300, ease: "linear" }}
@@ -302,13 +302,13 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-black/90 via-gray-900 to-gray-950 border border-gray-800 shadow-2xl rounded-2xl"
+      className="flex flex-col items-center justify-center p-8 bg-card/95 border border-border shadow-2xl rounded-2xl"
     >
       <div className="text-4xl mb-4">😕</div>
-      <h3 className="text-lg font-medium text-brand-secondary-1 mb-2">
+      <h3 className="text-lg font-medium text-foreground mb-2">
         {t('title')}
       </h3>
-      <p className="text-red-400 text-center text-sm mb-6 max-w-md">
+      <p className="text-destructive text-center text-sm mb-6 max-w-md">
         {message}
       </p>
       <Button
@@ -350,7 +350,7 @@ function QuickLink() {
   return (
     <motion.a
       href="/my-images"
-      className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-brand-secondary-1 rounded-full font-semibold shadow hover:bg-red-600 transition"
+      className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-white rounded-full font-semibold shadow hover:bg-red-600 transition"
       whileHover={{ scale: 1.05 }}
     >
       📁 {t('goToMyImages')}

@@ -82,7 +82,7 @@ export default function ExpandableCards({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 h-full w-full z-10"
+            className="fixed inset-0 bg-background/80 h-full w-full z-10"
           />
         )}
       </AnimatePresence>
@@ -97,7 +97,7 @@ export default function ExpandableCards({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.05 } }}
-              className="flex absolute top-3 right-3 lg:hidden items-center justify-center rounded-full h-8 w-8 bg-white/90"
+              className="flex absolute top-3 right-3 lg:hidden items-center justify-center rounded-full h-8 w-8 bg-background/90 text-foreground border border-border"
               onClick={() => setActive(null)}
               aria-label="Close"
             >
@@ -107,7 +107,7 @@ export default function ExpandableCards({
             <motion.div
               layoutId={`card-${active.title}-${id}`}
               ref={ref}
-              className="w-full max-w-[900px] min-h-[70vh]  relative h-full md:h-fit md:max-h-[90%] rounded-xl flex flex-col bg-neutral-900 shadow-2xl overflow-hidden"
+              className="w-full max-w-[900px] min-h-[70vh] relative h-full md:h-fit md:max-h-[90%] rounded-xl flex flex-col bg-card/95 border border-border shadow-2xl overflow-hidden"
               role="dialog"
               aria-modal="true"
             >
@@ -140,14 +140,14 @@ export default function ExpandableCards({
                     {active.description && (
                       <motion.p
                         layoutId={`description-${active.description}-${id}`}
-                        className="text-white font-black text-5xl dark:text-neutral-200"
+                        className="text-foreground font-black text-5xl"
                       >
                         {active.description}
                       </motion.p>
                     )}
                     <motion.h3
                       layoutId={`title-${active.title}-${id}`}
-                      className="text-xl text-white font-bold mt-4 dark:text-neutral-100"
+                      className="text-xl text-foreground font-bold mt-4"
                     >
                       {active.title}
                     </motion.h3>
@@ -160,7 +160,7 @@ export default function ExpandableCards({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="text-white text-md md:text-base lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto font-bold dark:text-neutral-300 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
+                    className="text-muted-foreground text-md md:text-base lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto font-bold [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                   >
                     {Array.isArray(active.body) ? (
                       <PortableText value={active.body as any} />
@@ -205,7 +205,7 @@ export default function ExpandableCards({
             >
               <motion.div
                 layoutId={`image-${card.title}-${id}`}
-                className="col-start-1 col-span-1 row-start-1 bg-black h-full rounded-lg overflow-hidden"
+                className="col-start-1 col-span-1 row-start-1 bg-background h-full rounded-lg overflow-hidden"
               >
                 <img
                   width={1200}
@@ -227,14 +227,14 @@ export default function ExpandableCards({
                   {card.description && (
                     <motion.p
                       layoutId={`description-${card.description}-${id}`}
-                      className="text-neutral-100 text-2xl md:text-3xl dark:text-neutral-300 md:text-left"
+                      className="text-foreground text-2xl md:text-3xl md:text-left"
                     >
                       {card.description}
                     </motion.p>
                   )}
                   <motion.h3
                     layoutId={`title-${card.title}-${id}`}
-                    className="font-medium text-xl text-neutral-100 dark:text-neutral-200 md:text-left"
+                    className="font-medium text-xl text-foreground md:text-left"
                   >
                     {card.title}
                   </motion.h3>
@@ -262,7 +262,7 @@ export const CloseIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="h-4 w-4 text-black"
+    className="h-4 w-4 text-foreground"
   >
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M18 6l-12 12" />

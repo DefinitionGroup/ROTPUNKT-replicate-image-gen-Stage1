@@ -84,7 +84,7 @@ export default function Header({
   return (
     <section
       className={cn(
-        `grid grid-cols-1 grid-rows-1  h-[70vh] min-h-[700px] rounded-2xl z-50  container  mx-auto  overflow- items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
+        `grid grid-cols-1 grid-rows-1 h-[70vh] min-h-[700px] rounded-2xl z-50 container mx-auto items-center justify-center text-foreground selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
         className
       )}
       aria-labelledby="hero-title"
@@ -117,7 +117,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-7xl leading-relaxed tracking-tight font-medium  text-center  text-white"
+            className="text-7xl leading-relaxed tracking-tight font-medium text-center text-foreground"
           >
             {title}
           </h1>
@@ -130,7 +130,7 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-white mx-auto tracking-wider text-2xl max-w-2xl text-center font-bold "
+          <p className="text-muted-foreground mx-auto tracking-wider text-2xl max-w-2xl text-center font-bold"
 
             role="doc-subtitle"
           >
@@ -145,7 +145,7 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-white  tracking-wider text-md max-w-2xl text-center  ">
+          <p className="text-muted-foreground tracking-wider text-md max-w-2xl text-center">
 
             {description}
           </p>

@@ -67,9 +67,9 @@ export default function Footer({
   const logoUrl = getCloudinaryUrl(footerLogo);
 
   return (
-    <footer className=" text-gray-200 selection:bg-brand-primary-2 selection:text-brand-secondary-1">
+    <footer className="bg-background text-muted-foreground selection:bg-brand-primary-2 selection:text-brand-secondary-1">
       <div className="mx-auto px-6 lg:px-8 py-16 sm:py-24 lg:py-32 max-w-7xl">
-        <div className="xl:gap-8 border-white/10 xl:grid xl:grid-cols-3 mt-8 pt-8 border-t">
+        <div className="xl:gap-8 border-border/70 xl:grid xl:grid-cols-3 mt-8 pt-8 border-t">
           <div className="px-4 py-2">
             <Link href="/" aria-label="Rotpunkt Küchen">
               {logoUrl ? (
@@ -84,7 +84,7 @@ export default function Footer({
             </Link>
 
             {footerNote ? (
-              <p className="mt-6 text-sm text-gray-400 max-w-xs">
+              <p className="mt-6 text-sm text-muted-foreground max-w-xs">
                 {footerNote}
               </p>
             ) : null}
@@ -95,7 +95,7 @@ export default function Footer({
             <div className="md:gap-8 md:grid md:grid-cols-4">
               {footerColumns.map((column, index) => (
                 <div key={index} className={index > 0 ? "mt-8 md:mt-0" : ""}>
-                  <h3 className="font-semibold text-sm text-brand-secondary-1">
+                  <h3 className="font-semibold text-sm text-foreground">
                     {column.title}
                   </h3>
                   <ul role="list" className="space-y-4 mt-6">
@@ -112,7 +112,7 @@ export default function Footer({
                             href={href}
                             target={target}
                             rel={rel}
-                            className="text-gray-400 text-sm hover:text-brand-secondary-1"
+                            className="text-muted-foreground text-sm hover:text-foreground"
                           >
                             {link.label}
                           </Link>
@@ -126,8 +126,8 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="md:flex md:justify-between md:items-center border-white/10 mt-12 pt-8 border-t">
-          <div className="mt-6 md:mt-0 text-gray-400 text-sm">
+        <div className="md:flex md:justify-between md:items-center border-border/70 mt-12 pt-8 border-t">
+          <div className="mt-6 md:mt-0 text-muted-foreground text-sm">
             {footerCopyright ? (
               <span>&copy; {footerCopyright}</span>
             ) : (
@@ -138,13 +138,13 @@ export default function Footer({
           <div className="flex gap-x-6 md:order-2 mt-6 md:mt-0">
             <Link
               href="/impressum"
-              className="text-gray-400 hover:text-gray-300 text-sm"
+              className="text-muted-foreground hover:text-foreground text-sm"
             >
               Impressum
             </Link>
             <Link
               href="/datenschutz"
-              className="text-gray-400 hover:text-gray-300 text-sm"
+              className="text-muted-foreground hover:text-foreground text-sm"
             >
               Datenschutz
             </Link>
