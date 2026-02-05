@@ -39,7 +39,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const wizardState = useStore(wizardStore);
   const { isSignedIn } = useAuth();
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false);
+  const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(true);
   const translatedSteps = useTranslatedWizardSteps();
 
   const CARD_HEIGHT = 640;
@@ -66,6 +66,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
 
   const startWithPreset = (preset: WizardPreset) => {
+    setIsSummaryCollapsed(true);
     wizardActions.applyPreset({
       options: preset.options,
       extraWishes: preset.extraWishes,
@@ -74,6 +75,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   };
 
   const startBlank = () => {
+    setIsSummaryCollapsed(true);
     wizardActions.reset();
     wizardActions.setStep(0);
   };
