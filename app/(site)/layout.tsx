@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "../globals.css";
 
 // This layout is now just a passthrough for the [locale] routes
 // The actual layout logic is in [locale]/layout.tsx

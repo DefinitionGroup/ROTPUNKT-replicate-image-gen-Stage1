@@ -18,8 +18,6 @@ export default async function Page({ params }: Props) {
     query: PAGE_QUERY,
     params: { slug, locale }
   });
-  console.log('[Page] Fetched page:', page?._id, page?.title, 'Translations:', page?.translations);
-
 
   const translations = page?.translations?.reduce((acc: Record<string, string>, curr: any) => {
     if (curr?.language && curr?.slug) {

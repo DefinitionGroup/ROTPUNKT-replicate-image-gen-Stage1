@@ -24,6 +24,9 @@ async function generateImageApi({ prompt, signal }: GenerationParams): Promise<A
   const res = await fetch("/api/replicate", {
     body: JSON.stringify({ prompt }),
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     signal,
   });
 

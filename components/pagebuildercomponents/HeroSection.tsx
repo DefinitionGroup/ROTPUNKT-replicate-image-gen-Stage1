@@ -21,8 +21,6 @@ function urlFromCloudinary(a?: CloudinaryAsset | null) {
 function hrefFromLink(link: any) {
   if (!link) return undefined;
 
-  console.log("Processing link:", link); // Debug log
-
   if (link.linkType === "external") {
     return link.externalUrl;
   }
@@ -74,16 +72,10 @@ export default function HeroSection({
   const logoSrc =
     urlFromCloudinary(logoImageUrl) ?? "/rotpunkt-kuechen-logo.svg";
 
-  // Log for debugging
-  console.log("additionalContent:", additionalContent);
-
   // collect CTAs and rich text blocks from additionalContent using updated type guards
   const items = additionalContent ?? [];
   const ctas: (Cta & { _type?: string })[] = items.filter(isCta);
   const richTexts: (RichText & { _type?: string })[] = items.filter(isRichText);
-
-  console.log("Filtered CTAs:", ctas);
-  console.log("Filtered RichTexts:", richTexts);
 
   const bgVariants: Variants = {
     initial: { opacity: 0, scale: 1.04, y: 12 },
@@ -262,15 +254,12 @@ export default function HeroSection({
               >
                 {ctas.map((c, i) => {
                   const href = hrefFromLink(c.link);
-                  console.log(`CTA ${i} - text: ${c.text}, href: ${href}`); // Debug log
 
                   if (!c.text) {
-                    console.log(`CTA ${i} has no text, skipping`);
                     return null;
                   }
 
                   if (!href) {
-                    console.log(`CTA ${i} has no href, skipping`);
                     return null;
                   }
 

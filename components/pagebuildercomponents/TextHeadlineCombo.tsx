@@ -149,7 +149,6 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
       : undefined,
   });
 
-  console.log(props);
   return (
     <div className="relative container max-w-5xl mx-auto my-12 px-4 selection:bg-brand-primary-2 selection:text-brand-secondary-1">
       <div

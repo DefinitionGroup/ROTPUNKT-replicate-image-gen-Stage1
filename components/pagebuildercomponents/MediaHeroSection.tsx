@@ -54,8 +54,6 @@ export default function MediaHeroSection({
   function hrefFromLink(link: any) {
     if (!link) return undefined;
 
-    console.log("Processing link:", link); // Debug log
-
     if (link.linkType === "external") {
       return link.externalUrl;
     }
@@ -95,9 +93,6 @@ export default function MediaHeroSection({
   const richTexts = items.filter(isRich);
 
   // Debug logging
-  console.log("MediaHero additionalContent:", additionalContent);
-  console.log("MediaHero CTAs found:", ctas.length);
-  console.log("MediaHero Rich texts found:", richTexts.length);
 
   return (
     <section
@@ -152,17 +147,12 @@ export default function MediaHeroSection({
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
               {ctas.map((c, i) => {
                 const href = hrefFromLink(c.link);
-                console.log(
-                  `MediaHero CTA ${i} - text: ${c.text}, href: ${href}`
-                ); // Debug log
 
                 if (!c.text) {
-                  console.log(`MediaHero CTA ${i} has no text, skipping`);
                   return null;
                 }
 
                 if (!href) {
-                  console.log(`MediaHero CTA ${i} has no href, skipping`);
                   return null;
                 }
 

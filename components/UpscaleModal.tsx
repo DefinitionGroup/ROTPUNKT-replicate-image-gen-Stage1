@@ -20,6 +20,7 @@ type ApiResponse = string[];
 export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps) {
   const t = useTranslations('upscale');
   const tCommon = useTranslations('common');
+  const isDev = process.env.NODE_ENV === "development";
   const [upscaledImage, setUpscaledImage] = useState<string | null>(null);
   const hasTriggered = useRef(false);
 
@@ -30,7 +31,7 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
     error,
   } = useMutation<ApiResponse, Error, { imageUrl: string; prompt?: string }>({
     mutationFn: async ({ imageUrl, prompt }) => {
-      console.log("[UpscaleModal] Starting upscale...");
+      if (isDev) console.log("[UpscaleModal] Starting upscale...");
       // 5 minute timeout for extreme cold starts
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 300_000);
@@ -39,32 +40,35 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
         const res = await fetch("/api/replicate/upscale", {
           body: JSON.stringify({ imageUrl, prompt }),
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
 
         if (!res.ok) {
           const errorText = await res.text();
-          console.error("[UpscaleModal] Response not OK:", res.status, errorText);
+          if (isDev) console.error("[UpscaleModal] Response not OK:", res.status, errorText);
           throw new Error(`Upscale failed: ${res.status}`);
         }
         const data = await res.json();
-        console.log("[UpscaleModal] Received data:", data);
+        if (isDev) console.log("[UpscaleModal] Received data:", data);
         return data;
       } catch (error) {
         clearTimeout(timeoutId);
-        console.error("[UpscaleModal] Fetch error:", error);
+        if (isDev) console.error("[UpscaleModal] Fetch error:", error);
         throw error;
       }
     },
     onSuccess: (data) => {
-      console.log("[UpscaleModal] ✅ onSuccess called with:", data);
+      if (isDev) console.log("[UpscaleModal] ✅ onSuccess called with:", data);
       if (Array.isArray(data) && data.length > 0) {
         setUpscaledImage(data[0]);
       }
     },
     onError: (err) => {
-      console.error("[UpscaleModal] ❌ onError called:", err);
+      if (isDev) console.error("[UpscaleModal] ❌ onError called:", err);
     },
   });
 

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "../../globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/Footer";
@@ -59,25 +58,21 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body className="antialiased">
-        <NextIntlClientProvider messages={messages}>
-          <Providers>
-            {navbar && <Navbar {...navbar} currentLocale={locale} />}
-            {children}
-            {footer && <Footer data={footer} currentLocale={locale} />}
-          </Providers>
+    <NextIntlClientProvider messages={messages}>
+      <Providers>
+        {navbar && <Navbar {...navbar} currentLocale={locale} />}
+        {children}
+        {footer && <Footer data={footer} currentLocale={locale} />}
+      </Providers>
 
-          <SanityLive />
+      <SanityLive />
 
-          {isEnabled && (
-            <>
-              <VisualEditing />
-              <DisableDraftMode />
-            </>
-          )}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+      {isEnabled && (
+        <>
+          <VisualEditing />
+          <DisableDraftMode />
+        </>
+      )}
+    </NextIntlClientProvider>
   );
 }
