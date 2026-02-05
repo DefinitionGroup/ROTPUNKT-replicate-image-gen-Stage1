@@ -46,7 +46,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0 pr-2">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-4">
           {options.map((opt) => {
             const isSelected = selectedValue === opt.value;
             const hasImage = !!opt.image;
@@ -62,10 +62,10 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                 onClick={() => onSelect(opt.value)}
                 disabled={loading}
                 data-selected={isSelected}
-                className="group h-auto overflow-hidden py-4 px-5 text-left flex-col items-start gap-3 border-border/70 bg-muted/60 backdrop-blur rounded-xl"
+                className="group h-auto overflow-hidden p-0 text-left flex-col items-start rounded-xl"
               >
                 {hasImage ? (
-                  <div className="relative -mx-1 -mt-1 h-32 w-[calc(100%+0.5rem)] overflow-hidden rounded-lg">
+                  <div className="relative -mx-1 -mt-1 h-48 w-[calc(100%+0.5rem)] overflow-hidden rounded-lg">
                     <Image
                       src={opt.image!}
                       alt={opt.label}
@@ -74,11 +74,11 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                       sizes="(max-width: 768px) 100vw, 320px"
                       priority={false}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/100 via-background/20 to-transparent" />
                   </div>
                 ) : null}
 
-                <div className="flex flex-col items-start gap-1 w-full">
+                <div className="flex flex-col items-start gap-1 p-4 w-full">
                   <span className="text-sm font-semibold text-foreground">
                     {opt.label}
                   </span>

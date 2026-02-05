@@ -64,9 +64,7 @@ export function buildPrompt({
   }
 
   if (environment) {
-    const descriptors: string[] = [];
-    if (environment) descriptors.push(`${environment}e Atmosphäre`);
-    sections.push(`Umgebung & Stimmung: ${descriptors.join(", ")}.`);
+    sections.push(`Kategorie & Architekturkontext: ${environment}.`);
   }
 
   if (time) {

@@ -17,9 +17,9 @@ export const wizardPresets: WizardPreset[] = [
       kind: "kueche",
       color: "holz",
       style: "minimalistisch",
-      environment: "naturnah",
+      environment: "einfamilienhaus",
       viewpoint: "innenansicht",
-      time: "Nachmittag",
+      time: "afternoon, warm afternoon light",
     },
     extraWishes:
       "Große Panoramafenster, matte Fronten, dezente schwarze Akzente, viel Grünpflanzen.",
@@ -32,9 +32,9 @@ export const wizardPresets: WizardPreset[] = [
       kind: "from the outside",
       color: "schwarz",
       style: "modern",
-      environment: "urban",
+      environment: "loft-industriegebaeude",
       viewpoint: "aussenansicht",
-      time: "Sonnenuntergang",
+      time: "golden hour, magic hour, warm orange sunlight",
     },
     extraWishes:
       "Glasfassade, warmes Innenlicht sichtbar von außen, dezente Neonlicht-Akzente.",
@@ -46,10 +46,10 @@ export const wizardPresets: WizardPreset[] = [
     options: {
       kind: "kueche",
       color: "burgunderrot",
-      style: "luxuriös",
-      environment: "stilvoll",
+      style: "elegant",
+      environment: "apartment-penthouse",
       viewpoint: "innenansicht",
-      time: "Abend",
+      time: "evening, interior lighting, ambient lamps",
     },
     extraWishes:
       "Indirekte Beleuchtung, Marmorarbeitsplatten, einzelne goldene Armaturen, reflektierender Boden.",

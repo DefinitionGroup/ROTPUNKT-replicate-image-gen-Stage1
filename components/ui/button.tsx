@@ -31,7 +31,7 @@ const buttonVariants = cva(
           "bg-transparent text-brand-primary-2 border border-brand-primary-2/50 hover:bg-brand-primary-2/10 hover:border-brand-primary-2 transition-all duration-300",
         close: "text-muted-foreground hover:text-foreground transition-colors duration-200",
         wizardOption:
-          "bg-muted/70 border border-border text-muted-foreground font-medium hover:bg-muted hover:text-foreground hover:border-border/70 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-brand-primary-2 data-[selected=true]:text-white transition-all duration-300 shadow-sm",
+          "bg-muted/70 text-muted-foreground font-medium hover:bg-muted hover:text-foreground hover:border-border/70 data-[selected=true]:bg-brand-primary-2 data-[selected=true]:border-brand-primary-2 data-[selected=true]:text-white transition-all duration-300 ",
       },
       size: {
         default: "h-10 px-6 py-2 rounded-full",
@@ -41,7 +41,7 @@ const buttonVariants = cva(
 
         // Project-specific sizes
         red: "px-8 py-3 text-base rounded-full",
-        cta: "px-10 py-4 text-base rounded-full", 
+        cta: "px-10 py-4 text-base rounded-full",
         back: "px-6 py-2 text-sm min-w-[120px] rounded-full",
         close: "w-10 h-10 p-0 text-2xl rounded-full flex items-center justify-center",
         wizardOption: "px-6 py-4 text-sm h-auto w-full rounded-xl border",

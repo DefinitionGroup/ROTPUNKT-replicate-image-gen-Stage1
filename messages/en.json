@@ -55,8 +55,8 @@
         "description": "Which interior style fits best? This selection determines lines and material mix."
       },
       "environment": {
-        "label": "Atmosphere",
-        "description": "Sets the ambiance of the environment – from urban to nature-inspired."
+        "label": "Category",
+        "description": "Choose the architectural context for your scene. The category sets proportions, spatial feel, and the material character of the visualization."
       },
       "viewpoint": {
         "label": "Perspective",
@@ -105,6 +105,16 @@
       "minimalistisch": "Minimalist",
       "stilvoll": "Stylish",
       "naturnah": "Nature-inspired",
+      "categoryLandhaus": "Country House",
+      "categoryLoftIndustriegebaeude": "Loft / Industrial Building",
+      "categoryStadtwohnung": "City Apartment",
+      "categoryEinfamilienhaus": "Single-Family Home",
+      "categoryAltbau": "Historic Building",
+      "categoryFerienhaus": "Holiday Home",
+      "categoryReihenhausDoppelhaushaelfte": "Townhouse / Semi-Detached House",
+      "categoryTinyHouse": "Tiny House",
+      "categoryStadtvilla": "Urban Villa",
+      "categoryApartmentPenthouse": "Apartment / Penthouse",
       "augenhoehe": "Eye Level",
       "froschperspektive": "Low Angle",
       "vogelperspektive": "High Angle",
