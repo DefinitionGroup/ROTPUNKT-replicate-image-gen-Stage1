@@ -24,13 +24,12 @@ export default function Header({
   description,
   subheadline,
   title,
-  logoImage = "/rotpunkt-kuechen-logo.svg",
   className = "",
 }: Props) {
   const backgroundImageVariants: Variants = {
-    initial: { opacity: 0, y: 40, scale: 0.9 },
+    initial: { opacity: 0, y: 40, scale: 0.7 },
     animate: {
-      opacity: 0.4,
+      opacity: 1,
       y: 0,
       scale: 1,
       transition: {
@@ -38,7 +37,7 @@ export default function Header({
         stiffness: 72,
         mass: 1,
         damping: 20,
-        delay: 1.1,
+        delay: 0.61,
       },
     },
   };
@@ -91,14 +90,14 @@ export default function Header({
       role="banner"
     >
       <motion.div
-        className="w-full   col-span-1 min-h-full  row-span-1 col-start-1 row-start-1"
+        className="w-full  border-red-500  bg-black col-span-1 min-h-full  row-span-1 col-start-1 flex items-stretch row-start-1 rounded-2xl overflow-hidden drop-shadow-lg"
         variants={backgroundImageVariants}
         initial="initial"
         animate="animate"
         aria-hidden="true"
       >
         <img
-          className="w-full h-full"
+          className=" rounded-2xl opacity-70 "
           src={backgroundImage?.secure_url}
           alt={subheadline}
           role="presentation"
@@ -117,7 +116,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-7xl leading-relaxed tracking-tight font-medium text-center text-foreground"
+            className="text-7xl leading-relaxed tracking-tight font-medium text-center text-white"
           >
             {title}
           </h1>
@@ -130,7 +129,7 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-muted-foreground mx-auto tracking-wider text-2xl max-w-2xl text-center font-bold"
+          <p className="text-white mx-auto tracking-wider text-2xl max-w-2xl text-center font-bold"
 
             role="doc-subtitle"
           >
@@ -145,7 +144,7 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-muted-foreground tracking-wider text-md max-w-2xl text-center">
+          <p className="text-white font-semibold tracking-normal text-md max-w-xl text-center">
 
             {description}
           </p>

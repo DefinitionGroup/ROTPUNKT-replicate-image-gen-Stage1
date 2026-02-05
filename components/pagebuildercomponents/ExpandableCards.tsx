@@ -6,6 +6,11 @@ import { useOutsideClick } from "@/app/hooks/use-outside-click";
 import StaggeredSlideUp from "@/components/StaggeredSlideUp";
 import { PortableText, type PortableTextBlock } from "@portabletext/react";
 import { Button } from "@/components/ui/button";
+import {
+  ROTPUNKT_LOGO_DARK_MODE,
+  ROTPUNKT_LOGO_LIGHT_MODE,
+  useRotpunktLogoSrc,
+} from "@/components/theme/useRotpunktLogo";
 
 import type {
   ExpandableCards as ExpandableCardsType,
@@ -38,11 +43,19 @@ type ExpandableCardsProps = ExpandableCardsType & {
 export default function ExpandableCards({
   className,
   items,
-  defaultLogoSrc = "/rotpunkt-kuechen-logo.svg",
+  defaultLogoSrc,
 }: ExpandableCardsProps) {
   const [active, setActive] = useState<TransformedItem | boolean | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
+  const themeLogoSrc = useRotpunktLogoSrc();
+
+  const resolvedDefaultLogoSrc =
+    defaultLogoSrc &&
+    defaultLogoSrc !== ROTPUNKT_LOGO_DARK_MODE &&
+    defaultLogoSrc !== ROTPUNKT_LOGO_LIGHT_MODE
+      ? defaultLogoSrc
+      : themeLogoSrc;
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -63,7 +76,7 @@ export default function ExpandableCards({
       description: item.description,
       imageSrc: item.image?.secure_url || "",
       imageAlt: item.image?.context?.custom?.alt || item.imageAlt,
-      logoSrc: item.logo?.secure_url || defaultLogoSrc,
+      logoSrc: item.logo?.secure_url || resolvedDefaultLogoSrc,
       body: item.body,
       ctaText: item.ctaButton?.text,
       ctaHref:

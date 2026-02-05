@@ -69,8 +69,7 @@ export default function HeroSection({
   className = "",
 }: Props) {
   const bgSrc = urlFromCloudinary(backgroundImage);
-  const logoSrc =
-    urlFromCloudinary(logoImageUrl) ?? "/rotpunkt-kuechen-logo.svg";
+  const logoSrc = urlFromCloudinary(logoImageUrl);
 
   // collect CTAs and rich text blocks from additionalContent using updated type guards
   const items = additionalContent ?? [];
@@ -129,7 +128,7 @@ export default function HeroSection({
     <section
       className={cn(
         "relative grid grid-cols-1 grid-rows-1 bg-card container mt-12 rounded-2xl mx-auto text-foreground selection:bg-brand-primary-2 selection:text-brand-secondary-1",
-        "min-h-[40vh] md:min-h-[50vh] lg:min-h-[20vh] h-[50vh]",
+        "min-h-[40vh] md:min-h-[50vh] rounded-2xl overflow-hidden lg:min-h-[20vh] h-[50vh]",
         className
       )}
       aria-labelledby="hero-title"
@@ -157,8 +156,8 @@ export default function HeroSection({
         className="pointer-events-none absolute inset-0 col-start-1 row-start-1"
       >
         {/* Subtle gradient for text readability at the bottom/left */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" /> */}
       </div>
 
       {/* Content stack (top-left) */}
@@ -188,7 +187,7 @@ export default function HeroSection({
               initial="initial"
               animate="animate"
               className={cn(
-                "font-normal tracking-tight text-foreground",
+                "font-normal tracking-tight text-white",
                 "text-5xl sm:text-6xl md:text-5xl lg:text-5xl",
                 "drop-shadow-lg"
               )}
@@ -206,7 +205,7 @@ export default function HeroSection({
               >
                 <div className="h-[2px] w-12 bg-brand-primary-2" />
                 {subheadline && (
-                  <p className="text-foreground font-medium tracking-wide text-lg sm:text-xl uppercase bg-background/40 backdrop-blur-sm px-3 py-1 rounded">
+                  <p className="text-foreground font-medium tracking-wide text-lg sm:text-xl uppercase bg-background/80 backdrop-blur-sm px-3 py-1 rounded">
                     {subheadline}
                   </p>
                 )}

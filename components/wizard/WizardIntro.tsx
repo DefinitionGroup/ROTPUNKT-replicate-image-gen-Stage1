@@ -5,6 +5,7 @@ import { FaRegCompass } from "react-icons/fa";
 import type { WizardPreset } from "./wizardPresets";
 import { wizardPresets } from "./wizardPresets";
 import { useTranslations } from "next-intl";
+import { useRotpunktLogoSrc } from "@/components/theme/useRotpunktLogo";
 
 interface WizardIntroProps {
   onPresetSelect: (preset: WizardPreset) => void;
@@ -18,6 +19,7 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
   loading = false,
 }) => {
   const t = useTranslations('wizard.intro');
+  const logoSrc = useRotpunktLogoSrc();
 
   return (
     <motion.div
@@ -35,7 +37,7 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
           transition={{ delay: 0.1, duration: 0.4 }}
         >
           <img
-            src="/rotpunkt-kuechen-logo.svg"
+            src={logoSrc}
             alt="Rotpunkt Küchen Logo"
             className="w-20 h-20 object-contain"
           />
