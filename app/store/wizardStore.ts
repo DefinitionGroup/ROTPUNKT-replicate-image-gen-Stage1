@@ -8,9 +8,7 @@ export interface WizardState {
     kind?: string
     kitchenLook?: string
     environment?: string
-    location?: string
     time?: string
-    houseType?: string
     background?: string
     viewpoint?: string
     floor?: string

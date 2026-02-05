@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
 import {
-  FaHouse,
   FaClock,
   FaTree,
-  FaLocationDot,
   FaPalette,
   FaCouch,
   FaEye,
@@ -233,44 +231,6 @@ export const wizardSteps: WizardStepDefinition[] = [
     icon: <FaEye className="w-full h-full text-red-600" />,
   },
   {
-    key: "location",
-    labelKey: "wizard.steps.location.label",
-    descriptionKey: "wizard.steps.location.description",
-    options: [
-      {
-        value: "mediterrane Küstenstadt",
-        labelKey: "wizard.options.mediteraneKuestenstadt",
-        germanLabel: "Mediterrane Küstenstadt",
-        hintKey: "wizard.hints.warmeFarben",
-      },
-      {
-        value: "historisches altstadtviertel",
-        labelKey: "wizard.options.historischesAltstadtviertel",
-        germanLabel: "Historisches Altstadtviertel",
-        hintKey: "wizard.hints.kopfsteinpflaster",
-      },
-      {
-        value: "nordisches fjordhaus",
-        labelKey: "wizard.options.nordischesFjordhaus",
-        germanLabel: "Nordisches Fjordhaus",
-        hintKey: "wizard.hints.vielGlas",
-      },
-      {
-        value: "dachterrasse metropole",
-        labelKey: "wizard.options.dachterrasseMetropole",
-        germanLabel: "Dachterrasse Metropole",
-        hintKey: "wizard.hints.skyline",
-      },
-      {
-        value: "tropischer regenwald bungalow",
-        labelKey: "wizard.options.tropischerRegenwaldBungalow",
-        germanLabel: "Tropischer Regenwald Bungalow",
-        hintKey: "wizard.hints.sattesGruen",
-      },
-    ],
-    icon: <FaLocationDot className="w-full h-full text-red-600" />,
-  },
-  {
     key: "time",
     labelKey: "wizard.steps.time.label",
     descriptionKey: "wizard.steps.time.description",
@@ -445,46 +405,5 @@ export const wizardSteps: WizardStepDefinition[] = [
       },
     ],
     icon: <FaLeaf className="w-full h-full text-red-600" />,
-  },
-  {
-    key: "houseType",
-    labelKey: "wizard.steps.houseType.label",
-    descriptionKey: "wizard.steps.houseType.description",
-    options: [
-      {
-        value: "modernes Holzhaus mit großen Fenstern",
-        labelKey: "wizard.options.modernesHolzhaus",
-        germanLabel: "Modernes Holzhaus",
-        hintKey: "wizard.hints.skandinavisch",
-      },
-      { value: "Stadtwohnung", labelKey: "wizard.options.stadtwohnung", germanLabel: "Stadtwohnung" },
-      { value: "Loft", labelKey: "wizard.options.loft", germanLabel: "Loft" },
-      { value: "Landhaus", labelKey: "wizard.options.landhaus", germanLabel: "Landhaus" },
-      {
-        value: "penthouse mit dachterrasse",
-        labelKey: "wizard.options.penthouse",
-        germanLabel: "Penthouse",
-        hintKey: "wizard.hints.panoramablick",
-      },
-      {
-        value: "historische villa",
-        labelKey: "wizard.options.historischeVilla",
-        germanLabel: "Historische Villa",
-        hintKey: "wizard.hints.hoheDecken",
-      },
-      {
-        value: "reihenhaus mit garten",
-        labelKey: "wizard.options.reihenhaus",
-        germanLabel: "Reihenhaus",
-        hintKey: "wizard.hints.familienfreundlich",
-      },
-      {
-        value: "architektenhaus aus sichtbeton",
-        labelKey: "wizard.options.architektenhaus",
-        germanLabel: "Architektenhaus",
-        hintKey: "wizard.hints.brutalismus",
-      },
-    ],
-    icon: <FaHouse className="w-full h-full text-red-600" />,
   },
 ];

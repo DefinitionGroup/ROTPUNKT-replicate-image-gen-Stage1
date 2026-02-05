@@ -44,8 +44,6 @@ export function buildPrompt({
   const fenixColor = isFenix ? getFenixColorByValue(colorSelection) : undefined;
   const colorLabel = !isFenix ? getLabel("color", colorSelection) : undefined;
   const environment = getLabel("environment", selections.environment);
-  const houseType = getLabel("houseType", selections.houseType);
-  const location = getLabel("location", selections.location);
   const time = getLabel("time", selections.time);
   const viewpoint = selections.viewpoint ?? "innenansicht";
 
@@ -65,11 +63,9 @@ export function buildPrompt({
     sections.push(`Raumfokus: ${descriptors.join(" ")}.`.trim());
   }
 
-  if (environment || houseType || location) {
+  if (environment) {
     const descriptors: string[] = [];
     if (environment) descriptors.push(`${environment}e Atmosphäre`);
-    if (houseType) descriptors.push(`in einem ${houseType}`);
-    if (location) descriptors.push(`Standort: ${location}`);
     sections.push(`Umgebung & Stimmung: ${descriptors.join(", ")}.`);
   }
 

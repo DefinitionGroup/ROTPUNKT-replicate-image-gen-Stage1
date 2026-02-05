@@ -19,9 +19,7 @@ export const wizardPresets: WizardPreset[] = [
       style: "minimalistisch",
       environment: "naturnah",
       viewpoint: "innenansicht",
-      location: "am See",
       time: "Nachmittag",
-      houseType: "modernes Holzhaus mit großen Fenstern",
     },
     extraWishes:
       "Große Panoramafenster, matte Fronten, dezente schwarze Akzente, viel Grünpflanzen.",
@@ -36,9 +34,7 @@ export const wizardPresets: WizardPreset[] = [
       style: "modern",
       environment: "urban",
       viewpoint: "aussenansicht",
-      location: "am Stadtrand",
       time: "Sonnenuntergang",
-      houseType: "Loft",
     },
     extraWishes:
       "Glasfassade, warmes Innenlicht sichtbar von außen, dezente Neonlicht-Akzente.",
@@ -53,9 +49,7 @@ export const wizardPresets: WizardPreset[] = [
       style: "luxuriös",
       environment: "stilvoll",
       viewpoint: "innenansicht",
-      location: "am Stadtrand",
       time: "Abend",
-      houseType: "Stadtwohnung",
     },
     extraWishes:
       "Indirekte Beleuchtung, Marmorarbeitsplatten, einzelne goldene Armaturen, reflektierender Boden.",
