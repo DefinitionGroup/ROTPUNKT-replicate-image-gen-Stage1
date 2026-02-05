@@ -42,7 +42,7 @@ export default function Header({
       },
     },
   };
- const pageStep = useStore($pageStep);
+  const pageStep = useStore($pageStep);
   const showWizard = useStore($showWizard);
 
   const logoVariants: Variants = {
@@ -84,7 +84,7 @@ export default function Header({
   return (
     <section
       className={cn(
-        `grid grid-cols-1 grid-rows-1  h-[70vh] min-h-[700px] rounded-2xl   container  mx-auto  overflow- items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
+        `grid grid-cols-1 grid-rows-1  h-[70vh] min-h-[700px] rounded-2xl z-50  container  mx-auto  overflow- items-center justify-center selection:bg-brand-primary-2 selection:text-brand-secondary-1`,
         className
       )}
       aria-labelledby="hero-title"
@@ -145,46 +145,46 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p  className="text-white  tracking-wider text-md max-w-2xl text-center  ">
+          <p className="text-white  tracking-wider text-md max-w-2xl text-center  ">
 
             {description}
           </p>
         </motion.div>
-         <div className="text-center  flex flex-col items-center justify-center">
-            {pageStep === "intro" && (
-              <IntroCard onStart={() => $showWizard.set(true)} />
+        <div className="text-center  flex flex-col items-center justify-center">
+          {pageStep === "intro" && (
+            <IntroCard onStart={() => $showWizard.set(true)} />
+          )}
+          {pageStep === "imagegen" && (
+            <div className="">
+              <ImageGenerator
+                onBack={() => {
+                  $prompt.set(null);
+                  $pageStep.set("intro");
+                  $showWizard.set(true);
+                }}
+              />
+            </div>
+          )}
+
+          <AnimatePresence>
+            {showWizard && (
+              <KitchenWizardModal
+                onPromptReady={(prompt) => {
+                  $prompt.set(prompt);
+                  $showWizard.set(false);
+                  $pageStep.set("imagegen");
+                }}
+                onClose={() => {
+                  $showWizard.set(false);
+                  wizardActions.reset();
+                }}
+              />
             )}
-            {pageStep === "imagegen" && (
-              <div className="">
-                <ImageGenerator
-                  onBack={() => {
-                    $prompt.set(null);
-                    $pageStep.set("intro");
-                    $showWizard.set(true);
-                  }}
-                />
-              </div>
-            )}
-      
-            <AnimatePresence>
-              {showWizard && (
-                <KitchenWizardModal
-                  onPromptReady={(prompt) => {
-                    $prompt.set(prompt);
-                    $showWizard.set(false);
-                    $pageStep.set("imagegen");
-                  }}
-                  onClose={() => {
-                    $showWizard.set(false);
-                    wizardActions.reset();
-                  }}
-                />
-              )}
-            </AnimatePresence>
-          </div>
-      </div>  
-      
-     
+          </AnimatePresence>
+        </div>
+      </div>
+
+
     </section>
   );
 }

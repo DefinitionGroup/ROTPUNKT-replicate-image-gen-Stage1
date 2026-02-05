@@ -128,7 +128,7 @@ export default function HeroSection({
   return (
     <section
       className={cn(
-        "relative grid grid-cols-1 grid-rows-1 bg-black container z-999999999 mt-12 rounded-2xl mx-auto text-brand-secondary-1 selection:bg-brand-primary-2 selection:text-brand-secondary-1",
+        "relative grid grid-cols-1 grid-rows-1 bg-black container mt-12 rounded-2xl mx-auto text-brand-secondary-1 selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         "min-h-[40vh] md:min-h-[50vh] lg:min-h-[20vh] h-[50vh]",
         className
       )}
