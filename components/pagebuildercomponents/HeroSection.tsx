@@ -127,8 +127,8 @@ export default function HeroSection({
   return (
     <section
       className={cn(
-        "relative grid grid-cols-1 grid-rows-1 bg-card container mt-12 rounded-2xl mx-auto text-foreground selection:bg-brand-primary-2 selection:text-brand-secondary-1",
-        "min-h-[40vh] md:min-h-[50vh] rounded-2xl overflow-hidden lg:min-h-[20vh] h-[50vh]",
+        "relative grid grid-cols-1 grid-rows-1  bg-card container  rounded-2xl mx-auto text-foreground selection:bg-brand-primary-2 selection:text-brand-secondary-1",
+        "min-h-[40vh] md:min-h-[50vh] rounded-2xl overflow-hidden  mt-32  lg:min-h-[20vh] h-[50vh]",
         className
       )}
       aria-labelledby="hero-title"

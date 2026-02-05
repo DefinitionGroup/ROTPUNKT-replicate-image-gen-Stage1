@@ -143,7 +143,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       <motion.div
         key="wizard-popover"
         ref={overlayRef}
-        className="fixed inset-0 z-9999990 flex items-center justify-center bg-background/80 backdrop-blur-sm absolute"
+        className="fixed inset-0 z-9999990 flex items-center justify-center bg-background/20 backdrop-blur-lg absolute"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
