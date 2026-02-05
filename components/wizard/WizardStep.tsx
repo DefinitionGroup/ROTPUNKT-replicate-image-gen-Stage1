@@ -36,10 +36,10 @@ export const WizardStep: React.FC<WizardStepProps> = ({
           {icon}
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl text-left tracking-tight text-foreground">
+          <h3 className="text-xl md:text-4xl text-left tracking-tight text-foreground">
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground text-left mt-1 max-w-xl">
+          <p className="text-sm font-medium text-muted-foreground  tracking-tight text-left mt-1 max-w-xl">
             {description}
           </p>
         </div>
