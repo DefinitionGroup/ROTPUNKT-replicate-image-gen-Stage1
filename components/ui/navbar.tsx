@@ -20,7 +20,7 @@ import Image from "next/image";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useTranslations } from "next-intl";
-import { useThemeAwareRotpunktLogo } from "@/components/theme/useRotpunktLogo";
+import { useRotpunktLogoSrc } from "@/components/theme/useRotpunktLogo";
 
 type Props = Pick<
   MenuNavbarProjected,
@@ -31,16 +31,10 @@ type Props = Pick<
 
 export default function Navbar({
   menuItems,
-  navbarLogo,
   navbarLogoAlt,
-  navbarLogoUrl,
 }: Props) {
   const t = useTranslations('common');
-  // use string directly if available
-  const logoSource = navbarLogoUrl ?? navbarLogo?.secure_url ?? navbarLogo?.url;
-  const resolvedLogo = useThemeAwareRotpunktLogo(logoSource, {
-    fallbackToThemeLogo: true,
-  });
+  const resolvedLogo = useRotpunktLogoSrc();
   const [open, setOpen] = useState(false);
   const closeMenu = () => setOpen(false);
   const pathname = usePathname();

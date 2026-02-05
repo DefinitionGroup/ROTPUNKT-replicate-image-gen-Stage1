@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
-import { useThemeAwareRotpunktLogo } from "@/components/theme/useRotpunktLogo";
+import { useRotpunktLogoSrc } from "@/components/theme/useRotpunktLogo";
 
 type LinkItem = {
   label: string;
@@ -43,22 +43,7 @@ export default function Footer({
   data?: FooterData;
   currentLocale?: string;
 }) {
-  function getCloudinaryUrl(logo?: FooterData["footerLogo"]) {
-    if (!logo) return undefined;
-    return (
-      logo.secure_url ||
-      logo.secureUrl ||
-      logo.url ||
-      logo.original_url ||
-      logo.path ||
-      logo.asset?.secure_url ||
-      logo.asset?.url
-    );
-  }
-
-  const logoUrl = useThemeAwareRotpunktLogo(getCloudinaryUrl(data?.footerLogo), {
-    fallbackToThemeLogo: true,
-  });
+  const logoUrl = useRotpunktLogoSrc();
 
   if (!data) return null;
 
