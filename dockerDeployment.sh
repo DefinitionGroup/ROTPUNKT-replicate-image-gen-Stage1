@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Trap for error handling - ensures Jenkins gets proper exit code
+trap 'echo "ERROR: Deployment failed at line $LINENO with exit code $?" >&2; exit 1' ERR
 
 # Variables
 IMAGE_NAME="rotpunkt-image-gen"
@@ -22,8 +26,9 @@ cleanup_build_cache() {
 # Function to stop and remove the old container if it exists
 clean_up() {
     echo "Stopping and removing old container if it exists..."
-    docker stop $CONTAINER_NAME >/dev/null 2>&1
-    docker rm $CONTAINER_NAME >/dev/null 2>&1
+    # These may fail if container doesn't exist - that's OK
+    docker stop "$CONTAINER_NAME" 2>/dev/null || true
+    docker rm "$CONTAINER_NAME" 2>/dev/null || true
     cleanup_images
     cleanup_build_cache
 }
@@ -31,13 +36,13 @@ clean_up() {
 # Function to build the Docker image
 build_image() {
     echo "Building new Docker image..."
-    DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME $DOCKERFILE_PATH
+    DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" "$DOCKERFILE_PATH"
 }
 
 # Function to run the Docker container
 run_container() {
     echo "Running new Docker container..."
-    docker run -d --restart always -p $PORT_MAPPING -e PORT=7000 -e HOST=0.0.0.0 --name $CONTAINER_NAME $IMAGE_NAME
+    docker run -d --restart always -p "$PORT_MAPPING" -e PORT=7000 -e HOST=0.0.0.0 --name "$CONTAINER_NAME" "$IMAGE_NAME"
 }
 
 # Main script execution
