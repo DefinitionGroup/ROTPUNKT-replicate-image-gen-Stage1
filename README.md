@@ -2,7 +2,7 @@
 
 A modern image generation interface built with Next.js, Tailwind CSS, and Motion (formerly Framer Motion), powered by Replicate AI.
 Christoph Hat nen Knall.
-
+Und das wiederholt.
 ## Features
 
 - 🎨 Generate images using state-of-the-art AI models
