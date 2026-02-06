@@ -1,6 +1,7 @@
 # AI Image Generator with Replicate
 
 A modern image generation interface built with Next.js, Tailwind CSS, and Motion (formerly Framer Motion), powered by Replicate AI.
+Christoph Hat nen Knall.
 
 ## Features
 
