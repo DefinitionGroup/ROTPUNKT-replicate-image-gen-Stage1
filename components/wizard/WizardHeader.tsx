@@ -27,9 +27,9 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
     getWizardProgress(currentStep, totalSteps);
 
   return (
-    <header className="relative flex flex-row items-center justify-between w-full px-8">
+    <header className="relative flex flex-row items-center justify-between w-full px-3 sm:px-8">
       {/* left slot: reserve space even when wizard hasn't started so the close button stays on the right */}
-      <div className="min-w-[8rem] flex items-center justify-start">
+      <div className="min-w-[5rem] sm:min-w-[8rem] flex items-center justify-start">
         {currentStep >= 0 ? (
           <Button
             onClick={onBack}
@@ -38,7 +38,9 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
             size="back"
             enableMotion
             whileHover={canGoBack && !loading ? { scale: 1.05 } : {}}
+            whileTap={canGoBack && !loading ? { scale: 0.98 } : {}}
             className={`
+              px-3 py-1.5 text-xs min-w-[4.5rem] sm:min-w-[120px] sm:px-6 sm:py-2 sm:text-sm
               ${!canGoBack || loading
                 ? "opacity-0 cursor-not-allowed pointer-events-none"
                 : ""
@@ -54,7 +56,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
       </div>
 
       <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 gap-1">
-        <div className="h-2 w-64 rounded-full bg-muted overflow-hidden">
+        <div className="h-2 w-36 sm:w-64 rounded-full bg-muted overflow-hidden">
           <motion.div
             className="h-2 rounded-full bg-brand-primary-2"
             initial={false}

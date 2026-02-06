@@ -36,7 +36,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
           {icon}
         </div>
         <div>
-          <h3 className="text-xl md:text-4xl text-left tracking-tight text-foreground">
+          <h3 className="text-lg sm:text-xl md:text-4xl text-left tracking-tight text-foreground">
             {title}
           </h3>
           <p className="text-sm font-medium text-muted-foreground  tracking-tight text-left mt-1 max-w-xl">
@@ -45,8 +45,8 @@ export const WizardStep: React.FC<WizardStepProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-2">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-4">
+      <div className="flex-1 overflow-y-auto min-h-0 pr-1 sm:pr-2 touch-pan-y [-webkit-overflow-scrolling:touch]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-4">
           {options.map((opt) => {
             const isSelected = selectedValue === opt.value;
             const hasImage = !!opt.image;
@@ -65,7 +65,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                 className="group h-auto overflow-hidden p-0 text-left flex-col items-start rounded-xl"
               >
                 {hasImage ? (
-                  <div className="relative -mx-1 -mt-1 h-48 w-[calc(100%+0.5rem)] overflow-hidden rounded-lg">
+                  <div className="relative -mx-1 -mt-1 h-28 sm:h-36 md:h-40 w-[calc(100%+0.5rem)] overflow-hidden rounded-lg">
                     <Image
                       src={opt.image!}
                       alt={opt.label}
@@ -78,12 +78,12 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                   </div>
                 ) : null}
 
-                <div className="flex flex-col items-start gap-1 p-4 w-full">
-                  <span className="text-sm font-semibold text-foreground">
+                <div className="flex flex-col items-start gap-1 p-3 sm:p-4 w-full">
+                  <span className="text-xs sm:text-sm font-semibold text-foreground">
                     {opt.label}
                   </span>
                   {opt.hint ? (
-                    <span className="text-xs text-muted-foreground">{opt.hint}</span>
+                    <span className="text-xxs sm:text-xs text-muted-foreground">{opt.hint}</span>
                   ) : null}
                 </div>
               </Button>
