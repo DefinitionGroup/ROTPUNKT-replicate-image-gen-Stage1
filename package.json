@@ -50,6 +50,7 @@
     "sanity-plugin-cloudinary": "^1.4.0",
     "server-only": "^0.0.1",
     "shadcn-ui": "^0.9.5",
+    "svix": "^1.24.0",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1"
   },
