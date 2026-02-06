@@ -21,8 +21,6 @@ function urlFromCloudinary(a?: CloudinaryAsset | null) {
 function hrefFromLink(link: any) {
   if (!link) return undefined;
 
-  console.log("Processing link:", link); // Debug log
-
   if (link.linkType === "external") {
     return link.externalUrl;
   }
@@ -71,19 +69,12 @@ export default function HeroSection({
   className = "",
 }: Props) {
   const bgSrc = urlFromCloudinary(backgroundImage);
-  const logoSrc =
-    urlFromCloudinary(logoImageUrl) ?? "/rotpunkt-kuechen-logo.svg";
-
-  // Log for debugging
-  console.log("additionalContent:", additionalContent);
+  const logoSrc = urlFromCloudinary(logoImageUrl);
 
   // collect CTAs and rich text blocks from additionalContent using updated type guards
   const items = additionalContent ?? [];
   const ctas: (Cta & { _type?: string })[] = items.filter(isCta);
   const richTexts: (RichText & { _type?: string })[] = items.filter(isRichText);
-
-  console.log("Filtered CTAs:", ctas);
-  console.log("Filtered RichTexts:", richTexts);
 
   const bgVariants: Variants = {
     initial: { opacity: 0, scale: 1.04, y: 12 },
@@ -136,8 +127,8 @@ export default function HeroSection({
   return (
     <section
       className={cn(
-        "relative grid grid-cols-1 grid-rows-1 bg-black container z-999999999 mt-12 rounded-2xl mx-auto text-brand-secondary-1 selection:bg-brand-primary-2 selection:text-brand-secondary-1",
-        "min-h-[40vh] md:min-h-[50vh] lg:min-h-[20vh] h-[50vh]",
+        "relative grid grid-cols-1 grid-rows-1  bg-card container  rounded-2xl mx-auto text-foreground selection:bg-brand-primary-2 selection:text-brand-secondary-1",
+        "min-h-[40vh] md:min-h-[50vh] rounded-2xl overflow-hidden  mt-32  lg:min-h-[20vh] h-[50vh]",
         className
       )}
       aria-labelledby="hero-title"
@@ -165,8 +156,8 @@ export default function HeroSection({
         className="pointer-events-none absolute inset-0 col-start-1 row-start-1"
       >
         {/* Subtle gradient for text readability at the bottom/left */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" /> */}
       </div>
 
       {/* Content stack (top-left) */}
@@ -214,7 +205,7 @@ export default function HeroSection({
               >
                 <div className="h-[2px] w-12 bg-brand-primary-2" />
                 {subheadline && (
-                  <p className="text-neutral-200 font-medium tracking-wide text-lg sm:text-xl uppercase bg-black/30 backdrop-blur-sm px-3 py-1 rounded">
+                  <p className="text-foreground font-medium tracking-wide text-lg sm:text-xl uppercase bg-background/80 backdrop-blur-sm px-3 py-1 rounded">
                     {subheadline}
                   </p>
                 )}
@@ -227,7 +218,7 @@ export default function HeroSection({
                 variants={descVariants}
                 initial="initial"
                 animate="animate"
-                className="mt-8 max-w-2xl text-neutral-200 leading-relaxed text-base sm:text-lg font-light drop-shadow-md"
+                className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base sm:text-lg font-light drop-shadow-md"
               >
                 {description}
               </motion.p>
@@ -244,7 +235,7 @@ export default function HeroSection({
                 {richTexts.map((rt, idx) => (
                   <div
                     key={(rt as any)._key ?? `richtext-${idx}`}
-                    className="prose prose-invert max-w-none"
+                    className="prose dark:prose-invert max-w-none"
                   >
                     <RichTextComponent value={rt.content ?? []} />
                   </div>
@@ -262,15 +253,12 @@ export default function HeroSection({
               >
                 {ctas.map((c, i) => {
                   const href = hrefFromLink(c.link);
-                  console.log(`CTA ${i} - text: ${c.text}, href: ${href}`); // Debug log
 
                   if (!c.text) {
-                    console.log(`CTA ${i} has no text, skipping`);
                     return null;
                   }
 
                   if (!href) {
-                    console.log(`CTA ${i} has no href, skipping`);
                     return null;
                   }
 

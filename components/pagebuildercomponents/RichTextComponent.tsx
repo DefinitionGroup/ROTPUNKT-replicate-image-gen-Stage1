@@ -87,7 +87,7 @@ function createComponents({
         </Heading>
       ),
       blockquote: ({ children }) => (
-        <blockquote className="my-8 rounded-md border-l-4 border-gray-300 bg-gray-50 px-5 py-4 italic dark:border-gray-700 dark:bg-gray-900/40">
+        <blockquote className="my-8 rounded-md border-l-4 border-border bg-muted/60 px-5 py-4 italic">
           {children}
         </blockquote>
       ),
@@ -111,7 +111,7 @@ function createComponents({
         <s className="line-through">{children}</s>
       ),
       code: ({ children }) => (
-        <code className="rounded-md border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-[0.95em] dark:border-gray-700 dark:bg-gray-800">
+        <code className="rounded-md border border-border bg-muted/60 px-1.5 py-0.5 font-mono text-[0.95em]">
           {children}
         </code>
       ),
@@ -126,7 +126,7 @@ function createComponents({
           .filter(Boolean)
           .join(" ");
         const cls =
-          "underline decoration-2 underline-offset-4 text-red-600 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 transition dark:text-blue-400 dark:hover:text-blue-300 dark:focus-visible:ring-blue-400";
+          "underline decoration-2 underline-offset-4 text-brand-primary-2 hover:text-brand-primary-2/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary-2 transition";
 
         return openInNewTab ? (
           <Link href={href} target="_blank" rel={rel} className={cls}>
@@ -150,7 +150,7 @@ function createComponents({
         return (
           <Link
             href={href}
-            className="underline decoration-2 underline-offset-4 text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 transition dark:text-blue-400 dark:hover:text-blue-300 dark:focus-visible:ring-blue-400"
+            className="underline decoration-2 underline-offset-4 text-brand-primary-2 hover:text-brand-primary-2/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary-2 transition"
           >
             {children}
           </Link>
@@ -176,8 +176,8 @@ export default function RichTextComponent({
   return (
     <div
       className={[
-        "richtext text-brand-secondary-1 antialiased max-w-5xl mx-auto px-4 sm:px-6 md:px-0 ",
-        "prose prose-invert lg:prose-lg",
+        "richtext text-foreground antialiased max-w-5xl mx-auto px-4 sm:px-6 md:px-0 ",
+        "prose dark:prose-invert lg:prose-lg",
         "space-y-5 md:space-y-6 text-base leading-relaxed tracking-normal",
         "break-words hyphens-auto selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         className,

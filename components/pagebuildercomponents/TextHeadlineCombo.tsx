@@ -149,7 +149,6 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
       : undefined,
   });
 
-  console.log(props);
   return (
     <div className="relative container max-w-5xl mx-auto my-12 px-4 selection:bg-brand-primary-2 selection:text-brand-secondary-1">
       <div
@@ -169,7 +168,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
 
           <motion.h1
             {...baseMotion(0.05)}
-            className={`font-semibold tracking-tight text-brand-secondary-1 leading-compress ${sizes.headline}`}
+            className={`font-semibold tracking-tight text-foreground leading-compress ${sizes.headline}`}
           >
             {typeof headline === "string" && highlight ? (
               <>
@@ -190,7 +189,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
               {...baseMotion(0.12)}
               className={`${
                 sizes.subhead
-              } font-bold tracking-wider   leading-relaxed text-brand-secondary-1 ${
+              } font-bold tracking-wider leading-relaxed text-muted-foreground ${
                 clamp ? `line-clamp-${clamp}` : ""
               }`}
             >
@@ -201,7 +200,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
           {kicker && (
             <motion.div
               {...baseMotion(0.18)}
-              className={`text-brand-secondary-1 ${sizes.kicker} font-medium tracking-wide`}
+              className={`text-muted-foreground ${sizes.kicker} font-medium tracking-wide`}
             >
               {kicker}
             </motion.div>

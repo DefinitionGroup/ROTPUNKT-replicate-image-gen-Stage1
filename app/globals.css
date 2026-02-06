@@ -167,10 +167,6 @@
   font-display: swap;
 }
 
-:root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-}
 body {
   background: var(--background) !important;
   color: var(--foreground);
@@ -229,58 +225,56 @@ html {
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --color-brand-primary-1: #2d2d2d;
-  --color-brand-primary-2: #e30421;
-  --color-brand-secondary-1: #f8f8f8;
-  --color-brand-secondary-2: #5c782b;
+  --color-brand-primary-1: var(--brand-primary-1);
+  --color-brand-primary-2: var(--brand-primary-2);
+  --color-brand-secondary-1: var(--brand-secondary-1);
+  --color-brand-secondary-2: var(--brand-secondary-2);
 }
 
 :root {
   --radius: 0.625rem;
-  /* Deep Premium Black Background */
-  --background: #050505; 
-  /* Soft Off-White text */
-  --foreground: #f4f4f5;
+  color-scheme: light;
+  --background: #f7f5f2;
+  --foreground: #151515;
 
-  /* Card / Surfaces - Slightly lighter than bg */
-  --card: #0f0f10;
-  --card-foreground: #f4f4f5;
+  --card: #ffffff;
+  --card-foreground: #171717;
   
-  --popover: #0f0f10;
-  --popover-foreground: #f4f4f5;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
 
-  --primary: #f4f4f5;
-  --primary-foreground: #09090b;
+  --primary: #151515;
+  --primary-foreground: #ffffff;
 
-  --secondary: #27272a;
-  --secondary-foreground: #f4f4f5;
+  --secondary: #f1eeea;
+  --secondary-foreground: #1f1f1f;
 
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
+  --muted: #f1eeea;
+  --muted-foreground: #6b6b6b;
 
-  --accent: #27272a;
-  --accent-foreground: #f4f4f5;
+  --accent: #efece7;
+  --accent-foreground: #1a1a1a;
 
-  --destructive: #7f1d1d;
-  --destructive-foreground: #f4f4f5;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
 
-  --border: #27272a;
-  --input: #27272a;
+  --border: #e3ded7;
+  --input: #e3ded7;
   --ring: #e30421; /* Brand Red for focus rings */
 
   --chart-1: #e30421;
   --chart-2: #5c782b;
   --chart-3: #2d2d2d;
-  --chart-4: #a1a1aa;
-  --chart-5: #f4f4f5;
+  --chart-4: #7c7c7c;
+  --chart-5: #151515;
 
-  --sidebar: #0f0f10;
-  --sidebar-foreground: #f4f4f5;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #151515;
   --sidebar-primary: #e30421;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #f4f4f5;
-  --sidebar-border: #27272a;
+  --sidebar-accent: #f1eeea;
+  --sidebar-accent-foreground: #1f1f1f;
+  --sidebar-border: #e3ded7;
   --sidebar-ring: #e30421;
 
   /* Brand Colors - Preserved */
@@ -296,6 +290,7 @@ html {
 
 /* Enforce dark mode look by default generally, but keep .dark class structure if needed */
 .dark {
+  color-scheme: dark;
   --background: #050505;
   --foreground: #f4f4f5;
   --card: #0f0f10;

@@ -66,19 +66,19 @@ export function WizardColorStep({
       transition={{ duration: 0.25 }}
     >
       <div className="flex items-center gap-3 mb-4 shrink-0">
-        <div className="h-9 w-9 shrink-0 rounded-full bg-red-900/30 border border-red-700/40 flex items-center justify-center text-red-400">
+        <div className="h-9 w-9 shrink-0 rounded-full bg-brand-primary-2/15 border border-brand-primary-2/40 flex items-center justify-center text-brand-primary-2">
           {icon}
         </div>
         <div>
-          <h3 className="text-xl text-left md:text-2xl tracking-tight text-brand-secondary-1">
+          <h3 className="text-xl text-left md:text-2xl tracking-tight text-foreground">
             {title}
           </h3>
-          <p className="text-sm text-gray-400 mt-1 max-w-xl">{description}</p>
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl">{description}</p>
         </div>
       </div>
 
       <div className="mb-4 flex flex-col gap-2 shrink-0">
-        <div className="inline-flex rounded-full border border-gray-800 bg-gray-950/70 p-1 text-xs text-gray-300 max-w-max">
+        <div className="inline-flex rounded-full border border-border bg-muted/60 p-1 text-xs text-muted-foreground max-w-max">
           {TABS.map((tab) => {
             const isActive = tab.id === activeTab;
             return (
@@ -86,8 +86,8 @@ export function WizardColorStep({
                 key={tab.id}
                 type="button"
                 className={`px-4 py-1.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isActive
-                    ? "bg-brand-primary-2 text-black shadow"
-                    : "hover:text-white"
+                    ? "bg-brand-primary-2 text-white shadow"
+                    : "hover:text-foreground"
                   }`}
                 onClick={() => setActiveTab(tab.id)}
                 disabled={loading}
@@ -98,7 +98,7 @@ export function WizardColorStep({
             );
           })}
         </div>
-        <p className="text-xxs text-gray-500">{renderTabDescription()}</p>
+        <p className="text-xxs text-muted-foreground">{renderTabDescription()}</p>
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0 pr-2">
@@ -118,13 +118,13 @@ export function WizardColorStep({
                   onClick={() => onSelect(opt.value)}
                   disabled={loading}
                   data-selected={isSelected}
-                  className="h-auto py-4 px-5 text-left flex-col items-start gap-2 border-gray-800/60 bg-gray-900/70 backdrop-blur rounded-xl"
+                  className="h-auto py-4 px-5 text-left flex-col items-start gap-2 border-border/70 bg-muted/60 backdrop-blur rounded-xl"
                 >
-                  <span className="text-sm font-semibold text-brand-secondary-1">
+                  <span className="text-sm font-semibold text-foreground">
                     {opt.label}
                   </span>
                   {opt.hint ? (
-                    <span className="text-xs text-gray-400">{opt.hint}</span>
+                    <span className="text-xs text-muted-foreground">{opt.hint}</span>
                   ) : null}
                 </Button>
               );
@@ -137,7 +137,7 @@ export function WizardColorStep({
               const isSelected = selectedValue === value;
               const selectedClass = isSelected
                 ? "border-emerald-400/80 bg-emerald-500/5"
-                : "border-gray-800 bg-gray-900/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5";
+                : "border-border bg-muted/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5";
 
               return (
                 <motion.button
@@ -150,12 +150,12 @@ export function WizardColorStep({
                   onClick={() => onSelect(value)}
                 >
                   <span
-                    className="h-16 w-full rounded-lg border border-black/40 shadow-inner"
+                    className="h-16 w-full rounded-lg border border-border/60 shadow-inner"
                     style={{ backgroundColor: color.hex }}
                     aria-hidden="true"
                   />
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold text-brand-secondary-1">
+                    <span className="text-xs font-semibold text-foreground">
                       {color.name}
                     </span>
                     {/* <span className="text-xxs text-gray-400">{color.hex}</span> */}

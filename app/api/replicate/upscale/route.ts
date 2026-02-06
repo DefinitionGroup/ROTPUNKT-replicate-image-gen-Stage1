@@ -8,18 +8,33 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
 });
 
+const isDev = process.env.NODE_ENV === "development";
+const UPSCALE_TIMEOUT_MS = 300_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${ms}ms`));
+    }, ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+  }) as Promise<T>;
+}
+
 const UPSCALE_MODEL = "philz1337x/clarity-upscaler:dfad41707589d68ecdccd1dfa600d55a208f9310748e44bfe35b4a6291453d5e";
 
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
-  console.log(`[${requestId}] 🚀 New upscale request received`);
+  if (isDev) console.log(`[${requestId}] 🚀 New upscale request received`);
 
   const { userId, getToken } = await getAuth(req);
   if (!userId) {
-    console.log(`[${requestId}] ❌ Unauthorized`);
+    if (isDev) console.log(`[${requestId}] ❌ Unauthorized`);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  console.log(`[${requestId}] 👤 User: ${userId}`);
+  if (isDev) console.log(`[${requestId}] 👤 User: ${userId}`);
 
   try {
     const { imageUrl, prompt } = await req.json();
@@ -30,10 +45,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    console.log(`[${requestId}] 🖼️ Upscaling image: ${imageUrl.slice(0, 50)}...`);
+    if (isDev) console.log(`[${requestId}] 🖼️ Upscaling image: ${imageUrl.slice(0, 50)}...`);
 
     const startTime = Date.now();
-    const output = await replicate.run(UPSCALE_MODEL, {
+    const output = await withTimeout(replicate.run(UPSCALE_MODEL, {
       input: {
         seed: 1337,
         image: imageUrl,
@@ -57,12 +72,14 @@ export async function POST(req: NextRequest) {
         num_inference_steps: 18,
         downscaling_resolution: 768
       },
-    });
+    }), UPSCALE_TIMEOUT_MS, "Replicate upscale");
     const totalTime = Date.now() - startTime;
 
     // Cold start typically > 20s, warm < 10s
     const isColdStart = totalTime > 20000;
-    console.log(`[${requestId}] ⏱️ Replicate upscale took ${(totalTime / 1000).toFixed(1)}s — ${isColdStart ? '🥶 COLD START' : '🔥 WARM'}`);
+    if (isDev) {
+      console.log(`[${requestId}] ⏱️ Replicate upscale took ${(totalTime / 1000).toFixed(1)}s — ${isColdStart ? '🥶 COLD START' : '🔥 WARM'}`);
+    }
 
     // Extract URLs from the FileOutput objects
     const generatedUrls: string[] = [];
@@ -111,6 +128,7 @@ export async function POST(req: NextRequest) {
       imageprompt: prompt || "High-res upscaled version",
       is_upscaled: true,
       original_image_url: imageUrl,
+      user_id: userId,
     }));
 
     const { error: dbError } = await supabase
@@ -123,13 +141,14 @@ export async function POST(req: NextRequest) {
       console.warn(`[${requestId}] ⚠️ DB insert failed but continuing with response`);
     }
 
-    console.log(`[${requestId}] ✅ Upscale complete, returning ${minioUrls.length} URLs`);
+    if (isDev) console.log(`[${requestId}] ✅ Upscale complete, returning ${minioUrls.length} URLs`);
     return NextResponse.json(minioUrls);
   } catch (error) {
     console.error("Upscale route error:", error);
-    return NextResponse.json(
-      { error: "Failed to upscale image" },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : "Failed to upscale image";
+    if (message.toLowerCase().includes("timed out")) {
+      return NextResponse.json({ error: "Upscale timed out" }, { status: 504 });
+    }
+    return NextResponse.json({ error: "Failed to upscale image" }, { status: 500 });
   }
 }

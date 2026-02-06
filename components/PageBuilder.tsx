@@ -43,7 +43,7 @@ export function PageBuilder({ content }: PageBuilderProps) {
       default:
         const unknown = block as any;
         return (
-          <div className="border border-white min-h-[20px]" key={unknown._key}>
+          <div className="border border-border min-h-[20px]" key={unknown._key}>
             Block not found: {unknown._type}
           </div>
         );

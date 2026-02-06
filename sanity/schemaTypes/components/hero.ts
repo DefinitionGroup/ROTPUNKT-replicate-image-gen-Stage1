@@ -38,7 +38,7 @@ export default defineType({
       title: "Logo Image (Cloudinary) - Optional",
       type: "cloudinary.asset",
       description:
-        "Optional override. If empty, the component defaults to /rotpunkt-kuechen-logo.svg",
+        "Optional override. If empty, the component uses /rotpunkt-kuechen-logo.svg in dark mode and /rotpunkt-kuechen-logo-dunkel.svg in light mode.",
     }),
 
     defineField({

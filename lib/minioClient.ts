@@ -15,6 +15,20 @@ if (!process.env.MINIO_DOMAIN) throw new Error('Missing MINIO_DOMAIN in env vari
 const BUCKET = 'vision-images' as const
 const streamPipeline = promisify(pipeline)
 
+function getSafeObjectName(originURL: string): string {
+  let baseName = 'image'
+  try {
+    const parsed = new URL(originURL)
+    baseName = path.basename(parsed.pathname) || baseName
+  } catch {
+    baseName = path.basename(originURL) || baseName
+  }
+
+  const cleaned = baseName.split('?')[0].replace(/[^a-zA-Z0-9._-]/g, '_')
+  const suffix = cleaned || 'image'
+  return `${crypto.randomUUID()}-${suffix}`
+}
+
 export function getObjectUrl(objectName: string): string {
   return `https://${process.env.MINIO_DOMAIN}/${BUCKET}/${objectName}`
 }
@@ -79,21 +93,24 @@ async function downloadImage(tempDir: string, originURL: string, destinationName
 
 async function uploadImages(images: string[]): Promise<string[]> {
   const tempDir = fs.mkdtempSync(path.join(tmpdir(), crypto.randomUUID()))
-
-  const result = await Promise.all(images.map(async (imageURL) => await pRetry(
-    async () => await downloadImage(tempDir, imageURL, imageURL.split('/').at(-1)!),
-    {
-      retries: 6,
-      minTimeout: 10,
-      maxTimeout: 200,
-      onFailedAttempt: (error) => {
-        console.debug(`🔄 Failed attempt ${error.attemptNumber} to download ${imageURL}`)
+  try {
+    const result = await Promise.all(images.map(async (imageURL) => await pRetry(
+      async () => await downloadImage(tempDir, imageURL, getSafeObjectName(imageURL)),
+      {
+        retries: 6,
+        minTimeout: 10,
+        maxTimeout: 200,
+        onFailedAttempt: (error) => {
+          console.debug(`🔄 Failed attempt ${error.attemptNumber} to download ${imageURL}`)
+        },
       },
-    },
-  )))
+    )))
 
-  console.debug(`✅ Uploaded ${images.length} images`)
-  return result
+    console.debug(`✅ Uploaded ${images.length} images`)
+    return result
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true })
+  }
 }
 
 export {

@@ -54,8 +54,6 @@ export default function MediaHeroSection({
   function hrefFromLink(link: any) {
     if (!link) return undefined;
 
-    console.log("Processing link:", link); // Debug log
-
     if (link.linkType === "external") {
       return link.externalUrl;
     }
@@ -95,9 +93,6 @@ export default function MediaHeroSection({
   const richTexts = items.filter(isRich);
 
   // Debug logging
-  console.log("MediaHero additionalContent:", additionalContent);
-  console.log("MediaHero CTAs found:", ctas.length);
-  console.log("MediaHero Rich texts found:", richTexts.length);
 
   return (
     <section
@@ -126,10 +121,10 @@ export default function MediaHeroSection({
           duration={animation.duration ?? 0.5}
           distance={animation.distance ?? 80}
         >
-          <h2 className="text-7xl leading-compress text-gray-100 max-w-3xl text-center font-bold tracking-wider leading-tighter mb-8">
+          <h2 className="text-7xl leading-compress text-foreground max-w-3xl text-center font-bold tracking-wider leading-tighter mb-8">
             {heading}
           </h2>
-          <p className="text-xl text-gray-100 font-bold text-center max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground font-bold text-center max-w-2xl mx-auto">
             {subheading}
           </p>
 
@@ -139,7 +134,7 @@ export default function MediaHeroSection({
               {richTexts.map((rt, i) => (
                 <div
                   key={(rt as any)._key ?? `richtext-${i}`}
-                  className="prose prose-invert mx-auto text-center"
+                  className="prose dark:prose-invert mx-auto text-center"
                 >
                   <RichTextComponent value={rt.content ?? []} />
                 </div>
@@ -152,17 +147,12 @@ export default function MediaHeroSection({
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
               {ctas.map((c, i) => {
                 const href = hrefFromLink(c.link);
-                console.log(
-                  `MediaHero CTA ${i} - text: ${c.text}, href: ${href}`
-                ); // Debug log
 
                 if (!c.text) {
-                  console.log(`MediaHero CTA ${i} has no text, skipping`);
                   return null;
                 }
 
                 if (!href) {
-                  console.log(`MediaHero CTA ${i} has no href, skipping`);
                   return null;
                 }
 

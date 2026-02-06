@@ -3,13 +3,25 @@ import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { uploadImages } from "@/lib/minioClient";
 import { createClient } from "@supabase/supabase-js";
-import { Info } from "lucide-react";
-import { info } from "console";
-import { FaCircleXmark } from "react-icons/fa6";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
 });
+
+const isDev = process.env.NODE_ENV === "development";
+const REPLICATE_TIMEOUT_MS = 180_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${ms}ms`));
+    }, ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+  }) as Promise<T>;
+}
 
 const MODEL = "mainframeai/rddt-finetune-dec-2025:9620255525bcbad26f909dd62b2820aaae39aa99d0d9de5933c4a39465c6ff83";
 const NEGATIVE_PROMPT =
@@ -17,14 +29,14 @@ const NEGATIVE_PROMPT =
 
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
-  console.log(`[${requestId}] 🚀 New generation request received`);
+  if (isDev) console.log(`[${requestId}] 🚀 New generation request received`);
 
   const { userId, getToken } = await getAuth(req);
   if (!userId) {
-    console.log(`[${requestId}] ❌ Unauthorized`);
+    if (isDev) console.log(`[${requestId}] ❌ Unauthorized`);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  console.log(`[${requestId}] 👤 User: ${userId}`);
+  if (isDev) console.log(`[${requestId}] 👤 User: ${userId}`);
 
   try {
     const { prompt } = await req.json();
@@ -35,12 +47,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    console.log(`[${requestId}] 📝 Prompt: ${prompt.slice(0, 50)}...`);
+    if (isDev) console.log(`[${requestId}] 📝 Prompt: ${prompt.slice(0, 50)}...`);
 
     const finalPrompt = `RDTDOT ${prompt.trim()}`;
 
     const startTime = Date.now();
-    const output = await replicate.run(MODEL, {
+    const output = await withTimeout(replicate.run(MODEL, {
       // input: {
       //   prompt: finalPrompt,
       //   go_fast: true,
@@ -71,12 +83,14 @@ export async function POST(req: NextRequest) {
         num_inference_steps: 24,
         num_outputs: 1,
       },
-    });
+    }), REPLICATE_TIMEOUT_MS, "Replicate generation");
     const totalTime = Date.now() - startTime;
 
     // Cold start typically > 20s, warm < 10s
     const isColdStart = totalTime > 20000;
-    console.log(`[${requestId}] ⏱️ Replicate generation took ${(totalTime / 1000).toFixed(1)}s — ${isColdStart ? '🥶 COLD START' : '🔥 WARM'}`);
+    if (isDev) {
+      console.log(`[${requestId}] ⏱️ Replicate generation took ${(totalTime / 1000).toFixed(1)}s — ${isColdStart ? '🥶 COLD START' : '🔥 WARM'}`);
+    }
 
     // Extract URLs from the FileOutput objects
     const generatedUrls: string[] = [];
@@ -119,7 +133,11 @@ export async function POST(req: NextRequest) {
     );
 
 
-    const insertPayload = minioUrls.map((url) => ({ url, imageprompt: prompt }));
+    const insertPayload = minioUrls.map((url) => ({
+      url,
+      imageprompt: prompt,
+      user_id: userId,
+    }));
     const { error: dbError } = await supabase
       .from("images")
       .insert(insertPayload);
@@ -131,9 +149,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(minioUrls);
   } catch (error) {
     console.error("Replicate route error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate image" },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : "Failed to generate image";
+    if (message.toLowerCase().includes("timed out")) {
+      return NextResponse.json({ error: "Generation timed out" }, { status: 504 });
+    }
+    return NextResponse.json({ error: "Failed to generate image" }, { status: 500 });
   }
 }

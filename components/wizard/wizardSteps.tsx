@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
 import {
-  FaHouse,
   FaClock,
   FaTree,
-  FaLocationDot,
   FaPalette,
   FaCouch,
   FaEye,
@@ -31,6 +29,74 @@ export type WizardStepDefinition = {
 };
 
 export const wizardSteps: WizardStepDefinition[] = [
+  {
+    key: "environment",
+    labelKey: "wizard.steps.environment.label",
+    descriptionKey: "wizard.steps.environment.description",
+    options: [
+      {
+        value: "landhaus",
+        labelKey: "wizard.options.categoryLandhaus",
+        germanLabel: "Landhaus",
+        image: "/wizard-presets/category-landhaus.png",
+      },
+      {
+        value: "loft-industriegebaeude",
+        labelKey: "wizard.options.categoryLoftIndustriegebaeude",
+        germanLabel: "Loft / Industriegebäude",
+        image: "/wizard-presets/category-loft-industriegebaeude.png",
+      },
+      {
+        value: "stadtwohnung",
+        labelKey: "wizard.options.categoryStadtwohnung",
+        germanLabel: "Stadtwohnung",
+        image: "/wizard-presets/category-stadtwohnung.png",
+      },
+      {
+        value: "einfamilienhaus",
+        labelKey: "wizard.options.categoryEinfamilienhaus",
+        germanLabel: "Einfamilienhaus",
+        image: "/wizard-presets/category-einfamilienhaus.png",
+      },
+      {
+        value: "altbau",
+        labelKey: "wizard.options.categoryAltbau",
+        germanLabel: "Altbau",
+        image: "/wizard-presets/category-altbau.png",
+      },
+      {
+        value: "ferienhaus",
+        labelKey: "wizard.options.categoryFerienhaus",
+        germanLabel: "Ferienhaus",
+        image: "/wizard-presets/category-ferienhaus.png",
+      },
+      {
+        value: "reihenhaus-doppelhaushaelfte",
+        labelKey: "wizard.options.categoryReihenhausDoppelhaushaelfte",
+        germanLabel: "Reihenhaus / Doppelhaushälfte",
+        image: "/wizard-presets/category-reihenhaus-doppelhaushaelfte.png",
+      },
+      {
+        value: "tiny-house",
+        labelKey: "wizard.options.categoryTinyHouse",
+        germanLabel: "Tiny House",
+        image: "/wizard-presets/category-tiny-house.png",
+      },
+      {
+        value: "stadtvilla",
+        labelKey: "wizard.options.categoryStadtvilla",
+        germanLabel: "Stadtvilla",
+        image: "/wizard-presets/category-stadtvilla.png",
+      },
+      {
+        value: "apartment-penthouse",
+        labelKey: "wizard.options.categoryApartmentPenthouse",
+        germanLabel: "Apartment / Penthouse",
+        image: "/wizard-presets/category-apartment-penthouse.png",
+      },
+    ],
+    icon: <FaTree className="w-full h-full text-red-600" />,
+  },
   {
     key: "kind",
     labelKey: "wizard.steps.kind.label",
@@ -141,18 +207,6 @@ export const wizardSteps: WizardStepDefinition[] = [
     icon: <FaCouch className="w-full h-full text-red-600" />,
   },
   {
-    key: "environment",
-    labelKey: "wizard.steps.environment.label",
-    descriptionKey: "wizard.steps.environment.description",
-    options: [
-      { value: "stilvoll", labelKey: "wizard.options.stilvoll", germanLabel: "Stilvoll" },
-      { value: "modern", labelKey: "wizard.options.modern", germanLabel: "Modern" },
-      { value: "urban", labelKey: "wizard.options.urban", germanLabel: "Urban" },
-      { value: "naturnah", labelKey: "wizard.options.naturnah", germanLabel: "Naturnah" },
-    ],
-    icon: <FaTree className="w-full h-full text-red-600" />,
-  },
-  {
     key: "viewpoint",
     labelKey: "wizard.steps.viewpoint.label",
     descriptionKey: "wizard.steps.viewpoint.description",
@@ -231,44 +285,6 @@ export const wizardSteps: WizardStepDefinition[] = [
       },
     ],
     icon: <FaEye className="w-full h-full text-red-600" />,
-  },
-  {
-    key: "location",
-    labelKey: "wizard.steps.location.label",
-    descriptionKey: "wizard.steps.location.description",
-    options: [
-      {
-        value: "mediterrane Küstenstadt",
-        labelKey: "wizard.options.mediteraneKuestenstadt",
-        germanLabel: "Mediterrane Küstenstadt",
-        hintKey: "wizard.hints.warmeFarben",
-      },
-      {
-        value: "historisches altstadtviertel",
-        labelKey: "wizard.options.historischesAltstadtviertel",
-        germanLabel: "Historisches Altstadtviertel",
-        hintKey: "wizard.hints.kopfsteinpflaster",
-      },
-      {
-        value: "nordisches fjordhaus",
-        labelKey: "wizard.options.nordischesFjordhaus",
-        germanLabel: "Nordisches Fjordhaus",
-        hintKey: "wizard.hints.vielGlas",
-      },
-      {
-        value: "dachterrasse metropole",
-        labelKey: "wizard.options.dachterrasseMetropole",
-        germanLabel: "Dachterrasse Metropole",
-        hintKey: "wizard.hints.skyline",
-      },
-      {
-        value: "tropischer regenwald bungalow",
-        labelKey: "wizard.options.tropischerRegenwaldBungalow",
-        germanLabel: "Tropischer Regenwald Bungalow",
-        hintKey: "wizard.hints.sattesGruen",
-      },
-    ],
-    icon: <FaLocationDot className="w-full h-full text-red-600" />,
   },
   {
     key: "time",
@@ -445,46 +461,5 @@ export const wizardSteps: WizardStepDefinition[] = [
       },
     ],
     icon: <FaLeaf className="w-full h-full text-red-600" />,
-  },
-  {
-    key: "houseType",
-    labelKey: "wizard.steps.houseType.label",
-    descriptionKey: "wizard.steps.houseType.description",
-    options: [
-      {
-        value: "modernes Holzhaus mit großen Fenstern",
-        labelKey: "wizard.options.modernesHolzhaus",
-        germanLabel: "Modernes Holzhaus",
-        hintKey: "wizard.hints.skandinavisch",
-      },
-      { value: "Stadtwohnung", labelKey: "wizard.options.stadtwohnung", germanLabel: "Stadtwohnung" },
-      { value: "Loft", labelKey: "wizard.options.loft", germanLabel: "Loft" },
-      { value: "Landhaus", labelKey: "wizard.options.landhaus", germanLabel: "Landhaus" },
-      {
-        value: "penthouse mit dachterrasse",
-        labelKey: "wizard.options.penthouse",
-        germanLabel: "Penthouse",
-        hintKey: "wizard.hints.panoramablick",
-      },
-      {
-        value: "historische villa",
-        labelKey: "wizard.options.historischeVilla",
-        germanLabel: "Historische Villa",
-        hintKey: "wizard.hints.hoheDecken",
-      },
-      {
-        value: "reihenhaus mit garten",
-        labelKey: "wizard.options.reihenhaus",
-        germanLabel: "Reihenhaus",
-        hintKey: "wizard.hints.familienfreundlich",
-      },
-      {
-        value: "architektenhaus aus sichtbeton",
-        labelKey: "wizard.options.architektenhaus",
-        germanLabel: "Architektenhaus",
-        hintKey: "wizard.hints.brutalismus",
-      },
-    ],
-    icon: <FaHouse className="w-full h-full text-red-600" />,
   },
 ];

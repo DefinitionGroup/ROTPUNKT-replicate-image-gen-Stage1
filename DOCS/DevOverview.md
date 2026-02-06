@@ -579,7 +579,7 @@ CREATE TABLE images (
   url                TEXT NOT NULL,
   imageprompt        TEXT,
   created_at         TIMESTAMPTZ DEFAULT now(),
-  user_id            UUID NOT NULL,
+  user_id            TEXT NOT NULL,
   is_upscaled        BOOLEAN DEFAULT FALSE,
   original_image_url TEXT
 );
@@ -604,7 +604,7 @@ CREATE POLICY "Users can insert own images" ON images
 │ url                TEXT      NOT NULL
 │ imageprompt        TEXT             │
 │ created_at         TIMESTAMPTZ      │
-│ user_id            UUID      FK→Clerk
+│ user_id            TEXT      FK→Clerk
 │ is_upscaled        BOOLEAN          │
 │ original_image_url TEXT             │
 └─────────────────────────────────────┘
@@ -882,6 +882,7 @@ docker run -p 3000:3000 \
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...
 CLERK_SECRET_KEY=sk_live_...
+CLERK_WEBHOOK_SIGNING_SECRET=whsec_...
 
 # Replicate AI
 REPLICATE_API_TOKEN=r8_...
@@ -899,7 +900,11 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 # Sanity CMS
 NEXT_PUBLIC_SANITY_PROJECT_ID=abc123
 NEXT_PUBLIC_SANITY_DATASET=production
-SANITY_API_READ_TOKEN=sk...
+NEXT_PUBLIC_SANITY_API_VERSION=2025-08-21
+NEXT_PUBLIC_SANITY_STUDIO_URL=https://your-sanity-studio-url
+NEXT_PUBLIC_SANITY_BROWSER_TOKEN=sk_live_readonly_optional
+SANITY_VIEWER_TOKEN=sk_live_server_only
+SANITY_STUDIO_PREVIEW_ORIGIN=http://localhost:3000
 ```
 
 ### Variable Categories

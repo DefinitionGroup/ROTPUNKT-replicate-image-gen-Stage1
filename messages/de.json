@@ -55,8 +55,8 @@
         "description": "Welcher Einrichtungsstil passt am besten? Diese Auswahl bestimmt Linienführung und Materialmix."
       },
       "environment": {
-        "label": "Atmosphäre",
-        "description": "Legt die Anmutung des Umfelds fest – von urban bis naturnah."
+        "label": "Kategorie",
+        "description": "Wählen Sie den architektonischen Kontext Ihrer Szene. Die Kategorie steuert Proportionen, Raumwirkung und Materialcharakter der Visualisierung."
       },
       "viewpoint": {
         "label": "Perspektive",
@@ -105,6 +105,16 @@
       "minimalistisch": "Minimalistisch",
       "stilvoll": "Stilvoll",
       "naturnah": "Naturnah",
+      "categoryLandhaus": "Landhaus",
+      "categoryLoftIndustriegebaeude": "Loft/ Industriegebäude",
+      "categoryStadtwohnung": "Stadtwohnung",
+      "categoryEinfamilienhaus": "Einfamilienhaus",
+      "categoryAltbau": "Altbau",
+      "categoryFerienhaus": "Ferienhaus",
+      "categoryReihenhausDoppelhaushaelfte": "Reihenhaus/ Doppelhaushälfte",
+      "categoryTinyHouse": "Tiny House",
+      "categoryStadtvilla": "Stadtvilla",
+      "categoryApartmentPenthouse": "Apartment/ Penthouse",
       "augenhoehe": "Augenhöhe",
       "froschperspektive": "Froschperspektive",
       "vogelperspektive": "Vogelperspektive",
@@ -187,6 +197,8 @@
       "progress": "Fortschritt",
       "step": "Schritt {current} / {total}",
       "overview": "Auswahlüberblick",
+      "showDetails": "Details anzeigen",
+      "hideDetails": "Details ausblenden",
       "selected": "ausgewählt",
       "open": "offen",
       "noSelection": "Noch keine Auswahl",

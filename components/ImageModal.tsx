@@ -112,14 +112,14 @@ export default function ImageModal({
       onClick={onClose}
     >
       <motion.div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       />
 
       <motion.div
-        className="relative rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-800/60"
+        className="relative rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-border/60 bg-card/95 backdrop-blur-md"
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 50 }}
@@ -129,7 +129,7 @@ export default function ImageModal({
         <motion.button
           type="button"
           aria-label={tCommon('close')}
-          className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-black/60 hover:bg-brand-primary-2 border border-white/20 text-brand-secondary-1 shadow-md backdrop-blur-sm transition-colors leading-none"
+          className="absolute top-3 right-3 z-10 grid place-items-center w-10 h-10 rounded-full bg-background/80 hover:bg-brand-primary-2 border border-border/60 text-foreground shadow-md backdrop-blur-sm transition-colors leading-none"
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
           onClick={onClose}
@@ -158,7 +158,7 @@ export default function ImageModal({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-50 z-[60] bg-black/60 text-brand-secondary-1 shadow-md backdrop-blur-sm border-white/20"
+              className="w-50 z-[60] bg-popover/90 text-popover-foreground shadow-md backdrop-blur-sm border-border/60"
               side="top"
               align="start"
               sideOffset={8}
@@ -214,7 +214,7 @@ export default function ImageModal({
                   <FaSquareXTwitter className="inline mr-2" />X (Twitter)
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/20" />
+              <DropdownMenuSeparator className="bg-border/60" />
               <DropdownMenuItem asChild>
                 <Link
                   href={`mailto:?body=${encodeURIComponent(normalizedUrl)}`}
@@ -224,7 +224,7 @@ export default function ImageModal({
                   Email
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/20" />
+              <DropdownMenuSeparator className="bg-border/60" />
               <DropdownMenuItem
                 onClick={() => {
                   navigator.clipboard.writeText(normalizedUrl);
