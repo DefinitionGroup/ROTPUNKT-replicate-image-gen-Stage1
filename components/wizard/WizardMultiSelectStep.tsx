@@ -87,7 +87,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
       </div>
 
       {/* Grouped options */}
-      <div className="flex-1 overflow-y-auto min-h-0 pr-2">
+      <div className="flex-1 overflow-y-auto min-h-0 pr-1 sm:pr-2 touch-pan-y [-webkit-overflow-scrolling:touch]">
         <div className="space-y-6 pb-4">
           {groupedOptions.map(({ name, options: groupOptions }) => (
             <div key={name || "default"}>

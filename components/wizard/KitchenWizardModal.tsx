@@ -39,11 +39,10 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const wizardState = useStore(wizardStore);
   const { isSignedIn } = useAuth();
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const stepContainerRef = useRef<HTMLDivElement | null>(null);
   const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(true);
   const translatedSteps = useTranslatedWizardSteps();
 
-  const CARD_HEIGHT = 640;
-  const CARD_WIDTH = 980;
   const totalSteps = wizardSteps.length;
 
   const summaryData = useMemo(
@@ -106,6 +105,10 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    stepContainerRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [wizardState.currentStep]);
+
   const handleOptionSelect = (option: string) => {
     if (
       wizardState.currentStep < 0 ||
@@ -145,7 +148,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       <motion.div
         key="wizard-popover"
         ref={overlayRef}
-        className="fixed inset-0 z-9999990 flex items-center justify-center bg-background/20 backdrop-blur-lg absolute"
+        className="fixed inset-0 z-9999990 flex items-center justify-center overflow-y-auto bg-background/20 backdrop-blur-lg p-2 sm:p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -160,20 +163,11 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ duration: 0.25, type: "spring" }}
-          className="relative"
-          style={{
-            width: CARD_WIDTH,
-            minWidth: CARD_WIDTH,
-            maxWidth: "98vw",
-            minHeight: CARD_HEIGHT,
-            maxHeight: "96vh",
-            zIndex: 999999999,
-            position: "relative",
-          }}
+          className="relative w-full max-w-[980px] h-[calc(100dvh-1rem)] sm:h-[96vh] max-h-[640px] min-h-0 z-[999999999]"
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
-          <Card className="relative w-full h-full min-h-[500px] max-h-[96vh] flex flex-col shadow-2xl bg-card/95 border border-border rounded-2xl overflow-hidden">
+          <Card className="relative w-full h-full min-h-0 sm:min-h-[500px] flex flex-col shadow-2xl bg-card/95 border border-border rounded-2xl overflow-hidden">
             <CardHeader>
               <WizardHeader
                 currentStep={wizardState.currentStep}
@@ -185,7 +179,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
               />
             </CardHeader>
 
-            <CardContent className="flex-1 flex flex-col p-6 sm:p-8 overflow-hidden">
+            <CardContent className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 overflow-hidden">
               {showSummaryPanel && (
                 <div className="mb-3 flex justify-end shrink-0">
                   <button
@@ -212,8 +206,11 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                 </div>
               )}
 
-              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full overflow-hidden">
-                <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 h-full min-h-0 overflow-hidden">
+                  <div
+                    ref={stepContainerRef}
+                    className="flex-1 flex flex-col min-h-0 overflow-y-auto touch-pan-y [-webkit-overflow-scrolling:touch]"
+                  >
                   <AnimatePresence mode="wait" initial={false}>
                     {isIntro && (
                       <WizardIntro

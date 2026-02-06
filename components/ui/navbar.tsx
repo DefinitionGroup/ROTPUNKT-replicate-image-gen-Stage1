@@ -132,11 +132,11 @@ export default function Navbar({
   // ----------------------------------------
 
   return (
-    <div className="fixed top-4 inset-x-0 z-10 px-10 md:px-20 flex justify-center w-full">
+    <div className="fixed top-0 md:top-4 inset-x-0 z-10 px-0 md:px-20 flex justify-center w-full">
       <nav
         className={cn(
-          "relative mx-auto w-auto md:w-full max-w-4xl flex items-center justify-between",
-          "rounded-full pl-4 md:pl-6 py-12 md:py-3 shadow-lg",
+          "relative mx-auto w-full md:w-full max-w-none md:max-w-4xl flex items-center justify-between",
+          "rounded-none md:rounded-full px-4 md:pl-6 md:pr-4 py-4 md:py-3 shadow-lg",
           "bg-card/70 backdrop-blur-md border border-border/70",
           "text-foreground transition-all duration-300"
         )}
@@ -233,7 +233,7 @@ export default function Navbar({
             />
 
             <motion.div
-              className="relative h-full w-full flex flex-col"
+              className="relative h-full w-screen flex flex-col"
               initial={{ y: 24, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 24, opacity: 0 }}
