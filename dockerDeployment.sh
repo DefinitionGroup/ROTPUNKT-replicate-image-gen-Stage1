@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Trap for error handling - ensures Jenkins gets proper exit code
+# Trap for error handling - ensures Jenkins gets proper exit code (cg)
 trap 'echo "ERROR: Deployment failed at line $LINENO with exit code $?" >&2; exit 1' ERR
 
 # Variables
