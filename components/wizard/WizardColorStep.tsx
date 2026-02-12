@@ -158,7 +158,7 @@ export function WizardColorStep({
           hasFrontfarbenOptions ? (
             <div className="flex flex-col gap-3">
               <div className="sticky top-0 z-20 pb-2 backdrop-blur supports-[backdrop-filter]:bg-card/80 shadow-xl">
-                <div className="rounded-xl border border-border bg-muted/40 p-2 sm:p-3">
+                <div className="rounded-xl border border-border p-2 sm:p-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
@@ -240,7 +240,7 @@ export function WizardColorStep({
                                     <span className="truncate text-xs font-medium text-foreground">
                                       {tabLabel}
                                     </span>
-                                    <span className="text-xxs text-muted-foreground">
+                                    <span className="inline-flex w-fit font-bold items-center rounded-full border border-border/70 bg-muted/70 px-1.5 py-0.5 text-xxs text-brand-primary-2 leading-none">
                                       {tab.count}
                                     </span>
                                   </div>

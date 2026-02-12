@@ -43,8 +43,8 @@
     },
     "steps": {
       "kind": {
-        "label": "Raumfokusxxxx",
-        "description": "Welche Art von Raum soll visualisiert werden? Wählen Sie den Schwerpunkt für die Szene.xxxx"
+        "label": "Raumfokus",
+        "description": "Welche Art von Raum soll visualisiert werden? Wählen Sie den Schwerpunkt für die Szene."
       },
       "color": {
         "label": "Farbwelt",
