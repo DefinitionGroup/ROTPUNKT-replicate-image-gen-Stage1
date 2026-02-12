@@ -145,6 +145,13 @@ export const wizardSteps: WizardStepDefinition[] = [
     icon: <FaPalette className="w-full h-full text-red-600" />,
   },
   {
+    key: "handle",
+    labelKey: "wizard.steps.handle.label",
+    descriptionKey: "wizard.steps.handle.description",
+    options: [],
+    icon: <FaPalette className="w-full h-full text-red-600" />,
+  },
+  {
     key: "style",
     labelKey: "wizard.steps.style.label",
     descriptionKey: "wizard.steps.style.description",

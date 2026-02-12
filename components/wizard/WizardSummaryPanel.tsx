@@ -1,15 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { motion } from "motion/react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useTranslatedWizardSteps } from "./useTranslatedWizardSteps";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { WizardState } from "@/app/store/wizardStore";
 import { getFenixColorLabel } from "./fenixColors";
 import { getWizardProgress } from "./wizardProgress";
+import { getFrontfarbenColorLabel } from "./frontfarbenCatalog";
+import { getHandleSelectionLabel } from "./handleCatalog";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -28,10 +29,10 @@ interface WizardSummaryPanelProps {
 
 export function WizardSummaryPanel({
   selections,
-  extraWishes,
+  extraWishes: _extraWishes,
   currentStep,
   totalSteps,
-  prompt,
+  prompt: _prompt,
   missingKeys,
   isSignedIn,
   loading = false,
@@ -40,10 +41,10 @@ export function WizardSummaryPanel({
   onJumpToFinal,
   onJumpToStep,
 }: WizardSummaryPanelProps) {
-  const [copied, setCopied] = useState(false);
-  const [showPrompt, setShowPrompt] = useState(false);
+  void _extraWishes;
+  void _prompt;
   const t = useTranslations("wizard.summary");
-  const cleanedWishes = extraWishes.trim();
+  const locale = useLocale();
   const translatedSteps = useTranslatedWizardSteps();
 
   const isComplete = missingKeys.length === 0;
@@ -79,7 +80,11 @@ export function WizardSummaryPanel({
       )?.label;
       const selectedLabel =
         step.key === "color"
-          ? getFenixColorLabel(selectedValue as string) ?? baseLabel
+          ? getFrontfarbenColorLabel(selectedValue as string, locale) ??
+          getFenixColorLabel(selectedValue as string) ??
+          baseLabel
+          : step.key === "handle"
+            ? getHandleSelectionLabel(selectedValue as string, locale) ?? baseLabel
           : baseLabel;
       return {
         key,
@@ -90,17 +95,7 @@ export function WizardSummaryPanel({
         count: selectedLabel ? 1 : 0,
       };
     });
-  }, [selections, translatedSteps]);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(prompt);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error("Clipboard error", error);
-    }
-  };
+  }, [selections, translatedSteps, locale]);
 
   const renderPrimaryAction = () => {
     if (!isComplete) {

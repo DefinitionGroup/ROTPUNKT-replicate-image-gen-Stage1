@@ -48,7 +48,11 @@
       },
       "color": {
         "label": "Farbwelt",
-        "description": "Definieren Sie die dominante Farbgebung für Möbel, Fronten und Akzente – wahlweise aus der Rotpunkt Palette oder originalen FENIX NTM® Farbtönen."
+        "description": "Definieren Sie die dominante Farbgebung für Möbel, Fronten und Akzente – wahlweise aus dem Frontfarben-Katalog oder originalen FENIX NTM® Farbtönen."
+      },
+      "handle": {
+        "label": "Griffe & Griffleisten",
+        "description": "Wählen Sie ein Griff- oder Griffleistenmodell und genau eine verfügbare Farbvariante aus."
       },
       "style": {
         "label": "Stilrichtung",
@@ -214,6 +218,21 @@
       "selected": "{count} ausgewählt",
       "continue": "Weiter →",
       "remove": "Entfernen"
+    },
+    "colorTabs": {
+      "frontfarbenLabel": "Frontfarben",
+      "frontfarbenDescription": "Material- und Farbvarianten aus dem Frontfarben-Datensatz mit Bild- und Trainingscaption-Referenzen.",
+      "fenixLabel": "FENIX Palette",
+      "fenixDescription": "Originale FENIX NTM® Oberflächenfarben zur Auswahl.",
+      "allMaterials": "Alle Materialien",
+      "trainingCaptionLabel": "Training-Caption"
+    },
+    "handleMatrix": {
+      "categoryLabel": "Kategorien",
+      "modelLabel": "Modell",
+      "availableColors": "Verfügbare Farben (Einzelauswahl)",
+      "imageUnavailable": "Kein Produktbild verfügbar",
+      "noProducts": "Keine Produkte in dieser Kategorie verfügbar."
     }
   },
   "imageGenerator": {

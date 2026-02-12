@@ -22,6 +22,7 @@ import { WizardSummaryPanel } from "./WizardSummaryPanel";
 import { buildPrompt } from "./promptBuilder";
 import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
+import { WizardHandleStep } from "./WizardHandleStep";
 import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
@@ -62,6 +63,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       ? translatedSteps[wizardState.currentStep]
       : undefined;
   const isColorStep = currentStepDefinition?.key === "color";
+  const isHandleStep = currentStepDefinition?.key === "handle";
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
 
   const startWithPreset = (preset: WizardPreset) => {
@@ -232,6 +234,16 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           selectedValue={
                             wizardState.selectedOptions.color
                           }
+                          onSelect={handleOptionSelect}
+                          loading={loading}
+                        />
+                      ) : isHandleStep ? (
+                        <WizardHandleStep
+                          key={`${wizardState.currentStep}-handle`}
+                          icon={currentStepDefinition.icon}
+                          title={currentStepDefinition.label}
+                          description={currentStepDefinition.description}
+                          selectedValue={wizardState.selectedOptions.handle}
                           onSelect={handleOptionSelect}
                           loading={loading}
                         />

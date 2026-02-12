@@ -1,0 +1,38 @@
+{
+  "total_images": 359,
+  "material_types": {
+    "Echtlackfront": 61,
+    "Rahmenfront": 103,
+    "Glaslaminat": 7,
+    "Nussbaumfront": 1,
+    "Matte Kunststofffront": 94,
+    "null": 3,
+    "Eichenholzfront": 54,
+    "Synchronpore Front": 36
+  },
+  "subcategories": {
+    "SC": 22,
+    "HL": 17,
+    "LX": 22,
+    "OL": 26,
+    "FL": 26,
+    "NL": 26,
+    "MX": 4,
+    "CL": 21,
+    "VI": 3,
+    "VM": 4,
+    "WN": 1,
+    "MT": 2,
+    "KQ": 8,
+    "MA": 13,
+    "FM": 24,
+    "HPL": 45,
+    "QM": 2,
+    "null": 3,
+    "A": 26,
+    "B": 26,
+    "RW": 1,
+    "RP": 1,
+    "SY": 36
+  }
+}

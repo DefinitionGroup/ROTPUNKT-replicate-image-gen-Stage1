@@ -1,6 +1,11 @@
 import type { WizardState } from "@/app/store/wizardStore";
 import { wizardSteps } from "./wizardSteps";
 import { getFenixColorByValue, isFenixColorValue } from "./fenixColors";
+import {
+  getFrontfarbenColorByValue,
+  isFrontfarbenColorValue,
+} from "./frontfarbenCatalog";
+import { getHandlePromptDescriptor } from "./handleCatalog";
 
 export type PromptBuildResult = {
   prompt: string;
@@ -41,19 +46,32 @@ export function buildPrompt({
   const style = getLabel("style", selections.style);
   const colorSelection = selections.color;
   const isFenix = isFenixColorValue(colorSelection);
+  const isFrontfarbe = isFrontfarbenColorValue(colorSelection);
   const fenixColor = isFenix ? getFenixColorByValue(colorSelection) : undefined;
-  const colorLabel = !isFenix ? getLabel("color", colorSelection) : undefined;
+  const frontfarbe = isFrontfarbe
+    ? getFrontfarbenColorByValue(colorSelection)
+    : undefined;
+  const colorLabel =
+    !isFenix && !isFrontfarbe ? getLabel("color", colorSelection) : undefined;
   const environment = getLabel("environment", selections.environment);
   const time = getLabel("time", selections.time);
+  const handleSelection = getHandlePromptDescriptor(selections.handle);
   const viewpoint = selections.viewpoint ?? "innenansicht";
 
-  const colorDescriptor = isFenix
-    ? fenixColor
+  let colorDescriptor: string | undefined;
+  if (isFenix) {
+    colorDescriptor = fenixColor
       ? `mit der FENIX Farbwelt "${fenixColor.name}" (${fenixColor.hex}) - ${fenixColor.description}`
-      : undefined
-    : colorLabel
+      : undefined;
+  } else if (isFrontfarbe) {
+    colorDescriptor = frontfarbe
+      ? `mit der Frontfarbe "${frontfarbe.labelDe}" (Katalog ${frontfarbe.id}, ${frontfarbe.materialTypeDe})`
+      : undefined;
+  } else {
+    colorDescriptor = colorLabel
       ? `mit einer Farbpalette in ${colorLabel}`
       : undefined;
+  }
 
   if (kind || style || colorDescriptor) {
     const descriptors: string[] = [];
@@ -69,6 +87,18 @@ export function buildPrompt({
 
   if (time) {
     sections.push(`Tageszeit: ${time}.`);
+  }
+
+  if (handleSelection) {
+    sections.push(
+      `Griff-/Griffleistenkonfiguration: ${handleSelection.categoryDe}, Modell ${handleSelection.model}, Typ ${handleSelection.typeDe}, Farbe ${handleSelection.colorNameDe} (${handleSelection.colorCode}, ${handleSelection.colorHex}).`
+    );
+  }
+
+  if (frontfarbe) {
+    sections.push(
+      `Exakte Frontfarben-Referenz (Training Caption unverändert verwenden): ${frontfarbe.trainingCaption}.`
+    );
   }
 
   // Floor selection
@@ -107,10 +137,17 @@ export function buildPrompt({
   const emphasisLine =
     isFenix && fenixColor
       ? `Wichtig: Möbel in ${fenixColor.description} (FENIX ${fenixColor.name}, ${fenixColor.hex}).`
-      : undefined;
+      : frontfarbe
+        ? `Wichtig: Nutze die Frontfarbenreferenz exakt als "${frontfarbe.trainingCaption}" (Katalog ${frontfarbe.id} - ${frontfarbe.labelDe}).`
+        : undefined;
+
+  const handleEmphasisLine = handleSelection
+    ? `Wichtig: Verwende den ausgewählten Griff exakt als ${handleSelection.categoryDe} ${handleSelection.model} in ${handleSelection.colorNameDe} (${handleSelection.colorCode}).`
+    : undefined;
 
   const prompt = [
     emphasisLine,
+    handleEmphasisLine,
     "Photorealistische Rotpunkt Küchenvisualisierung, entworfen von einem preisgekrönten Innenarchitekten.",
     ...sections,
   ]

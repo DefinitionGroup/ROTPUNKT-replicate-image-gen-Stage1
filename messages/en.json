@@ -48,7 +48,11 @@
       },
       "color": {
         "label": "Color World",
-        "description": "Define the dominant color scheme for furniture, fronts and accents – choose from the Rotpunkt palette or original FENIX NTM® color tones."
+        "description": "Define the dominant color scheme for furniture, fronts and accents – choose from the Frontfarben catalog or original FENIX NTM® color tones."
+      },
+      "handle": {
+        "label": "Handles & Rails",
+        "description": "Select a handle/rail model and exactly one available color variant."
       },
       "style": {
         "label": "Style Direction",
@@ -214,6 +218,21 @@
       "selected": "{count} selected",
       "continue": "Continue →",
       "remove": "Remove"
+    },
+    "colorTabs": {
+      "frontfarbenLabel": "Front Colors",
+      "frontfarbenDescription": "Material and color variants from the Frontfarben dataset with image and training-caption references.",
+      "fenixLabel": "FENIX Palette",
+      "fenixDescription": "Original FENIX NTM® surface colors.",
+      "allMaterials": "All materials",
+      "trainingCaptionLabel": "Training caption"
+    },
+    "handleMatrix": {
+      "categoryLabel": "Categories",
+      "modelLabel": "Model",
+      "availableColors": "Available colors (single selection)",
+      "imageUnavailable": "No product image available",
+      "noProducts": "No products available in this category."
     }
   },
   "imageGenerator": {
