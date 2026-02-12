@@ -105,7 +105,7 @@ export function WizardColorStep({
           <h3 className="text-lg sm:text-xl text-left md:text-2xl tracking-tight text-foreground">
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-xl">{description}</p>
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl text-left leading-snug break-words">{description}</p>
         </div>
       </div>
 
@@ -118,8 +118,8 @@ export function WizardColorStep({
                 key={tab.id}
                 type="button"
                 className={`flex-1 sm:flex-none px-3 sm:px-4 py-1.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isActive
-                    ? "bg-brand-primary-2 text-white shadow"
-                    : "hover:text-foreground"
+                  ? "bg-brand-primary-2 text-white shadow"
+                  : "hover:text-foreground"
                   }`}
                 onClick={() => setActiveTab(tab.id)}
                 disabled={loading}
@@ -130,7 +130,7 @@ export function WizardColorStep({
             );
           })}
         </div>
-        <p className="text-xxs text-muted-foreground">{renderTabDescription()}</p>
+        <p className="text-xxs text-muted-foreground text-left leading-snug break-words">{renderTabDescription()}</p>
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0 pr-1 sm:pr-2 touch-pan-y [-webkit-overflow-scrolling:touch]">
@@ -142,8 +142,8 @@ export function WizardColorStep({
                   <button
                     type="button"
                     className={`px-3 sm:px-4 py-1.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${activeMaterialTab === ALL_MATERIALS_TAB_ID
-                        ? "bg-brand-primary-2 text-white shadow"
-                        : "hover:text-foreground"
+                      ? "bg-brand-primary-2 text-white shadow"
+                      : "hover:text-foreground"
                       }`}
                     onClick={() => setActiveMaterialTab(ALL_MATERIALS_TAB_ID)}
                     disabled={loading}
@@ -159,8 +159,8 @@ export function WizardColorStep({
                         key={tab.id}
                         type="button"
                         className={`px-3 sm:px-4 py-1.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isActive
-                            ? "bg-brand-primary-2 text-white shadow"
-                            : "hover:text-foreground"
+                          ? "bg-brand-primary-2 text-white shadow"
+                          : "hover:text-foreground"
                           }`}
                         onClick={() => setActiveMaterialTab(tab.id)}
                         disabled={loading}

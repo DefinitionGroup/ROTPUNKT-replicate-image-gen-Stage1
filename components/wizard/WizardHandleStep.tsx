@@ -73,7 +73,7 @@ export function WizardHandleStep({
           <h3 className="text-lg sm:text-xl text-left md:text-2xl tracking-tight text-foreground">
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-xl">{description}</p>
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl text-left leading-snug break-words">{description}</p>
         </div>
       </div>
 
@@ -90,8 +90,8 @@ export function WizardHandleStep({
                   key={category.id}
                   type="button"
                   className={`px-3 sm:px-4 py-1.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isActive
-                      ? "bg-brand-primary-2 text-white shadow"
-                      : "hover:text-foreground"
+                    ? "bg-brand-primary-2 text-white shadow"
+                    : "hover:text-foreground"
                     }`}
                   onClick={() => setActiveCategory(category.id)}
                   disabled={loading}
@@ -118,8 +118,8 @@ export function WizardHandleStep({
               <div
                 key={product.id}
                 className={`rounded-xl border p-3 sm:p-4 transition ${isProductSelected
-                    ? "border-emerald-400/80 bg-emerald-500/5"
-                    : "border-border bg-muted/60"
+                  ? "border-emerald-400/80 bg-emerald-500/5"
+                  : "border-border bg-muted/60"
                   }`}
               >
                 <div className="grid grid-cols-1 min-[680px]:grid-cols-[220px_1fr] gap-3 sm:gap-4">
@@ -140,22 +140,22 @@ export function WizardHandleStep({
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 min-w-0">
                     <div className="flex flex-col gap-1">
-                      <span className="text-xxs uppercase tracking-wide text-brand-primary-2 font-semibold">
+                      <span className="text-xxs uppercase text-left tracking-wide text-brand-primary-2 font-semibold">
                         {t("modelLabel")}: {product.model}
                       </span>
-                      <h4 className="text-sm sm:text-base font-semibold text-foreground leading-tight">
+                      <h4 className="text-sm sm:text-base font-semibold text-foreground leading-tight text-left break-words">
                         {productLabel}
                       </h4>
-                      <p className="text-xxs sm:text-xs text-muted-foreground">
+                      <p className="text-xxs sm:text-xs text-muted-foreground text-left leading-snug break-words">
                         {typeLabel}
                       </p>
-                      <p className="text-xxs text-muted-foreground/90">{product.dimensions}</p>
+                      <p className="text-xxs text-muted-foreground/90 text-left leading-snug break-words">{product.dimensions}</p>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-xxs uppercase tracking-wide text-muted-foreground">
+                      <span className="text-xxs uppercase text-left tracking-wide text-muted-foreground">
                         {t("availableColors")}
                       </span>
                       <div className="flex flex-wrap gap-2">
@@ -169,8 +169,8 @@ export function WizardHandleStep({
                               key={`${product.id}-${color.id}`}
                               type="button"
                               className={`inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xxs sm:text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isSelected
-                                  ? "border-emerald-400/80 bg-emerald-500/5 text-foreground"
-                                  : "border-border bg-background/70 text-muted-foreground hover:text-foreground hover:border-brand-primary-2/50"
+                                ? "border-emerald-400/80 bg-emerald-500/5 text-foreground"
+                                : "border-border bg-background/70 text-muted-foreground hover:text-foreground hover:border-brand-primary-2/50"
                                 }`}
                               onClick={() => onSelect(value)}
                               disabled={loading}

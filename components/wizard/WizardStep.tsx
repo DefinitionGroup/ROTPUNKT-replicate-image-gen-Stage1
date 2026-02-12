@@ -39,7 +39,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
           <h3 className="text-lg sm:text-xl md:text-4xl text-left tracking-tight text-foreground">
             {title}
           </h3>
-          <p className="text-sm font-medium text-muted-foreground  tracking-tight text-left mt-1 max-w-xl">
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl text-left leading-snug break-words">
             {description}
           </p>
         </div>
