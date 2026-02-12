@@ -157,100 +157,102 @@ export function WizardColorStep({
         {activeTab === "frontfarben" ? (
           hasFrontfarbenOptions ? (
             <div className="flex flex-col gap-3">
-              <div className="rounded-xl border border-border bg-muted/40 p-2 sm:p-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    className={`px-3 sm:px-4 py-1.5 rounded-full border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 text-xs ${activeMaterialTab === ALL_MATERIALS_TAB_ID
-                      ? "border-brand-primary-2 bg-brand-primary-2 text-white shadow"
-                      : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
-                      }`}
-                    onClick={() => {
-                      setActiveMaterialTab(ALL_MATERIALS_TAB_ID);
-                      setIsMaterialMenuOpen(false);
-                    }}
-                    disabled={loading}
-                    aria-pressed={activeMaterialTab === ALL_MATERIALS_TAB_ID}
-                  >
-                    {t("allMaterials")}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-border bg-muted/60 text-xs text-foreground transition hover:border-brand-primary-2/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70"
-                    onClick={() => setIsMaterialMenuOpen((value) => !value)}
-                    disabled={loading}
-                    aria-expanded={isMaterialMenuOpen}
-                    aria-controls="frontfarben-material-menu"
-                  >
-                    <span>{activeMaterialLabel}</span>
-                    {isMaterialMenuOpen ? (
-                      <ChevronUp className="h-3.5 w-3.5" />
-                    ) : (
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    )}
-                  </button>
-                </div>
-
-                <AnimatePresence initial={false}>
-                  {isMaterialMenuOpen ? (
-                    <motion.div
-                      id="frontfarben-material-menu"
-                      initial={{ opacity: 0, y: 6, height: 0 }}
-                      animate={{ opacity: 1, y: 0, height: "auto" }}
-                      exit={{ opacity: 0, y: 6, height: 0 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="overflow-hidden"
+              <div className="sticky top-0 z-20 pb-2 backdrop-blur supports-[backdrop-filter]:bg-card/80 shadow-xl">
+                <div className="rounded-xl border border-border bg-muted/40 p-2 sm:p-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      className={`px-3 sm:px-4 py-1.5 rounded-full border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 text-xs ${activeMaterialTab === ALL_MATERIALS_TAB_ID
+                        ? "border-brand-primary-2 bg-brand-primary-2 text-white shadow"
+                        : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+                        }`}
+                      onClick={() => {
+                        setActiveMaterialTab(ALL_MATERIALS_TAB_ID);
+                        setIsMaterialMenuOpen(false);
+                      }}
+                      disabled={loading}
+                      aria-pressed={activeMaterialTab === ALL_MATERIALS_TAB_ID}
                     >
-                      <div className="mt-3 grid grid-cols-1 min-[460px]:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {materialTabs.map((tab) => {
-                          const isActive = tab.id === activeMaterialTab;
-                          const tabLabel = normalizedLocale === "de" ? tab.labelDe : tab.labelEn;
-                          const previewImagePath = getFrontfarbenMaterialTabPreviewImage(tab.id);
-                          return (
-                            <button
-                              key={tab.id}
-                              type="button"
-                              className={`w-full px-3 py-2 rounded-lg border text-xs text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isActive
-                                ? "border-brand-primary-2 bg-brand-primary-2/15 text-foreground"
-                                : "border-border bg-background/60 text-muted-foreground hover:text-foreground hover:border-brand-primary-2/50"
-                                }`}
-                              onClick={() => {
-                                setActiveMaterialTab(tab.id);
-                                setIsMaterialMenuOpen(false);
-                              }}
-                              disabled={loading}
-                              aria-pressed={isActive}
-                            >
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div className="relative h-9 w-9 rounded-md overflow-hidden border border-border/60 bg-background shrink-0">
-                                  {previewImagePath ? (
-                                    <Image
-                                      src={getFrontfarbenImageSrc(previewImagePath)}
-                                      alt={tabLabel}
-                                      fill
-                                      unoptimized
-                                      className="object-cover"
-                                      sizes="36px"
-                                    />
-                                  ) : null}
+                      {t("allMaterials")}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-border bg-muted/60 text-xs text-foreground transition hover:border-brand-primary-2/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70"
+                      onClick={() => setIsMaterialMenuOpen((value) => !value)}
+                      disabled={loading}
+                      aria-expanded={isMaterialMenuOpen}
+                      aria-controls="frontfarben-material-menu"
+                    >
+                      <span>{activeMaterialLabel}</span>
+                      {isMaterialMenuOpen ? (
+                        <ChevronUp className="h-3.5 w-3.5" />
+                      ) : (
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  </div>
+
+                  <AnimatePresence initial={false}>
+                    {isMaterialMenuOpen ? (
+                      <motion.div
+                        id="frontfarben-material-menu"
+                        initial={{ opacity: 0, y: 6, height: 0 }}
+                        animate={{ opacity: 1, y: 0, height: "auto" }}
+                        exit={{ opacity: 0, y: 6, height: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-3 grid grid-cols-1 min-[460px]:grid-cols-2 lg:grid-cols-3 gap-2">
+                          {materialTabs.map((tab) => {
+                            const isActive = tab.id === activeMaterialTab;
+                            const tabLabel = normalizedLocale === "de" ? tab.labelDe : tab.labelEn;
+                            const previewImagePath = getFrontfarbenMaterialTabPreviewImage(tab.id);
+                            return (
+                              <button
+                                key={tab.id}
+                                type="button"
+                                className={`w-full px-3 py-2 rounded-lg border text-xs text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isActive
+                                  ? "border-brand-primary-2 bg-brand-primary-2/15 text-foreground"
+                                  : "border-border bg-background/60 text-muted-foreground hover:text-foreground hover:border-brand-primary-2/50"
+                                  }`}
+                                onClick={() => {
+                                  setActiveMaterialTab(tab.id);
+                                  setIsMaterialMenuOpen(false);
+                                }}
+                                disabled={loading}
+                                aria-pressed={isActive}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div className="relative h-9 w-9 rounded-md overflow-hidden border border-border/60 bg-background shrink-0">
+                                    {previewImagePath ? (
+                                      <Image
+                                        src={getFrontfarbenImageSrc(previewImagePath)}
+                                        alt={tabLabel}
+                                        fill
+                                        unoptimized
+                                        className="object-cover"
+                                        sizes="36px"
+                                      />
+                                    ) : null}
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="truncate text-xs font-medium text-foreground">
+                                      {tabLabel}
+                                    </span>
+                                    <span className="text-xxs text-muted-foreground">
+                                      {tab.count}
+                                    </span>
+                                  </div>
                                 </div>
-                                <div className="flex flex-col min-w-0">
-                                  <span className="truncate text-xs font-medium text-foreground">
-                                    {tabLabel}
-                                  </span>
-                                  <span className="text-xxs text-muted-foreground">
-                                    {tab.count}
-                                  </span>
-                                </div>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
               </div>
 
               <AnimatePresence mode="wait" initial={false}>
