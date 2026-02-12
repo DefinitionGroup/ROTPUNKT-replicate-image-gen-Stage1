@@ -22,6 +22,7 @@ import { WizardSummaryPanel } from "./WizardSummaryPanel";
 import { buildPrompt } from "./promptBuilder";
 import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
+import { WizardHandleStep } from "./WizardHandleStep";
 import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
@@ -62,6 +63,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       ? translatedSteps[wizardState.currentStep]
       : undefined;
   const isColorStep = currentStepDefinition?.key === "color";
+  const isHandleStep = currentStepDefinition?.key === "handle";
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
 
   const startWithPreset = (preset: WizardPreset) => {
@@ -163,7 +165,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ duration: 0.25, type: "spring" }}
-          className="relative w-full max-w-[980px] h-[calc(100dvh-1rem)] sm:h-[96vh] max-h-[640px] min-h-0 z-[999999999]"
+          className="relative w-full max-w-[980px] h-[calc(100dvh-1rem)] sm:h-[96vh] max-h-[90vh] min-h-0 z-[999999999]"
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
@@ -206,11 +208,11 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                 </div>
               )}
 
-                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 h-full min-h-0 overflow-hidden">
-                  <div
-                    ref={stepContainerRef}
-                    className="flex-1 flex flex-col min-h-0 overflow-y-auto touch-pan-y [-webkit-overflow-scrolling:touch]"
-                  >
+              <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 h-full min-h-0 overflow-hidden">
+                <div
+                  ref={stepContainerRef}
+                  className="flex-1 flex flex-col min-h-0 overflow-y-auto touch-pan-y [-webkit-overflow-scrolling:touch]"
+                >
                   <AnimatePresence mode="wait" initial={false}>
                     {isIntro && (
                       <WizardIntro
@@ -232,6 +234,16 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           selectedValue={
                             wizardState.selectedOptions.color
                           }
+                          onSelect={handleOptionSelect}
+                          loading={loading}
+                        />
+                      ) : isHandleStep ? (
+                        <WizardHandleStep
+                          key={`${wizardState.currentStep}-handle`}
+                          icon={currentStepDefinition.icon}
+                          title={currentStepDefinition.label}
+                          description={currentStepDefinition.description}
+                          selectedValue={wizardState.selectedOptions.handle}
                           onSelect={handleOptionSelect}
                           loading={loading}
                         />

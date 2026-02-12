@@ -4,6 +4,7 @@ export interface WizardState {
   currentStep: number
   selectedOptions: {
     color?: string
+    handle?: string
     style?: string
     kind?: string
     kitchenLook?: string

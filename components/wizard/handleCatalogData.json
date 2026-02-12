@@ -1,0 +1,393 @@
+[
+  {
+    "id": "buster-grips-490-knopf-knopf-mit-griffbohrung",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "490",
+    "descriptionDe": "Knopf mit Griffbohrung",
+    "descriptionEn": "Knopf mit Griffbohrung",
+    "typeDe": "Knopf",
+    "typeEn": "Knob",
+    "dimensions": "HO, MI, VE | Bohrmaß <16> | l x b x h 65 x 15 x 29 mm",
+    "imagePath": "BUSTER GRIPS/490_00_00_005_converted.jpeg",
+    "colors": [
+      {
+        "id": "487",
+        "nameDe": "Bronze",
+        "nameEn": "Bronze",
+        "hex": "#8C6E4B",
+        "group": null
+      },
+      {
+        "id": "488",
+        "nameDe": "Carbon",
+        "nameEn": "Carbon",
+        "hex": "#3D3D3D",
+        "group": null
+      },
+      {
+        "id": "489",
+        "nameDe": "Brass",
+        "nameEn": "Brass",
+        "hex": "#B08D57",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-526-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "526",
+    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
+    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
+    "typeDe": "Bügelgriff mit Bodenplatte",
+    "typeEn": "Bar handle with backplate",
+    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/526_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "526",
+        "nameDe": "Steel",
+        "nameEn": "Steel",
+        "hex": "#A6A9AD",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-527-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "527",
+    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
+    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
+    "typeDe": "Bügelgriff mit Bodenplatte",
+    "typeEn": "Bar handle with backplate",
+    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/527_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "527",
+        "nameDe": "Brass",
+        "nameEn": "Brass",
+        "hex": "#B08D57",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-528-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "528",
+    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
+    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
+    "typeDe": "Bügelgriff mit Bodenplatte",
+    "typeEn": "Bar handle with backplate",
+    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/528_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "528",
+        "nameDe": "Smoked Bronze",
+        "nameEn": "Smoked Bronze",
+        "hex": "#6C5A4B",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-529-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "529",
+    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
+    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
+    "typeDe": "Bügelgriff mit Bodenplatte",
+    "typeEn": "Bar handle with backplate",
+    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/529_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "529",
+        "nameDe": "Black",
+        "nameEn": "Black",
+        "hex": "#1E1E1E",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-810-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "810",
+    "descriptionDe": "Pull Bar - Plate - Large - Cross",
+    "descriptionEn": "Pull Bar - Plate - Large - Cross",
+    "typeDe": "Stangengriff mit Bodenplatte",
+    "typeEn": "Pull bar with backplate",
+    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/810_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "810",
+        "nameDe": "Steel",
+        "nameEn": "Steel",
+        "hex": "#A6A9AD",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-811-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "811",
+    "descriptionDe": "Pull Bar - Plate - Large - Cross",
+    "descriptionEn": "Pull Bar - Plate - Large - Cross",
+    "typeDe": "Stangengriff mit Bodenplatte",
+    "typeEn": "Pull bar with backplate",
+    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/811_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "811",
+        "nameDe": "Brass",
+        "nameEn": "Brass",
+        "hex": "#B08D57",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-812-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "812",
+    "descriptionDe": "Pull Bar - Plate - Large - Cross",
+    "descriptionEn": "Pull Bar - Plate - Large - Cross",
+    "typeDe": "Stangengriff mit Bodenplatte",
+    "typeEn": "Pull bar with backplate",
+    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/812_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "812",
+        "nameDe": "Smoked Bronze",
+        "nameEn": "Smoked Bronze",
+        "hex": "#6C5A4B",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buster-grips-813-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
+    "categoryId": "buster-grips",
+    "categoryDe": "BUSTER GRIPS",
+    "categoryEn": "Buster Grips",
+    "model": "813",
+    "descriptionDe": "Pull Bar - Plate - Large - Cross",
+    "descriptionEn": "Pull Bar - Plate - Large - Cross",
+    "typeDe": "Stangengriff mit Bodenplatte",
+    "typeEn": "Pull bar with backplate",
+    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
+    "imagePath": "BUSTER GRIPS/813_00_00_001_converted.jpeg",
+    "colors": [
+      {
+        "id": "813",
+        "nameDe": "Black",
+        "nameEn": "Black",
+        "hex": "#1E1E1E",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buegelgriff-pg-mp-buegelgriff-knopf-knopf-mit-griffbohrung",
+    "categoryId": "buegelgriff",
+    "categoryDe": "BÜGELGRIFF",
+    "categoryEn": "Handle Bars",
+    "model": "PG|MP",
+    "descriptionDe": "Knopf mit Griffbohrung",
+    "descriptionEn": "Knopf mit Griffbohrung",
+    "typeDe": "Bügelgriff (Knopf)",
+    "typeEn": "Handle knob",
+    "dimensions": "HO, MI, VE | Bohrmaß <16> | l x b x h 65 x 15 x 29 mm",
+    "imagePath": "Buegel Griff.jpeg",
+    "colors": [
+      {
+        "id": "487",
+        "nameDe": "Bronze",
+        "nameEn": "Bronze",
+        "hex": "#8C6E4B",
+        "group": null
+      },
+      {
+        "id": "488",
+        "nameDe": "Carbon",
+        "nameEn": "Carbon",
+        "hex": "#3D3D3D",
+        "group": null
+      },
+      {
+        "id": "489",
+        "nameDe": "Brass",
+        "nameEn": "Brass",
+        "hex": "#B08D57",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "buegelgriff-pg-mp-buegelgriff-bar-buegelgriff-mit-griffbohrung",
+    "categoryId": "buegelgriff",
+    "categoryDe": "BÜGELGRIFF",
+    "categoryEn": "Handle Bars",
+    "model": "PG|MP",
+    "descriptionDe": "Bügelgriff mit Griffbohrung",
+    "descriptionEn": "Bügelgriff mit Griffbohrung",
+    "typeDe": "Bügelgriff (Bar)",
+    "typeEn": "Handle bar",
+    "dimensions": "HO, HN, MI, MN, VE | Bohrmaß <160> | l x b x h 210 x 15 x 30 mm",
+    "imagePath": "Buegel Griff.jpeg",
+    "colors": [
+      {
+        "id": "490",
+        "nameDe": "Bronze",
+        "nameEn": "Bronze",
+        "hex": "#8C6E4B",
+        "group": null
+      },
+      {
+        "id": "491",
+        "nameDe": "Carbon",
+        "nameEn": "Carbon",
+        "hex": "#3D3D3D",
+        "group": null
+      },
+      {
+        "id": "492",
+        "nameDe": "Brass",
+        "nameEn": "Brass",
+        "hex": "#B08D57",
+        "group": null
+      }
+    ]
+  },
+  {
+    "id": "tokyo-tokyo-002-griffleiste-tokyo-holz-griffleiste",
+    "categoryId": "tokyo",
+    "categoryDe": "TOKYO",
+    "categoryEn": "Tokyo",
+    "model": "TOKYO_002",
+    "descriptionDe": "Tokyo Holz-Griffleiste",
+    "descriptionEn": "Tokyo Holz-Griffleiste",
+    "typeDe": "Griffleiste",
+    "typeEn": "Handle rail",
+    "dimensions": "TM | Bohrmaß fronthängend | b x h 22 x 22 mm",
+    "imagePath": "TOKYO_00_00_002_converted.jpeg",
+    "colors": [
+      {
+        "id": "10229",
+        "nameDe": "Dunkelbraun",
+        "nameEn": "Dunkelbraun",
+        "hex": "#5B3A29",
+        "group": "Holzfarben"
+      },
+      {
+        "id": "10263",
+        "nameDe": "Metal Grey",
+        "nameEn": "Metal Grey",
+        "hex": "#7F8489",
+        "group": "Holzfarben"
+      },
+      {
+        "id": "10270",
+        "nameDe": "Stone",
+        "nameEn": "Stone",
+        "hex": "#C5C0B7",
+        "group": "Unifarben matt"
+      },
+      {
+        "id": "10271",
+        "nameDe": "Wisteria",
+        "nameEn": "Wisteria",
+        "hex": "#8571A8",
+        "group": "Holzfarben"
+      },
+      {
+        "id": "10274",
+        "nameDe": "Petrol Smoke",
+        "nameEn": "Petrol Smoke",
+        "hex": "#35535D",
+        "group": "Holzfarben"
+      },
+      {
+        "id": "10277",
+        "nameDe": "Schwarz",
+        "nameEn": "Schwarz",
+        "hex": "#1E1E1E",
+        "group": "Holzfarben"
+      },
+      {
+        "id": "10278",
+        "nameDe": "Oak",
+        "nameEn": "Oak",
+        "hex": "#B58A5B",
+        "group": "Holzfarben"
+      },
+      {
+        "id": "10198",
+        "nameDe": "Rusty Red",
+        "nameEn": "Rusty Red",
+        "hex": "#8E3B32",
+        "group": "Holzfarben"
+      },
+      {
+        "id": "10204",
+        "nameDe": "Umbra",
+        "nameEn": "Umbra",
+        "hex": "#5C5146",
+        "group": "Unifarben matt"
+      },
+      {
+        "id": "10206",
+        "nameDe": "Curry",
+        "nameEn": "Curry",
+        "hex": "#C79B2D",
+        "group": "Holzfarben"
+      }
+    ]
+  },
+  {
+    "id": "yell-yell-schwarz-griffleiste-yell-griffleiste-schwarz",
+    "categoryId": "yell",
+    "categoryDe": "YELL",
+    "categoryEn": "Yell",
+    "model": "Yell-Schwarz",
+    "descriptionDe": "Yell Griffleiste Schwarz",
+    "descriptionEn": "Yell Griffleiste Schwarz",
+    "typeDe": "Griffleiste",
+    "typeEn": "Handle rail",
+    "dimensions": "Standard Profile",
+    "imagePath": "Yell Griffleiste Schwarz.jpeg",
+    "colors": [
+      {
+        "id": "schwarz-black",
+        "nameDe": "Schwarz (Black)",
+        "nameEn": "Schwarz (Black)",
+        "hex": "#1E1E1E",
+        "group": null
+      }
+    ]
+  }
+]

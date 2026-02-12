@@ -7,20 +7,38 @@ import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
 import { $prompt } from "@/store/prompt";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 import { useTranslations } from "next-intl";
 
 const isDev = process.env.NODE_ENV === "development";
 
-type ApiResponse = string[];
+interface StartGenerationResponse {
+  predictionId: string;
+  status: string;
+}
 
-interface GenerationParams {
+interface StatusGenerationResponse {
+  status: string;
+  urls?: string[];
+  error?: string | null;
+}
+
+interface StartGenerationParams {
   prompt: string;
   signal: AbortSignal;
 }
 
-async function generateImageApi({ prompt, signal }: GenerationParams): Promise<ApiResponse> {
+interface PollGenerationParams {
+  prompt: string;
+  predictionId: string;
+  signal: AbortSignal;
+}
+
+async function startGenerationApi({
+  prompt,
+  signal,
+}: StartGenerationParams): Promise<StartGenerationResponse> {
   const res = await fetch("/api/replicate", {
     body: JSON.stringify({ prompt }),
     method: "POST",
@@ -31,9 +49,30 @@ async function generateImageApi({ prompt, signal }: GenerationParams): Promise<A
   });
 
   if (!res.ok) {
-    // Try to extract error message from response
     const errorData = await res.json().catch(() => ({ error: `Server error: ${res.status}` }));
     throw new Error(errorData.error || `Generierung fehlgeschlagen: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function pollGenerationApi({
+  prompt,
+  predictionId,
+  signal,
+}: PollGenerationParams): Promise<StatusGenerationResponse> {
+  const res = await fetch("/api/replicate/status", {
+    body: JSON.stringify({ prompt, predictionId }),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    signal,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ error: `Server error: ${res.status}` }));
+    throw new Error(errorData.error || `Statusabfrage fehlgeschlagen: ${res.status}`);
   }
 
   return res.json();
@@ -44,98 +83,113 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const t = useTranslations('imageGenerator');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
+  const [predictionId, setPredictionId] = useState<string | null>(null);
 
-  // Refs for cleanup and double-call prevention
+  // Ref to prevent duplicate starts for identical prompt strings.
   const hasTriggered = useRef<string | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   const {
-    mutate: generateImage,
-    isPending,
-    isError,
-    error,
+    mutate: startGeneration,
+    isPending: isStarting,
+    isError: isStartError,
+    error: startError,
     reset: resetMutation,
-  } = useMutation<ApiResponse, Error, string>({
+  } = useMutation<StartGenerationResponse, Error, string>({
     mutationFn: async (p) => {
       if (isDev) console.log("[ImageGenerator] Starting generation...");
-
-      // Cancel any existing request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      // Create new abort controller
-      abortControllerRef.current = new AbortController();
-
-      try {
-        const data = await generateImageApi({
-          prompt: p,
-          signal: abortControllerRef.current.signal,
-        });
-
-        if (isDev) console.log("[ImageGenerator] Received data:", data);
-        return data;
-      } catch (err) {
-        // Provide user-friendly error messages
-        if (err instanceof Error) {
-          if (err.name === "AbortError") {
-            if (isDev) console.log("[ImageGenerator] Request aborted");
-            throw new Error("Die Anfrage wurde abgebrochen.");
-          }
-        }
-        if (isDev) console.error("[ImageGenerator] Error:", err);
-        throw err;
-      }
+      const controller = new AbortController();
+      const data = await startGenerationApi({
+        prompt: p,
+        signal: controller.signal,
+      });
+      if (isDev) console.log("[ImageGenerator] Prediction started:", data);
+      return data;
     },
     onSuccess: (data) => {
-      if (isDev) console.log("[ImageGenerator] ✅ Success:", data);
-      if (Array.isArray(data) && data.length > 0) {
-        setGeneratedImages(data);
-        setSelectedImage(data[0]);
-        // Clear the prompt after successful generation to prevent re-triggering
-        // when component remounts or user navigates back
-        $prompt.set(null);
-      }
+      setPredictionId(data.predictionId);
     },
-    onError: (err) => {
-      if (isDev) console.error("[ImageGenerator] ❌ Error:", err);
-    },
-    // Retry configuration for transient failures
     retry: 1,
     retryDelay: 3000,
   });
 
-  // Stable retry handler
+  const {
+    data: statusData,
+    error: statusError,
+    isError: isStatusError,
+    refetch: refetchStatus,
+  } = useQuery<StatusGenerationResponse, Error>({
+    queryKey: ["replicate-status", predictionId, prompt],
+    enabled: Boolean(predictionId && prompt),
+    queryFn: ({ signal }) =>
+      pollGenerationApi({
+        prompt: prompt!,
+        predictionId: predictionId!,
+        signal,
+      }),
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      if (!status) return 3000;
+      return status === "starting" || status === "processing" ? 3000 : false;
+    },
+    retry: 1,
+  });
+
+  useEffect(() => {
+    if (!statusData) return;
+    if (statusData.status !== "succeeded") return;
+    if (!Array.isArray(statusData.urls) || statusData.urls.length === 0) return;
+
+    setGeneratedImages(statusData.urls);
+    setSelectedImage(statusData.urls[0]);
+    setPredictionId(null);
+    // Clear the prompt to avoid accidental regeneration on remount.
+    $prompt.set(null);
+  }, [statusData]);
+
   const handleRetry = useCallback(() => {
     resetMutation();
-    hasTriggered.current = null;
-    if (prompt) {
-      generateImage(prompt);
-    }
-  }, [resetMutation, prompt, generateImage]);
+    setPredictionId(null);
 
-  // Trigger generation on prompt change
+    if (!prompt) return;
+    hasTriggered.current = prompt;
+    startGeneration(prompt);
+  }, [prompt, resetMutation, startGeneration]);
+
+  useEffect(() => {
+    if (statusData?.status === "failed" || statusData?.status === "canceled") {
+      setPredictionId(null);
+    }
+  }, [statusData]);
+
   useEffect(() => {
     if (prompt && hasTriggered.current !== prompt) {
       hasTriggered.current = prompt;
       if (isDev) console.log("[ImageGenerator] Triggering generation");
-      generateImage(prompt);
+      startGeneration(prompt);
     }
-  }, [prompt, generateImage]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
+  }, [prompt, startGeneration]);
 
   const hasImages = Array.isArray(generatedImages) && generatedImages.length > 0;
+  const status = statusData?.status;
+  const isTerminalFailure = status === "failed" || status === "canceled";
+  const isPending =
+    !hasImages &&
+    (isStarting ||
+      (!!predictionId && (status === undefined || status === "starting" || status === "processing")));
+  const errorMessage =
+    isTerminalFailure
+      ? statusData?.error || t("error.unknown")
+      : startError?.message || statusError?.message || t("error.unknown");
+  const isError = !hasImages && (isStartError || isStatusError || isTerminalFailure);
 
   if (isDev) {
-    console.log("[ImageGenerator] State:", { isPending, isError, hasImages });
+    console.log("[ImageGenerator] State:", {
+      isPending,
+      isError,
+      hasImages,
+      predictionId,
+      status,
+    });
   }
 
   return (
@@ -148,8 +202,14 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         {!isPending && isError && !hasImages && (
           <ErrorState
             key="error"
-            message={error?.message || t('error.unknown')}
-            onRetry={handleRetry}
+            message={errorMessage}
+            onRetry={() => {
+              if (predictionId && prompt) {
+                void refetchStatus();
+                return;
+              }
+              handleRetry();
+            }}
           />
         )}
 

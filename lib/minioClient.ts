@@ -9,6 +9,9 @@ import pRetry from 'p-retry'
 import { Client } from 'minio'
 
 type ObjectMetaData = Record<string, string | number>
+type UploadImagesOptions = {
+  deterministicPrefix?: string
+}
 
 if (!process.env.MINIO_DOMAIN) throw new Error('Missing MINIO_DOMAIN in env variables')
 
@@ -27,6 +30,25 @@ function getSafeObjectName(originURL: string): string {
   const cleaned = baseName.split('?')[0].replace(/[^a-zA-Z0-9._-]/g, '_')
   const suffix = cleaned || 'image'
   return `${crypto.randomUUID()}-${suffix}`
+}
+
+function getObjectExtension(originURL: string): string {
+  let ext = ''
+  try {
+    const parsed = new URL(originURL)
+    ext = path.extname(parsed.pathname)
+  } catch {
+    ext = path.extname(originURL)
+  }
+
+  const sanitized = ext.toLowerCase()
+  if (/^\.[a-z0-9]{1,8}$/.test(sanitized)) return sanitized
+  return '.webp'
+}
+
+function getDeterministicObjectName(originURL: string, index: number, prefix: string): string {
+  const safePrefix = prefix.replace(/[^a-zA-Z0-9._-]/g, '_') || 'image'
+  return `${safePrefix}-${index}${getObjectExtension(originURL)}`
 }
 
 export function getObjectUrl(objectName: string): string {
@@ -91,11 +113,16 @@ async function downloadImage(tempDir: string, originURL: string, destinationName
   return getObjectUrl(destinationName)
 }
 
-async function uploadImages(images: string[]): Promise<string[]> {
+async function uploadImages(images: string[], options?: UploadImagesOptions): Promise<string[]> {
   const tempDir = fs.mkdtempSync(path.join(tmpdir(), crypto.randomUUID()))
   try {
-    const result = await Promise.all(images.map(async (imageURL) => await pRetry(
-      async () => await downloadImage(tempDir, imageURL, getSafeObjectName(imageURL)),
+    const result = await Promise.all(images.map(async (imageURL, index) => await pRetry(
+      async () => {
+        const destinationName = options?.deterministicPrefix
+          ? getDeterministicObjectName(imageURL, index, options.deterministicPrefix)
+          : getSafeObjectName(imageURL)
+        return await downloadImage(tempDir, imageURL, destinationName)
+      },
       {
         retries: 6,
         minTimeout: 10,
