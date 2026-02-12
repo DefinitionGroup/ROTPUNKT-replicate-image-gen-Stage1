@@ -11,6 +11,7 @@ import {
   frontfarbenCatalog,
   getFrontfarbenByMaterialTab,
   getFrontfarbenImageSrc,
+  getFrontfarbenMaterialTabPreviewImage,
   getFrontfarbenMaterialTabs,
   getFrontfarbenMaterialTabIdByValue,
 } from "./frontfarbenCatalog";
@@ -205,6 +206,7 @@ export function WizardColorStep({
                         {materialTabs.map((tab) => {
                           const isActive = tab.id === activeMaterialTab;
                           const tabLabel = normalizedLocale === "de" ? tab.labelDe : tab.labelEn;
+                          const previewImagePath = getFrontfarbenMaterialTabPreviewImage(tab.id);
                           return (
                             <button
                               key={tab.id}
@@ -220,7 +222,28 @@ export function WizardColorStep({
                               disabled={loading}
                               aria-pressed={isActive}
                             >
-                              {tabLabel}
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="relative h-9 w-9 rounded-md overflow-hidden border border-border/60 bg-background shrink-0">
+                                  {previewImagePath ? (
+                                    <Image
+                                      src={getFrontfarbenImageSrc(previewImagePath)}
+                                      alt={tabLabel}
+                                      fill
+                                      unoptimized
+                                      className="object-cover"
+                                      sizes="36px"
+                                    />
+                                  ) : null}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                  <span className="truncate text-xs font-medium text-foreground">
+                                    {tabLabel}
+                                  </span>
+                                  <span className="text-xxs text-muted-foreground">
+                                    {tab.count}
+                                  </span>
+                                </div>
+                              </div>
                             </button>
                           );
                         })}

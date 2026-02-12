@@ -37,9 +37,17 @@ export const frontfarbenCatalog = frontfarbenCatalogData as FrontfarbenCatalogEn
 const frontfarbenById = new Map(
   frontfarbenCatalog.map((entry) => [entry.id, entry] as const)
 );
+const frontfarbenMaterialPreviewByTabId = new Map<string, string>();
 const materialTabIdByColorId = new Map(
   frontfarbenCatalog.map((entry) => [entry.id, toMaterialTabId(entry.materialTypeDe)] as const)
 );
+
+for (const entry of frontfarbenCatalog) {
+  const tabId = toMaterialTabId(entry.materialTypeDe);
+  if (!frontfarbenMaterialPreviewByTabId.has(tabId)) {
+    frontfarbenMaterialPreviewByTabId.set(tabId, entry.imagePath);
+  }
+}
 
 function toMaterialTabId(value: string): string {
   return value
@@ -131,4 +139,8 @@ export function getFrontfarbenColorLabel(value?: string, locale?: string) {
 
 export function getFrontfarbenImageSrc(imagePath: string) {
   return `/api/frontfarben-image?path=${encodeURIComponent(imagePath)}`;
+}
+
+export function getFrontfarbenMaterialTabPreviewImage(tabId: string) {
+  return frontfarbenMaterialPreviewByTabId.get(tabId);
 }
