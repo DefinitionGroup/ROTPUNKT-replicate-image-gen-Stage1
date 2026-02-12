@@ -60,7 +60,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
           {icon}
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl text-left tracking-tight text-foreground">
+          <h3 className="text-lg sm:text-xl md:text-2xl text-left tracking-tight text-foreground">
             {title}
           </h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-xl text-left leading-snug break-words">
