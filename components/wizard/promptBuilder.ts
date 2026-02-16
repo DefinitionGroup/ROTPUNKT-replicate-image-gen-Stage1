@@ -14,10 +14,9 @@ export type PromptBuildResult = {
 };
 
 const viewpointDescriptions: Record<string, string> = {
-  aussenansicht:
-    "Außenperspektive: Die Szene zeigt die Architektur von außen und ermöglicht einen Blick ins Innere durch Fenster.",
-  innenansicht:
-    "Innenperspektive: Betrachtung aus dem Raum heraus mit Fokus auf Arbeitsflächen, Schränke und Ausstattung.",
+  // Legacy descriptions kept for reference if needed, but we use direct values now
+  aussenansicht: "Exterior view",
+  innenansicht: "Interior view",
 };
 
 function getLabel(
@@ -26,6 +25,7 @@ function getLabel(
 ): string | undefined {
   if (!value) return undefined;
   const step = wizardSteps.find((item) => item.key === key);
+  // Returns German label by default which is fine, but for the prompt we might want to check the value itself in future
   return step?.options.find((opt) => opt.value === value)?.germanLabel ?? value;
 }
 
@@ -54,101 +54,110 @@ export function buildPrompt({
   const colorLabel =
     !isFenix && !isFrontfarbe ? getLabel("color", colorSelection) : undefined;
   const environment = getLabel("environment", selections.environment);
-  const time = getLabel("time", selections.time);
+  const time = selections.time; // Raw English value
   const handleSelection = getHandlePromptDescriptor(selections.handle);
-  const viewpoint = selections.viewpoint ?? "innenansicht";
+  const viewpoint = selections.viewpoint || "Eye level shot"; // Raw English value with safe default
+  const floor = selections.floor; // Raw English value
+  const accessories = selections.accessories;
 
+  // 1. Subject & Style (High Priority)
+  let subjectDescription = "";
+  if (kind) subjectDescription += kind;
+  if (style) subjectDescription += ` in ${style} style`;
+
+  if (subjectDescription) {
+    sections.push(`Subject: ${subjectDescription}.`);
+  }
+
+  // 2. Camera View / Perspective (High Priority - Moved Up)
+  if (viewpoint) {
+    sections.push(`Camera View: ${viewpoint}.`);
+  }
+
+  // 3. Lighting & Atmosphere (High Priority - Moved Up)
+  if (time) {
+    sections.push(`Lighting & Atmosphere: ${time}.`);
+  }
+
+  // 4. Environment / Context
+  if (environment) {
+    sections.push(`Architecture Context: ${environment}.`);
+  }
+
+  // 5. Colors & Materials
   let colorDescriptor: string | undefined;
   if (isFenix) {
     colorDescriptor = fenixColor
-      ? `mit der FENIX Farbwelt "${fenixColor.name}" (${fenixColor.hex}) - ${fenixColor.description}`
+      ? `Main Surface: FENIX "${fenixColor.name}" (${fenixColor.hex}) - ${fenixColor.description}`
       : undefined;
   } else if (isFrontfarbe) {
     colorDescriptor = frontfarbe
-      ? `mit der Frontfarbe "${frontfarbe.labelDe}" (Katalog ${frontfarbe.id}, ${frontfarbe.materialTypeDe})`
+      ? `Main Surface: Front color "${frontfarbe.labelDe}" (Catalog ${frontfarbe.id}, ${frontfarbe.materialTypeDe})`
       : undefined;
   } else {
     colorDescriptor = colorLabel
-      ? `mit einer Farbpalette in ${colorLabel}`
+      ? `Color Palette: ${colorLabel}`
       : undefined;
   }
+  if (colorDescriptor) sections.push(`${colorDescriptor}.`);
 
-  if (kind || style || colorDescriptor) {
-    const descriptors: string[] = [];
-    if (kind) descriptors.push(kind);
-    if (style) descriptors.push(`im Stil ${style}`);
-    if (colorDescriptor) descriptors.push(colorDescriptor);
-    sections.push(`Raumfokus: ${descriptors.join(" ")}.`.trim());
+  // 6. Flooring
+  if (floor) {
+    sections.push(`Flooring: ${floor}.`);
   }
 
-  if (environment) {
-    sections.push(`Kategorie & Architekturkontext: ${environment}.`);
-  }
-
-  if (time) {
-    sections.push(`Tageszeit: ${time}.`);
-  }
-
+  // 7. Handles
   if (handleSelection) {
     sections.push(
-      `Griff-/Griffleistenkonfiguration: ${handleSelection.categoryDe}, Modell ${handleSelection.model}, Typ ${handleSelection.typeDe}, Farbe ${handleSelection.colorNameDe} (${handleSelection.colorCode}, ${handleSelection.colorHex}).`
+      `Hardware: ${handleSelection.categoryDe}, Model ${handleSelection.model}, Type ${handleSelection.typeDe}, Color ${handleSelection.colorNameDe} (${handleSelection.colorCode}, ${handleSelection.colorHex}).`
     );
   }
 
+  // 8. Front Reference (Technical)
   if (frontfarbe) {
     sections.push(
-      `Exakte Frontfarben-Referenz (Training Caption unverändert verwenden): ${frontfarbe.trainingCaption}.`
+      `Exact Front Reference (Use training caption unchanged): ${frontfarbe.trainingCaption}.`
     );
   }
 
-  // Floor selection
-  const floor = getLabel("floor", selections.floor);
-  if (floor) {
-    sections.push(`Bodenbelag: ${selections.floor}.`);
-  }
-
-  // Accessories (multi-select) - handle both array and object formats for backwards compatibility
-  const accessories = selections.accessories;
+  // 9. Accessories / Decor
   if (accessories) {
-    // Convert to array if it's an object (e.g., {item1: true, item2: true})
     const accessoriesArray = Array.isArray(accessories)
       ? accessories
       : Object.keys(accessories).filter(key => (accessories as Record<string, boolean>)[key]);
 
     if (accessoriesArray.length > 0) {
-      sections.push(`Accessoires & Dekoration: ${accessoriesArray.join(", ")}.`);
+      sections.push(`Decor & Accessories: ${accessoriesArray.join(", ")}.`);
     }
   }
 
+  // 10. Technical Requirements & Negative Prompts
   sections.push(
-    `Perspektive: ${viewpointDescriptions[viewpoint] ?? viewpointDescriptions.innenansicht
-    }`
+    "Technical Requirements: exactly one sink with a single faucet, all lights must be physically anchored (no floating lamps), no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt kitchen design language."
   );
 
-  sections.push(
-    "Wichtige Vorgaben: genau ein Spülbecken mit einem einzigen Wasserhahn, alle Leuchten müssen physisch verankert sein (keine schwebenden Lampen), keine doppelten Armaturen, klare Linienführung, konsistente Materialien und Markensprache von Rotpunkt."
-  );
-
+  // 11. User Wishes
   const wishes = extraWishes?.trim();
   if (wishes) {
-    sections.push(`Zusätzliche Wünsche des Nutzers: ${wishes}.`);
+    sections.push(`Additional User Wishes: ${wishes}.`);
   }
 
+  // Emphasis Lines (Prepend for absolute highest priority)
   const emphasisLine =
     isFenix && fenixColor
-      ? `Wichtig: Möbel in ${fenixColor.description} (FENIX ${fenixColor.name}, ${fenixColor.hex}).`
+      ? `IMPORTANT: Furniture in ${fenixColor.description} (FENIX ${fenixColor.name}, ${fenixColor.hex}).`
       : frontfarbe
-        ? `Wichtig: Nutze die Frontfarbenreferenz exakt als "${frontfarbe.trainingCaption}" (Katalog ${frontfarbe.id} - ${frontfarbe.labelDe}).`
+        ? `IMPORTANT: Use front color reference exactly as "${frontfarbe.trainingCaption}" (Catalog ${frontfarbe.id}).`
         : undefined;
 
   const handleEmphasisLine = handleSelection
-    ? `Wichtig: Verwende den ausgewählten Griff exakt als ${handleSelection.categoryDe} ${handleSelection.model} in ${handleSelection.colorNameDe} (${handleSelection.colorCode}).`
+    ? `IMPORTANT: Use selected handle exactly as ${handleSelection.categoryDe} ${handleSelection.model} in ${handleSelection.colorNameDe} (${handleSelection.colorCode}).`
     : undefined;
 
   const prompt = [
     emphasisLine,
     handleEmphasisLine,
-    "Photorealistische Rotpunkt Küchenvisualisierung, entworfen von einem preisgekrönten Innenarchitekten.",
+    "Photorealistic Rotpunkt kitchen visualization, designed by an award-winning interior architect.",
     ...sections,
   ]
     .filter((line): line is string => Boolean(line))
