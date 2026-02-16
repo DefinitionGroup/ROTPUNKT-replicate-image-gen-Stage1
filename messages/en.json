@@ -211,7 +211,8 @@
       "loginToGenerate": "Log in to generate",
       "generating": "Generating image...",
       "createImage": "Create image",
-      "autoPromptNote": "Additional wishes will be automatically added to the prompt."
+      "autoPromptNote": "Additional wishes will be automatically added to the prompt.",
+      "noPromptYet": "No prompt generated yet"
     },
     "multiselect": {
       "noSelection": "No selection",
