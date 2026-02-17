@@ -21,8 +21,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   }) as Promise<T>;
 }
 
-const MODEL =
-  "mainframeai/rddt-finetune-dec-2025:9620255525bcbad26f909dd62b2820aaae39aa99d0d9de5933c4a39465c6ff83";
+const MODEL = "rotpunkt007/basemodel-2-2026:0b02764a8f8bd1db5e211829ddb94f75e003252ac464e8f58398d8539730b74b";
 const MODEL_VERSION = MODEL.split(":")[1];
 const NEGATIVE_PROMPT =
   "duplicate sinks, double faucets, extra taps, floating lamps, disembodied lighting,text on surfaces, text, typography, distorted structure, warped cabinetry, incorrect perspective";
@@ -67,6 +66,7 @@ export async function POST(req: NextRequest) {
           output_format: "webp",
           enhance_prompt: true,
           output_quality: 80,
+          seed: 503461301,
           negative_prompt: NEGATIVE_PROMPT,
           num_inference_steps: 24,
           num_outputs: 1,

@@ -32,7 +32,7 @@ export function WizardSummaryPanel({
   extraWishes: _extraWishes,
   currentStep,
   totalSteps,
-  prompt: _prompt,
+  prompt,
   missingKeys,
   isSignedIn,
   loading = false,
@@ -42,7 +42,7 @@ export function WizardSummaryPanel({
   onJumpToStep,
 }: WizardSummaryPanelProps) {
   void _extraWishes;
-  void _prompt;
+
   const t = useTranslations("wizard.summary");
   const locale = useLocale();
   const translatedSteps = useTranslatedWizardSteps();
@@ -155,7 +155,7 @@ export function WizardSummaryPanel({
   };
 
   return (
-    <aside className="bg-card/80 border border-border rounded-2xl p-5 shadow-inner flex flex-col gap-5 w-full lg:max-w-sm max-h-[calc(96vh-6rem)]">
+    <aside className="bg-card/80 border border-border rounded-2xl p-5 shadow-inner flex flex-col gap-5 w-full lg:max-w-sm lg:h-full max-h-[85vh] lg:max-h-full">
       <div className="flex justify-between items-center">
         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
           {t("progress")}
@@ -175,9 +175,7 @@ export function WizardSummaryPanel({
         />
       </div>
 
-      <div className="flex flex-col gap-3 overflow-y-auto pr-1"
-      // style={{ maxHeight: "26rem" }}
-      >
+      <div className="flex flex-col gap-3 overflow-y-auto pr-1 flex-1 min-h-0 max-h-[40vh] lg:max-h-none">
         <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
           {t("overview")}
         </h4>
@@ -221,6 +219,18 @@ export function WizardSummaryPanel({
       </div>
 
       <div className="h-px bg-border/70" />
+
+      <div className="text-xs text-muted-foreground">
+        <details className="group">
+          <summary className="cursor-pointer font-semibold mb-2 hover:text-foreground transition-colors list-none flex items-center gap-2">
+            <span className="text-xxs uppercase tracking-wide">Prompt Preview</span>
+            <span className="text-[10px] opacity-50 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div className="p-3 bg-muted/50 rounded-lg border border-border/50 font-mono text-[10px] leading-relaxed break-words">
+            {prompt || t("noPromptYet")}
+          </div>
+        </details>
+      </div>
 
 
       <div className="mt-auto flex flex-col gap-2">

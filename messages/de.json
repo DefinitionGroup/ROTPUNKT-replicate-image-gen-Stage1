@@ -211,7 +211,8 @@
       "loginToGenerate": "Einloggen, um zu generieren",
       "generating": "Erzeuge Bild...",
       "createImage": "Bild erstellen",
-      "autoPromptNote": "Zusätzliche Wünsche werden automatisch in den Prompt eingefügt."
+      "autoPromptNote": "Zusätzliche Wünsche werden automatisch in den Prompt eingefügt.",
+      "noPromptYet": "Noch kein Prompt generiert"
     },
     "multiselect": {
       "noSelection": "Keine Auswahl",
