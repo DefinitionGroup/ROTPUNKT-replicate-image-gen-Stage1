@@ -97,7 +97,7 @@ export default function Header({
         aria-hidden="true"
       >
         <img
-          className=" rounded-2xl opacity-70 "
+          className=" rounded-2xl opacity-50 "
           src={backgroundImage?.secure_url}
           alt={subheadline}
           role="presentation"
@@ -129,7 +129,7 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-white mx-auto tracking-wider text-2xl max-w-2xl text-center font-bold"
+          <p className="text-white mx-auto tracking-wide text-2xl max-w-2xl text-center font-semibold"
 
             role="doc-subtitle"
           >
@@ -139,12 +139,12 @@ export default function Header({
 
         {/* Description */}
         <motion.div
-          className="mx-auto max-w-3xl "
+          className="mx-auto max-w-4xl "
           variants={descriptionVariants}
           initial="initial"
           animate="animate"
         >
-          <p className="text-white font-semibold tracking-normal text-md max-w-xl text-center">
+          <p className="text-white font-semibold tracking-wide text-lg mt-4 leading-relaxed text-center">
 
             {description}
           </p>
