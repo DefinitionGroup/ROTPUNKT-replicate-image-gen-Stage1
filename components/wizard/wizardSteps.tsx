@@ -85,20 +85,6 @@ export const wizardSteps: WizardStepDefinition[] = [
         image: "/wizard-presets/category-ferienhaus.png",
       },
       {
-        value: "reihenhaus-doppelhaushaelfte",
-        labelKey: "wizard.options.categoryReihenhausDoppelhaushaelfte",
-        germanLabel: "Reihenhaus / Doppelhaushälfte",
-        englishLabel: "townhouse / semi-detached house",
-        image: "/wizard-presets/category-reihenhaus-doppelhaushaelfte.png",
-      },
-      {
-        value: "tiny-house",
-        labelKey: "wizard.options.categoryTinyHouse",
-        germanLabel: "Tiny House",
-        englishLabel: "tiny house",
-        image: "/wizard-presets/category-tiny-house.png",
-      },
-      {
         value: "stadtvilla",
         labelKey: "wizard.options.categoryStadtvilla",
         germanLabel: "Stadtvilla",
