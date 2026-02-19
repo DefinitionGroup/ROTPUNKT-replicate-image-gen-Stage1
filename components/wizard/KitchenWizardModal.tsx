@@ -24,6 +24,7 @@ import { buildPrompt } from "./promptBuilder";
 import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
 import { WizardHandleStep } from "./WizardHandleStep";
+import { WizardKitchenLayoutPanel } from "./WizardKitchenLayoutPanel";
 import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
@@ -43,6 +44,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const stepContainerRef = useRef<HTMLDivElement | null>(null);
   const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(true);
+  const [showKitchenLayout, setShowKitchenLayout] = useState(false);
   const translatedSteps = useTranslatedWizardSteps();
 
   const totalSteps = wizardSteps.length;
@@ -67,6 +69,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const isHandleStep = currentStepDefinition?.key === "handle";
   const isAtmosphereStep = currentStepDefinition?.key === "atmosphere";
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
+  const isKindStepWithLayout = currentStepDefinition?.key === "kind" && showKitchenLayout;
 
   const startWithPreset = (preset: WizardPreset) => {
     setIsSummaryCollapsed(true);
@@ -113,6 +116,23 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     stepContainerRef.current?.scrollTo({ top: 0, behavior: "auto" });
   }, [wizardState.currentStep]);
 
+  // Reset kitchen layout panel when navigating away from the kind step
+  const kindStepIndex = wizardSteps.findIndex((s) => s.key === "kind");
+  useEffect(() => {
+    if (wizardState.currentStep !== kindStepIndex) {
+      setShowKitchenLayout(false);
+    }
+  }, [wizardState.currentStep, kindStepIndex]);
+
+  // Override back button to go back to kind grid from kitchen layout panel
+  const handleBack = () => {
+    if (showKitchenLayout) {
+      setShowKitchenLayout(false);
+      return;
+    }
+    wizardActions.goBack();
+  };
+
   const handleOptionSelect = (option: string) => {
     if (
       wizardState.currentStep < 0 ||
@@ -122,7 +142,38 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
 
     const currentStepKey = wizardSteps[wizardState.currentStep]
       .key as keyof WizardState["selectedOptions"];
+
+    // Intercept kitchen selection in the "kind" step
+    if (currentStepKey === "kind" && option === "kueche") {
+      wizardActions.selectOption(currentStepKey, option);
+      setShowKitchenLayout(true);
+      return;
+    }
+
+    // Clear kitchenLook when selecting a non-kitchen kind
+    if (currentStepKey === "kind" && option !== "kueche") {
+      const current = wizardStore.get();
+      if (current.selectedOptions.kitchenLook) {
+        const { kitchenLook: _, ...rest } = current.selectedOptions;
+        wizardStore.set({
+          ...current,
+          selectedOptions: rest,
+        });
+      }
+    }
+
     wizardActions.selectOption(currentStepKey, option);
+    wizardActions.nextStep(totalSteps);
+  };
+
+  const handleKitchenLayoutSelect = (value: string) => {
+    wizardActions.selectOption("kitchenLook", value);
+    setShowKitchenLayout(false);
+    wizardActions.nextStep(totalSteps);
+  };
+
+  const handleKitchenLayoutSkip = () => {
+    setShowKitchenLayout(false);
     wizardActions.nextStep(totalSteps);
   };
 
@@ -176,9 +227,9 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
               <WizardHeader
                 currentStep={wizardState.currentStep}
                 totalSteps={wizardSteps.length}
-                onBack={wizardActions.goBack}
+                onBack={handleBack}
                 onClose={onClose}
-                canGoBack={canGoBack}
+                canGoBack={canGoBack || showKitchenLayout}
                 loading={loading}
               />
             </CardHeader>
@@ -226,7 +277,14 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                     )}
 
                     {!isIntro && !isFinalStep && currentStepDefinition && (
-                      isColorStep ? (
+                      isKindStepWithLayout ? (
+                        <WizardKitchenLayoutPanel
+                          key={`${wizardState.currentStep}-kitchen-layout`}
+                          onSelect={handleKitchenLayoutSelect}
+                          onSkip={handleKitchenLayoutSkip}
+                          loading={loading}
+                        />
+                      ) : isColorStep ? (
                         <WizardColorStep
                           key={`${wizardState.currentStep}-color`}
                           icon={currentStepDefinition.icon}

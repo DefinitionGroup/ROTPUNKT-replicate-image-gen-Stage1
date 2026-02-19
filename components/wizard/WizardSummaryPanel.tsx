@@ -11,6 +11,7 @@ import { getFenixColorLabel } from "./fenixColors";
 import { getWizardProgress } from "./wizardProgress";
 import { getFrontfarbenColorLabel } from "./frontfarbenCatalog";
 import { getHandleSelectionLabel } from "./handleCatalog";
+import { kitchenLayoutOptions } from "./wizardSteps";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -44,6 +45,8 @@ export function WizardSummaryPanel({
   void _extraWishes;
 
   const t = useTranslations("wizard.summary");
+  const tLayout = useTranslations("wizard.kitchenLayout");
+  const tOptions = useTranslations();
   const locale = useLocale();
   const translatedSteps = useTranslatedWizardSteps();
 
@@ -129,6 +132,25 @@ export function WizardSummaryPanel({
         isMulti: false,
         count: selectedLabel ? 1 : 0,
       });
+
+      // Show kitchen layout sub-selection after the "kind" step
+      if (step.key === "kind" && selections.kitchenLook) {
+        const layoutOpt = kitchenLayoutOptions.find(
+          (o) => o.value === selections.kitchenLook
+        );
+        const layoutLabel = layoutOpt
+          ? tOptions(layoutOpt.labelKey)
+          : selections.kitchenLook;
+        items.push({
+          key: "kitchenLook",
+          stepIndex,
+          title: tLayout("title"),
+          description: tLayout("description"),
+          selectedLabel: layoutLabel,
+          isMulti: false,
+          count: 1,
+        });
+      }
     });
 
     return items;

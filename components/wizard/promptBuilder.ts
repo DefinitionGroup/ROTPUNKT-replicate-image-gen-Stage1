@@ -1,5 +1,5 @@
 import type { WizardState } from "@/app/store/wizardStore";
-import { wizardSteps } from "./wizardSteps";
+import { wizardSteps, kitchenLayoutOptions } from "./wizardSteps";
 import { getFenixColorByValue, isFenixColorValue } from "./fenixColors";
 import {
   getFrontfarbenColorByValue,
@@ -54,6 +54,14 @@ function getLabel(
  * Steps with subSteps (like "atmosphere") are expanded to their sub-step keys
  * (e.g., "style", "viewpoint", "time") since those are the actual selection keys.
  */
+function getKitchenLayoutLabel(value?: string): string | undefined {
+  if (!value) return undefined;
+  const opt = kitchenLayoutOptions.find((o) => o.value === value);
+  if (!opt) return value;
+  if (PROMPT_LANGUAGE === "en" && opt.englishLabel) return opt.englishLabel;
+  return opt.germanLabel;
+}
+
 function getSelectionKeys(): (keyof WizardState["selectedOptions"])[] {
   const keys: (keyof WizardState["selectedOptions"])[] = [];
   for (const step of wizardSteps) {
@@ -102,11 +110,16 @@ export function buildPrompt({
 
   // 1. Opening + Subject & Style as natural language
   let opening = "Photorealistic Rotpunkt kitchen visualization, designed by an award-winning interior architect.";
+  const kitchenLayoutLabel = getKitchenLayoutLabel(selections.kitchenLook);
+  // When kind is "kitchen" and a layout is selected, use the layout-specific phrasing
+  const effectiveKind = (kind === "kitchen" || selections.kind === "kueche") && kitchenLayoutLabel
+    ? kitchenLayoutLabel
+    : kind;
   const subjectParts: string[] = [];
-  if (kind && style) {
-    subjectParts.push(`A ${style} ${kind}`);
-  } else if (kind) {
-    subjectParts.push(`A ${kind}`);
+  if (effectiveKind && style) {
+    subjectParts.push(`A ${style} ${effectiveKind}`);
+  } else if (effectiveKind) {
+    subjectParts.push(`A ${effectiveKind}`);
   } else if (style) {
     subjectParts.push(`${style} style`);
   }

@@ -504,3 +504,29 @@ export const wizardSteps: WizardStepDefinition[] = [
     icon: <FaLeaf className="w-full h-full text-red-600" />,
   },
 ];
+
+/* ─── Kitchen Layout Options (sub-selection for kind=kueche) ─── */
+
+export const kitchenLayoutOptions: WizardOption[] = [
+  {
+    value: "kuechenzeile",
+    labelKey: "wizard.options.kuechenzeile",
+    germanLabel: "Küchenzeile",
+    englishLabel: "galley kitchen, straight kitchen layout",
+    image: "/wizard-presets/layout-kuechenzeile.jpg",
+  },
+  {
+    value: "kuecheninsel",
+    labelKey: "wizard.options.kuecheninsel",
+    germanLabel: "Küche mit Kücheninsel",
+    englishLabel: "kitchen with a central island",
+    image: "/wizard-presets/layout-kuecheninsel.jpg",
+  },
+  {
+    value: "kueche-ueber-eck",
+    labelKey: "wizard.options.kuecheUeberEck",
+    germanLabel: "Küche über Eck",
+    englishLabel: "L-shaped corner kitchen",
+    image: "/wizard-presets/layout-kueche-ueber-eck.jpg",
+  },
+];

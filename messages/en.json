@@ -96,6 +96,9 @@
       "wohnzimmer": "Living Room",
       "fromTheOutside": "Exterior View",
       "flur": "Hallway",
+      "kuechenzeile": "Galley Kitchen",
+      "kuecheninsel": "Kitchen with Island",
+      "kuecheUeberEck": "L-Shaped Kitchen",
       "schwarz": "Black",
       "rot": "Red",
       "burgunderrot": "Burgundy Red",
@@ -237,6 +240,11 @@
       "description": "Set the visual mood — choose a style, camera angle, and time of day.",
       "continue": "Continue",
       "selectAll": "Select all three"
+    },
+    "kitchenLayout": {
+      "title": "Kitchen Layout",
+      "description": "What type of kitchen layout would you like?",
+      "skip": "Skip — standard layout"
     },
     "handleMatrix": {
       "categoryLabel": "Categories",

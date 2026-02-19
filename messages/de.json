@@ -96,6 +96,9 @@
       "wohnzimmer": "Wohnzimmer",
       "fromTheOutside": "Außenansicht",
       "flur": "Flur",
+      "kuechenzeile": "Küchenzeile",
+      "kuecheninsel": "Küche mit Kücheninsel",
+      "kuecheUeberEck": "Küche über Eck",
       "schwarz": "Schwarz",
       "rot": "Rot",
       "burgunderrot": "Burgunderrot",
@@ -237,6 +240,11 @@
       "description": "Bestimmen Sie die Stimmung – wählen Sie Stil, Kamerawinkel und Tageszeit.",
       "continue": "Weiter",
       "selectAll": "Alle drei auswählen"
+    },
+    "kitchenLayout": {
+      "title": "Küchenform",
+      "description": "Welche Küchenform soll dargestellt werden?",
+      "skip": "Überspringen — Standardlayout"
     },
     "handleMatrix": {
       "categoryLabel": "Kategorien",
