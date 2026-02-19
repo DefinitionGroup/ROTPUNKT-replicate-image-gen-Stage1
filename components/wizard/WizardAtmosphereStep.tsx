@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 import { TimeSlider } from "./TimeSlider";
+import { PerspectiveSlider } from "./PerspectiveSlider";
 
 /* ─── Types ──────────────────────────────────────────────────── */
 
@@ -148,12 +149,19 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
     [activeSection, handlersMap, selectionMap]
   );
 
-  // Time slider: select immediately (no auto-advance while dragging)
+  // Slider sections: select immediately (no auto-advance while dragging)
   const handleTimeSelect = useCallback(
     (value: string) => {
       onSelectTime(value);
     },
     [onSelectTime]
+  );
+
+  const handleViewpointSelect = useCallback(
+    (value: string) => {
+      onSelectViewpoint(value);
+    },
+    [onSelectViewpoint]
   );
 
   const currentOptions = optionsMap[activeSection];
@@ -248,6 +256,14 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
               options={timeOptions}
               selectedValue={selectedTime}
               onSelect={handleTimeSelect}
+              loading={loading}
+            />
+          ) : activeSection === "viewpoint" ? (
+            <PerspectiveSlider
+              key="perspective-slider"
+              options={viewpointOptions}
+              selectedValue={selectedViewpoint}
+              onSelect={handleViewpointSelect}
               loading={loading}
             />
           ) : (
