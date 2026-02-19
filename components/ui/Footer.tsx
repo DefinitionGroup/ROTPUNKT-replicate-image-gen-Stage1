@@ -130,20 +130,7 @@ export default function Footer({
             )}
           </div>
 
-          <div className="flex gap-x-6 md:order-2 mt-6 md:mt-0">
-            <Link
-              href="/impressum"
-              className="text-muted-foreground hover:text-foreground text-sm"
-            >
-              Impressum
-            </Link>
-            <Link
-              href="/datenschutz"
-              className="text-muted-foreground hover:text-foreground text-sm"
-            >
-              Datenschutz
-            </Link>
-          </div>
+
         </div>
       </div>
     </footer>
