@@ -159,6 +159,7 @@
       "toepfePfannen": "Töpfe & Pfannen",
       "kerzen": "Kerzen",
       "spiegel": "Spiegel",
+      "fruehstueck": "Frühstück",
       "modernesHolzhaus": "Modernes Holzhaus mit großen Fenstern",
       "stadtwohnung": "Stadtwohnung",
       "loft": "Loft",
@@ -170,7 +171,8 @@
     },
     "optionGroups": {
       "pflanzen": "Pflanzen",
-      "dekoration": "Dekoration"
+      "dekoration": "Dekoration",
+      "essenTrinken": "Essen & Trinken"
     },
     "hints": {
       "standard": "Standard",

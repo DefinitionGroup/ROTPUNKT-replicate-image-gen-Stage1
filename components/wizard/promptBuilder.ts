@@ -85,7 +85,12 @@ export function buildPrompt({
   extraWishes?: string;
 }): PromptBuildResult {
   const missingKeys = getSelectionKeys()
-    .filter((key) => !selections[key]);
+    .filter((key) => {
+      // Multi-select steps (e.g. accessories) are optional — zero selections allowed
+      const step = wizardSteps.find((s) => s.key === key);
+      if (step?.multiSelect) return false;
+      return !selections[key];
+    });
 
   const sections: string[] = [];
 

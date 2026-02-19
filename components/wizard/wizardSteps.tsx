@@ -384,7 +384,7 @@ export const wizardSteps: WizardStepDefinition[] = [
     labelKey: "wizard.steps.accessories.label",
     descriptionKey: "wizard.steps.accessories.description",
     multiSelect: true,
-    optionGroupKeys: ["wizard.optionGroups.pflanzen", "wizard.optionGroups.dekoration"],
+    optionGroupKeys: ["wizard.optionGroups.pflanzen", "wizard.optionGroups.dekoration", "wizard.optionGroups.essenTrinken"],
     options: [
       {
         value: "indoor plants, houseplants, potted plants",
@@ -439,6 +439,12 @@ export const wizardSteps: WizardStepDefinition[] = [
         labelKey: "wizard.options.spiegel",
         germanLabel: "Spiegel",
         group: "wizard.optionGroups.dekoration",
+      },
+      {
+        value: "breakfast food on kitchen table, fresh croissants, coffee cups, fruit bowl, morning breakfast setting",
+        labelKey: "wizard.options.fruehstueck",
+        germanLabel: "Frühstück",
+        group: "wizard.optionGroups.essenTrinken",
       },
     ],
     icon: <FaLeaf className="w-full h-full text-red-600" />,

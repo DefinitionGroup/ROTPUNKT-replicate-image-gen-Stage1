@@ -159,6 +159,7 @@
       "toepfePfannen": "Pots & Pans",
       "kerzen": "Candles",
       "spiegel": "Mirror",
+      "fruehstueck": "Breakfast",
       "modernesHolzhaus": "Modern Wooden House with Large Windows",
       "stadtwohnung": "City Apartment",
       "loft": "Loft",
@@ -170,7 +171,8 @@
     },
     "optionGroups": {
       "pflanzen": "Plants",
-      "dekoration": "Decoration"
+      "dekoration": "Decoration",
+      "essenTrinken": "Food & Drinks"
     },
     "hints": {
       "standard": "Standard",
