@@ -21,7 +21,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   }) as Promise<T>;
 }
 
-const MODEL = "rotpunkt007/basemodel-2-2026:0b02764a8f8bd1db5e211829ddb94f75e003252ac464e8f58398d8539730b74b";
+const MODEL = "rotpunkt007/basemodel-4-2026:0200979b0fa5fd320620d0af8ac046d806fa80e5406dc5e070722fbb91889be6";
 const MODEL_VERSION = MODEL.split(":")[1];
 
 export async function POST(req: NextRequest) {
