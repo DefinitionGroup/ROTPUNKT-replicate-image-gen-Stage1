@@ -20,26 +20,6 @@
     "labelEn": "Brass Gold Knurled"
   },
   {
-    "id": "bp-230821-rp-innovationscover-th-01567",
-    "category": "buster_and_punch",
-    "subcategory": null,
-    "imagePath": "Buster und Punch Griffe/230821_RP_InnovationsCover_TH-01567.jpeg",
-    "trainingCaption": "a lifestyle photograph of a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design, professional interior photography",
-    "promptCaption": "a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design",
-    "labelDe": "B&P dark matte",
-    "labelEn": "B&P dark matte"
-  },
-  {
-    "id": "bp-230821-rp-innovationscover-th-01567-2",
-    "category": "buster_and_punch",
-    "subcategory": null,
-    "imagePath": "Buster und Punch Griffe/230821_RP_InnovationsCover_TH-01567_CMYK.jpeg",
-    "trainingCaption": "a lifestyle photograph of a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design, professional interior photography, CMYK color profile",
-    "promptCaption": "a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design",
-    "labelDe": "B&P dark matte",
-    "labelEn": "B&P dark matte"
-  },
-  {
     "id": "bp-230821-rp-mk11-griff-th-01322",
     "category": "buster_and_punch",
     "subcategory": null,
@@ -68,46 +48,6 @@
     "promptCaption": "Buster and Punch knurled knob handles on dark teal-green Rotpunkt kitchen cabinet fronts, brushed brass gold cylindrical knobs with diamond-pattern crosshatch texture, mounted on rectangular brass backplates with visible hex screws, white countertop above dark cabinets, industrial-luxury design aesthetic",
     "labelDe": "Brushed Brass Gold Cylindrical",
     "labelEn": "Brushed Brass Gold Cylindrical"
-  },
-  {
-    "id": "bp-230821-rp-mk7-bup-griffe-th-00797-2",
-    "category": "buster_and_punch",
-    "subcategory": null,
-    "imagePath": "Buster und Punch Griffe/230821_RP_MK7_BUP-Griffe_TH-00797_HF_CMYK.jpeg",
-    "trainingCaption": "a close-up detail photograph of Buster and Punch knurled knob handles on dark teal-green Rotpunkt kitchen cabinet fronts, brushed brass gold cylindrical knobs with diamond-pattern crosshatch texture, mounted on rectangular brass backplates with visible hex screws, white countertop above, vertical composition showing two adjacent cabinet doors, industrial-luxury design",
-    "promptCaption": "Buster and Punch knurled knob handles on dark teal-green Rotpunkt kitchen cabinet fronts, brushed brass gold cylindrical knobs with diamond-pattern crosshatch texture, mounted on rectangular brass backplates with visible hex screws, white countertop above, vertical composition showing two adjacent cabinet doors, industrial-luxury design",
-    "labelDe": "Brushed Brass Gold Cylindrical",
-    "labelEn": "Brushed Brass Gold Cylindrical"
-  },
-  {
-    "id": "bp-mk07-a01",
-    "category": "buster_and_punch",
-    "subcategory": null,
-    "imagePath": "Buster und Punch Griffe/MK07_A01.jpg",
-    "trainingCaption": "a lifestyle photograph of a Rotpunkt kitchen with Buster and Punch brass hardware, dark matte fronts with brushed gold knurled handles, modern kitchen design",
-    "promptCaption": "a Rotpunkt kitchen with Buster and Punch brass hardware, dark matte fronts with brushed gold knurled handles, modern kitchen design",
-    "labelDe": "B&P brass",
-    "labelEn": "B&P brass"
-  },
-  {
-    "id": "bp-mk07-a02",
-    "category": "buster_and_punch",
-    "subcategory": null,
-    "imagePath": "Buster und Punch Griffe/MK07_A02.jpg",
-    "trainingCaption": "a lifestyle photograph of a Rotpunkt kitchen with Buster and Punch hardware, contemporary kitchen interior design with industrial-luxury handle details",
-    "promptCaption": "a Rotpunkt kitchen with Buster and Punch hardware, contemporary kitchen interior design with industrial-luxury handle details",
-    "labelDe": "B&P Lifestyle",
-    "labelEn": "B&P Lifestyle"
-  },
-  {
-    "id": "bp-mk11-a01-ergo-fl-zero-beach-grey",
-    "category": "buster_and_punch",
-    "subcategory": null,
-    "imagePath": "Buster und Punch Griffe/MK11_A01_Ergo_FL_Zero_Beach_Grey.jpg",
-    "trainingCaption": "a wide-angle lifestyle photograph of a spacious Rotpunkt kitchen with Buster and Punch matte black handles, light grey shaker-style cabinet fronts with black T-bar knob handles, dark accent wall with illuminated glass-front cabinets showing oak wood interior shelving, herringbone wood floor, modern pendant lighting, bar stools, contemporary luxury kitchen interior design",
-    "promptCaption": "a spacious Rotpunkt kitchen with Buster and Punch matte black handles, light grey shaker-style cabinet fronts with black T-bar knob handles, dark accent wall with illuminated glass-front cabinets showing oak wood interior shelving, herringbone wood floor, modern pendant lighting, bar stools, contemporary luxury kitchen interior design",
-    "labelDe": "B&P black",
-    "labelEn": "B&P black"
   },
   {
     "id": "bp-rotpunkt-themen-kollektion-2024-buster-and-punch-2",
@@ -730,26 +670,6 @@
     "labelEn": "bar pull handle with ribbed linear texture, dark pewter"
   },
   {
-    "id": "std-507",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/507_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "bridge pull handle, matte finish",
-    "labelEn": "bridge pull handle, matte finish"
-  },
-  {
-    "id": "std-508",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/508_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "bridge pull handle, matte finish",
-    "labelEn": "bridge pull handle, matte finish"
-  },
-  {
     "id": "std-518",
     "category": "standard_handle",
     "subcategory": null,
@@ -764,26 +684,6 @@
     "category": "standard_handle",
     "subcategory": null,
     "imagePath": "griffe/519_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "bar pull handle, matte finish",
-    "labelEn": "bar pull handle, matte finish"
-  },
-  {
-    "id": "std-520",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/520_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "bar pull handle, matte finish",
-    "labelEn": "bar pull handle, matte finish"
-  },
-  {
-    "id": "std-521",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/521_00_00_001_converted.jpeg",
     "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
     "promptCaption": "bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
     "labelDe": "bar pull handle, matte finish",
@@ -810,16 +710,6 @@
     "labelEn": "pull handle, metallic finish"
   },
   {
-    "id": "std-808",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/808-27X17_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "pull handle, metallic finish",
-    "labelEn": "pull handle, metallic finish"
-  },
-  {
     "id": "std-833",
     "category": "standard_handle",
     "subcategory": null,
@@ -830,26 +720,6 @@
     "labelEn": "tubular bar pull handle, brushed stainless steel finish"
   },
   {
-    "id": "std-851",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/851-27X17_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "pull handle, metallic finish",
-    "labelEn": "pull handle, metallic finish"
-  },
-  {
-    "id": "std-878",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/878-27X17_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "pull handle, metallic finish",
-    "labelEn": "pull handle, metallic finish"
-  },
-  {
     "id": "std-908",
     "category": "standard_handle",
     "subcategory": null,
@@ -858,16 +728,6 @@
     "promptCaption": "arched bow pull handle, brushed satin nickel finish, smooth flat curved bow with tapered feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
     "labelDe": "arched bow pull handle, brushed satin nickel finish",
     "labelEn": "arched bow pull handle, brushed satin nickel finish"
-  },
-  {
-    "id": "std-926",
-    "category": "standard_handle",
-    "subcategory": null,
-    "imagePath": "griffe/926-27X17_00_00_001_converted.jpeg",
-    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
-    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
-    "labelDe": "pull handle, metallic finish",
-    "labelEn": "pull handle, metallic finish"
   },
   {
     "id": "tokyo-holz-139",
