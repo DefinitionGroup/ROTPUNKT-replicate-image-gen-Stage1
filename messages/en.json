@@ -238,11 +238,11 @@
       "skip": "Skip — standard layout"
     },
     "handleMatrix": {
-      "categoryLabel": "Categories",
-      "modelLabel": "Model",
-      "availableColors": "Available colors (single selection)",
-      "imageUnavailable": "No product image available",
-      "noProducts": "No products available in this category."
+      "categoryLabel": "Handle Type",
+      "imageUnavailable": "No image available",
+      "noProducts": "No handles available in this category.",
+      "tokyoHolzfarben": "Wood Colors",
+      "tokyoUnifarben": "Solid Colors Matt"
     }
   },
   "imageGenerator": {

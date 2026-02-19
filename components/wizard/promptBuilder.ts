@@ -163,14 +163,10 @@ export function buildPrompt({
     sections.push(`${floor[0].toUpperCase() + floor.slice(1)}.`);
   }
 
-  // 5. Hardware (use English or German based on A/B flag)
+  // 5. Hardware — inject training-caption-derived description for FLUX grounding
   if (handleSelection) {
-    const category = PROMPT_LANGUAGE === "en" ? handleSelection.categoryEn : handleSelection.categoryDe;
-    const type = PROMPT_LANGUAGE === "en" ? handleSelection.typeEn : handleSelection.typeDe;
-    const colorName = PROMPT_LANGUAGE === "en" ? handleSelection.colorNameEn : handleSelection.colorNameDe;
-    sections.push(
-      `${category}, model ${handleSelection.model}, ${type}, ${colorName} (${handleSelection.colorHex}).`
-    );
+    const prefix = handleSelection.category === "handleless" ? "Handle design" : "Handle hardware";
+    sections.push(`${prefix}: ${handleSelection.promptCaption}.`);
   }
 
   // 6. Front Reference (training caption verbatim — always English as trained)

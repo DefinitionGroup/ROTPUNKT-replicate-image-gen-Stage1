@@ -238,11 +238,11 @@
       "skip": "Überspringen — Standardlayout"
     },
     "handleMatrix": {
-      "categoryLabel": "Kategorien",
-      "modelLabel": "Modell",
-      "availableColors": "Verfügbare Farben (Einzelauswahl)",
-      "imageUnavailable": "Kein Produktbild verfügbar",
-      "noProducts": "Keine Produkte in dieser Kategorie verfügbar."
+      "categoryLabel": "Griffart",
+      "imageUnavailable": "Kein Bild verfügbar",
+      "noProducts": "Keine Griffe in dieser Kategorie verfügbar.",
+      "tokyoHolzfarben": "Holzfarben",
+      "tokyoUnifarben": "Unifarben matt"
     }
   },
   "imageGenerator": {

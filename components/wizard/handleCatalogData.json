@@ -1,393 +1,1112 @@
 [
   {
-    "id": "buster-grips-490-knopf-knopf-mit-griffbohrung",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "490",
-    "descriptionDe": "Knopf mit Griffbohrung",
-    "descriptionEn": "Knopf mit Griffbohrung",
-    "typeDe": "Knopf",
-    "typeEn": "Knob",
-    "dimensions": "HO, MI, VE | Bohrmaß <16> | l x b x h 65 x 15 x 29 mm",
-    "imagePath": "BUSTER GRIPS/490_00_00_005_converted.jpeg",
-    "colors": [
-      {
-        "id": "487",
-        "nameDe": "Bronze",
-        "nameEn": "Bronze",
-        "hex": "#8C6E4B",
-        "group": null
-      },
-      {
-        "id": "488",
-        "nameDe": "Carbon",
-        "nameEn": "Carbon",
-        "hex": "#3D3D3D",
-        "group": null
-      },
-      {
-        "id": "489",
-        "nameDe": "Brass",
-        "nameEn": "Brass",
-        "hex": "#B08D57",
-        "group": null
-      }
-    ]
+    "id": "grifflos",
+    "category": "handleless",
+    "subcategory": null,
+    "imagePath": "grifflos.jpg",
+    "trainingCaption": "a close-up detail photograph of a Rotpunkt handleless kitchen cabinet front with integrated grip channel, no visible handle hardware, the top edge of the cabinet door is recessed creating a shadow gap finger-pull groove behind the countertop overhang, warm beige cream matte lacquered front surface, light oak wood visible inside the grip channel, stone or light grey countertop above, warm natural lighting, modern minimalist handleless kitchen design",
+    "promptCaption": "Rotpunkt handleless kitchen cabinet front with integrated grip channel, no visible handle hardware, the top edge of the cabinet door is recessed creating a shadow gap finger-pull groove behind the countertop overhang, modern minimalist handleless kitchen design",
+    "labelDe": "Grifflos",
+    "labelEn": "Handleless"
   },
   {
-    "id": "buster-grips-526-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "526",
-    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
-    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
-    "typeDe": "Bügelgriff mit Bodenplatte",
-    "typeEn": "Bar handle with backplate",
-    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/526_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "526",
-        "nameDe": "Steel",
-        "nameEn": "Steel",
-        "hex": "#A6A9AD",
-        "group": null
-      }
-    ]
+    "id": "bp-230821-rp-innovationscover-th-01524",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/230821_RP_InnovationsCover_TH-01524.jpg",
+    "trainingCaption": "a lifestyle photograph of a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with brass gold knurled handles, contemporary kitchen interior design with warm lighting and decorative elements, professional interior photography",
+    "promptCaption": "a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with brass gold knurled handles, contemporary kitchen interior design with warm lighting and decorative elements",
+    "labelDe": "Brass Gold Knurled",
+    "labelEn": "Brass Gold Knurled"
   },
   {
-    "id": "buster-grips-527-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "527",
-    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
-    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
-    "typeDe": "Bügelgriff mit Bodenplatte",
-    "typeEn": "Bar handle with backplate",
-    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/527_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "527",
-        "nameDe": "Brass",
-        "nameEn": "Brass",
-        "hex": "#B08D57",
-        "group": null
-      }
-    ]
+    "id": "bp-230821-rp-innovationscover-th-01567",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/230821_RP_InnovationsCover_TH-01567.jpg",
+    "trainingCaption": "a lifestyle photograph of a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design, professional interior photography",
+    "promptCaption": "a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design",
+    "labelDe": "B&P dark matte",
+    "labelEn": "B&P dark matte"
   },
   {
-    "id": "buster-grips-528-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "528",
-    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
-    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
-    "typeDe": "Bügelgriff mit Bodenplatte",
-    "typeEn": "Bar handle with backplate",
-    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/528_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "528",
-        "nameDe": "Smoked Bronze",
-        "nameEn": "Smoked Bronze",
-        "hex": "#6C5A4B",
-        "group": null
-      }
-    ]
+    "id": "bp-230821-rp-innovationscover-th-01567-2",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/230821_RP_InnovationsCover_TH-01567_CMYK.jpg",
+    "trainingCaption": "a lifestyle photograph of a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design, professional interior photography, CMYK color profile",
+    "promptCaption": "a modern Rotpunkt kitchen featuring Buster and Punch hardware, dark matte kitchen fronts with industrial-luxury brass handles, contemporary kitchen interior design",
+    "labelDe": "B&P dark matte",
+    "labelEn": "B&P dark matte"
   },
   {
-    "id": "buster-grips-529-buegelgriff-mit-bodenplatte-pull-bar-plate-medium-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "529",
-    "descriptionDe": "Pull Bar - Plate - Medium - Cross",
-    "descriptionEn": "Pull Bar - Plate - Medium - Cross",
-    "typeDe": "Bügelgriff mit Bodenplatte",
-    "typeEn": "Bar handle with backplate",
-    "dimensions": "HO, MI, VE | Bohrmaß <226> | l x b x h 300 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/529_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "529",
-        "nameDe": "Black",
-        "nameEn": "Black",
-        "hex": "#1E1E1E",
-        "group": null
-      }
-    ]
+    "id": "bp-230821-rp-mk11-griff-th-01322",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/230821_RP_MK11_Griff_TH-01322_CMYK.jpg",
+    "trainingCaption": "a close-up detail photograph of a Buster and Punch T-bar knob handle on a white Rotpunkt kitchen cabinet front, matte black knurled cylindrical T-bar handle with diamond-pattern crosshatch texture, mounted on a round black backplate with visible hex screws, industrial-luxury design aesthetic, close-up product photography against white cabinet front with dark countertop",
+    "promptCaption": "a Buster and Punch T-bar knob handle on a white Rotpunkt kitchen cabinet front, matte black knurled cylindrical T-bar handle with diamond-pattern crosshatch texture, mounted on a round black backplate with visible hex screws, industrial-luxury design aesthetic",
+    "labelDe": "Matte Black Knurled",
+    "labelEn": "Matte Black Knurled"
   },
   {
-    "id": "buster-grips-810-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "810",
-    "descriptionDe": "Pull Bar - Plate - Large - Cross",
-    "descriptionEn": "Pull Bar - Plate - Large - Cross",
-    "typeDe": "Stangengriff mit Bodenplatte",
-    "typeEn": "Pull bar with backplate",
-    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/810_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "810",
-        "nameDe": "Steel",
-        "nameEn": "Steel",
-        "hex": "#A6A9AD",
-        "group": null
-      }
-    ]
+    "id": "bp-230821-rp-mk11-griff-th-01362",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/230821_RP_MK11_Griff_TH-01362_CMYK.jpg",
+    "trainingCaption": "a detail photograph showing multiple Buster and Punch T-bar knob handles on white Rotpunkt kitchen drawer fronts, matte black knurled cylindrical T-bar handles with diamond-pattern crosshatch texture, mounted on round black backplates with visible hex screws, four handles visible in diagonal perspective on stacked white drawers with black stone countertop, industrial-luxury kitchen design",
+    "promptCaption": "a detail photograph showing multiple Buster and Punch T-bar knob handles on white Rotpunkt kitchen drawer fronts, matte black knurled cylindrical T-bar handles with diamond-pattern crosshatch texture, mounted on round black backplates with visible hex screws, four handles visible in diagonal perspective on stacked white drawers with black stone countertop, industrial-luxury kitchen design",
+    "labelDe": "Matte Black Knurled",
+    "labelEn": "Matte Black Knurled"
   },
   {
-    "id": "buster-grips-811-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "811",
-    "descriptionDe": "Pull Bar - Plate - Large - Cross",
-    "descriptionEn": "Pull Bar - Plate - Large - Cross",
-    "typeDe": "Stangengriff mit Bodenplatte",
-    "typeEn": "Pull bar with backplate",
-    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/811_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "811",
-        "nameDe": "Brass",
-        "nameEn": "Brass",
-        "hex": "#B08D57",
-        "group": null
-      }
-    ]
+    "id": "bp-230821-rp-mk7-bup-griffe-th-00797",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/230821_RP_MK7_BUP-Griffe_TH-00797_CMYK.jpg",
+    "trainingCaption": "a close-up detail photograph of Buster and Punch knurled knob handles on dark teal-green Rotpunkt kitchen cabinet fronts, brushed brass gold cylindrical knobs with diamond-pattern crosshatch texture, mounted on rectangular brass backplates with visible hex screws, white countertop above dark cabinets, industrial-luxury design aesthetic",
+    "promptCaption": "Buster and Punch knurled knob handles on dark teal-green Rotpunkt kitchen cabinet fronts, brushed brass gold cylindrical knobs with diamond-pattern crosshatch texture, mounted on rectangular brass backplates with visible hex screws, white countertop above dark cabinets, industrial-luxury design aesthetic",
+    "labelDe": "Brushed Brass Gold Cylindrical",
+    "labelEn": "Brushed Brass Gold Cylindrical"
   },
   {
-    "id": "buster-grips-812-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "812",
-    "descriptionDe": "Pull Bar - Plate - Large - Cross",
-    "descriptionEn": "Pull Bar - Plate - Large - Cross",
-    "typeDe": "Stangengriff mit Bodenplatte",
-    "typeEn": "Pull bar with backplate",
-    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/812_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "812",
-        "nameDe": "Smoked Bronze",
-        "nameEn": "Smoked Bronze",
-        "hex": "#6C5A4B",
-        "group": null
-      }
-    ]
+    "id": "bp-230821-rp-mk7-bup-griffe-th-00797-2",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/230821_RP_MK7_BUP-Griffe_TH-00797_HF_CMYK.jpg",
+    "trainingCaption": "a close-up detail photograph of Buster and Punch knurled knob handles on dark teal-green Rotpunkt kitchen cabinet fronts, brushed brass gold cylindrical knobs with diamond-pattern crosshatch texture, mounted on rectangular brass backplates with visible hex screws, white countertop above, vertical composition showing two adjacent cabinet doors, industrial-luxury design",
+    "promptCaption": "Buster and Punch knurled knob handles on dark teal-green Rotpunkt kitchen cabinet fronts, brushed brass gold cylindrical knobs with diamond-pattern crosshatch texture, mounted on rectangular brass backplates with visible hex screws, white countertop above, vertical composition showing two adjacent cabinet doors, industrial-luxury design",
+    "labelDe": "Brushed Brass Gold Cylindrical",
+    "labelEn": "Brushed Brass Gold Cylindrical"
   },
   {
-    "id": "buster-grips-813-stangengriff-mit-bodenplatte-pull-bar-plate-large-cross",
-    "categoryId": "buster-grips",
-    "categoryDe": "BUSTER GRIPS",
-    "categoryEn": "Buster Grips",
-    "model": "813",
-    "descriptionDe": "Pull Bar - Plate - Large - Cross",
-    "descriptionEn": "Pull Bar - Plate - Large - Cross",
-    "typeDe": "Stangengriff mit Bodenplatte",
-    "typeEn": "Pull bar with backplate",
-    "dimensions": "HO, VE | l x b x h 400 x 26 x 50 mm",
-    "imagePath": "BUSTER GRIPS/813_00_00_001_converted.jpeg",
-    "colors": [
-      {
-        "id": "813",
-        "nameDe": "Black",
-        "nameEn": "Black",
-        "hex": "#1E1E1E",
-        "group": null
-      }
-    ]
+    "id": "bp-mk07-a01",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/MK07_A01.jpg",
+    "trainingCaption": "a lifestyle photograph of a Rotpunkt kitchen with Buster and Punch brass hardware, dark matte fronts with brushed gold knurled handles, modern kitchen design",
+    "promptCaption": "a Rotpunkt kitchen with Buster and Punch brass hardware, dark matte fronts with brushed gold knurled handles, modern kitchen design",
+    "labelDe": "B&P brass",
+    "labelEn": "B&P brass"
   },
   {
-    "id": "buegelgriff-pg-mp-buegelgriff-knopf-knopf-mit-griffbohrung",
-    "categoryId": "buegelgriff",
-    "categoryDe": "BÜGELGRIFF",
-    "categoryEn": "Handle Bars",
-    "model": "PG|MP",
-    "descriptionDe": "Knopf mit Griffbohrung",
-    "descriptionEn": "Knopf mit Griffbohrung",
-    "typeDe": "Bügelgriff (Knopf)",
-    "typeEn": "Handle knob",
-    "dimensions": "HO, MI, VE | Bohrmaß <16> | l x b x h 65 x 15 x 29 mm",
-    "imagePath": "Buegel Griff.jpeg",
-    "colors": [
-      {
-        "id": "487",
-        "nameDe": "Bronze",
-        "nameEn": "Bronze",
-        "hex": "#8C6E4B",
-        "group": null
-      },
-      {
-        "id": "488",
-        "nameDe": "Carbon",
-        "nameEn": "Carbon",
-        "hex": "#3D3D3D",
-        "group": null
-      },
-      {
-        "id": "489",
-        "nameDe": "Brass",
-        "nameEn": "Brass",
-        "hex": "#B08D57",
-        "group": null
-      }
-    ]
+    "id": "bp-mk07-a02",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/MK07_A02.jpg",
+    "trainingCaption": "a lifestyle photograph of a Rotpunkt kitchen with Buster and Punch hardware, contemporary kitchen interior design with industrial-luxury handle details",
+    "promptCaption": "a Rotpunkt kitchen with Buster and Punch hardware, contemporary kitchen interior design with industrial-luxury handle details",
+    "labelDe": "B&P Lifestyle",
+    "labelEn": "B&P Lifestyle"
   },
   {
-    "id": "buegelgriff-pg-mp-buegelgriff-bar-buegelgriff-mit-griffbohrung",
-    "categoryId": "buegelgriff",
-    "categoryDe": "BÜGELGRIFF",
-    "categoryEn": "Handle Bars",
-    "model": "PG|MP",
-    "descriptionDe": "Bügelgriff mit Griffbohrung",
-    "descriptionEn": "Bügelgriff mit Griffbohrung",
-    "typeDe": "Bügelgriff (Bar)",
-    "typeEn": "Handle bar",
-    "dimensions": "HO, HN, MI, MN, VE | Bohrmaß <160> | l x b x h 210 x 15 x 30 mm",
-    "imagePath": "Buegel Griff.jpeg",
-    "colors": [
-      {
-        "id": "490",
-        "nameDe": "Bronze",
-        "nameEn": "Bronze",
-        "hex": "#8C6E4B",
-        "group": null
-      },
-      {
-        "id": "491",
-        "nameDe": "Carbon",
-        "nameEn": "Carbon",
-        "hex": "#3D3D3D",
-        "group": null
-      },
-      {
-        "id": "492",
-        "nameDe": "Brass",
-        "nameEn": "Brass",
-        "hex": "#B08D57",
-        "group": null
-      }
-    ]
+    "id": "bp-mk11-a01-ergo-fl-zero-beach-grey",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/MK11_A01_Ergo_FL_Zero_Beach_Grey.jpg",
+    "trainingCaption": "a wide-angle lifestyle photograph of a spacious Rotpunkt kitchen with Buster and Punch matte black handles, light grey shaker-style cabinet fronts with black T-bar knob handles, dark accent wall with illuminated glass-front cabinets showing oak wood interior shelving, herringbone wood floor, modern pendant lighting, bar stools, contemporary luxury kitchen interior design",
+    "promptCaption": "a spacious Rotpunkt kitchen with Buster and Punch matte black handles, light grey shaker-style cabinet fronts with black T-bar knob handles, dark accent wall with illuminated glass-front cabinets showing oak wood interior shelving, herringbone wood floor, modern pendant lighting, bar stools, contemporary luxury kitchen interior design",
+    "labelDe": "B&P black",
+    "labelEn": "B&P black"
   },
   {
-    "id": "tokyo-tokyo-002-griffleiste-tokyo-holz-griffleiste",
-    "categoryId": "tokyo",
-    "categoryDe": "TOKYO",
-    "categoryEn": "Tokyo",
-    "model": "TOKYO_002",
-    "descriptionDe": "Tokyo Holz-Griffleiste",
-    "descriptionEn": "Tokyo Holz-Griffleiste",
-    "typeDe": "Griffleiste",
-    "typeEn": "Handle rail",
-    "dimensions": "TM | Bohrmaß fronthängend | b x h 22 x 22 mm",
-    "imagePath": "TOKYO_00_00_002_converted.jpeg",
-    "colors": [
-      {
-        "id": "10229",
-        "nameDe": "Dunkelbraun",
-        "nameEn": "Dunkelbraun",
-        "hex": "#5B3A29",
-        "group": "Holzfarben"
-      },
-      {
-        "id": "10263",
-        "nameDe": "Metal Grey",
-        "nameEn": "Metal Grey",
-        "hex": "#7F8489",
-        "group": "Holzfarben"
-      },
-      {
-        "id": "10270",
-        "nameDe": "Stone",
-        "nameEn": "Stone",
-        "hex": "#C5C0B7",
-        "group": "Unifarben matt"
-      },
-      {
-        "id": "10271",
-        "nameDe": "Wisteria",
-        "nameEn": "Wisteria",
-        "hex": "#8571A8",
-        "group": "Holzfarben"
-      },
-      {
-        "id": "10274",
-        "nameDe": "Petrol Smoke",
-        "nameEn": "Petrol Smoke",
-        "hex": "#35535D",
-        "group": "Holzfarben"
-      },
-      {
-        "id": "10277",
-        "nameDe": "Schwarz",
-        "nameEn": "Schwarz",
-        "hex": "#1E1E1E",
-        "group": "Holzfarben"
-      },
-      {
-        "id": "10278",
-        "nameDe": "Oak",
-        "nameEn": "Oak",
-        "hex": "#B58A5B",
-        "group": "Holzfarben"
-      },
-      {
-        "id": "10198",
-        "nameDe": "Rusty Red",
-        "nameEn": "Rusty Red",
-        "hex": "#8E3B32",
-        "group": "Holzfarben"
-      },
-      {
-        "id": "10204",
-        "nameDe": "Umbra",
-        "nameEn": "Umbra",
-        "hex": "#5C5146",
-        "group": "Unifarben matt"
-      },
-      {
-        "id": "10206",
-        "nameDe": "Curry",
-        "nameEn": "Curry",
-        "hex": "#C79B2D",
-        "group": "Holzfarben"
-      }
-    ]
+    "id": "bp-rotpunkt-themen-kollektion-2024-buster-and-punch-2",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/rotpunkt_themen_kollektion_2024_buster_and_punch-2.jpg",
+    "trainingCaption": "a close-up detail photograph of a Buster and Punch knurled bar handle on a dark matte Rotpunkt kitchen cabinet front, brushed brass gold bar pull with diamond-pattern crosshatch texture mounted on a rectangular brass backplate with visible hex screw, dark charcoal-black cabinet front, white countertop edge visible above, industrial-luxury design, macro product photography",
+    "promptCaption": "a Buster and Punch knurled bar handle on a dark matte Rotpunkt kitchen cabinet front, brushed brass gold bar pull with diamond-pattern crosshatch texture mounted on a rectangular brass backplate with visible hex screw, dark charcoal-black cabinet front, white countertop edge visible above, industrial-luxury design",
+    "labelDe": "Brushed Brass Gold Bar Pull",
+    "labelEn": "Brushed Brass Gold Bar Pull"
   },
   {
-    "id": "yell-yell-schwarz-griffleiste-yell-griffleiste-schwarz",
-    "categoryId": "yell",
-    "categoryDe": "YELL",
-    "categoryEn": "Yell",
-    "model": "Yell-Schwarz",
-    "descriptionDe": "Yell Griffleiste Schwarz",
-    "descriptionEn": "Yell Griffleiste Schwarz",
-    "typeDe": "Griffleiste",
-    "typeEn": "Handle rail",
-    "dimensions": "Standard Profile",
-    "imagePath": "Yell Griffleiste Schwarz.jpeg",
-    "colors": [
-      {
-        "id": "schwarz-black",
-        "nameDe": "Schwarz (Black)",
-        "nameEn": "Schwarz (Black)",
-        "hex": "#1E1E1E",
-        "group": null
-      }
-    ]
+    "id": "bp-rotpunkt-themen-kollektion-2024-buster-and-punch-3",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/rotpunkt_themen_kollektion_2024_buster_and_punch-3.jpg",
+    "trainingCaption": "a close-up detail photograph of a Buster and Punch T-bar knob handle on a dark matte Rotpunkt kitchen cabinet front, brushed brass gold cylindrical T-bar with diamond-pattern knurled texture, mounted on a round brass backplate with visible hex screws, dark blue-black cabinet front, industrial-luxury design, macro product photography",
+    "promptCaption": "a Buster and Punch T-bar knob handle on a dark matte Rotpunkt kitchen cabinet front, brushed brass gold cylindrical T-bar with diamond-pattern knurled texture, mounted on a round brass backplate with visible hex screws, dark blue-black cabinet front, industrial-luxury design",
+    "labelDe": "Brushed Brass Gold Cylindrical",
+    "labelEn": "Brushed Brass Gold Cylindrical"
+  },
+  {
+    "id": "bp-rotpunkt-themen-kollektion-2024-buster-and-punch-4",
+    "category": "buster_and_punch",
+    "subcategory": null,
+    "imagePath": "Buster und Punch Griffe/rotpunkt_themen_kollektion_2024_buster_and_punch-4.jpg",
+    "trainingCaption": "a detail photograph of Buster and Punch hardware on a Rotpunkt kitchen, brushed brass gold knurled handles on dark matte cabinet fronts, industrial-luxury design aesthetic, professional product photography",
+    "promptCaption": "Buster and Punch hardware on a Rotpunkt kitchen, brushed brass gold knurled handles on dark matte cabinet fronts, industrial-luxury design aesthetic",
+    "labelDe": "Brushed Brass Gold Knurled",
+    "labelEn": "Brushed Brass Gold Knurled"
+  },
+  {
+    "id": "std-121",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/121-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet T-bar knob handle, polished nickel silver finish, cross-shaped cylindrical T-bar with spherical center joint on a round pedestal base, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "T-bar knob handle, polished nickel silver finish, cross-shaped cylindrical T-bar with spherical center joint on a round pedestal base, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "T-bar knob handle, polished nickel silver finish",
+    "labelEn": "T-bar knob handle, polished nickel silver finish"
+  },
+  {
+    "id": "std-154",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/154-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet oval knob handle, cast iron with dark grey hammered antique finish, elongated oval mushroom-shaped knob on a tapered pedestal base, rustic traditional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "oval knob handle, cast iron with dark grey hammered antique finish, elongated oval mushroom-shaped knob on a tapered pedestal base, rustic traditional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "oval knob handle, cast iron with dark grey hammered ant",
+    "labelEn": "oval knob handle, cast iron with dark grey hammered ant"
+  },
+  {
+    "id": "std-180",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/180-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet D-shaped bar pull handle, polished chrome finish with dark reflective edges, rectangular cross-section bar with rounded corners on squared feet, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "D-shaped bar pull handle, polished chrome finish with dark reflective edges, rectangular cross-section bar with rounded corners on squared feet, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "D-shaped bar pull handle, polished chrome finish with d",
+    "labelEn": "D-shaped bar pull handle, polished chrome finish with d"
+  },
+  {
+    "id": "std-181",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/181-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet arched bow handle, brushed stainless steel finish, smooth curved tubular bow pull with rounded cylindrical feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "arched bow handle, brushed stainless steel finish, smooth curved tubular bow pull with rounded cylindrical feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "arched bow handle, brushed stainless steel finish",
+    "labelEn": "arched bow handle, brushed stainless steel finish"
+  },
+  {
+    "id": "std-205",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/205-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, polished chrome silver finish, flat rectangular bar with squared-off design and beveled edges on wide feet, clean modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, polished chrome silver finish, flat rectangular bar with squared-off design and beveled edges on wide feet, clean modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, polished chrome silver finish",
+    "labelEn": "bridge pull handle, polished chrome silver finish"
+  },
+  {
+    "id": "std-207",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/207-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, brushed stainless steel finish, flat rectangular bar with asymmetric feet design featuring one curved foot, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, brushed stainless steel finish, flat rectangular bar with asymmetric feet design featuring one curved foot, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, brushed stainless steel finish",
+    "labelEn": "bridge pull handle, brushed stainless steel finish"
+  },
+  {
+    "id": "std-210",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/210-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, brushed stainless steel finish, square cross-section bar with clean right-angle corners, contemporary minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, brushed stainless steel finish, square cross-section bar with clean right-angle corners, contemporary minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, brushed stainless steel fini",
+    "labelEn": "square bridge pull handle, brushed stainless steel fini"
+  },
+  {
+    "id": "std-230",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/230-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, matte stainless steel finish, flat rectangular bar with squared feet and precise right angles, ultra-minimalist modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, matte stainless steel finish, flat rectangular bar with squared feet and precise right angles, ultra-minimalist modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, matte stainless steel finish",
+    "labelEn": "square bridge pull handle, matte stainless steel finish"
+  },
+  {
+    "id": "std-295",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/295-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, dark antiqued brass finish with patina showing golden-brass undertones, flat rectangular bar with squared feet, rustic industrial style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, dark antiqued brass finish with patina showing golden-brass undertones, flat rectangular bar with squared feet, rustic industrial style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, dark antiqued brass finish w",
+    "labelEn": "square bridge pull handle, dark antiqued brass finish w"
+  },
+  {
+    "id": "std-352",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/352-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet flat bridge pull handle, dark pewter antiqued metal finish with subtle sheen, flat rectangular cross-section bar with squared feet and welded joints visible, industrial style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "flat bridge pull handle, dark pewter antiqued metal finish with subtle sheen, flat rectangular cross-section bar with squared feet and welded joints visible, industrial style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "flat bridge pull handle, dark pewter antiqued metal fin",
+    "labelEn": "flat bridge pull handle, dark pewter antiqued metal fin"
+  },
+  {
+    "id": "std-380",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/380-27X17_00_00_002_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet oval mushroom knob, dark iron cast metal finish with textured hammered surface, large oval-shaped knob on a tapered pedestal base, rustic traditional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "oval mushroom knob, dark iron cast metal finish with textured hammered surface, large oval-shaped knob on a tapered pedestal base, rustic traditional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "oval mushroom knob, dark iron cast metal finish with te",
+    "labelEn": "oval mushroom knob, dark iron cast metal finish with te"
+  },
+  {
+    "id": "std-381",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/381-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, dark iron cast metal finish with textured hammered surface, flat-topped rectangular bar with squared feet, rustic traditional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, dark iron cast metal finish with textured hammered surface, flat-topped rectangular bar with squared feet, rustic traditional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, dark iron cast metal finish with te",
+    "labelEn": "bridge pull handle, dark iron cast metal finish with te"
+  },
+  {
+    "id": "std-386",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/386-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, dark pewter hammered iron finish, square cross-section bar with flat squared feet, rustic industrial style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, dark pewter hammered iron finish, square cross-section bar with flat squared feet, rustic industrial style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, dark pewter hammered iron finish",
+    "labelEn": "bridge pull handle, dark pewter hammered iron finish"
+  },
+  {
+    "id": "std-387",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/387-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, oil-rubbed dark bronze finish with warm copper undertones visible at edges, round cross-section bar with flat squared feet, classic transitional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, oil-rubbed dark bronze finish with warm copper undertones visible at edges, round cross-section bar with flat squared feet, classic transitional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, oil-rubbed dark bronze finish with ",
+    "labelEn": "bridge pull handle, oil-rubbed dark bronze finish with "
+  },
+  {
+    "id": "std-393",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/393-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet arched bow handle, dark iron graphite finish with matte textured surface, thick rounded tubular bow pull, rustic traditional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "arched bow handle, dark iron graphite finish with matte textured surface, thick rounded tubular bow pull, rustic traditional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "arched bow handle, dark iron graphite finish with matte",
+    "labelEn": "arched bow handle, dark iron graphite finish with matte"
+  },
+  {
+    "id": "std-395",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/395-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet arched bow handle, oil-rubbed dark bronze finish with warm brown undertones, thick rounded tubular bow pull, classic traditional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "arched bow handle, oil-rubbed dark bronze finish with warm brown undertones, thick rounded tubular bow pull, classic traditional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "arched bow handle, oil-rubbed dark bronze finish with w",
+    "labelEn": "arched bow handle, oil-rubbed dark bronze finish with w"
+  },
+  {
+    "id": "std-400",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/400-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet oval pointed knob, brushed dark anthracite pewter finish, almond-shaped elongated knob on a cylindrical pedestal base with round foot, modern transitional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "oval pointed knob, brushed dark anthracite pewter finish, almond-shaped elongated knob on a cylindrical pedestal base with round foot, modern transitional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "oval pointed knob, brushed dark anthracite pewter finis",
+    "labelEn": "oval pointed knob, brushed dark anthracite pewter finis"
+  },
+  {
+    "id": "std-405",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/405-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet flat bridge pull handle, brushed dark graphite nickel finish with subtle metallic sheen, flat rectangular bar with squared feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "flat bridge pull handle, brushed dark graphite nickel finish with subtle metallic sheen, flat rectangular bar with squared feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "flat bridge pull handle, brushed dark graphite nickel f",
+    "labelEn": "flat bridge pull handle, brushed dark graphite nickel f"
+  },
+  {
+    "id": "std-416",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/416-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet arched flat bar pull handle, dark iron blacksmith-forged finish with textured hammered surface, wide flat bow pull with organic slightly uneven surface, rustic artisanal style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "arched flat bar pull handle, dark iron blacksmith-forged finish with textured hammered surface, wide flat bow pull with organic slightly uneven surface, rustic artisanal style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "arched flat bar pull handle, dark iron blacksmith-forge",
+    "labelEn": "arched flat bar pull handle, dark iron blacksmith-forge"
+  },
+  {
+    "id": "std-417",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/417-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, dark forged iron finish with rough hammered texture, thick square cross-section bar with squared feet, rustic industrial blacksmith style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, dark forged iron finish with rough hammered texture, thick square cross-section bar with squared feet, rustic industrial blacksmith style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, dark forged iron finish with",
+    "labelEn": "square bridge pull handle, dark forged iron finish with"
+  },
+  {
+    "id": "std-422",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/422-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet arched bow pull handle, brushed satin nickel finish, smooth elegant curved bow with flared feet, classic transitional style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "arched bow pull handle, brushed satin nickel finish, smooth elegant curved bow with flared feet, classic transitional style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "arched bow pull handle, brushed satin nickel finish",
+    "labelEn": "arched bow pull handle, brushed satin nickel finish"
+  },
+  {
+    "id": "std-424",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/424-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet wire pull handle, brushed stainless steel finish, thin round tubular wire bow with rounded corners and simple straight feet, minimalist modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "wire pull handle, brushed stainless steel finish, thin round tubular wire bow with rounded corners and simple straight feet, minimalist modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "wire pull handle, brushed stainless steel finish",
+    "labelEn": "wire pull handle, brushed stainless steel finish"
+  },
+  {
+    "id": "std-425",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/425-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet wide bow pull handle, brushed satin stainless steel finish, smooth wide flat arched bow with gently curved tapered feet, sleek modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "wide bow pull handle, brushed satin stainless steel finish, smooth wide flat arched bow with gently curved tapered feet, sleek modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "wide bow pull handle, brushed satin stainless steel fin",
+    "labelEn": "wide bow pull handle, brushed satin stainless steel fin"
+  },
+  {
+    "id": "std-426",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/426-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet oval pointed knob, matte black finish, almond-shaped elongated knob on a cylindrical pedestal base with round foot, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "oval pointed knob, matte black finish, almond-shaped elongated knob on a cylindrical pedestal base with round foot, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "oval pointed knob, matte black finish",
+    "labelEn": "oval pointed knob, matte black finish"
+  },
+  {
+    "id": "std-432",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/432-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, matte black finish, square cross-section bar with clean right-angle corners, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, matte black finish, square cross-section bar with clean right-angle corners, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, matte black finish",
+    "labelEn": "square bridge pull handle, matte black finish"
+  },
+  {
+    "id": "std-435",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/435-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, matte black finish, square cross-section bar with clean right-angle corners, longer length version, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, matte black finish, square cross-section bar with clean right-angle corners, longer length version, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, matte black finish",
+    "labelEn": "square bridge pull handle, matte black finish"
+  },
+  {
+    "id": "std-436",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/436-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, matte white finish, square cross-section bar with clean right-angle corners, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, matte white finish, square cross-section bar with clean right-angle corners, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, matte white finish",
+    "labelEn": "square bridge pull handle, matte white finish"
+  },
+  {
+    "id": "std-437",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/437-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, matte white finish, square cross-section bar with clean right-angle corners, longer length version, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, matte white finish, square cross-section bar with clean right-angle corners, longer length version, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, matte white finish",
+    "labelEn": "square bridge pull handle, matte white finish"
+  },
+  {
+    "id": "std-446",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/446-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet flat bridge pull handle, brushed stainless steel finish, flat rectangular bar with squared feet and visible screw holes, industrial modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "flat bridge pull handle, brushed stainless steel finish, flat rectangular bar with squared feet and visible screw holes, industrial modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "flat bridge pull handle, brushed stainless steel finish",
+    "labelEn": "flat bridge pull handle, brushed stainless steel finish"
+  },
+  {
+    "id": "std-452",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/452-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet flat bridge pull handle, brushed antique pewter finish with dark patina, flat rectangular bar with squared feet, vintage industrial style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "flat bridge pull handle, brushed antique pewter finish with dark patina, flat rectangular bar with squared feet, vintage industrial style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "flat bridge pull handle, brushed antique pewter finish ",
+    "labelEn": "flat bridge pull handle, brushed antique pewter finish "
+  },
+  {
+    "id": "std-456",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/456-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet tubular pull handle, brushed antique pewter finish, round tubular bar with pipe-fitting style elbow joints and decorative ring details at connections, industrial plumbing-inspired style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "tubular pull handle, brushed antique pewter finish, round tubular bar with pipe-fitting style elbow joints and decorative ring details at connections, industrial plumbing-inspired style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "tubular pull handle, brushed antique pewter finish",
+    "labelEn": "tubular pull handle, brushed antique pewter finish"
+  },
+  {
+    "id": "std-465",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/465-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet flat edge pull, matte black finish, long thin rectangular flat bar with no visible feet, ultra-minimalist modern self-adhesive style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "flat edge pull, matte black finish, long thin rectangular flat bar with no visible feet, ultra-minimalist modern self-adhesive style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "flat edge pull, matte black finish",
+    "labelEn": "flat edge pull, matte black finish"
+  },
+  {
+    "id": "std-466",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/466-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet flat edge pull, matte stainless steel finish, long thin rectangular flat bar with no visible feet, ultra-minimalist modern self-adhesive style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "flat edge pull, matte stainless steel finish, long thin rectangular flat bar with no visible feet, ultra-minimalist modern self-adhesive style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "flat edge pull, matte stainless steel finish",
+    "labelEn": "flat edge pull, matte stainless steel finish"
+  },
+  {
+    "id": "std-467",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/467-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square knob, dark anthracite graphite matte finish, flat square-topped knob on a square pedestal base, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square knob, dark anthracite graphite matte finish, flat square-topped knob on a square pedestal base, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square knob, dark anthracite graphite matte finish",
+    "labelEn": "square knob, dark anthracite graphite matte finish"
+  },
+  {
+    "id": "std-468",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/468-17X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, matte black finish, slim rectangular cross-section bar with clean right-angle corners, longer length version, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, matte black finish, slim rectangular cross-section bar with clean right-angle corners, longer length version, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, matte black finish",
+    "labelEn": "square bridge pull handle, matte black finish"
+  },
+  {
+    "id": "std-470",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/470-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet knurled bar pull handle, matte black finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "knurled bar pull handle, matte black finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "knurled bar pull handle, matte black finish",
+    "labelEn": "knurled bar pull handle, matte black finish"
+  },
+  {
+    "id": "std-472",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/472-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet cylindrical knob with knurled texture, matte black finish, flat-topped cylinder with diamond-pattern crosshatch knurled body on a flat round base, industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "cylindrical knob with knurled texture, matte black finish, flat-topped cylinder with diamond-pattern crosshatch knurled body on a flat round base, industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "cylindrical knob with knurled texture, matte black fini",
+    "labelEn": "cylindrical knob with knurled texture, matte black fini"
+  },
+  {
+    "id": "std-474",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/474-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet tall cylindrical knurled knob, matte black finish, tapered cylindrical body with diamond-pattern crosshatch texture on a round flat base, industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "tall cylindrical knurled knob, matte black finish, tapered cylindrical body with diamond-pattern crosshatch texture on a round flat base, industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "tall cylindrical knurled knob, matte black finish",
+    "labelEn": "tall cylindrical knurled knob, matte black finish"
+  },
+  {
+    "id": "std-476",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/476-27X71_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, brushed satin brass gold finish, square cross-section bar with clean right-angle corners, warm golden metallic tone, modern luxury style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, brushed satin brass gold finish, square cross-section bar with clean right-angle corners, warm golden metallic tone, modern luxury style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, brushed satin brass gold fin",
+    "labelEn": "square bridge pull handle, brushed satin brass gold fin"
+  },
+  {
+    "id": "std-477",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/477-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet vintage bridge pull handle, matte black finish with flat mounting plates visible at each end with screw holes, curved slightly raised bar with flat bottom, traditional country-house style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "vintage bridge pull handle, matte black finish with flat mounting plates visible at each end with screw holes, curved slightly raised bar with flat bottom, traditional country-house style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "vintage bridge pull handle, matte black finish with fla",
+    "labelEn": "vintage bridge pull handle, matte black finish with fla"
+  },
+  {
+    "id": "std-478",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/478-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet round tubular bar pull handle, dark iron cast metal finish with matte textured surface, simple round cross-section bar with rounded cylindrical feet, industrial rustic style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "round tubular bar pull handle, dark iron cast metal finish with matte textured surface, simple round cross-section bar with rounded cylindrical feet, industrial rustic style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "round tubular bar pull handle, dark iron cast metal fin",
+    "labelEn": "round tubular bar pull handle, dark iron cast metal fin"
+  },
+  {
+    "id": "std-487",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/487-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet T-bar knob handle with knurled texture, dark bronze copper finish, horizontal knurled bar with diamond-pattern crosshatch texture on a squared rectangular pedestal mount, industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "T-bar knob handle with knurled texture, dark bronze copper finish, horizontal knurled bar with diamond-pattern crosshatch texture on a squared rectangular pedestal mount, industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "T-bar knob handle with knurled texture, dark bronze cop",
+    "labelEn": "T-bar knob handle with knurled texture, dark bronze cop"
+  },
+  {
+    "id": "std-488",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/488-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet T-bar knob handle with knurled texture, matte black finish, horizontal knurled bar with diamond-pattern crosshatch texture on a squared rectangular pedestal mount, industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "T-bar knob handle with knurled texture, matte black finish, horizontal knurled bar with diamond-pattern crosshatch texture on a squared rectangular pedestal mount, industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "T-bar knob handle with knurled texture, matte black fin",
+    "labelEn": "T-bar knob handle with knurled texture, matte black fin"
+  },
+  {
+    "id": "std-489",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/489-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet T-bar knob handle with knurled texture, brushed brass gold finish, horizontal knurled bar with diamond-pattern crosshatch texture on a squared rectangular pedestal mount, warm golden metallic tone, industrial-luxury style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "T-bar knob handle with knurled texture, brushed brass gold finish, horizontal knurled bar with diamond-pattern crosshatch texture on a squared rectangular pedestal mount, warm golden metallic tone, industrial-luxury style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "T-bar knob handle with knurled texture, brushed brass g",
+    "labelEn": "T-bar knob handle with knurled texture, brushed brass g"
+  },
+  {
+    "id": "std-490",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/490-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet knurled bar pull handle, dark bronze copper finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, warm coppery brown metallic tone, industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "knurled bar pull handle, dark bronze copper finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, warm coppery brown metallic tone, industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "knurled bar pull handle, dark bronze copper finish",
+    "labelEn": "knurled bar pull handle, dark bronze copper finish"
+  },
+  {
+    "id": "std-491",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/491-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet knurled bar pull handle, matte black finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, longer length version, industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "knurled bar pull handle, matte black finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, longer length version, industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "knurled bar pull handle, matte black finish",
+    "labelEn": "knurled bar pull handle, matte black finish"
+  },
+  {
+    "id": "std-492",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/492-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet knurled bar pull handle, brushed brass gold finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, warm golden metallic tone, industrial-luxury style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "knurled bar pull handle, brushed brass gold finish, round tubular bar with diamond-pattern crosshatch knurled texture and squared bracket feet, warm golden metallic tone, industrial-luxury style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "knurled bar pull handle, brushed brass gold finish",
+    "labelEn": "knurled bar pull handle, brushed brass gold finish"
+  },
+  {
+    "id": "std-493",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/493_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet D-shaped bridge pull handle, dark iron textured finish with matte granular surface, thick rounded rectangular bar with squared feet, rugged industrial style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "D-shaped bridge pull handle, dark iron textured finish with matte granular surface, thick rounded rectangular bar with squared feet, rugged industrial style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "D-shaped bridge pull handle, dark iron textured finish ",
+    "labelEn": "D-shaped bridge pull handle, dark iron textured finish "
+  },
+  {
+    "id": "std-495",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/495_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet round tubular bar pull, matte stainless steel finish, simple round tubular T-bar design, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "round tubular bar pull, matte stainless steel finish, simple round tubular T-bar design, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "round tubular bar pull, matte stainless steel finish",
+    "labelEn": "round tubular bar pull, matte stainless steel finish"
+  },
+  {
+    "id": "std-496",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/496_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet round tubular bar pull, matte black finish, simple round tubular bar with thin cylindrical feet, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "round tubular bar pull, matte black finish, simple round tubular bar with thin cylindrical feet, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "round tubular bar pull, matte black finish",
+    "labelEn": "round tubular bar pull, matte black finish"
+  },
+  {
+    "id": "std-497",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/497_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet T-bar knob handle, dark forged iron finish with raw industrial patina, square cross-section horizontal bar on a rectangular squared pedestal mount with visible welding marks, rustic blacksmith artisan style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "T-bar knob handle, dark forged iron finish with raw industrial patina, square cross-section horizontal bar on a rectangular squared pedestal mount with visible welding marks, rustic blacksmith artisan style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "T-bar knob handle, dark forged iron finish with raw ind",
+    "labelEn": "T-bar knob handle, dark forged iron finish with raw ind"
+  },
+  {
+    "id": "std-498",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/498_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, dark forged iron finish with raw industrial patina, flat rectangular bar with squared feet and visible welding marks, rustic blacksmith artisan style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, dark forged iron finish with raw industrial patina, flat rectangular bar with squared feet and visible welding marks, rustic blacksmith artisan style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, dark forged iron finish with raw in",
+    "labelEn": "bridge pull handle, dark forged iron finish with raw in"
+  },
+  {
+    "id": "std-499",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/499_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet T-bar knob handle, matte black finish, smooth round tubular cross-shaped T-bar with cylindrical center joint on a round pedestal base, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "T-bar knob handle, matte black finish, smooth round tubular cross-shaped T-bar with cylindrical center joint on a round pedestal base, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "T-bar knob handle, matte black finish",
+    "labelEn": "T-bar knob handle, matte black finish"
+  },
+  {
+    "id": "std-500",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/500_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet square bridge pull handle, matte black finish, clean flat rectangular bar with squared feet, modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "square bridge pull handle, matte black finish, clean flat rectangular bar with squared feet, modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "square bridge pull handle, matte black finish",
+    "labelEn": "square bridge pull handle, matte black finish"
+  },
+  {
+    "id": "std-501",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/501_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet slim bridge pull handle, matte black finish, thin flat rectangular bar with wider squared feet, sleek modern minimalist style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "slim bridge pull handle, matte black finish, thin flat rectangular bar with wider squared feet, sleek modern minimalist style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "slim bridge pull handle, matte black finish",
+    "labelEn": "slim bridge pull handle, matte black finish"
+  },
+  {
+    "id": "std-502",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/502_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, brushed stainless steel or matte nickel finish, flat rectangular bar with squared feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, brushed stainless steel or matte nickel finish, flat rectangular bar with squared feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, brushed stainless steel or matte ni",
+    "labelEn": "bridge pull handle, brushed stainless steel or matte ni"
+  },
+  {
+    "id": "std-503",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/503_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, matte finish",
+    "labelEn": "bridge pull handle, matte finish"
+  },
+  {
+    "id": "std-505",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/505_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet T-bar knob handle with ribbed linear texture, dark pewter graphite finish, horizontal bar with fine parallel grooves on a squared rectangular pedestal mount, textured industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "T-bar knob handle with ribbed linear texture, dark pewter graphite finish, horizontal bar with fine parallel grooves on a squared rectangular pedestal mount, textured industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "T-bar knob handle with ribbed linear texture, dark pewt",
+    "labelEn": "T-bar knob handle with ribbed linear texture, dark pewt"
+  },
+  {
+    "id": "std-506",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/506_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle with ribbed linear texture, dark pewter graphite finish, horizontal bar with fine parallel grooves and squared bracket feet, textured industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bar pull handle with ribbed linear texture, dark pewter graphite finish, horizontal bar with fine parallel grooves and squared bracket feet, textured industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bar pull handle with ribbed linear texture, dark pewter",
+    "labelEn": "bar pull handle with ribbed linear texture, dark pewter"
+  },
+  {
+    "id": "std-507",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/507_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, matte finish",
+    "labelEn": "bridge pull handle, matte finish"
+  },
+  {
+    "id": "std-508",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/508_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bridge pull handle, matte finish, flat rectangular bar with squared feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bridge pull handle, matte finish",
+    "labelEn": "bridge pull handle, matte finish"
+  },
+  {
+    "id": "std-518",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/518_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle with ribbed linear texture, dark pewter graphite finish, horizontal bar with fine parallel grooves and squared bracket feet, longer length version, textured industrial-modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bar pull handle with ribbed linear texture, dark pewter graphite finish, horizontal bar with fine parallel grooves and squared bracket feet, longer length version, textured industrial-modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bar pull handle with ribbed linear texture, dark pewter",
+    "labelEn": "bar pull handle with ribbed linear texture, dark pewter"
+  },
+  {
+    "id": "std-519",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/519_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bar pull handle, matte finish",
+    "labelEn": "bar pull handle, matte finish"
+  },
+  {
+    "id": "std-520",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/520_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bar pull handle, matte finish",
+    "labelEn": "bar pull handle, matte finish"
+  },
+  {
+    "id": "std-521",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/521_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "bar pull handle, matte finish, horizontal bar with squared bracket feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "bar pull handle, matte finish",
+    "labelEn": "bar pull handle, matte finish"
+  },
+  {
+    "id": "std-719",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/719-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet round mushroom knob, distressed antique finish with grey-blue and golden patina showing through worn areas, classic vintage round mushroom-shaped knob on a tapered pedestal base, antique rustic style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "round mushroom knob, distressed antique finish with grey-blue and golden patina showing through worn areas, classic vintage round mushroom-shaped knob on a tapered pedestal base, antique rustic style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "round mushroom knob, distressed antique finish with gre",
+    "labelEn": "round mushroom knob, distressed antique finish with gre"
+  },
+  {
+    "id": "std-801",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/801-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "pull handle, metallic finish",
+    "labelEn": "pull handle, metallic finish"
+  },
+  {
+    "id": "std-808",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/808-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "pull handle, metallic finish",
+    "labelEn": "pull handle, metallic finish"
+  },
+  {
+    "id": "std-833",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/833-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet tubular bar pull handle, brushed stainless steel finish, round tubular bar with squared bracket feet, clean modern style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "tubular bar pull handle, brushed stainless steel finish, round tubular bar with squared bracket feet, clean modern style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "tubular bar pull handle, brushed stainless steel finish",
+    "labelEn": "tubular bar pull handle, brushed stainless steel finish"
+  },
+  {
+    "id": "std-851",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/851-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "pull handle, metallic finish",
+    "labelEn": "pull handle, metallic finish"
+  },
+  {
+    "id": "std-878",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/878-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "pull handle, metallic finish",
+    "labelEn": "pull handle, metallic finish"
+  },
+  {
+    "id": "std-908",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/908-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet arched bow pull handle, brushed satin nickel finish, smooth flat curved bow with tapered feet, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "arched bow pull handle, brushed satin nickel finish, smooth flat curved bow with tapered feet, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "arched bow pull handle, brushed satin nickel finish",
+    "labelEn": "arched bow pull handle, brushed satin nickel finish"
+  },
+  {
+    "id": "std-926",
+    "category": "standard_handle",
+    "subcategory": null,
+    "imagePath": "griffe/926-27X17_00_00_001_converted.jpeg",
+    "trainingCaption": "a product photograph of a standard kitchen cabinet pull handle, metallic finish, modern contemporary style, isolated on white background, cabinet hardware product photography",
+    "promptCaption": "pull handle, metallic finish, modern contemporary style, on Rotpunkt kitchen cabinet fronts",
+    "labelDe": "pull handle, metallic finish",
+    "labelEn": "pull handle, metallic finish"
+  },
+  {
+    "id": "tokyo-holz-139",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/139HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, light natural birch wood tone, very pale warm beige with subtle horizontal wood grain, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in light natural birch wood tone, very pale warm beige with subtle horizontal wood grain, anti-fingerprint surface finish",
+    "labelDe": "light natural birch wood tone",
+    "labelEn": "light natural birch wood tone"
+  },
+  {
+    "id": "tokyo-holz-197",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/197-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, natural medium oak wood, warm honey-amber tone with visible grain lines and small knots, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in natural medium oak wood, warm honey-amber tone with visible grain lines and small knots, anti-fingerprint surface finish",
+    "labelDe": "natural medium oak wood",
+    "labelEn": "natural medium oak wood"
+  },
+  {
+    "id": "tokyo-holz-198",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/198-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, natural light oak wood with pronounced swirling grain pattern, warm sandy blonde tone with visible knots and organic grain movement, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in natural light oak wood with pronounced swirling grain pattern, warm sandy blonde tone with visible knots and organic grain movement, anti-fingerprint surface finish",
+    "labelDe": "natural light oak wood with pronounced swirling grain pattern",
+    "labelEn": "natural light oak wood with pronounced swirling grain pattern"
+  },
+  {
+    "id": "tokyo-holz-206",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/206-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, natural rustic oak wood, medium warm tone with prominent grain lines and small dark knots, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in natural rustic oak wood, medium warm tone with prominent grain lines and small dark knots, anti-fingerprint surface finish",
+    "labelDe": "natural rustic oak wood, medium warm tone with prominent grain lines and small dark knots",
+    "labelEn": "natural rustic oak wood, medium warm tone with prominent grain lines and small dark knots"
+  },
+  {
+    "id": "tokyo-holz-226",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/226-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, dark chocolate brown wood with subtle grain texture visible beneath the dark lacquer, deep warm espresso brown tone, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in dark chocolate brown wood with subtle grain texture visible beneath the dark lacquer, deep warm espresso brown tone, anti-fingerprint surface finish",
+    "labelDe": "dark chocolate brown wood with subtle grain texture visible beneath the dark lacquer",
+    "labelEn": "dark chocolate brown wood with subtle grain texture visible beneath the dark lacquer"
+  },
+  {
+    "id": "tokyo-holz-763",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/763-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, grey-washed oak wood with a cool greige tone, visible open-pore grain texture with sandy undertones showing through the grey wash, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in grey-washed oak wood with a cool greige tone, visible open-pore grain texture with sandy undertones showing through the grey wash, anti-fingerprint surface finish",
+    "labelDe": "grey-washed oak wood with a cool greige tone",
+    "labelEn": "grey-washed oak wood with a cool greige tone"
+  },
+  {
+    "id": "tokyo-holz-765",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/765-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, weathered grey oak wood with blue-grey tones, prominent open-pore grain with sandy golden undertones visible in the grain channels, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in weathered grey oak wood with blue-grey tones, prominent open-pore grain with sandy golden undertones visible in the grain channels, anti-fingerprint surface finish",
+    "labelDe": "weathered grey oak wood with blue-grey tones",
+    "labelEn": "weathered grey oak wood with blue-grey tones"
+  },
+  {
+    "id": "tokyo-holz-766",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/766-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, medium brown oak wood with warm caramel undertones, visible open-pore grain texture with small dark knots, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in medium brown oak wood with warm caramel undertones, visible open-pore grain texture with small dark knots, anti-fingerprint surface finish",
+    "labelDe": "medium brown oak wood with warm caramel undertones",
+    "labelEn": "medium brown oak wood with warm caramel undertones"
+  },
+  {
+    "id": "tokyo-holz-771",
+    "category": "tokyo_grip",
+    "subcategory": "holzfarben",
+    "imagePath": "tokyo/farben Holzfarben Anti-Fingerprint/771-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, very dark smoked oak wood, deep charcoal brown with visible grain pattern and a prominent knot, anti-fingerprint surface finish, flat product photography of a rectangular wood veneer sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in very dark smoked oak wood, deep charcoal brown with visible grain pattern and a prominent knot, anti-fingerprint surface finish",
+    "labelDe": "very dark smoked oak wood",
+    "labelEn": "very dark smoked oak wood"
+  },
+  {
+    "id": "tokyo-uni-113",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/113-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid warm taupe color with subtle wood grain texture visible underneath, mid-tone greige, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid warm taupe color with subtle wood grain texture visible underneath, mid-tone greige, anti-fingerprint surface finish",
+    "labelDe": "Matt warm taupe",
+    "labelEn": "Matte warm taupe"
+  },
+  {
+    "id": "tokyo-uni-114",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/114-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid sage green-grey color with subtle wood grain texture visible underneath, muted olive-grey tone, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid sage green-grey color with subtle wood grain texture visible underneath, muted olive-grey tone, anti-fingerprint surface finish",
+    "labelDe": "Matt sage green-grey",
+    "labelEn": "Matte sage green-grey"
+  },
+  {
+    "id": "tokyo-uni-165",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/165-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid medium grey color with subtle wood grain texture visible underneath, cool neutral charcoal grey, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid medium grey color with subtle wood grain texture visible underneath, cool neutral charcoal grey, anti-fingerprint surface finish",
+    "labelDe": "Matt medium grey",
+    "labelEn": "Matte medium grey"
+  },
+  {
+    "id": "tokyo-uni-204",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/204-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid warm grey color with subtle wood grain texture visible underneath, light warm greige tone, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid warm grey color with subtle wood grain texture visible underneath, light warm greige tone, anti-fingerprint surface finish",
+    "labelDe": "Matt warm grey",
+    "labelEn": "Matte warm grey"
+  },
+  {
+    "id": "tokyo-uni-270",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/270-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid off-white color with subtle wood grain texture visible underneath, very light warm white, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid off-white color with subtle wood grain texture visible underneath, very light warm white, anti-fingerprint surface finish",
+    "labelDe": "Matt off-white",
+    "labelEn": "Matte off-white"
+  },
+  {
+    "id": "tokyo-uni-430",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/430-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid dark anthracite color with subtle wood grain texture visible underneath, very dark near-black charcoal, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid dark anthracite color with subtle wood grain texture visible underneath, very dark near-black charcoal, anti-fingerprint surface finish",
+    "labelDe": "Matt dark anthracite",
+    "labelEn": "Matte dark anthracite"
+  },
+  {
+    "id": "tokyo-uni-602",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/602-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid light pearl grey color with subtle wood grain texture visible underneath, pale cool-toned light grey, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid light pearl grey color with subtle wood grain texture visible underneath, pale cool-toned light grey, anti-fingerprint surface finish",
+    "labelDe": "Matt light pearl grey",
+    "labelEn": "Matte light pearl grey"
+  },
+  {
+    "id": "tokyo-uni-605",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/605-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid steel blue color with subtle wood grain texture visible underneath, muted dusty blue-grey tone, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid steel blue color with subtle wood grain texture visible underneath, muted dusty blue-grey tone, anti-fingerprint surface finish",
+    "labelDe": "Matt steel blue",
+    "labelEn": "Matte steel blue"
+  },
+  {
+    "id": "tokyo-uni-730",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/730-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid dark graphite grey color with subtle wood grain texture visible underneath, deep cool-toned dark grey, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid dark graphite grey color with subtle wood grain texture visible underneath, deep cool-toned dark grey, anti-fingerprint surface finish",
+    "labelDe": "Matt dark graphite grey",
+    "labelEn": "Matte dark graphite grey"
+  },
+  {
+    "id": "tokyo-uni-751",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/751-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid pure white color with subtle wood grain texture visible underneath, clean bright white, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid pure white color with subtle wood grain texture visible underneath, clean bright white, anti-fingerprint surface finish",
+    "labelDe": "Matt pure white",
+    "labelEn": "Matte pure white"
+  },
+  {
+    "id": "tokyo-uni-752",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/752-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid warm ivory white color with subtle wood grain texture visible underneath, soft cream white with warm undertone, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid warm ivory white color with subtle wood grain texture visible underneath, soft cream white with warm undertone, anti-fingerprint surface finish",
+    "labelDe": "Matt warm ivory white",
+    "labelEn": "Matte warm ivory white"
+  },
+  {
+    "id": "tokyo-uni-781",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/781-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid light sand beige color with subtle wood grain texture visible underneath, soft warm light beige, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid light sand beige color with subtle wood grain texture visible underneath, soft warm light beige, anti-fingerprint surface finish",
+    "labelDe": "Matt light sand beige",
+    "labelEn": "Matte light sand beige"
+  },
+  {
+    "id": "tokyo-uni-851",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/851-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid bright white color with subtle wood grain texture visible underneath, clean cool-toned white, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid bright white color with subtle wood grain texture visible underneath, clean cool-toned white, anti-fingerprint surface finish",
+    "labelDe": "Matt bright white",
+    "labelEn": "Matte bright white"
+  },
+  {
+    "id": "tokyo-uni-875",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/875-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid warm brown-grey color with subtle wood grain texture visible underneath, medium taupe with olive undertone, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid warm brown-grey color with subtle wood grain texture visible underneath, medium taupe with olive undertone, anti-fingerprint surface finish",
+    "labelDe": "Matt warm brown-grey",
+    "labelEn": "Matte warm brown-grey"
+  },
+  {
+    "id": "tokyo-uni-879",
+    "category": "tokyo_grip",
+    "subcategory": "unifarben",
+    "imagePath": "tokyo/farben Unifarben matt lackiert Anti-Fingerprint/879-FL-27,5X16-HOR_00_00_001_converted.jpeg",
+    "trainingCaption": "a material sample swatch for a Rotpunkt Tokyo grip kitchen front, matte lacquered solid light warm grey color with subtle wood grain texture visible underneath, pale grey with slightly warm undertone, anti-fingerprint surface finish, flat product photography of a rectangular color sample",
+    "promptCaption": "Rotpunkt Tokyo grip kitchen front in matte lacquered solid light warm grey color with subtle wood grain texture visible underneath, pale grey with slightly warm undertone, anti-fingerprint surface finish",
+    "labelDe": "Matt light warm grey",
+    "labelEn": "Matte light warm grey"
   }
 ]
