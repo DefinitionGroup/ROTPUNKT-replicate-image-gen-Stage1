@@ -70,7 +70,6 @@ export function WizardKitchenLayoutPanel({
                     sizes="(max-width: 768px) 100vw, 320px"
                     priority={false}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/100 via-background/20 to-transparent" />
                 </div>
               )}
 

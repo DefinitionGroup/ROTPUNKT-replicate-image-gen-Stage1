@@ -308,8 +308,6 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
                             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 220px"
                             priority={false}
                           />
-                          {/* Gradient Overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
                           {/* Selection checkmark */}
                           <AnimatePresence>
