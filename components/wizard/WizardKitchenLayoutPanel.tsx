@@ -3,7 +3,6 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
 import { kitchenLayoutOptions } from "./wizardSteps";
 import { useTranslations } from "next-intl";
 
@@ -12,6 +11,26 @@ interface WizardKitchenLayoutPanelProps {
   onSkip: () => void;
   loading?: boolean;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05, delayChildren: 0.08 },
+  },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 12, scale: 0.96 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 260, damping: 24 },
+  },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.12 } },
+};
 
 export function WizardKitchenLayoutPanel({
   onSelect,
@@ -46,41 +65,43 @@ export function WizardKitchenLayoutPanel({
 
       {/* Options Grid */}
       <div className="flex-1 overflow-y-auto min-h-0 pr-1 sm:pr-2 touch-pan-y [-webkit-overflow-scrolling:touch]">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pb-4">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 pb-4 p-1"
+        >
           {kitchenLayoutOptions.map((opt) => (
-            <Button
-              key={opt.value}
-              variant="wizardOption"
-              size="wizardOption"
-              enableMotion
-              whileHover={{ scale: 1.015 }}
-              whileTap={{ scale: 0.99 }}
-              transition={{ type: "spring", stiffness: 220, damping: 18 }}
-              onClick={() => onSelect(opt.value)}
-              disabled={loading}
-              className="group h-auto overflow-hidden p-0 text-left flex-col items-start rounded-xl"
-            >
-              {opt.image && (
-                <div className="relative -mx-1 -mt-1 h-32 sm:h-40 md:h-48 w-[calc(100%+0.5rem)] overflow-hidden rounded-lg">
-                  <Image
-                    src={opt.image}
-                    alt={t(opt.labelKey)}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    sizes="(max-width: 768px) 100vw, 320px"
-                    priority={false}
-                  />
-                </div>
-              )}
+            <motion.div key={opt.value} variants={cardVariants}>
+              <button
+                type="button"
+                onClick={() => onSelect(opt.value)}
+                disabled={loading}
+                className="group relative w-full overflow-hidden rounded-xl text-left transition-all duration-200 outline-none ring-1 ring-border/50 hover:ring-border hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-primary-2/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+              >
+                {opt.image && (
+                  <div className="relative h-32 sm:h-40 md:h-48 w-full overflow-hidden">
+                    <Image
+                      src={opt.image}
+                      alt={t(opt.labelKey)}
+                      fill
+                      className="object-cover transition-all duration-500 group-hover:scale-[1.04] group-hover:brightness-105"
+                      sizes="(max-width: 768px) 100vw, 320px"
+                      priority={false}
+                    />
+                  </div>
+                )}
 
-              <div className="flex flex-col items-start gap-1 p-3 sm:p-4 w-full">
-                <span className="text-xs sm:text-sm font-semibold">
-                  {t(opt.labelKey)}
-                </span>
-              </div>
-            </Button>
+                <div className="px-2.5 py-5 bg-card/80 transition-colors">
+                  <span className="text-xs font-semibold leading-tight block text-foreground">
+                    {t(opt.labelKey)}
+                  </span>
+                </div>
+              </button>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Skip link */}
         <div className="text-center mt-2 pb-4">

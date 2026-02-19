@@ -273,7 +273,7 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
               initial="hidden"
               animate="show"
               exit="exit"
-              className="grid grid-cols-2 sm:grid-cols-3 gap-2 pb-4"
+              className="grid grid-cols-2 sm:grid-cols-3 gap-2 pb-4 p-1"
             >
               {currentOptions.map((opt) => {
                 const isSelected = currentSelection === opt.value;
@@ -330,7 +330,7 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
                           className={`
                           relative h-16 w-full flex items-center justify-center
                           ${isSelected
-                              ? "bg-brand-primary-2/10"
+                              ? "bg-brand-primary-2"
                               : "bg-muted/30 group-hover:bg-muted/50"
                             }
                         `}
@@ -354,14 +354,14 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
                       {/* Label */}
                       <div
                         className={`
-                        px-2.5 py-2 transition-colors
-                        ${isSelected ? "bg-brand-primary-2/5" : "bg-card/80"}
+                        px-2.5 py-5 transition-colors
+                        ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}
                       `}
                       >
                         <span
                           className={`
                           text-xs font-semibold leading-tight block
-                          ${isSelected ? "text-brand-primary-2" : "text-foreground"}
+                          ${isSelected ? "text-white" : "text-foreground"}
                         `}
                         >
                           {opt.label}

@@ -118,7 +118,7 @@ export function WizardHandleStep({
               <div
                 key={product.id}
                 className={`rounded-xl border p-3 sm:p-4 transition ${isProductSelected
-                  ? "border-emerald-400/80 bg-emerald-500/5"
+                  ? "border-brand-primary-2/60 bg-brand-primary-2/5"
                   : "border-border bg-muted/60"
                   }`}
               >
@@ -169,7 +169,7 @@ export function WizardHandleStep({
                               key={`${product.id}-${color.id}`}
                               type="button"
                               className={`inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xxs sm:text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 ${isSelected
-                                ? "border-emerald-400/80 bg-emerald-500/5 text-foreground"
+                                ? "border-brand-primary-2 bg-brand-primary-2/10 text-foreground"
                                 : "border-border bg-background/70 text-muted-foreground hover:text-foreground hover:border-brand-primary-2/50"
                                 }`}
                               onClick={() => onSelect(value)}
