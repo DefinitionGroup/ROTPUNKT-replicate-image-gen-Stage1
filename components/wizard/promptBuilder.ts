@@ -91,6 +91,7 @@ export function buildPrompt({
 
   // Resolve all selections
   const kind = getLabel("kind", selections.kind);
+  const isKitchenRoom = selections.kind === "kueche";
   const style = getLabel("style", selections.style);
   const colorSelection = selections.color;
   const isFenix = isFenixColorValue(colorSelection);
@@ -109,7 +110,9 @@ export function buildPrompt({
   const accessories = selections.accessories;
 
   // 1. Opening + Subject & Style as natural language
-  let opening = "Photorealistic Rotpunkt kitchen visualization, designed by an award-winning interior architect.";
+  let opening = isKitchenRoom
+    ? "Photorealistic Rotpunkt kitchen visualization, designed by an award-winning interior architect."
+    : "Photorealistic Rotpunkt interior visualization, designed by an award-winning interior architect. Showcasing Rotpunkt cabinetry and built-in furniture in a residential setting, not a kitchen.";
   const kitchenLayoutLabel = getKitchenLayoutLabel(selections.kitchenLook);
   // When kind is "kitchen" and a layout is selected, use the layout-specific phrasing
   const effectiveKind = (kind === "kitchen" || selections.kind === "kueche") && kitchenLayoutLabel
@@ -189,9 +192,15 @@ export function buildPrompt({
   }
 
   // 8. Technical Requirements (positive phrasing — FLUX ignores negative prompts)
-  sections.push(
-    "Exactly one sink with a single faucet, all lights physically anchored, no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt kitchen design language."
-  );
+  if (isKitchenRoom) {
+    sections.push(
+      "Exactly one sink with a single faucet, all lights physically anchored, no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt kitchen design language."
+    );
+  } else {
+    sections.push(
+      "Rotpunkt furniture and cabinetry only, absolutely no kitchen appliances, no sink, no faucet, no oven, no cooktop, no range hood visible. Residential furniture showroom aesthetic, all lights physically anchored, no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt furniture design language."
+    );
+  }
 
   // 9. User Wishes
   const wishes = extraWishes?.trim();

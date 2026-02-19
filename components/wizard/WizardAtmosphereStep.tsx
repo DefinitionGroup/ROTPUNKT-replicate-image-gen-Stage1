@@ -354,7 +354,7 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
                       {/* Label */}
                       <div
                         className={`
-                        px-2.5 py-5 transition-colors
+                        px-5 py-5 transition-colors
                         ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}
                       `}
                       >

@@ -136,13 +136,6 @@ export const wizardSteps: WizardStepDefinition[] = [
         image: "/wizard-presets/kind-wohnzimmer.jpg",
       },
       {
-        value: "from the outside",
-        labelKey: "wizard.options.fromTheOutside",
-        germanLabel: "von Außen",
-        englishLabel: "exterior view from the outside",
-        image: "/wizard-presets/kind-aussen.jpg",
-      },
-      {
         value: "flur",
         labelKey: "wizard.options.flur",
         germanLabel: "Flur",

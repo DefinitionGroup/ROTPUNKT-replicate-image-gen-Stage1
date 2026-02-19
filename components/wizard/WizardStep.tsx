@@ -136,7 +136,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                     </div>
                   )}
 
-                  <div className={`px-2.5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                  <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
                     <span className={`text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
                       {opt.label}
                     </span>

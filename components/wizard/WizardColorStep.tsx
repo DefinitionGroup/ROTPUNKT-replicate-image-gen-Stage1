@@ -312,7 +312,7 @@ export function WizardColorStep({
                           </AnimatePresence>
                         </div>
 
-                        <div className={`px-2.5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                        <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
                           <span className={`text-xxs font-semibold uppercase tracking-wide ${isSelected ? "text-white/80" : "text-brand-primary-2"}`}>
                             {color.id}
                           </span>
@@ -363,7 +363,7 @@ export function WizardColorStep({
                         )}
                       </AnimatePresence>
                     </div>
-                    <div className={`px-2.5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                    <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
                       <span className={`text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
                         {opt.label}
                       </span>
@@ -417,7 +417,7 @@ export function WizardColorStep({
                       )}
                     </AnimatePresence>
                   </div>
-                  <div className={`px-2.5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                  <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
                     <span className={`text-xxs sm:text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
                       {color.name}
                     </span>

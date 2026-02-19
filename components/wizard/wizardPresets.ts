@@ -25,21 +25,6 @@ export const wizardPresets: WizardPreset[] = [
       "Große Panoramafenster, matte Fronten, dezente schwarze Akzente, viel Grünpflanzen.",
   },
   {
-    label: "Urban Loft Außen",
-    description: "Dunkle, moderne Loft-Architektur mit urbaner Skyline.",
-    previewImage: "/wizard-presets/urban-loft.jpg",
-    options: {
-      kind: "from the outside",
-      color: "schwarz",
-      style: "modern",
-      environment: "loft-industriegebaeude",
-      viewpoint: "wide shot, long shot, establishing shot",
-      time: "golden hour, magic hour, warm orange sunlight",
-    },
-    extraWishes:
-      "Glasfassade, warmes Innenlicht sichtbar von außen, dezente Neonlicht-Akzente.",
-  },
-  {
     label: "Luxury Evening",
     description: "Burgunderrote Statement-Küche in eleganter Abendstimmung.",
     previewImage: "/wizard-presets/luxury.jpg",

@@ -93,7 +93,7 @@ export function WizardKitchenLayoutPanel({
                   </div>
                 )}
 
-                <div className="px-2.5 py-5 bg-card/80 transition-colors">
+                <div className="px-5 py-5 bg-card/80 transition-colors">
                   <span className="text-xs font-semibold leading-tight block text-foreground">
                     {t(opt.labelKey)}
                   </span>
