@@ -74,7 +74,7 @@ export function WizardKitchenLayoutPanel({
               )}
 
               <div className="flex flex-col items-start gap-1 p-3 sm:p-4 w-full">
-                <span className="text-xs sm:text-sm font-semibold text-foreground">
+                <span className="text-xs sm:text-sm font-semibold">
                   {t(opt.labelKey)}
                 </span>
               </div>

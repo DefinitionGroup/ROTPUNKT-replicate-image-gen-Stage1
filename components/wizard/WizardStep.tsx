@@ -78,11 +78,11 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                 ) : null}
 
                 <div className="flex flex-col items-start gap-1 p-3 sm:p-4 w-full">
-                  <span className="text-xs sm:text-sm font-semibold text-foreground">
+                  <span className="text-xs sm:text-sm font-semibold">
                     {opt.label}
                   </span>
                   {opt.hint ? (
-                    <span className="text-xxs sm:text-xs text-muted-foreground">{opt.hint}</span>
+                    <span className="text-xxs sm:text-xs text-muted-foreground group-data-[selected=true]:text-white/70">{opt.hint}</span>
                   ) : null}
                 </div>
               </Button>
