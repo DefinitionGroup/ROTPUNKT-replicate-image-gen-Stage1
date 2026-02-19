@@ -69,6 +69,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const isHandleStep = currentStepDefinition?.key === "handle";
   const isAtmosphereStep = currentStepDefinition?.key === "atmosphere";
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
+  const isFloorStep = currentStepDefinition?.key === "floor";
   const isKindStepWithLayout = currentStepDefinition?.key === "kind" && showKitchenLayout;
 
   const startWithPreset = (preset: WizardPreset) => {
@@ -351,6 +352,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           }
                           onSelect={handleOptionSelect}
                           loading={loading}
+                          columns={isFloorStep ? 4 : undefined}
                         />
                       )
                     )}

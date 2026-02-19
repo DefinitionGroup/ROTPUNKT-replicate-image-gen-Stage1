@@ -12,6 +12,7 @@ interface WizardStepProps {
   selectedValue?: string;
   onSelect: (value: string) => void;
   loading?: boolean;
+  columns?: 2 | 3 | 4;
 }
 
 const containerVariants = {
@@ -42,7 +43,9 @@ export const WizardStep: React.FC<WizardStepProps> = ({
   selectedValue,
   onSelect,
   loading = false,
+  columns,
 }) => {
+  const compact = columns !== undefined && columns >= 3;
   return (
     <motion.div
       className="w-full flex flex-col h-full min-h-0"
@@ -71,7 +74,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
           initial="hidden"
           animate="show"
           exit="exit"
-          className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-4 p-1"
+          className={`grid grid-cols-1 sm:grid-cols-2 ${columns === 4 ? "lg:grid-cols-4" : columns === 3 ? "lg:grid-cols-3" : ""} gap-2 pb-4 p-1`}
         >
           {options.map((opt) => {
             const isSelected = selectedValue === opt.value;
@@ -92,7 +95,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                   `}
                 >
                   {hasImage ? (
-                    <div className="relative h-72 sm:h-80 md:h-[270px] w-full overflow-hidden">
+                    <div className={`relative ${compact ? "h-40 sm:h-44 md:h-48" : "h-72 sm:h-80 md:h-[270px]"} w-full overflow-hidden`}>
                       <Image
                         src={opt.image!}
                         alt={opt.label}
@@ -136,7 +139,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                     </div>
                   )}
 
-                  <div className={`px-5 py-5 h-[100px] flex flex-col justify-center transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                  <div className={`px-5 ${compact ? "py-3" : "py-5 h-[100px]"} flex flex-col justify-center transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
                     <span className={`text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
                       {opt.label}
                     </span>
