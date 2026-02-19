@@ -54,6 +54,10 @@
         "label": "Handles & Rails",
         "description": "Select a handle/rail model and exactly one available color variant."
       },
+      "atmosphere": {
+        "label": "Atmosphere & Style",
+        "description": "Define the visual atmosphere of your scene — style direction, camera perspective, and lighting mood."
+      },
       "style": {
         "label": "Style Direction",
         "description": "Which interior style fits best? This selection determines lines and material mix."
@@ -227,6 +231,12 @@
       "fenixDescription": "Original FENIX NTM® surface colors.",
       "allMaterials": "All materials",
       "trainingCaptionLabel": "Training caption"
+    },
+    "atmosphere": {
+      "title": "Atmosphere & Style",
+      "description": "Set the visual mood — choose a style, camera angle, and time of day.",
+      "continue": "Continue",
+      "selectAll": "Select all three"
     },
     "handleMatrix": {
       "categoryLabel": "Categories",

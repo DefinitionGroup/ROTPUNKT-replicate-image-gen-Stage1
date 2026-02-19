@@ -12,10 +12,17 @@ import {
 export type WizardOption = {
   value: string;
   labelKey: string;  // Translation key for UI
-  germanLabel: string; // German label for AI prompt generation (always German for Replicate model)
+  germanLabel: string; // German label for UI display fallback
+  englishLabel?: string; // English label for AI prompt generation (FLUX T5 encoder is English-trained)
   hintKey?: string;  // Translation key for hint
   image?: string;
   group?: string;
+};
+
+export type WizardSubStep = {
+  labelKey: string;
+  descriptionKey: string;
+  options: WizardOption[];
 };
 
 export type WizardStepDefinition = {
@@ -26,6 +33,7 @@ export type WizardStepDefinition = {
   icon: ReactNode;
   multiSelect?: boolean;
   optionGroupKeys?: string[]; // Translation keys for groups
+  subSteps?: Record<string, WizardSubStep>; // For merged steps (e.g., atmosphere → style/viewpoint/time)
 };
 
 export const wizardSteps: WizardStepDefinition[] = [
@@ -38,60 +46,70 @@ export const wizardSteps: WizardStepDefinition[] = [
         value: "landhaus",
         labelKey: "wizard.options.categoryLandhaus",
         germanLabel: "Landhaus",
+        englishLabel: "country house",
         image: "/wizard-presets/category-landhaus.png",
       },
       {
         value: "loft-industriegebaeude",
         labelKey: "wizard.options.categoryLoftIndustriegebaeude",
         germanLabel: "Loft / Industriegebäude",
+        englishLabel: "loft / industrial building",
         image: "/wizard-presets/category-loft-industriegebaeude.png",
       },
       {
         value: "stadtwohnung",
         labelKey: "wizard.options.categoryStadtwohnung",
         germanLabel: "Stadtwohnung",
+        englishLabel: "city apartment",
         image: "/wizard-presets/category-stadtwohnung.png",
       },
       {
         value: "einfamilienhaus",
         labelKey: "wizard.options.categoryEinfamilienhaus",
         germanLabel: "Einfamilienhaus",
+        englishLabel: "single family house",
         image: "/wizard-presets/category-einfamilienhaus.png",
       },
       {
         value: "altbau",
         labelKey: "wizard.options.categoryAltbau",
         germanLabel: "Altbau",
+        englishLabel: "classic old building",
         image: "/wizard-presets/category-altbau.png",
       },
       {
         value: "ferienhaus",
         labelKey: "wizard.options.categoryFerienhaus",
         germanLabel: "Ferienhaus",
+        englishLabel: "vacation home",
         image: "/wizard-presets/category-ferienhaus.png",
       },
       {
         value: "reihenhaus-doppelhaushaelfte",
         labelKey: "wizard.options.categoryReihenhausDoppelhaushaelfte",
         germanLabel: "Reihenhaus / Doppelhaushälfte",
+        englishLabel: "townhouse / semi-detached house",
         image: "/wizard-presets/category-reihenhaus-doppelhaushaelfte.png",
       },
       {
         value: "tiny-house",
         labelKey: "wizard.options.categoryTinyHouse",
         germanLabel: "Tiny House",
+        englishLabel: "tiny house",
         image: "/wizard-presets/category-tiny-house.png",
       },
       {
         value: "stadtvilla",
         labelKey: "wizard.options.categoryStadtvilla",
         germanLabel: "Stadtvilla",
+        englishLabel: "urban villa",
         image: "/wizard-presets/category-stadtvilla.png",
       },
       {
         value: "apartment-penthouse",
         labelKey: "wizard.options.categoryApartmentPenthouse",
         germanLabel: "Apartment / Penthouse",
+        englishLabel: "apartment / penthouse",
         image: "/wizard-presets/category-apartment-penthouse.png",
       },
     ],
@@ -106,6 +124,7 @@ export const wizardSteps: WizardStepDefinition[] = [
         value: "kueche",
         labelKey: "wizard.options.kueche",
         germanLabel: "Küche",
+        englishLabel: "kitchen",
         hintKey: "wizard.hints.standard",
         image: "/wizard-presets/kind-kueche.jpg",
       },
@@ -113,18 +132,21 @@ export const wizardSteps: WizardStepDefinition[] = [
         value: "wohnzimmer",
         labelKey: "wizard.options.wohnzimmer",
         germanLabel: "Wohnzimmer",
+        englishLabel: "living room",
         image: "/wizard-presets/kind-wohnzimmer.jpg",
       },
       {
         value: "from the outside",
         labelKey: "wizard.options.fromTheOutside",
         germanLabel: "von Außen",
+        englishLabel: "exterior view from the outside",
         image: "/wizard-presets/kind-aussen.jpg",
       },
       {
         value: "flur",
         labelKey: "wizard.options.flur",
         germanLabel: "Flur",
+        englishLabel: "hallway",
         image: "/wizard-presets/kind-flur.jpg",
       },
     ],
@@ -135,12 +157,12 @@ export const wizardSteps: WizardStepDefinition[] = [
     labelKey: "wizard.steps.color.label",
     descriptionKey: "wizard.steps.color.description",
     options: [
-      { value: "schwarz", labelKey: "wizard.options.schwarz", germanLabel: "Schwarz" },
-      { value: "rot", labelKey: "wizard.options.rot", germanLabel: "Rot" },
-      { value: "burgunderrot", labelKey: "wizard.options.burgunderrot", germanLabel: "Burgunderrot" },
-      { value: "weiß", labelKey: "wizard.options.weiss", germanLabel: "Weiß" },
-      { value: "holz", labelKey: "wizard.options.holz", germanLabel: "Holz" },
-      { value: "dunkles holz", labelKey: "wizard.options.dunklesHolz", germanLabel: "Dunkles Holz" },
+      { value: "schwarz", labelKey: "wizard.options.schwarz", germanLabel: "Schwarz", englishLabel: "black" },
+      { value: "rot", labelKey: "wizard.options.rot", germanLabel: "Rot", englishLabel: "red" },
+      { value: "burgunderrot", labelKey: "wizard.options.burgunderrot", germanLabel: "Burgunderrot", englishLabel: "burgundy red" },
+      { value: "weiß", labelKey: "wizard.options.weiss", germanLabel: "Weiß", englishLabel: "white" },
+      { value: "holz", labelKey: "wizard.options.holz", germanLabel: "Holz", englishLabel: "wood" },
+      { value: "dunkles holz", labelKey: "wizard.options.dunklesHolz", germanLabel: "Dunkles Holz", englishLabel: "dark wood" },
     ],
     icon: <FaPalette className="w-full h-full text-red-600" />,
   },
@@ -152,202 +174,214 @@ export const wizardSteps: WizardStepDefinition[] = [
     icon: <FaPalette className="w-full h-full text-red-600" />,
   },
   {
-    key: "style",
-    labelKey: "wizard.steps.style.label",
-    descriptionKey: "wizard.steps.style.description",
-    options: [
-      {
-        value: "modern",
-        labelKey: "wizard.options.modern",
-        germanLabel: "Modern",
-        image: "/wizard-presets/style-modern.jpg",
-      },
-      {
-        value: "zeitlos",
-        labelKey: "wizard.options.zeitlos",
-        germanLabel: "Zeitlos",
-        image: "/wizard-presets/style-zeitlos.jpg",
-      },
-      {
-        value: "natürlich",
-        labelKey: "wizard.options.natuerlich",
-        germanLabel: "Natürlich",
-        image: "/wizard-presets/style-natuerlich.jpg",
-      },
-      {
-        value: "urban",
-        labelKey: "wizard.options.urban",
-        germanLabel: "Urban",
-        image: "/wizard-presets/style-urban.jpg",
-      },
-      {
-        value: "elegant",
-        labelKey: "wizard.options.elegant",
-        germanLabel: "Elegant",
-        image: "/wizard-presets/style-elegant.jpg",
-      },
-      {
-        value: "kreativ",
-        labelKey: "wizard.options.kreativ",
-        germanLabel: "Kreativ",
-        image: "/wizard-presets/style-kreativ.jpg",
-      },
-      {
-        value: "puristisch",
-        labelKey: "wizard.options.puristisch",
-        germanLabel: "Puristisch",
-        image: "/wizard-presets/style-puristisch.jpg",
-      },
-      {
-        value: "gemütlich",
-        labelKey: "wizard.options.gemuetlich",
-        germanLabel: "Gemütlich",
-        image: "/wizard-presets/style-gemuetlich.jpg",
-      },
-      {
-        value: "minimalistisch",
-        labelKey: "wizard.options.minimalistisch",
-        germanLabel: "Minimalistisch",
-        image: "/wizard-presets/style-minimalistisch.jpg",
-      },
-    ],
+    key: "atmosphere",
+    labelKey: "wizard.steps.atmosphere.label",
+    descriptionKey: "wizard.steps.atmosphere.description",
+    options: [], // Options are in subSteps below
     icon: <FaCouch className="w-full h-full text-red-600" />,
-  },
-  {
-    key: "viewpoint",
-    labelKey: "wizard.steps.viewpoint.label",
-    descriptionKey: "wizard.steps.viewpoint.description",
-    options: [
-      {
-        value: "eye level shot",
-        labelKey: "wizard.options.augenhoehe",
-        germanLabel: "Augenhöhe",
-        image: "/wizard-presets/viewpoint-augenhoehe.jpg",
+    subSteps: {
+      style: {
+        labelKey: "wizard.steps.style.label",
+        descriptionKey: "wizard.steps.style.description",
+        options: [
+          {
+            value: "modern",
+            labelKey: "wizard.options.modern",
+            germanLabel: "Modern",
+            englishLabel: "modern",
+            image: "/wizard-presets/style-modern.jpg",
+          },
+          {
+            value: "zeitlos",
+            labelKey: "wizard.options.zeitlos",
+            germanLabel: "Zeitlos",
+            englishLabel: "timeless",
+            image: "/wizard-presets/style-zeitlos.jpg",
+          },
+          {
+            value: "natürlich",
+            labelKey: "wizard.options.natuerlich",
+            germanLabel: "Natürlich",
+            englishLabel: "natural",
+            image: "/wizard-presets/style-natuerlich.jpg",
+          },
+          {
+            value: "urban",
+            labelKey: "wizard.options.urban",
+            germanLabel: "Urban",
+            englishLabel: "urban",
+            image: "/wizard-presets/style-urban.jpg",
+          },
+          {
+            value: "elegant",
+            labelKey: "wizard.options.elegant",
+            germanLabel: "Elegant",
+            englishLabel: "elegant",
+            image: "/wizard-presets/style-elegant.jpg",
+          },
+          {
+            value: "kreativ",
+            labelKey: "wizard.options.kreativ",
+            germanLabel: "Kreativ",
+            englishLabel: "creative",
+            image: "/wizard-presets/style-kreativ.jpg",
+          },
+          {
+            value: "puristisch",
+            labelKey: "wizard.options.puristisch",
+            germanLabel: "Puristisch",
+            englishLabel: "purist",
+            image: "/wizard-presets/style-puristisch.jpg",
+          },
+          {
+            value: "gemütlich",
+            labelKey: "wizard.options.gemuetlich",
+            germanLabel: "Gemütlich",
+            englishLabel: "cozy",
+            image: "/wizard-presets/style-gemuetlich.jpg",
+          },
+          {
+            value: "minimalistisch",
+            labelKey: "wizard.options.minimalistisch",
+            germanLabel: "Minimalistisch",
+            englishLabel: "minimalist",
+            image: "/wizard-presets/style-minimalistisch.jpg",
+          },
+        ],
       },
-      {
-        value: "low angle shot, worm's eye view",
-        labelKey: "wizard.options.froschperspektive",
-        germanLabel: "Froschperspektive",
-        image: "/wizard-presets/viewpoint-frosch.jpg",
+      viewpoint: {
+        labelKey: "wizard.steps.viewpoint.label",
+        descriptionKey: "wizard.steps.viewpoint.description",
+        options: [
+          {
+            value: "eye level shot",
+            labelKey: "wizard.options.augenhoehe",
+            germanLabel: "Augenhöhe",
+            image: "/wizard-presets/viewpoint-augenhoehe.jpg",
+          },
+          {
+            value: "low angle shot, worm's eye view",
+            labelKey: "wizard.options.froschperspektive",
+            germanLabel: "Froschperspektive",
+            image: "/wizard-presets/viewpoint-frosch.jpg",
+          },
+          {
+            value: "high angle shot, bird's eye view",
+            labelKey: "wizard.options.vogelperspektive",
+            germanLabel: "Vogelperspektive",
+            image: "/wizard-presets/viewpoint-vogel.jpg",
+          },
+          {
+            value: "dutch angle, tilted frame",
+            labelKey: "wizard.options.hollaendischerWinkel",
+            germanLabel: "Holländischer Winkel",
+            image: "/wizard-presets/viewpoint-dutch.jpg",
+          },
+          {
+            value: "wide shot, long shot, establishing shot",
+            labelKey: "wizard.options.totale",
+            germanLabel: "Totale",
+            image: "/wizard-presets/viewpoint-totale.jpg",
+          },
+          {
+            value: "medium shot, mid shot",
+            labelKey: "wizard.options.halbtotale",
+            germanLabel: "Halbtotale",
+            image: "/wizard-presets/viewpoint-halbtotale.jpg",
+          },
+          {
+            value: "close-up shot",
+            labelKey: "wizard.options.nahaufnahme",
+            germanLabel: "Nahaufnahme",
+            image: "/wizard-presets/viewpoint-nahaufnahme.jpg",
+          },
+          {
+            value: "full room view, interior panorama",
+            labelKey: "wizard.options.ganzerRaum",
+            germanLabel: "Ganzer Raum",
+            image: "/wizard-presets/viewpoint-ganzerraum.jpg",
+          },
+          {
+            value: "extreme close-up, detail shot, macro",
+            labelKey: "wizard.options.detailaufnahme",
+            germanLabel: "Detailaufnahme",
+            image: "/wizard-presets/viewpoint-detail.jpg",
+          },
+          {
+            value: "shallow depth of field, bokeh background",
+            labelKey: "wizard.options.geringeTiefenschaerfe",
+            germanLabel: "Geringe Tiefenschärfe",
+            image: "/wizard-presets/viewpoint-shallow-dof.jpg",
+          },
+          {
+            value: "deep depth of field, everything in focus",
+            labelKey: "wizard.options.tiefenschaerfe",
+            germanLabel: "Tiefenschärfe",
+            image: "/wizard-presets/viewpoint-deep-dof.jpg",
+          },
+          {
+            value: "soft focus, dreamy blur",
+            labelKey: "wizard.options.weicherFokus",
+            germanLabel: "Weicher Fokus",
+            image: "/wizard-presets/viewpoint-soft-focus.jpg",
+          },
+        ],
       },
-      {
-        value: "high angle shot, bird's eye view",
-        labelKey: "wizard.options.vogelperspektive",
-        germanLabel: "Vogelperspektive",
-        image: "/wizard-presets/viewpoint-vogel.jpg",
+      time: {
+        labelKey: "wizard.steps.time.label",
+        descriptionKey: "wizard.steps.time.description",
+        options: [
+          {
+            value: "early morning, dawn light, first light of day",
+            labelKey: "wizard.options.frueherMorgen",
+            germanLabel: "Früher Morgen",
+            image: "/wizard-presets/time-fruehmorgen.jpg",
+          },
+          {
+            value: "late morning, mid-morning sunlight",
+            labelKey: "wizard.options.spaeterVormittag",
+            germanLabel: "Später Vormittag",
+            image: "/wizard-presets/time-spaetervormittag.jpg",
+          },
+          {
+            value: "noon, midday, high sun, harsh shadows",
+            labelKey: "wizard.options.mittag",
+            germanLabel: "Mittag",
+            image: "/wizard-presets/time-mittag.jpg",
+          },
+          {
+            value: "afternoon, warm afternoon light",
+            labelKey: "wizard.options.nachmittag",
+            germanLabel: "Nachmittag",
+            image: "/wizard-presets/time-nachmittag.jpg",
+          },
+          {
+            value: "golden hour, magic hour, warm orange sunlight",
+            labelKey: "wizard.options.goldeneStunde",
+            germanLabel: "Goldene Stunde",
+            image: "/wizard-presets/time-goldenestunde.jpg",
+          },
+          {
+            value: "dusk, twilight, blue hour",
+            labelKey: "wizard.options.abenddaemmerung",
+            germanLabel: "Abenddämmerung",
+            image: "/wizard-presets/time-abenddaemmerung.jpg",
+          },
+          {
+            value: "evening, interior lighting, ambient lamps",
+            labelKey: "wizard.options.abend",
+            germanLabel: "Abend",
+            image: "/wizard-presets/time-abend.jpg",
+          },
+          {
+            value: "night, nighttime, dark exterior, interior lights glowing",
+            labelKey: "wizard.options.nacht",
+            germanLabel: "Nacht",
+            image: "/wizard-presets/time-nacht.jpg",
+          },
+        ],
       },
-      {
-        value: "dutch angle, tilted frame",
-        labelKey: "wizard.options.hollaendischerWinkel",
-        germanLabel: "Holländischer Winkel",
-        image: "/wizard-presets/viewpoint-dutch.jpg",
-      },
-      {
-        value: "wide shot, long shot, establishing shot",
-        labelKey: "wizard.options.totale",
-        germanLabel: "Totale",
-        image: "/wizard-presets/viewpoint-totale.jpg",
-      },
-      {
-        value: "medium shot, mid shot",
-        labelKey: "wizard.options.halbtotale",
-        germanLabel: "Halbtotale",
-        image: "/wizard-presets/viewpoint-halbtotale.jpg",
-      },
-      {
-        value: "close-up shot",
-        labelKey: "wizard.options.nahaufnahme",
-        germanLabel: "Nahaufnahme",
-        image: "/wizard-presets/viewpoint-nahaufnahme.jpg",
-      },
-      {
-        value: "full room view, interior panorama",
-        labelKey: "wizard.options.ganzerRaum",
-        germanLabel: "Ganzer Raum",
-        image: "/wizard-presets/viewpoint-ganzerraum.jpg",
-      },
-      {
-        value: "extreme close-up, detail shot, macro",
-        labelKey: "wizard.options.detailaufnahme",
-        germanLabel: "Detailaufnahme",
-        image: "/wizard-presets/viewpoint-detail.jpg",
-      },
-      {
-        value: "shallow depth of field, bokeh background",
-        labelKey: "wizard.options.geringeTiefenschaerfe",
-        germanLabel: "Geringe Tiefenschärfe",
-        image: "/wizard-presets/viewpoint-shallow-dof.jpg",
-      },
-      {
-        value: "deep depth of field, everything in focus",
-        labelKey: "wizard.options.tiefenschaerfe",
-        germanLabel: "Tiefenschärfe",
-        image: "/wizard-presets/viewpoint-deep-dof.jpg",
-      },
-      {
-        value: "soft focus, dreamy blur",
-        labelKey: "wizard.options.weicherFokus",
-        germanLabel: "Weicher Fokus",
-        image: "/wizard-presets/viewpoint-soft-focus.jpg",
-      },
-    ],
-    icon: <FaEye className="w-full h-full text-red-600" />,
-  },
-  {
-    key: "time",
-    labelKey: "wizard.steps.time.label",
-    descriptionKey: "wizard.steps.time.description",
-    options: [
-      {
-        value: "early morning, dawn light, first light of day",
-        labelKey: "wizard.options.frueherMorgen",
-        germanLabel: "Früher Morgen",
-        image: "/wizard-presets/time-fruehmorgen.jpg",
-      },
-      {
-        value: "late morning, mid-morning sunlight",
-        labelKey: "wizard.options.spaeterVormittag",
-        germanLabel: "Später Vormittag",
-        image: "/wizard-presets/time-spaetervormittag.jpg",
-      },
-      {
-        value: "noon, midday, high sun, harsh shadows",
-        labelKey: "wizard.options.mittag",
-        germanLabel: "Mittag",
-        image: "/wizard-presets/time-mittag.jpg",
-      },
-      {
-        value: "afternoon, warm afternoon light",
-        labelKey: "wizard.options.nachmittag",
-        germanLabel: "Nachmittag",
-        image: "/wizard-presets/time-nachmittag.jpg",
-      },
-      {
-        value: "golden hour, magic hour, warm orange sunlight",
-        labelKey: "wizard.options.goldeneStunde",
-        germanLabel: "Goldene Stunde",
-        image: "/wizard-presets/time-goldenestunde.jpg",
-      },
-      {
-        value: "dusk, twilight, blue hour",
-        labelKey: "wizard.options.abenddaemmerung",
-        germanLabel: "Abenddämmerung",
-        image: "/wizard-presets/time-abenddaemmerung.jpg",
-      },
-      {
-        value: "evening, interior lighting, ambient lamps",
-        labelKey: "wizard.options.abend",
-        germanLabel: "Abend",
-        image: "/wizard-presets/time-abend.jpg",
-      },
-      {
-        value: "night, nighttime, dark exterior, interior lights glowing",
-        labelKey: "wizard.options.nacht",
-        germanLabel: "Nacht",
-        image: "/wizard-presets/time-nacht.jpg",
-      },
-    ],
-    icon: <FaClock className="w-full h-full text-red-600" />,
+    },
   },
   {
     key: "floor",

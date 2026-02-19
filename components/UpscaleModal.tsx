@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { downloadImageBlob } from "@/lib/downloadImage";
 
 interface UpscaleModalProps {
   src: string;
@@ -166,17 +166,10 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
 
               <div className="mt-4 flex justify-center gap-3">
                 <Button
-                  asChild
+                  onClick={() => downloadImageBlob(upscaledImage, `high-res-image-${Date.now()}.png`)}
                   className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-brand-primary-2"
                 >
-                  <Link
-                    href={upscaledImage}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download={`high-res-image-${Date.now()}.png`}
-                  >
-                    📥 {t('download')}
-                  </Link>
+                  📥 {t('download')}
                 </Button>
                 <Button
                   onClick={onClose}

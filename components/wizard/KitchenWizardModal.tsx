@@ -15,6 +15,7 @@ import { WizardHeader } from "./WizardHeader";
 import { WizardIntro } from "./WizardIntro";
 import { WizardStep } from "./WizardStep";
 import { WizardMultiSelectStep } from "./WizardMultiSelectStep";
+import { WizardAtmosphereStep } from "./WizardAtmosphereStep";
 import { WizardFinal } from "./WizardFinal";
 import { wizardSteps } from "./wizardSteps";
 import { useTranslatedWizardSteps } from "./useTranslatedWizardSteps";
@@ -64,6 +65,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       : undefined;
   const isColorStep = currentStepDefinition?.key === "color";
   const isHandleStep = currentStepDefinition?.key === "handle";
+  const isAtmosphereStep = currentStepDefinition?.key === "atmosphere";
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
 
   const startWithPreset = (preset: WizardPreset) => {
@@ -245,6 +247,21 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                           description={currentStepDefinition.description}
                           selectedValue={wizardState.selectedOptions.handle}
                           onSelect={handleOptionSelect}
+                          loading={loading}
+                        />
+                      ) : isAtmosphereStep && currentStepDefinition.translatedSubSteps ? (
+                        <WizardAtmosphereStep
+                          key={`${wizardState.currentStep}-atmosphere`}
+                          styleOptions={currentStepDefinition.translatedSubSteps.style?.options ?? []}
+                          viewpointOptions={currentStepDefinition.translatedSubSteps.viewpoint?.options ?? []}
+                          timeOptions={currentStepDefinition.translatedSubSteps.time?.options ?? []}
+                          selectedStyle={wizardState.selectedOptions.style}
+                          selectedViewpoint={wizardState.selectedOptions.viewpoint}
+                          selectedTime={wizardState.selectedOptions.time}
+                          onSelectStyle={(v) => wizardActions.selectOption("style", v)}
+                          onSelectViewpoint={(v) => wizardActions.selectOption("viewpoint", v)}
+                          onSelectTime={(v) => wizardActions.selectOption("time", v)}
+                          onContinue={() => wizardActions.nextStep(totalSteps)}
                           loading={loading}
                         />
                       ) : isMultiSelectStep ? (

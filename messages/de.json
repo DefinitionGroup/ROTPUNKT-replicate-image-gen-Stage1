@@ -54,6 +54,10 @@
         "label": "Griffe & Griffleisten",
         "description": "Wählen Sie ein Griff- oder Griffleistenmodell und genau eine verfügbare Farbvariante aus."
       },
+      "atmosphere": {
+        "label": "Atmosphäre & Stil",
+        "description": "Bestimmen Sie die visuelle Atmosphäre Ihrer Szene – Stilrichtung, Kameraperspektive und Lichtstimmung."
+      },
       "style": {
         "label": "Stilrichtung",
         "description": "Welcher Einrichtungsstil passt am besten? Diese Auswahl bestimmt Linienführung und Materialmix."
@@ -227,6 +231,12 @@
       "fenixDescription": "Originale FENIX NTM® Oberflächenfarben zur Auswahl.",
       "allMaterials": "Alle Materialien",
       "trainingCaptionLabel": "Training-Caption"
+    },
+    "atmosphere": {
+      "title": "Atmosphäre & Stil",
+      "description": "Bestimmen Sie die Stimmung – wählen Sie Stil, Kamerawinkel und Tageszeit.",
+      "continue": "Weiter",
+      "selectAll": "Alle drei auswählen"
     },
     "handleMatrix": {
       "categoryLabel": "Kategorien",

@@ -18,7 +18,7 @@ export const wizardPresets: WizardPreset[] = [
       color: "holz",
       style: "minimalistisch",
       environment: "einfamilienhaus",
-      viewpoint: "innenansicht",
+      viewpoint: "eye level shot",
       time: "afternoon, warm afternoon light",
     },
     extraWishes:
@@ -33,7 +33,7 @@ export const wizardPresets: WizardPreset[] = [
       color: "schwarz",
       style: "modern",
       environment: "loft-industriegebaeude",
-      viewpoint: "aussenansicht",
+      viewpoint: "wide shot, long shot, establishing shot",
       time: "golden hour, magic hour, warm orange sunlight",
     },
     extraWishes:
@@ -48,7 +48,7 @@ export const wizardPresets: WizardPreset[] = [
       color: "burgunderrot",
       style: "elegant",
       environment: "apartment-penthouse",
-      viewpoint: "innenansicht",
+      viewpoint: "full room view, interior panorama",
       time: "evening, interior lighting, ambient lamps",
     },
     extraWishes:

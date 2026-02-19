@@ -115,12 +115,16 @@ export function getHandlePromptDescriptor(value?: string | null) {
   const { product, color } = selection;
   return {
     categoryDe: product.categoryDe,
+    categoryEn: product.categoryEn,
     model: product.model,
     typeDe: product.typeDe,
+    typeEn: product.typeEn,
     descriptionDe: product.descriptionDe,
+    descriptionEn: product.descriptionEn,
     dimensions: product.dimensions,
     colorCode: color.id,
     colorNameDe: color.nameDe,
+    colorNameEn: color.nameEn,
     colorHex: color.hex,
   };
 }

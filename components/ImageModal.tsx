@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { MdEmail } from "react-icons/md";
 import Image from "next/image";
 import UpscaleModal from "@/components/UpscaleModal";
 import { useTranslations } from "next-intl";
+import { downloadImageBlob } from "@/lib/downloadImage";
 
 export default function ImageModal({
   src,
@@ -245,17 +246,10 @@ export default function ImageModal({
               ✨ {t('upscale')}
             </Button>
             <Button
-              asChild
+              onClick={() => downloadImageBlob(normalizedUrl, `generated-image-${Date.now()}.webp`)}
               className="px-6 py-3 text-xs font-medium shadow-lg rounded-full bg-brand-primary-2"
             >
-              <Link
-                href={normalizedUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                download={`generated-image-${Date.now()}.png`}
-              >
-                {tCommon('download')}
-              </Link>
+              {tCommon('download')}
             </Button>
           </div>
         </div>
