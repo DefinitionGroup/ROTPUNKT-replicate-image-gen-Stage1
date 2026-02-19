@@ -10,6 +10,8 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   encodeFrontfarbenColorValue,
   frontfarbenCatalog,
+  getDisplayMaterialDe,
+  getDisplayMaterialEn,
   getFrontfarbenByMaterialTab,
   getFrontfarbenImageSrc,
   getFrontfarbenMaterialTabPreviewImage,
@@ -271,8 +273,8 @@ export function WizardColorStep({
                     const colorLabel = normalizedLocale === "de" ? color.labelDe : color.labelEn;
                     const materialLabel =
                       normalizedLocale === "de"
-                        ? color.materialTypeDe
-                        : color.materialTypeEn;
+                        ? getDisplayMaterialDe(color.materialTypeDe)
+                        : getDisplayMaterialEn(color.materialTypeEn);
                     return (
                       <button
                         key={color.id}

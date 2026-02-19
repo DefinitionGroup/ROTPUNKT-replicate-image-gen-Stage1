@@ -92,7 +92,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                   `}
                 >
                   {hasImage ? (
-                    <div className="relative h-28 sm:h-36 md:h-40 w-full overflow-hidden">
+                    <div className="relative h-72 sm:h-80 md:h-[270px] w-full overflow-hidden">
                       <Image
                         src={opt.image!}
                         alt={opt.label}
@@ -136,7 +136,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
                     </div>
                   )}
 
-                  <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                  <div className={`px-5 py-5 h-[100px] flex flex-col justify-center transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
                     <span className={`text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
                       {opt.label}
                     </span>

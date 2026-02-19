@@ -180,6 +180,13 @@ export function buildPrompt({
     );
   }
 
+  // 6b. Glossy emphasis for high-gloss lacquer fronts
+  if (frontfarbe && (frontfarbe.subcategory === "HL" || frontfarbe.subcategory === "LX")) {
+    sections.push(
+      "Ultra high-gloss reflective lacquer finish, mirror-like surface with sharp light reflections, polished to a glass-like sheen."
+    );
+  }
+
   // 7. Accessories / Decor
   if (accessories) {
     const accessoriesArray = Array.isArray(accessories)

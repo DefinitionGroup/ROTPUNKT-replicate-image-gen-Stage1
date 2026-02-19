@@ -21,6 +21,33 @@ export type FrontfarbenMaterialTab = {
 
 export const FRONTFARBEN_COLOR_PREFIX = "frontfarbe:";
 
+/** UI display overrides — keeps raw data fields intact for prompt/training references */
+const materialDisplayNameDe: Record<string, string> = {
+  "Rahmenfront": "Echtholz",
+  "Nussbaumfront": "Echtholz",
+};
+const materialDisplayNameEn: Record<string, string> = {
+  "Frame front": "Real Wood",
+  "Walnut front": "Real Wood",
+};
+
+/** Grouping overrides — merge material types into a single tab */
+const materialGroupKey: Record<string, string> = {
+  "Nussbaumfront": "Rahmenfront",
+};
+
+export function getDisplayMaterialDe(raw: string): string {
+  return materialDisplayNameDe[raw] ?? raw;
+}
+export function getDisplayMaterialEn(raw: string): string {
+  return materialDisplayNameEn[raw] ?? raw;
+}
+
+/** Returns the canonical grouping key for a material type (merges Nussbaumfront → Rahmenfront, etc.) */
+function getMaterialGroupKey(materialTypeDe: string): string {
+  return materialGroupKey[materialTypeDe] ?? materialTypeDe;
+}
+
 const materialOrder = [
   "Matte Kunststofffront",
   "Echtlackfront",
@@ -29,7 +56,6 @@ const materialOrder = [
   "Synchronpore Front",
   "Glaslaminat",
   "Front mit Metalloberfläche",
-  "Nussbaumfront",
 ];
 
 export const frontfarbenCatalog = frontfarbenCatalogData as FrontfarbenCatalogEntry[];
@@ -39,11 +65,11 @@ const frontfarbenById = new Map(
 );
 const frontfarbenMaterialPreviewByTabId = new Map<string, string>();
 const materialTabIdByColorId = new Map(
-  frontfarbenCatalog.map((entry) => [entry.id, toMaterialTabId(entry.materialTypeDe)] as const)
+  frontfarbenCatalog.map((entry) => [entry.id, toMaterialTabId(getMaterialGroupKey(entry.materialTypeDe))] as const)
 );
 
 for (const entry of frontfarbenCatalog) {
-  const tabId = toMaterialTabId(entry.materialTypeDe);
+  const tabId = toMaterialTabId(getMaterialGroupKey(entry.materialTypeDe));
   if (!frontfarbenMaterialPreviewByTabId.has(tabId)) {
     frontfarbenMaterialPreviewByTabId.set(tabId, entry.imagePath);
   }
@@ -69,9 +95,10 @@ const frontfarbenMaterialTabs: FrontfarbenMaterialTab[] = (() => {
   const grouped = new Map<string, FrontfarbenCatalogEntry[]>();
 
   for (const entry of frontfarbenCatalog) {
-    const existing = grouped.get(entry.materialTypeDe) ?? [];
+    const groupKey = getMaterialGroupKey(entry.materialTypeDe);
+    const existing = grouped.get(groupKey) ?? [];
     existing.push(entry);
-    grouped.set(entry.materialTypeDe, existing);
+    grouped.set(groupKey, existing);
   }
 
   return [...grouped.entries()]
@@ -85,8 +112,8 @@ const frontfarbenMaterialTabs: FrontfarbenMaterialTab[] = (() => {
     })
     .map(([materialTypeDe, entries]) => ({
       id: toMaterialTabId(materialTypeDe),
-      labelDe: materialTypeDe,
-      labelEn: entries[0]?.materialTypeEn ?? materialTypeDe,
+      labelDe: getDisplayMaterialDe(materialTypeDe),
+      labelEn: getDisplayMaterialEn(entries[0]?.materialTypeEn ?? materialTypeDe),
       count: entries.length,
     }));
 })();
@@ -101,7 +128,7 @@ export function getFrontfarbenByMaterialTab(
   const tab = frontfarbenMaterialTabs.find((item) => item.id === tabId);
   if (!tab) return frontfarbenCatalog;
   return frontfarbenCatalog.filter(
-    (entry) => toMaterialTabId(entry.materialTypeDe) === tab.id
+    (entry) => toMaterialTabId(getMaterialGroupKey(entry.materialTypeDe)) === tab.id
   );
 }
 
@@ -133,7 +160,7 @@ export function getFrontfarbenColorLabel(value?: string, locale?: string) {
   const normalizedLocale = normalizeLocale(locale);
   const label = normalizedLocale === "de" ? entry.labelDe : entry.labelEn;
   const material =
-    normalizedLocale === "de" ? entry.materialTypeDe : entry.materialTypeEn;
+    normalizedLocale === "de" ? getDisplayMaterialDe(entry.materialTypeDe) : getDisplayMaterialEn(entry.materialTypeEn);
   return `${entry.id} - ${label} (${material})`;
 }
 
