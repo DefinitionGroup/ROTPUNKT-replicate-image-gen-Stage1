@@ -127,9 +127,23 @@ export function WizardHandleStep({
         </div>
       </div>
 
-      {/* Tokyo Sub-Tabs */}
+      {/* Tokyo Key Visual + Sub-Tabs */}
       {activeCategory === "tokyo_grip" && (
-        <div className="mb-3 flex gap-2 shrink-0">
+        <>
+          <div className="mb-4 shrink-0 overflow-hidden rounded-xl ring-1 ring-border/50">
+            <div className="relative w-full h-40 sm:h-52 md:h-60 bg-background">
+              <Image
+                src={getGriffeImageSrc("tokyo/Griff Tokyo Detail_converted.jpeg")}
+                alt="Tokyo Grip"
+                fill
+                unoptimized
+                className="object-contain"
+                sizes="(max-width: 768px) 90vw, 500px"
+                priority
+              />
+            </div>
+          </div>
+          <div className="mb-3 flex gap-2 shrink-0">
           <button
             type="button"
             className={`px-3 py-1 rounded-lg border text-xs transition ${
@@ -155,6 +169,7 @@ export function WizardHandleStep({
             {t("tokyoUnifarben")}
           </button>
         </div>
+        </>
       )}
 
       {/* Image Grid */}
