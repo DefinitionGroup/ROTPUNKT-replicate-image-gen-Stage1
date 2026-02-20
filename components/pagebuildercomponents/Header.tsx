@@ -139,12 +139,12 @@ export default function Header({
 
         {/* Description */}
         <motion.div
-          className="mx-auto max-w-4xl "
+          className="mx-auto max-w-3xl "
           variants={descriptionVariants}
           initial="initial"
           animate="animate"
         >
-          <p className="text-white font-semibold tracking-wide text-lg mt-4 leading-relaxed text-center">
+          <p className="text-white font-medium  mt-4 leading-relaxed text-center">
 
             {description}
           </p>

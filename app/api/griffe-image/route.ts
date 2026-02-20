@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
-const GRIFFE_DIR = path.resolve(process.cwd(), "Griffe");
+const GRIFFE_DIR = path.resolve(process.cwd(), "grifffronten");
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]);
 
 function getMimeType(extension: string): string {

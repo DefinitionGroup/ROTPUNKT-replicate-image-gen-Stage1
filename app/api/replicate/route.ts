@@ -21,10 +21,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   }) as Promise<T>;
 }
 
-const MODEL = "rotpunkt007/basemodel-2-2026:0b02764a8f8bd1db5e211829ddb94f75e003252ac464e8f58398d8539730b74b";
+const MODEL = "rotpunkt007/basemodel-4-2026:0200979b0fa5fd320620d0af8ac046d806fa80e5406dc5e070722fbb91889be6";
 const MODEL_VERSION = MODEL.split(":")[1];
-const NEGATIVE_PROMPT =
-  "duplicate sinks, double faucets, extra taps, floating lamps, disembodied lighting,text on surfaces, text, typography, distorted structure, warped cabinetry, incorrect perspective";
 
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
@@ -58,17 +56,15 @@ export async function POST(req: NextRequest) {
         input: {
           prompt: finalPrompt,
           go_fast: false,
-          guidance: 5,
-          strength: 0.9,
+          guidance: 3.5,
           image_size: "optimize_for_speed",
-          lora_scale: 1,
+          lora_scale: 0.85,
           aspect_ratio: "16:9",
           output_format: "webp",
-          enhance_prompt: true,
+          enhance_prompt: false,
           output_quality: 80,
           seed: 503461301,
-          negative_prompt: NEGATIVE_PROMPT,
-          num_inference_steps: 24,
+          num_inference_steps: 28,
           num_outputs: 1,
         },
       }),

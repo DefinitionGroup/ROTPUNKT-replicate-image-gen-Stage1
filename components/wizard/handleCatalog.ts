@@ -1,30 +1,24 @@
 import handleCatalogData from "./handleCatalogData.json";
 
-export type HandleColorOption = {
+export type HandleCatalogEntry = {
   id: string;
-  nameDe: string;
-  nameEn: string;
-  hex: string;
-  group: string | null;
+  category: HandleCategoryId;
+  subcategory: "holzfarben" | "unifarben" | null;
+  imagePath: string;
+  trainingCaption: string;
+  promptCaption: string;
+  labelDe: string;
+  labelEn: string;
 };
 
-export type HandleProduct = {
-  id: string;
-  categoryId: string;
-  categoryDe: string;
-  categoryEn: string;
-  model: string;
-  descriptionDe: string;
-  descriptionEn: string;
-  typeDe: string;
-  typeEn: string;
-  dimensions: string;
-  imagePath: string | null;
-  colors: HandleColorOption[];
-};
+export type HandleCategoryId =
+  | "handleless"
+  | "buster_and_punch"
+  | "standard_handle"
+  | "tokyo_grip";
 
-export type HandleCategory = {
-  id: string;
+export type HandleCategoryTab = {
+  id: HandleCategoryId;
   labelDe: string;
   labelEn: string;
   count: number;
@@ -32,96 +26,125 @@ export type HandleCategory = {
 
 export const HANDLE_SELECTION_PREFIX = "handle:";
 
-export const handleCatalog = handleCatalogData as HandleProduct[];
+const categoryConfig: Record<
+  HandleCategoryId,
+  { labelDe: string; labelEn: string; order: number }
+> = {
+  handleless: { labelDe: "Grifflos", labelEn: "Handleless", order: 0 },
+  buster_and_punch: {
+    labelDe: "Buster & Punch",
+    labelEn: "Buster & Punch",
+    order: 1,
+  },
+  standard_handle: {
+    labelDe: "Standardgriffe",
+    labelEn: "Standard Handles",
+    order: 2,
+  },
+  tokyo_grip: { labelDe: "Tokyo Griff", labelEn: "Tokyo Grip", order: 3 },
+};
 
-const categoryOrder = ["buster-grips", "tokyo", "buegelgriff", "yell"];
+export const handleCatalog =
+  handleCatalogData as unknown as HandleCatalogEntry[];
 
-const productById = new Map(handleCatalog.map((item) => [item.id, item] as const));
+const handleCatalogById = new Map(
+  handleCatalog.map((entry) => [entry.id, entry] as const)
+);
 
-export const handleCategories: HandleCategory[] = (() => {
-  const grouped = new Map<string, HandleProduct[]>();
+export const handleCategories: HandleCategoryTab[] = (() => {
+  const grouped = new Map<HandleCategoryId, HandleCatalogEntry[]>();
 
-  for (const product of handleCatalog) {
-    const current = grouped.get(product.categoryId) ?? [];
-    current.push(product);
-    grouped.set(product.categoryId, current);
+  for (const entry of handleCatalog) {
+    const current = grouped.get(entry.category) ?? [];
+    current.push(entry);
+    grouped.set(entry.category, current);
   }
 
   return [...grouped.entries()]
-    .sort(([idA], [idB]) => {
-      const orderA = categoryOrder.indexOf(idA);
-      const orderB = categoryOrder.indexOf(idB);
-      const normalizedA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
-      const normalizedB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
-      if (normalizedA !== normalizedB) return normalizedA - normalizedB;
-      return idA.localeCompare(idB);
-    })
-    .map(([id, products]) => ({
+    .sort(
+      ([idA], [idB]) =>
+        (categoryConfig[idA]?.order ?? 99) -
+        (categoryConfig[idB]?.order ?? 99)
+    )
+    .map(([id, entries]) => ({
       id,
-      labelDe: products[0]?.categoryDe ?? id,
-      labelEn: products[0]?.categoryEn ?? id,
-      count: products.length,
+      labelDe: categoryConfig[id]?.labelDe ?? id,
+      labelEn: categoryConfig[id]?.labelEn ?? id,
+      count: entries.length,
     }));
 })();
 
-export function getProductsByHandleCategory(categoryId: string): HandleProduct[] {
-  return handleCatalog.filter((item) => item.categoryId === categoryId);
+export function getHandlesByCategory(
+  categoryId: HandleCategoryId
+): HandleCatalogEntry[] {
+  return handleCatalog.filter((entry) => entry.category === categoryId);
 }
 
-export function encodeHandleSelectionValue(productId: string, colorId: string): string {
-  return `${HANDLE_SELECTION_PREFIX}${productId}|${colorId}`;
+/** Backwards-compatible alias used in KitchenWizardModal */
+export const getProductsByHandleCategory = getHandlesByCategory;
+
+export function getTokyoGripSwatches(
+  subcategory: "holzfarben" | "unifarben"
+): HandleCatalogEntry[] {
+  return handleCatalog.filter(
+    (entry) =>
+      entry.category === "tokyo_grip" && entry.subcategory === subcategory
+  );
 }
 
-export function isHandleSelectionValue(value?: string | null): value is string {
-  return typeof value === "string" && value.startsWith(HANDLE_SELECTION_PREFIX);
+export function encodeHandleSelectionValue(entryId: string): string {
+  return `${HANDLE_SELECTION_PREFIX}${entryId}`;
 }
 
-export function parseHandleSelectionValue(value?: string | null) {
+export function isHandleSelectionValue(
+  value?: string | null
+): value is string {
+  return (
+    typeof value === "string" && value.startsWith(HANDLE_SELECTION_PREFIX)
+  );
+}
+
+export function parseHandleSelectionValue(
+  value?: string | null
+): string | undefined {
   if (!isHandleSelectionValue(value)) return undefined;
-  const payload = value.slice(HANDLE_SELECTION_PREFIX.length);
-  const [productId, colorId] = payload.split("|");
-  if (!productId || !colorId) return undefined;
-  return { productId, colorId };
+  return value.slice(HANDLE_SELECTION_PREFIX.length);
 }
 
-export function getHandleSelectionByValue(value?: string | null) {
-  const parsed = parseHandleSelectionValue(value);
-  if (!parsed) return undefined;
-  const product = productById.get(parsed.productId);
-  if (!product) return undefined;
-  const color = product.colors.find((item) => item.id === parsed.colorId);
-  if (!color) return undefined;
-  return { product, color };
+export function getHandleSelectionByValue(
+  value?: string | null
+): HandleCatalogEntry | undefined {
+  const id = parseHandleSelectionValue(value);
+  if (!id) return undefined;
+  return handleCatalogById.get(id);
 }
 
 function normalizeLocale(locale?: string): "de" | "en" {
   return locale?.startsWith("de") ? "de" : "en";
 }
 
-export function getHandleSelectionLabel(value?: string | null, locale?: string) {
-  const selection = getHandleSelectionByValue(value);
-  if (!selection) return undefined;
+export function getHandleSelectionLabel(
+  value?: string | null,
+  locale?: string
+): string | undefined {
+  const entry = getHandleSelectionByValue(value);
+  if (!entry) return undefined;
   const normalizedLocale = normalizeLocale(locale);
-  const name = normalizedLocale === "de" ? selection.color.nameDe : selection.color.nameEn;
-  const type = normalizedLocale === "de" ? selection.product.typeDe : selection.product.typeEn;
-  const category =
-    normalizedLocale === "de" ? selection.product.categoryDe : selection.product.categoryEn;
-  return `${category} ${selection.product.model} - ${type} / ${name}`;
+  const catLabel =
+    normalizedLocale === "de"
+      ? categoryConfig[entry.category].labelDe
+      : categoryConfig[entry.category].labelEn;
+  const entryLabel =
+    normalizedLocale === "de" ? entry.labelDe : entry.labelEn;
+  return `${catLabel} – ${entryLabel}`;
 }
 
 export function getHandlePromptDescriptor(value?: string | null) {
-  const selection = getHandleSelectionByValue(value);
-  if (!selection) return undefined;
-  const { product, color } = selection;
+  const entry = getHandleSelectionByValue(value);
+  if (!entry) return undefined;
   return {
-    categoryDe: product.categoryDe,
-    model: product.model,
-    typeDe: product.typeDe,
-    descriptionDe: product.descriptionDe,
-    dimensions: product.dimensions,
-    colorCode: color.id,
-    colorNameDe: color.nameDe,
-    colorHex: color.hex,
+    promptCaption: entry.promptCaption,
+    category: entry.category,
   };
 }
 

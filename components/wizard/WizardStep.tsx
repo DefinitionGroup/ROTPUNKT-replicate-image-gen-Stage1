@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "motion/react";
+import { FaCheck } from "react-icons/fa6";
 import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 
 interface WizardStepProps {
@@ -12,7 +12,28 @@ interface WizardStepProps {
   selectedValue?: string;
   onSelect: (value: string) => void;
   loading?: boolean;
+  columns?: 2 | 3 | 4;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.03, delayChildren: 0.08 },
+  },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 12, scale: 0.96 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 260, damping: 24 },
+  },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.12 } },
+};
 
 export const WizardStep: React.FC<WizardStepProps> = ({
   icon,
@@ -22,7 +43,9 @@ export const WizardStep: React.FC<WizardStepProps> = ({
   selectedValue,
   onSelect,
   loading = false,
+  columns,
 }) => {
+  const compact = columns !== undefined && columns >= 3;
   return (
     <motion.div
       className="w-full flex flex-col h-full min-h-0"
@@ -46,50 +69,89 @@ export const WizardStep: React.FC<WizardStepProps> = ({
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0 pr-1 sm:pr-2 touch-pan-y [-webkit-overflow-scrolling:touch]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-4">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+          className={`grid grid-cols-1 sm:grid-cols-2 ${columns === 4 ? "lg:grid-cols-4" : columns === 3 ? "lg:grid-cols-3" : ""} gap-2 pb-4 p-1`}
+        >
           {options.map((opt) => {
             const isSelected = selectedValue === opt.value;
             const hasImage = !!opt.image;
             return (
-              <Button
-                key={opt.value}
-                variant="wizardOption"
-                size="wizardOption"
-                enableMotion
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.99 }}
-                transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                onClick={() => onSelect(opt.value)}
-                disabled={loading}
-                data-selected={isSelected}
-                className="group h-auto overflow-hidden p-0 text-left flex-col items-start rounded-xl"
-              >
-                {hasImage ? (
-                  <div className="relative -mx-1 -mt-1 h-28 sm:h-36 md:h-40 w-[calc(100%+0.5rem)] overflow-hidden rounded-lg">
-                    <Image
-                      src={opt.image!}
-                      alt={opt.label}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                      sizes="(max-width: 768px) 100vw, 320px"
-                      priority={false}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/100 via-background/20 to-transparent" />
-                  </div>
-                ) : null}
+              <motion.div key={opt.value} variants={cardVariants}>
+                <button
+                  type="button"
+                  onClick={() => onSelect(opt.value)}
+                  disabled={loading}
+                  className={`
+                    group relative w-full overflow-hidden rounded-xl text-left transition-all duration-200 outline-none
+                    focus-visible:ring-2 focus-visible:ring-brand-primary-2/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background
+                    ${isSelected
+                      ? "ring-2 ring-brand-primary-2 shadow-lg shadow-brand-primary-2/10"
+                      : "ring-1 ring-border/50 hover:ring-border hover:shadow-md"
+                    }
+                  `}
+                >
+                  {hasImage ? (
+                    <div className={`relative ${compact ? "h-40 sm:h-44 md:h-48" : "h-72 sm:h-80 md:h-[270px]"} w-full overflow-hidden`}>
+                      <Image
+                        src={opt.image!}
+                        alt={opt.label}
+                        fill
+                        className={`
+                          object-cover transition-all duration-500
+                          ${isSelected ? "scale-105 brightness-110" : "group-hover:scale-[1.04] group-hover:brightness-105"}
+                        `}
+                        sizes="(max-width: 768px) 100vw, 320px"
+                        priority={false}
+                      />
+                      <AnimatePresence>
+                        {isSelected && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-brand-primary-2 flex items-center justify-center shadow-lg"
+                          >
+                            <FaCheck className="w-2.5 h-2.5 text-white" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <div className={`relative h-16 w-full flex items-center justify-center ${isSelected ? "bg-brand-primary-2" : "bg-muted/30 group-hover:bg-muted/50"}`}>
+                      <AnimatePresence>
+                        {isSelected && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-brand-primary-2 flex items-center justify-center shadow-lg"
+                          >
+                            <FaCheck className="w-2.5 h-2.5 text-white" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
 
-                <div className="flex flex-col items-start gap-1 p-3 sm:p-4 w-full">
-                  <span className="text-xs sm:text-sm font-semibold text-foreground">
-                    {opt.label}
-                  </span>
-                  {opt.hint ? (
-                    <span className="text-xxs sm:text-xs text-muted-foreground">{opt.hint}</span>
-                  ) : null}
-                </div>
-              </Button>
+                  <div className={`px-5 ${compact ? "py-3" : "py-5 h-[100px]"} flex flex-col justify-center transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                    <span className={`text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
+                      {opt.label}
+                    </span>
+                    {opt.hint ? (
+                      <span className={`text-xxs mt-0.5 block ${isSelected ? "text-white/70" : "text-muted-foreground"}`}>{opt.hint}</span>
+                    ) : null}
+                  </div>
+                </button>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

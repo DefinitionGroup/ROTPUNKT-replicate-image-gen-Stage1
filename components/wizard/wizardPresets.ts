@@ -18,26 +18,11 @@ export const wizardPresets: WizardPreset[] = [
       color: "holz",
       style: "minimalistisch",
       environment: "einfamilienhaus",
-      viewpoint: "innenansicht",
+      viewpoint: "eye level shot",
       time: "afternoon, warm afternoon light",
     },
     extraWishes:
       "Große Panoramafenster, matte Fronten, dezente schwarze Akzente, viel Grünpflanzen.",
-  },
-  {
-    label: "Urban Loft Außen",
-    description: "Dunkle, moderne Loft-Architektur mit urbaner Skyline.",
-    previewImage: "/wizard-presets/urban-loft.jpg",
-    options: {
-      kind: "from the outside",
-      color: "schwarz",
-      style: "modern",
-      environment: "loft-industriegebaeude",
-      viewpoint: "aussenansicht",
-      time: "golden hour, magic hour, warm orange sunlight",
-    },
-    extraWishes:
-      "Glasfassade, warmes Innenlicht sichtbar von außen, dezente Neonlicht-Akzente.",
   },
   {
     label: "Luxury Evening",
@@ -48,7 +33,7 @@ export const wizardPresets: WizardPreset[] = [
       color: "burgunderrot",
       style: "elegant",
       environment: "apartment-penthouse",
-      viewpoint: "innenansicht",
+      viewpoint: "full room view, interior panorama",
       time: "evening, interior lighting, ambient lamps",
     },
     extraWishes:

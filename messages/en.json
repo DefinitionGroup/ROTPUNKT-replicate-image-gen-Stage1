@@ -54,6 +54,10 @@
         "label": "Handles & Rails",
         "description": "Select a handle/rail model and exactly one available color variant."
       },
+      "atmosphere": {
+        "label": "Atmosphere & Style",
+        "description": "Define the visual atmosphere of your scene — style direction, camera perspective, and lighting mood."
+      },
       "style": {
         "label": "Style Direction",
         "description": "Which interior style fits best? This selection determines lines and material mix."
@@ -90,8 +94,10 @@
     "options": {
       "kueche": "Kitchen",
       "wohnzimmer": "Living Room",
-      "fromTheOutside": "Exterior View",
       "flur": "Hallway",
+      "kuechenzeile": "Galley Kitchen",
+      "kuecheninsel": "Kitchen with Island",
+      "kuecheUeberEck": "L-Shaped Kitchen",
       "schwarz": "Black",
       "rot": "Red",
       "burgunderrot": "Burgundy Red",
@@ -99,12 +105,9 @@
       "holz": "Wood",
       "dunklesHolz": "Dark Wood",
       "modern": "Modern",
-      "zeitlos": "Timeless",
-      "natuerlich": "Natural",
       "urban": "Urban",
       "elegant": "Elegant",
       "kreativ": "Creative",
-      "puristisch": "Purist",
       "gemuetlich": "Cozy",
       "minimalistisch": "Minimalist",
       "stilvoll": "Stylish",
@@ -115,8 +118,6 @@
       "categoryEinfamilienhaus": "Single-Family Home",
       "categoryAltbau": "Historic Building",
       "categoryFerienhaus": "Holiday Home",
-      "categoryReihenhausDoppelhaushaelfte": "Townhouse / Semi-Detached House",
-      "categoryTinyHouse": "Tiny House",
       "categoryStadtvilla": "Urban Villa",
       "categoryApartmentPenthouse": "Apartment / Penthouse",
       "augenhoehe": "Eye Level",
@@ -128,9 +129,6 @@
       "nahaufnahme": "Close-up",
       "ganzerRaum": "Full Room",
       "detailaufnahme": "Detail Shot",
-      "geringeTiefenschaerfe": "Shallow Depth of Field",
-      "tiefenschaerfe": "Deep Focus",
-      "weicherFokus": "Soft Focus",
       "mediteraneKuestenstadt": "Mediterranean Coastal Town",
       "historischesAltstadtviertel": "Historic Old Town District",
       "nordischesFjordhaus": "Nordic Fjord House",
@@ -161,6 +159,7 @@
       "toepfePfannen": "Pots & Pans",
       "kerzen": "Candles",
       "spiegel": "Mirror",
+      "fruehstueck": "Breakfast",
       "modernesHolzhaus": "Modern Wooden House with Large Windows",
       "stadtwohnung": "City Apartment",
       "loft": "Loft",
@@ -172,7 +171,8 @@
     },
     "optionGroups": {
       "pflanzen": "Plants",
-      "dekoration": "Decoration"
+      "dekoration": "Decoration",
+      "essenTrinken": "Food & Drinks"
     },
     "hints": {
       "standard": "Standard",
@@ -223,17 +223,28 @@
     "colorTabs": {
       "frontfarbenLabel": "Front Colors",
       "frontfarbenDescription": "Material and color variants from the Frontfarben dataset with image and training-caption references.",
-      "fenixLabel": "FENIX Palette",
+      "fenixLabel": "FENIX® Colors",
       "fenixDescription": "Original FENIX NTM® surface colors.",
-      "allMaterials": "All materials",
+      "allMaterials": "All Categories",
       "trainingCaptionLabel": "Training caption"
     },
+    "atmosphere": {
+      "title": "Atmosphere & Style",
+      "description": "Set the visual mood — choose a style, camera angle, and time of day.",
+      "continue": "Continue",
+      "selectAll": "Select all three"
+    },
+    "kitchenLayout": {
+      "title": "Kitchen Layout",
+      "description": "What type of kitchen layout would you like?",
+      "skip": "Skip — standard layout"
+    },
     "handleMatrix": {
-      "categoryLabel": "Categories",
-      "modelLabel": "Model",
-      "availableColors": "Available colors (single selection)",
-      "imageUnavailable": "No product image available",
-      "noProducts": "No products available in this category."
+      "categoryLabel": "Handle Type",
+      "imageUnavailable": "No image available",
+      "noProducts": "No handles available in this category.",
+      "tokyoHolzfarben": "Wood Colors",
+      "tokyoUnifarben": "Solid Colors Matt"
     }
   },
   "imageGenerator": {

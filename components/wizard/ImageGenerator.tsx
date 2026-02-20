@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
 import { $prompt } from "@/store/prompt";
+import { $pageStep } from "@/store/step";
+import { wizardActions } from "@/store/wizardStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 import { useTranslations } from "next-intl";
+import { useRouter, Link } from "@/i18n/routing";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -81,6 +84,7 @@ async function pollGenerationApi({
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
   const t = useTranslations('imageGenerator');
+  const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
   const [predictionId, setPredictionId] = useState<string | null>(null);
@@ -169,6 +173,17 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     }
   }, [prompt, startGeneration]);
 
+  // When the image modal is closed after generation, reset and go to my-images
+  const handleModalClose = useCallback(() => {
+    setSelectedImage(null);
+    // Reset the entire app state
+    $prompt.set(null);
+    $pageStep.set("intro");
+    wizardActions.reset();
+    // Navigate to my-images gallery
+    router.push("/my-images");
+  }, [router]);
+
   const hasImages = Array.isArray(generatedImages) && generatedImages.length > 0;
   const status = statusData?.status;
   const isTerminalFailure = status === "failed" || status === "canceled";
@@ -230,7 +245,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         {selectedImage && (
           <ImageModal
             src={selectedImage}
-            onClose={() => setSelectedImage(null)}
+            onClose={handleModalClose}
             prompt={prompt ?? undefined}
           />
         )}
@@ -408,12 +423,11 @@ function ImagesGrid({
 function QuickLink() {
   const t = useTranslations('imageGenerator');
   return (
-    <motion.a
+    <Link
       href="/my-images"
-      className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-white rounded-full font-semibold shadow hover:bg-red-600 transition"
-      whileHover={{ scale: 1.05 }}
+      className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-white rounded-full font-semibold shadow hover:bg-red-600 transition hover:scale-105"
     >
       📁 {t('goToMyImages')}
-    </motion.a>
+    </Link>
   );
 }

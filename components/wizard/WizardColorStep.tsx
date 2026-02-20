@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
+import { FaCheck } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
 import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
@@ -9,6 +10,8 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   encodeFrontfarbenColorValue,
   frontfarbenCatalog,
+  getDisplayMaterialDe,
+  getDisplayMaterialEn,
   getFrontfarbenByMaterialTab,
   getFrontfarbenImageSrc,
   getFrontfarbenMaterialTabPreviewImage,
@@ -262,7 +265,7 @@ export function WizardColorStep({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="grid grid-cols-1 min-[430px]:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 pb-4"
+                  className="grid grid-cols-1 min-[430px]:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 pb-4 p-1"
                 >
                   {frontfarbenOptions.map((color) => {
                     const value = encodeFrontfarbenColorValue(color.id);
@@ -270,113 +273,158 @@ export function WizardColorStep({
                     const colorLabel = normalizedLocale === "de" ? color.labelDe : color.labelEn;
                     const materialLabel =
                       normalizedLocale === "de"
-                        ? color.materialTypeDe
-                        : color.materialTypeEn;
-                    const selectedClass = isSelected
-                      ? "border-emerald-400/80 bg-emerald-500/5"
-                      : "border-border bg-muted/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5";
-
+                        ? getDisplayMaterialDe(color.materialTypeDe)
+                        : getDisplayMaterialEn(color.materialTypeEn);
                     return (
-                      <motion.button
+                      <button
                         key={color.id}
                         type="button"
-                        className={`group flex flex-col gap-2 rounded-xl border ${selectedClass} p-2.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70`}
-                        whileHover={{ translateY: -2 }}
-                        whileTap={{ scale: 0.99 }}
+                        className={`
+                          group relative w-full overflow-hidden rounded-xl text-left transition-all duration-200 outline-none
+                          focus-visible:ring-2 focus-visible:ring-brand-primary-2/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background
+                          ${isSelected
+                            ? "ring-2 ring-brand-primary-2 shadow-lg shadow-brand-primary-2/10"
+                            : "ring-1 ring-border/50 hover:ring-border hover:shadow-md"
+                          }
+                        `}
                         disabled={loading}
                         onClick={() => onSelect(value)}
                       >
-                        <div className="relative h-20 sm:h-24 w-full overflow-hidden rounded-lg border border-border/60">
+                        <div className="relative h-20 sm:h-24 w-full overflow-hidden">
                           <Image
                             src={getFrontfarbenImageSrc(color.imagePath)}
                             alt={`${color.id} ${colorLabel}`}
                             fill
                             unoptimized
-                            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                            className={`object-cover transition-all duration-500 ${isSelected ? "scale-105 brightness-110" : "group-hover:scale-[1.04] group-hover:brightness-105"}`}
                             sizes="(max-width: 768px) 50vw, 280px"
                           />
+                          <AnimatePresence>
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0, opacity: 0 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                                className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-brand-primary-2 flex items-center justify-center shadow-lg"
+                              >
+                                <FaCheck className="w-2.5 h-2.5 text-white" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                          <span className="text-xxs font-semibold uppercase tracking-wide text-brand-primary-2">
+                        <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                          <span className={`text-xxs font-semibold uppercase tracking-wide ${isSelected ? "text-white/80" : "text-brand-primary-2"}`}>
                             {color.id}
                           </span>
-                          <span className="text-xs font-semibold text-foreground leading-tight">
+                          <span className={`text-xs font-semibold leading-tight block mt-0.5 ${isSelected ? "text-white" : "text-foreground"}`}>
                             {colorLabel}
                           </span>
-                          <span className="text-xxs text-muted-foreground leading-tight">
+                          <span className={`text-xxs leading-tight block ${isSelected ? "text-white/60" : "text-muted-foreground"}`}>
                             {materialLabel} · {color.subcategory}
                           </span>
-                          <span className="text-xxs text-muted-foreground/90 leading-tight max-h-8 overflow-hidden">
-                            {t("trainingCaptionLabel")}: {color.trainingCaption}
-                          </span>
                         </div>
-                      </motion.button>
+                      </button>
                     );
                   })}
                 </motion.div>
               </AnimatePresence>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 pb-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 pb-4 p-1">
               {options.map((opt) => {
                 const isSelected = selectedValue === opt.value;
                 return (
-                  <Button
+                  <button
                     key={opt.value}
-                    variant="wizardOption"
-                    size="wizardOption"
-                    enableMotion
-                    whileHover={{ scale: 1.015 }}
-                    whileTap={{ scale: 0.99 }}
-                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
+                    type="button"
                     onClick={() => onSelect(opt.value)}
                     disabled={loading}
-                    data-selected={isSelected}
-                    className="h-auto py-3 sm:py-4 px-3 sm:px-4 text-left flex-col items-start gap-1.5 border-border/70 bg-muted/60 backdrop-blur rounded-xl"
+                    className={`
+                      group relative w-full overflow-hidden rounded-xl text-left transition-all duration-200 outline-none
+                      focus-visible:ring-2 focus-visible:ring-brand-primary-2/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background
+                      ${isSelected
+                        ? "ring-2 ring-brand-primary-2 shadow-lg shadow-brand-primary-2/10"
+                        : "ring-1 ring-border/50 hover:ring-border hover:shadow-md"
+                      }
+                    `}
                   >
-                    <span className="text-xs sm:text-sm font-semibold text-foreground">
-                      {opt.label}
-                    </span>
-                    {opt.hint ? (
-                      <span className="text-xxs sm:text-xs text-muted-foreground">{opt.hint}</span>
-                    ) : null}
-                  </Button>
+                    <div className={`relative h-16 w-full flex items-center justify-center ${isSelected ? "bg-brand-primary-2" : "bg-muted/30 group-hover:bg-muted/50"}`}>
+                      <AnimatePresence>
+                        {isSelected && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-brand-primary-2 flex items-center justify-center shadow-lg"
+                          >
+                            <FaCheck className="w-2.5 h-2.5 text-white" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                      <span className={`text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
+                        {opt.label}
+                      </span>
+                      {opt.hint ? (
+                        <span className={`text-xxs mt-0.5 block ${isSelected ? "text-white/70" : "text-muted-foreground"}`}>{opt.hint}</span>
+                      ) : null}
+                    </div>
+                  </button>
                 );
               })}
             </div>
           )
         ) : (
-          <div className="grid grid-cols-2 min-[430px]:grid-cols-3 lg:grid-cols-4 gap-2 pb-4">
+          <div className="grid grid-cols-2 min-[430px]:grid-cols-3 lg:grid-cols-4 gap-2 pb-4 p-1">
             {fenixColors.map((color) => {
               const value = encodeFenixColorValue(color.name);
               const isSelected = selectedValue === value;
-              const selectedClass = isSelected
-                ? "border-emerald-400/80 bg-emerald-500/5"
-                : "border-border bg-muted/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5";
 
               return (
-                <motion.button
+                <button
                   key={color.name}
                   type="button"
-                  className={`group flex flex-col gap-2 rounded-xl border ${selectedClass} p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70`}
-                  whileHover={{ translateY: -2 }}
-                  whileTap={{ scale: 0.99 }}
+                  className={`
+                    group relative w-full overflow-hidden rounded-xl text-left transition-all duration-200 outline-none
+                    focus-visible:ring-2 focus-visible:ring-brand-primary-2/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background
+                    ${isSelected
+                      ? "ring-2 ring-brand-primary-2 shadow-lg shadow-brand-primary-2/10"
+                      : "ring-1 ring-border/50 hover:ring-border hover:shadow-md"
+                    }
+                  `}
                   disabled={loading}
                   onClick={() => onSelect(value)}
                 >
-                  <span
-                    className="h-12 sm:h-14 w-full rounded-lg border border-border/60 shadow-inner"
-                    style={{ backgroundColor: color.hex }}
-                    aria-hidden="true"
-                  />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xxs sm:text-xs font-semibold text-foreground leading-tight">
+                  <div className="relative p-3 pb-0">
+                    <span
+                      className={`block h-12 sm:h-14 w-full rounded-lg border shadow-inner transition-all duration-300 ${isSelected ? "border-brand-primary-2/40 brightness-110" : "border-border/60"}`}
+                      style={{ backgroundColor: color.hex }}
+                      aria-hidden="true"
+                    />
+                    <AnimatePresence>
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                          className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-brand-primary-2 flex items-center justify-center shadow-lg"
+                        >
+                          <FaCheck className="w-2.5 h-2.5 text-white" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                  <div className={`px-5 py-5 transition-colors ${isSelected ? "bg-brand-primary-2" : "bg-card/80"}`}>
+                    <span className={`text-xxs sm:text-xs font-semibold leading-tight block ${isSelected ? "text-white" : "text-foreground"}`}>
                       {color.name}
                     </span>
-                    {/* <span className="text-xxs text-gray-400">{color.hex}</span> */}
                   </div>
-                </motion.button>
+                </button>
               );
             })}
           </div>

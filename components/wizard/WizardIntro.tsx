@@ -121,8 +121,7 @@ function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCard
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-background" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/30 to-transparent" />
-        <span className="absolute bottom-3 left-4 text-base font-semibold text-foreground drop-shadow">
+        <span className="absolute bottom-3 left-4 text-base font-semibold text-white drop-shadow">
           {preset.label}
         </span>
       </div>

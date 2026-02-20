@@ -11,6 +11,7 @@ import { getFenixColorLabel } from "./fenixColors";
 import { getWizardProgress } from "./wizardProgress";
 import { getFrontfarbenColorLabel } from "./frontfarbenCatalog";
 import { getHandleSelectionLabel } from "./handleCatalog";
+import { kitchenLayoutOptions } from "./wizardSteps";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -44,6 +45,8 @@ export function WizardSummaryPanel({
   void _extraWishes;
 
   const t = useTranslations("wizard.summary");
+  const tLayout = useTranslations("wizard.kitchenLayout");
+  const tOptions = useTranslations();
   const locale = useLocale();
   const translatedSteps = useTranslatedWizardSteps();
 
@@ -56,7 +59,39 @@ export function WizardSummaryPanel({
   const activeIndex = currentStep >= 0 ? Math.min(currentStep, totalSteps - 1) : -1;
 
   const groupedSelections = useMemo(() => {
-    return translatedSteps.map((step) => {
+    type SelectionItem = {
+      key: string;
+      stepIndex: number;
+      title: string;
+      description: string;
+      selectedLabel: string | undefined;
+      isMulti: boolean;
+      count: number;
+    };
+
+    const items: SelectionItem[] = [];
+
+    translatedSteps.forEach((step, stepIndex) => {
+      // Handle atmosphere step — expand into sub-steps
+      if (step.key === "atmosphere" && step.translatedSubSteps) {
+        for (const [subKey, subStep] of Object.entries(step.translatedSubSteps)) {
+          const selectedValue = selections[subKey as keyof WizardState["selectedOptions"]] as string | undefined;
+          const baseLabel = subStep.options.find(
+            (opt) => opt.value === selectedValue
+          )?.label;
+          items.push({
+            key: subKey,
+            stepIndex,
+            title: subStep.label,
+            description: subStep.description,
+            selectedLabel: baseLabel,
+            isMulti: false,
+            count: baseLabel ? 1 : 0,
+          });
+        }
+        return;
+      }
+
       const key = step.key as keyof WizardState["selectedOptions"];
       const selectedValue = selections[key];
 
@@ -65,14 +100,16 @@ export function WizardSummaryPanel({
         const selectedLabels = selectedValue.map((val) =>
           step.options.find((opt) => opt.value === val)?.label ?? val
         );
-        return {
-          key,
+        items.push({
+          key: key as string,
+          stepIndex,
           title: step.label,
           description: step.description,
           selectedLabel: selectedLabels.length > 0 ? selectedLabels.join(", ") : undefined,
           isMulti: true,
           count: selectedLabels.length,
-        };
+        });
+        return;
       }
 
       const baseLabel = step.options.find(
@@ -86,15 +123,37 @@ export function WizardSummaryPanel({
           : step.key === "handle"
             ? getHandleSelectionLabel(selectedValue as string, locale) ?? baseLabel
           : baseLabel;
-      return {
-        key,
+      items.push({
+        key: key as string,
+        stepIndex,
         title: step.label,
         description: step.description,
         selectedLabel,
         isMulti: false,
         count: selectedLabel ? 1 : 0,
-      };
+      });
+
+      // Show kitchen layout sub-selection after the "kind" step
+      if (step.key === "kind" && selections.kitchenLook) {
+        const layoutOpt = kitchenLayoutOptions.find(
+          (o) => o.value === selections.kitchenLook
+        );
+        const layoutLabel = layoutOpt
+          ? tOptions(layoutOpt.labelKey)
+          : selections.kitchenLook;
+        items.push({
+          key: "kitchenLook",
+          stepIndex,
+          title: tLayout("title"),
+          description: tLayout("description"),
+          selectedLabel: layoutLabel,
+          isMulti: false,
+          count: 1,
+        });
+      }
     });
+
+    return items;
   }, [selections, translatedSteps, locale]);
 
   const renderPrimaryAction = () => {
@@ -182,10 +241,10 @@ export function WizardSummaryPanel({
         <div className="flex flex-col gap-3">
           {groupedSelections.map((item, idx) => (
             <button
-              key={item.key as string}
+              key={item.key}
               type="button"
-              onClick={() => onJumpToStep(idx)}
-              className={`text-left rounded-lg border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${idx === activeIndex
+              onClick={() => onJumpToStep(item.stepIndex)}
+              className={`text-left rounded-lg border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${item.stepIndex === activeIndex
                 ? "border-emerald-400 bg-emerald-500/10"
                 : "border-border bg-muted/60 hover:border-brand-primary-2/50 hover:bg-brand-primary-2/5"
                 }`}
