@@ -28,7 +28,7 @@ import { WizardKitchenLayoutPanel } from "./WizardKitchenLayoutPanel";
 import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
-  onPromptReady: (prompt: string) => void;
+  onPromptReady: (prompt: string, isKitchenRoom: boolean) => void;
   loading?: boolean;
   onClose?: () => void;
 }
@@ -192,7 +192,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       return;
     }
 
-    onPromptReady(summaryData.prompt);
+    onPromptReady(summaryData.prompt, summaryData.isKitchenRoom);
     if (onClose) onClose();
   };
 

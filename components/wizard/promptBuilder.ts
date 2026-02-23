@@ -11,6 +11,7 @@ export type PromptBuildResult = {
   prompt: string;
   sections: string[];
   missingKeys: string[];
+  isKitchenRoom: boolean;
 };
 
 /**
@@ -77,6 +78,73 @@ function getSelectionKeys(): (keyof WizardState["selectedOptions"])[] {
   return keys;
 }
 
+/**
+ * Expanded viewpoint descriptions for FLUX T5 encoder.
+ * Rich photographic framing language gets significantly more attention from
+ * the text encoder than terse 3-6 word phrases buried in the subject line.
+ */
+const VIEWPOINT_DESCRIPTIONS: Record<string, string> = {
+  "eye level shot":
+    "Eye level perspective, camera at standing height approximately 150cm, natural horizontal viewing angle with a straight-on composition.",
+  "low angle shot, worm's eye view":
+    "Low angle perspective, camera positioned below waist height looking upward, emphasizing ceiling height and vertical proportions of the cabinetry.",
+  "high angle shot, bird's eye view":
+    "High angle overhead perspective, camera elevated above head height angled downward, revealing countertops and room layout from above.",
+  "dutch angle, tilted frame":
+    "Dutch angle composition with the camera intentionally tilted 20 degrees from the horizontal axis, creating a dramatic diagonal horizon line across the entire frame, the vertical lines of walls and cabinets run diagonally.",
+  "wide shot, long shot, establishing shot":
+    "Wide establishing shot capturing the full room from wall to wall, camera pulled back with a wide-angle lens to show the complete interior space.",
+  "medium shot, mid shot":
+    "Medium shot framing the primary furniture grouping at a comfortable distance, balanced composition showing cabinets and their surrounding context.",
+  "close-up shot":
+    "Close-up shot of cabinet details and surfaces, camera positioned close to highlight material textures and hardware, shallow depth of field.",
+  "full room view, interior panorama":
+    "Full panoramic room view with ultra-wide framing from corner to corner, comprehensive interior overview showing floor walls and ceiling in a single frame.",
+  "extreme close-up, detail shot, macro":
+    "Extreme close-up macro detail shot of surface textures and handle hardware, very shallow depth of field with soft background blur.",
+};
+
+/**
+ * Expanded color descriptions for the 6 basic color options.
+ * Keys match the lowercase englishLabel values from wizardSteps.tsx.
+ */
+const COLOR_DESCRIPTIONS: Record<string, string> = {
+  "black":
+    "Rich matte black cabinet fronts, deep black cabinetry surfaces with dark monochromatic color scheme.",
+  "red":
+    "Bold red cabinet fronts, vibrant red lacquer cabinetry surfaces with striking red tones.",
+  "burgundy red":
+    "Deep burgundy red cabinet fronts, rich wine-red cabinetry surfaces with warm dark undertones.",
+  "white":
+    "Clean white cabinet fronts, bright white cabinetry surfaces with crisp monochromatic palette.",
+  "wood":
+    "Natural wood cabinet fronts, warm light wood grain cabinetry surfaces with visible natural grain texture.",
+  "dark wood":
+    "Dark stained wood cabinet fronts, deep brown wood grain cabinetry surfaces with rich dark timber finish.",
+};
+
+/**
+ * Replace "kitchen" references in handle promptCaptions for non-kitchen rooms.
+ * All 97 handle entries contain "kitchen" which contradicts the non-kitchen
+ * opening text and confuses the model into generating kitchen elements.
+ * Ordered from most-specific to least-specific to prevent double replacement.
+ */
+function contextualizeHandleCaption(
+  caption: string,
+  isKitchen: boolean
+): string {
+  if (isKitchen) return caption;
+  return caption
+    .replace(/\bkitchen cabinet fronts?\b/gi, "cabinet fronts")
+    .replace(/\bkitchen drawer fronts?\b/gi, "drawer fronts")
+    .replace(/\bkitchen fronts?\b/gi, "furniture fronts")
+    .replace(/\bkitchen design\b/gi, "interior design")
+    .replace(/\bkitchen interior design\b/gi, "interior design")
+    .replace(/\bkitchen interior\b/gi, "interior")
+    .replace(/\bkitchen featuring\b/gi, "interior featuring")
+    .replace(/\bkitchen\b/gi, "furniture");
+}
+
 export function buildPrompt({
   selections,
   extraWishes,
@@ -135,18 +203,22 @@ export function buildPrompt({
     subjectParts.push(`in a ${environment}`);
   }
   if (subjectParts.length > 0) {
-    opening += ` ${subjectParts.join(" ")}, ${viewpoint}.`;
-  } else {
-    opening += ` ${viewpoint[0].toUpperCase() + viewpoint.slice(1)}.`;
+    opening += ` ${subjectParts.join(" ")}.`;
   }
   sections.push(opening);
 
-  // 2. Lighting & Atmosphere
+  // 2. Camera & Composition (dedicated section for T5 attention priority)
+  const expandedViewpoint =
+    VIEWPOINT_DESCRIPTIONS[viewpoint] ??
+    `${viewpoint[0].toUpperCase() + viewpoint.slice(1)}.`;
+  sections.push(expandedViewpoint);
+
+  // 3. Lighting & Atmosphere
   if (time) {
     sections.push(`${time[0].toUpperCase() + time.slice(1)}.`);
   }
 
-  // 3. Colors & Materials (natural language, no labels)
+  // 4. Colors & Materials (natural language, no labels)
   const fenixDesc = PROMPT_LANGUAGE === "en"
     ? fenixColor?.englishDescription
     : fenixColor?.description;
@@ -160,35 +232,39 @@ export function buildPrompt({
       `Front color "${frontfarbe.labelDe}" (Catalog ${frontfarbe.id}, ${frontfarbe.materialTypeDe}).`
     );
   } else if (colorLabel) {
-    sections.push(`${colorLabel} color palette.`);
+    const expandedColor =
+      COLOR_DESCRIPTIONS[colorLabel.toLowerCase()] ??
+      `${colorLabel} color palette.`;
+    sections.push(expandedColor);
   }
 
-  // 4. Flooring
+  // 5. Flooring
   if (floor) {
     sections.push(`${floor[0].toUpperCase() + floor.slice(1)}.`);
   }
 
-  // 5. Hardware — inject training-caption-derived description for FLUX grounding
+  // 6. Hardware — inject training-caption-derived description for FLUX grounding
   if (handleSelection) {
     const prefix = handleSelection.category === "handleless" ? "Handle design" : "Handle hardware";
-    sections.push(`${prefix}: ${handleSelection.promptCaption}.`);
+    const caption = contextualizeHandleCaption(handleSelection.promptCaption, isKitchenRoom);
+    sections.push(`${prefix}: ${caption}.`);
   }
 
-  // 6. Front Reference (training caption verbatim — always English as trained)
+  // 7. Front Reference (training caption verbatim — always English as trained)
   if (frontfarbe) {
     sections.push(
       `Exact front reference: ${frontfarbe.trainingCaption}.`
     );
   }
 
-  // 6b. Glossy emphasis for high-gloss lacquer fronts
+  // 8. Glossy emphasis for high-gloss lacquer fronts
   if (frontfarbe && (frontfarbe.subcategory === "HL" || frontfarbe.subcategory === "LX")) {
     sections.push(
       "Ultra high-gloss reflective lacquer finish, mirror-like surface with sharp light reflections, polished to a glass-like sheen."
     );
   }
 
-  // 7. Accessories / Decor
+  // 9. Accessories / Decor
   if (accessories) {
     const accessoriesArray = Array.isArray(accessories)
       ? accessories
@@ -199,18 +275,18 @@ export function buildPrompt({
     }
   }
 
-  // 8. Technical Requirements (positive phrasing — FLUX ignores negative prompts)
+  // 10. Technical Requirements (positive phrasing — FLUX ignores negative prompts)
   if (isKitchenRoom) {
     sections.push(
-      "Exactly one sink with a single faucet, all lights physically anchored, no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt kitchen design language."
+      "All pull handles and bar handles mounted horizontally parallel to the countertop edge. Each handle centered on its own individual door panel near the opening edge, handles never span across the gap between two adjacent doors. Exactly one sink with a single faucet, all lights physically anchored, no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt kitchen design language."
     );
   } else {
     sections.push(
-      "Rotpunkt furniture and cabinetry only, absolutely no kitchen appliances, no sink, no faucet, no oven, no cooktop, no range hood visible. Residential furniture showroom aesthetic, all lights physically anchored, no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt furniture design language."
+      "All pull handles and bar handles mounted horizontally parallel to the floor. Each handle centered on its own individual door panel near the opening edge, handles never span across the gap between two adjacent doors. Rotpunkt furniture and cabinetry only, absolutely no kitchen appliances, no sink, no faucet, no oven, no cooktop, no range hood visible. Residential furniture showroom aesthetic, all lights physically anchored, no duplicate fixtures, clean lines, consistent materials, high-end Rotpunkt furniture design language."
     );
   }
 
-  // 9. User Wishes
+  // 11. User Wishes
   const wishes = extraWishes?.trim();
   if (wishes) {
     sections.push(`${wishes}.`);
@@ -222,5 +298,6 @@ export function buildPrompt({
     prompt,
     sections,
     missingKeys,
+    isKitchenRoom,
   };
 }

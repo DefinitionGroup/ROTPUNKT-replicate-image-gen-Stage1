@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Header as HeaderType } from "@/sanity/sanity.types";
 import { $showWizard } from "@/app/store/modals";
-import { $prompt } from "@/app/store/prompt";
+import { $prompt, $isKitchenRoom } from "@/app/store/prompt";
 import { $pageStep } from "@/app/store/step";
 import { AnimatePresence } from "motion/react";
 import { IntroCard } from "@/components/wizard/IntroCard";
@@ -168,8 +168,9 @@ export default function Header({
           <AnimatePresence>
             {showWizard && (
               <KitchenWizardModal
-                onPromptReady={(prompt) => {
+                onPromptReady={(prompt, isKitchen) => {
                   $prompt.set(prompt);
+                  $isKitchenRoom.set(isKitchen);
                   $showWizard.set(false);
                   $pageStep.set("imagegen");
                 }}
