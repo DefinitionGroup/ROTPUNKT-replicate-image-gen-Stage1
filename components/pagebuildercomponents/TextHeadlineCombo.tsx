@@ -71,11 +71,11 @@ const spacingMap = {
 const stripInvisible = (v?: any) =>
   typeof v === "string"
     ? v
-        .replace(
-          /[\u0000-\u0020\u007F-\u009F\u00A0\u200B-\u200F\u2028\u2029\uFEFF]/g,
-          ""
-        )
-        .trim()
+      .replace(
+        /[\u0000-\u0020\u007F-\u009F\u00A0\u200B-\u200F\u2028\u2029\uFEFF]/g,
+        ""
+      )
+      .trim()
     : "";
 
 const normalizeOption = <T extends string>(
@@ -152,9 +152,8 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
   return (
     <div className="relative container max-w-5xl mx-auto my-12 px-4 selection:bg-brand-primary-2 selection:text-brand-secondary-1">
       <div
-        className={`relative ${
-          bleed ? "w-full" : "max-w-6xl"
-        } ${wrapperAlign} font-aspekta ${className}`}
+        className={`relative ${bleed ? "w-full" : "max-w-6xl"
+          } ${wrapperAlign} font-aspekta ${className}`}
       >
         <div className={`flex flex-col ${sizes.gap} ${spacingMap[spacing]}`}>
           {eyebrow && (
@@ -168,7 +167,7 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
 
           <motion.h1
             {...baseMotion(0.05)}
-            className={`font-semibold tracking-tight text-foreground leading-compress ${sizes.headline}`}
+            className={`font-light tracking-tight text-foreground leading-compress ${sizes.headline}`}
           >
             {typeof headline === "string" && highlight ? (
               <>
@@ -187,11 +186,9 @@ export default function TextHeadlineCombo(props: TextHeadlineComboProps) {
           {subhead && (
             <motion.p
               {...baseMotion(0.12)}
-              className={`${
-                sizes.subhead
-              } font-bold tracking-wider leading-relaxed text-muted-foreground ${
-                clamp ? `line-clamp-${clamp}` : ""
-              }`}
+              className={`${sizes.subhead
+                } font-normal tracking-wider leading-relaxed text-foreground ${clamp ? `line-clamp-${clamp}` : ""
+                }`}
             >
               {subhead}
             </motion.p>

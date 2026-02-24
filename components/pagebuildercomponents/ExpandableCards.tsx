@@ -157,14 +157,14 @@ export default function ExpandableCards({
                     {active.description && (
                       <motion.p
                         layoutId={`description-${active.description}-${id}`}
-                        className="text-foreground font-black text-5xl"
+                        className="text-foreground text-5xl"
                       >
                         {active.description}
                       </motion.p>
                     )}
                     <motion.h3
                       layoutId={`title-${active.title}-${id}`}
-                      className="text-xl text-foreground font-bold mt-4"
+                      className="text-xl text-foreground  mt-4"
                     >
                       {active.title}
                     </motion.h3>
@@ -177,7 +177,7 @@ export default function ExpandableCards({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="text-muted-foreground text-md md:text-base lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto font-bold [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
+                    className="text-foreground text-md md:text-base lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto font-medium [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                   >
                     {Array.isArray(active.body) ? (
                       <PortableText value={active.body as PortableTextBlock[]} />

@@ -41,7 +41,7 @@ const categoryConfig: Record<
     labelEn: "Standard Handles",
     order: 2,
   },
-  tokyo_grip: { labelDe: "Tokyo Griff", labelEn: "Tokyo Grip", order: 3 },
+  tokyo_grip: { labelDe: "Tokyo Griff", labelEn: "Tokyo Handle", order: 3 },
 };
 
 export const handleCatalog =

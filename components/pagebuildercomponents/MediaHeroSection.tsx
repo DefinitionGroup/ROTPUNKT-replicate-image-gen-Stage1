@@ -121,10 +121,10 @@ export default function MediaHeroSection({
           duration={animation.duration ?? 0.5}
           distance={animation.distance ?? 80}
         >
-          <h2 className="text-7xl leading-compress text-foreground max-w-3xl text-center font-bold tracking-wider leading-tighter mb-8">
+          <h2 className="text-7xl leading-compress text-foreground max-w-3xl font-light text-center  tracking-tightleading-tighter mb-2">
             {heading}
           </h2>
-          <p className="text-xl text-muted-foreground font-bold text-center max-w-2xl mx-auto">
+          <p className="text-xl text-foreground font-medium text-center max-w-2xl mx-auto">
             {subheading}
           </p>
 
