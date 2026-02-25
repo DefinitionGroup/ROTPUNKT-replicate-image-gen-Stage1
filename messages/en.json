@@ -33,7 +33,19 @@
       "description": "Start with one of our curated templates or create your own combination. All settings can be adjusted afterwards.",
       "customCombination": "Custom Combination",
       "customDescription": "Start with an empty selection and determine each step individually.",
-      "startNow": "Start now"
+      "startNow": "Start now",
+      "presets": {
+        "scandi": {
+          "label": "Scandi Interior",
+          "description": "Light wood, lots of daylight, and a nature-inspired setting.",
+          "extraWishes": "Large panoramic windows, matte fronts, subtle black accents, lots of green plants."
+        },
+        "luxury": {
+          "label": "Luxury Evening",
+          "description": "Burgundy statement kitchen in an elegant evening atmosphere.",
+          "extraWishes": "Indirect lighting, marble countertops, selected gold fixtures, reflective flooring."
+        }
+      }
     },
     "header": {
       "back": "Back",
@@ -196,6 +208,9 @@
     "auth": {
       "title": "You must be logged in to generate an image.",
       "description": "Please sign in or register. Afterwards you can continue directly."
+    },
+    "errors": {
+      "fillAllSteps": "Please complete all steps."
     },
     "summary": {
       "progress": "Progress",

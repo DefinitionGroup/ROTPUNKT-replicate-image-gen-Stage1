@@ -17,6 +17,7 @@ export interface WizardState {
   }
   extraWishes: string
   showAuthPrompt: boolean
+  resumeAfterAuth: boolean
   error: string
 }
 
@@ -25,6 +26,7 @@ const initialState: WizardState = {
   selectedOptions: {},
   extraWishes: '',
   showAuthPrompt: false,
+  resumeAfterAuth: false,
   error: ''
 }
 
@@ -40,8 +42,28 @@ if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        const parsed = JSON.parse(stored)
-        wizardStore.set(parsed)
+        const parsed = JSON.parse(stored) as Partial<WizardState>
+        const hydratedStep =
+          typeof parsed.currentStep === 'number'
+            ? Math.max(-1, Math.trunc(parsed.currentStep))
+            : initialState.currentStep
+
+        wizardStore.set({
+          ...initialState,
+          ...parsed,
+          currentStep: hydratedStep,
+          selectedOptions: {
+            ...initialState.selectedOptions,
+            ...(parsed.selectedOptions ?? {})
+          },
+          extraWishes:
+            typeof parsed.extraWishes === 'string'
+              ? parsed.extraWishes
+              : initialState.extraWishes,
+          showAuthPrompt: Boolean(parsed.showAuthPrompt),
+          resumeAfterAuth: Boolean(parsed.resumeAfterAuth),
+          error: typeof parsed.error === 'string' ? parsed.error : initialState.error
+        })
       }
     } catch {
       // Ignore localStorage errors
@@ -102,7 +124,21 @@ export const wizardActions = {
 
   setAuthPrompt: (show: boolean) => {
     const current = wizardStore.get()
-    wizardStore.set({ ...current, showAuthPrompt: show })
+    wizardStore.set({
+      ...current,
+      showAuthPrompt: show,
+      resumeAfterAuth: show ? current.resumeAfterAuth : false
+    })
+  },
+
+  requestAuth: () => {
+    const current = wizardStore.get()
+    wizardStore.set({
+      ...current,
+      showAuthPrompt: true,
+      resumeAfterAuth: true,
+      error: ''
+    })
   },
 
   applyPreset: (payload: { options: Partial<WizardState['selectedOptions']>; extraWishes?: string }) => {
@@ -113,6 +149,7 @@ export const wizardActions = {
       selectedOptions: { ...current.selectedOptions, ...payload.options },
       extraWishes: payload.extraWishes ?? current.extraWishes,
       showAuthPrompt: false,
+      resumeAfterAuth: false,
       error: ''
     })
   },

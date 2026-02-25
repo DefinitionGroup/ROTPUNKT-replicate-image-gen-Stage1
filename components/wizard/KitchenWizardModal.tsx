@@ -39,6 +39,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   onClose,
 }) => {
   const tSummary = useTranslations("wizard.summary");
+  const tIntroPresets = useTranslations("wizard.intro.presets");
+  const tErrors = useTranslations("wizard.errors");
   const wizardState = useStore(wizardStore);
   const { isSignedIn } = useAuth();
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -76,7 +78,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     setIsSummaryCollapsed(true);
     wizardActions.applyPreset({
       options: preset.options,
-      extraWishes: preset.extraWishes,
+      extraWishes: tIntroPresets(`${preset.id}.extraWishes`),
     });
     wizardActions.setStep(0);
   };
@@ -188,7 +190,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
 
   const handleSubmit = () => {
     if (summaryData.missingKeys.length > 0) {
-      wizardActions.setError("Bitte alle Schritte ausfüllen.");
+      wizardActions.setError(tErrors("fillAllSteps"));
       return;
     }
 
@@ -365,7 +367,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                         showAuthPrompt={wizardState.showAuthPrompt}
                         isSignedIn={!!isSignedIn}
                         onSubmit={handleSubmit}
-                        onAuthRequired={() => wizardActions.setAuthPrompt(true)}
+                        onAuthRequired={() => wizardActions.requestAuth()}
                         loading={loading}
                         showSubmitButton={true}
                       />
@@ -405,7 +407,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                         isSignedIn={!!isSignedIn}
                         loading={loading}
                         onSubmit={handleSubmit}
-                        onRequireAuth={() => wizardActions.setAuthPrompt(true)}
+                        onRequireAuth={() => wizardActions.requestAuth()}
                         onJumpToFinal={() => wizardActions.setStep(totalSteps)}
                         onJumpToStep={(index) => wizardActions.setStep(index)}
                       />

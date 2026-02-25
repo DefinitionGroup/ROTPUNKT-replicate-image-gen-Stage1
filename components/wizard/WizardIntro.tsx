@@ -19,6 +19,7 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
   loading = false,
 }) => {
   const t = useTranslations('wizard.intro');
+  const tPresets = useTranslations("wizard.intro.presets");
   const logoSrc = useRotpunktLogoSrc();
 
   return (
@@ -55,8 +56,10 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {wizardPresets.map((preset) => (
           <PresetSelectionCard
-            key={preset.label}
+            key={preset.id}
             preset={preset}
+            label={tPresets(`${preset.id}.label`)}
+            description={tPresets(`${preset.id}.description`)}
             disabled={loading}
             onSelect={() => onPresetSelect(preset)}
           />
@@ -89,11 +92,19 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
 
 interface PresetSelectionCardProps {
   preset: WizardPreset;
+  label: string;
+  description: string;
   onSelect: () => void;
   disabled: boolean;
 }
 
-function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCardProps) {
+function PresetSelectionCard({
+  preset,
+  label,
+  description,
+  onSelect,
+  disabled,
+}: PresetSelectionCardProps) {
   const [imageError, setImageError] = useState(false);
   const hasImage = typeof preset.previewImage === "string";
   const showImage = hasImage && !imageError;
@@ -111,7 +122,7 @@ function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCard
         {showImage ? (
           <Image
             src={preset.previewImage!}
-            alt={preset.label}
+            alt={label}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 320px"
@@ -122,12 +133,12 @@ function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCard
           <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-background" />
         )}
         <span className="absolute bottom-3 left-4 text-base font-semibold text-white drop-shadow">
-          {preset.label}
+          {label}
         </span>
       </div>
       <div className="p-4">
         <p className="text-xxs text-muted-foreground leading-relaxed">
-          {preset.description}
+          {description}
         </p>
       </div>
     </motion.button>

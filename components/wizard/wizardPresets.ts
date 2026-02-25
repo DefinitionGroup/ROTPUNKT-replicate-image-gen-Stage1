@@ -1,17 +1,16 @@
 import type { WizardState } from "@/app/store/wizardStore";
 
+export type WizardPresetId = "scandi" | "luxury";
+
 export type WizardPreset = {
-  label: string;
-  description: string;
+  id: WizardPresetId;
   previewImage?: string;
   options: Partial<WizardState["selectedOptions"]>;
-  extraWishes?: string;
 };
 
 export const wizardPresets: WizardPreset[] = [
   {
-    label: "Scandi Innenansicht",
-    description: "Helle Holzoptik, viel Tageslicht und ein naturnahes Setting.",
+    id: "scandi",
     previewImage: "/wizard-presets/scandi.jpg",
     options: {
       kind: "kueche",
@@ -21,12 +20,9 @@ export const wizardPresets: WizardPreset[] = [
       viewpoint: "eye level shot",
       time: "afternoon, warm afternoon light",
     },
-    extraWishes:
-      "Große Panoramafenster, matte Fronten, dezente schwarze Akzente, viel Grünpflanzen.",
   },
   {
-    label: "Luxury Evening",
-    description: "Burgunderrote Statement-Küche in eleganter Abendstimmung.",
+    id: "luxury",
     previewImage: "/wizard-presets/luxury.jpg",
     options: {
       kind: "kueche",
@@ -36,7 +32,5 @@ export const wizardPresets: WizardPreset[] = [
       viewpoint: "full room view, interior panorama",
       time: "evening, interior lighting, ambient lamps",
     },
-    extraWishes:
-      "Indirekte Beleuchtung, Marmorarbeitsplatten, einzelne goldene Armaturen, reflektierender Boden.",
   },
 ];
