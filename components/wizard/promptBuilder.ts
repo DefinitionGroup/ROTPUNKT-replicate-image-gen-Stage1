@@ -5,7 +5,10 @@ import {
   getFrontfarbenColorByValue,
   isFrontfarbenColorValue,
 } from "./frontfarbenCatalog";
-import { getHandlePromptDescriptor } from "./handleCatalog";
+import {
+  getHandlePromptDescriptor,
+  getHandleSelectionByValue,
+} from "./handleCatalog";
 
 export type PromptBuildResult = {
   prompt: string;
@@ -123,6 +126,97 @@ const COLOR_DESCRIPTIONS: Record<string, string> = {
     "Dark stained wood cabinet fronts, deep brown wood grain cabinetry surfaces with rich dark timber finish.",
 };
 
+type TimeOfDaySpec = {
+  label: string;
+  description: string;
+  lock: string;
+};
+
+const TIME_OF_DAY_SPECS: Record<string, TimeOfDaySpec> = {
+  "early morning, dawn light, first light of day": {
+    label: "early morning",
+    description:
+      "Early morning dawn lighting with low sun angle, cool bluish ambient fill, soft warm sunrise rim highlights, and long gentle shadows across the room.",
+    lock:
+      "The image must read unmistakably as early morning at first glance, never as midday, afternoon, or night.",
+  },
+  "late morning, mid-morning sunlight": {
+    label: "late morning",
+    description:
+      "Late-morning daylight with clear but still soft sun, neutral-warm brightness, and defined natural shadows from windows without harsh noon contrast.",
+    lock:
+      "The image must clearly feel like late morning and not afternoon golden hour or evening.",
+  },
+  "noon, midday, high sun, harsh shadows": {
+    label: "noon",
+    description:
+      "Midday lighting with high sun position, bright high-intensity daylight, crisp hard-edged shadows, and strong contrast on horizontal surfaces.",
+    lock:
+      "The scene must be unmistakably midday with strong top-down daylight, not soft morning or evening light.",
+  },
+  "afternoon, warm afternoon light": {
+    label: "afternoon",
+    description:
+      "Warm afternoon light with sun from a medium-low angle, slightly golden highlights, and softer elongated shadows than noon.",
+    lock:
+      "The final image must read as warm afternoon light, not neutral midday and not evening.",
+  },
+  "golden hour, magic hour, warm orange sunlight": {
+    label: "golden hour",
+    description:
+      "Golden-hour lighting with strong warm amber-orange sunlight, dramatic long shadows, warm directional glow, and cinematic contrast between lit and shaded areas.",
+    lock:
+      "Golden hour must dominate the mood immediately and visually, with clearly warm low-angle sunlight.",
+  },
+  "dusk, twilight, blue hour": {
+    label: "dusk / blue hour",
+    description:
+      "Blue-hour twilight with cool blue ambient exterior light, lowered daylight intensity, and subtle transition toward artificial interior illumination.",
+    lock:
+      "The scene must clearly read as dusk/blue hour and not daytime; cool twilight ambience is mandatory.",
+  },
+  "evening, interior lighting, ambient lamps": {
+    label: "evening",
+    description:
+      "Evening ambiance with dim cool exterior light and clearly visible warm practical interior lighting from lamps and fixtures, creating layered pools of light and soft long shadows.",
+    lock:
+      "Evening mood is highest priority: the result must instantly read as evening with dominant warm interior lighting against darker surroundings.",
+  },
+  "night, nighttime, dark exterior, interior lights glowing": {
+    label: "night",
+    description:
+      "Night scene with dark exterior, minimal natural light, strong interior glow from artificial light sources, and high contrast between illuminated furniture and dark background zones.",
+    lock:
+      "The image must be unmistakably nighttime with dark exterior context and visible interior light glow.",
+  },
+};
+
+function capitalize(value: string): string {
+  if (!value) return value;
+  return value[0].toUpperCase() + value.slice(1);
+}
+
+function getTimeOfDaySpec(time?: string): TimeOfDaySpec | undefined {
+  if (!time) return undefined;
+  return (
+    TIME_OF_DAY_SPECS[time] ?? {
+      label: time,
+      description: `${capitalize(time)}.`,
+      lock: `Time-of-day selection "${time}" must be clearly visible in the final image.`,
+    }
+  );
+}
+
+function normalizeAccessories(
+  accessories?: WizardState["selectedOptions"]["accessories"]
+): string[] {
+  if (!accessories) return [];
+  if (Array.isArray(accessories)) return accessories;
+  return Object.keys(accessories).filter(
+    (key) => (accessories as Record<string, boolean>)[key]
+  );
+}
+
 /**
  * Replace "kitchen" references in handle promptCaptions for non-kitchen rooms.
  * All 97 handle entries contain "kitchen" which contradicts the non-kitchen
@@ -177,10 +271,12 @@ export function buildPrompt({
     !isFenix && !isFrontfarbe ? getLabel("color", colorSelection) : undefined;
   const environment = getLabel("environment", selections.environment);
   const time = selections.time;
+  const timeSpec = getTimeOfDaySpec(time);
   const handleSelection = getHandlePromptDescriptor(selections.handle);
+  const handleEntry = getHandleSelectionByValue(selections.handle);
   const viewpoint = selections.viewpoint || "eye level shot";
   const floor = selections.floor;
-  const accessories = selections.accessories;
+  const accessoriesArray = normalizeAccessories(selections.accessories);
 
   // 1. Opening + Subject & Style as natural language
   let opening = isKitchenRoom
@@ -207,35 +303,74 @@ export function buildPrompt({
   }
   sections.push(opening);
 
-  // 2. Camera & Composition (dedicated section for T5 attention priority)
+  const selectionLock: string[] = [];
+  if (environment) selectionLock.push(`Environment: ${environment}`);
+  if (effectiveKind) selectionLock.push(`Room concept: ${effectiveKind}`);
+  if (selections.kitchenLook && kitchenLayoutLabel) {
+    selectionLock.push(`Kitchen layout: ${kitchenLayoutLabel}`);
+  }
+  if (style) selectionLock.push(`Style: ${style}`);
+  if (timeSpec) selectionLock.push(`Time of day: ${timeSpec.label}`);
+  selectionLock.push(`Camera perspective: ${viewpoint}`);
+  if (floor) selectionLock.push(`Flooring: ${floor}`);
+  if (handleEntry) selectionLock.push(`Handle selection: ${handleEntry.labelEn}`);
+  if (accessoriesArray.length > 0) {
+    selectionLock.push(`Accessories: ${accessoriesArray.join(", ")}`);
+  }
+  if (selectionLock.length > 0) {
+    sections.push(
+      `Critical adherence requirement: all selected configuration choices must be visible together in one coherent scene. Mandatory selection lock: ${selectionLock.join(
+        "; "
+      )}.`
+    );
+  }
+
+  // 2. Time of day & lighting (highest priority)
+  if (timeSpec) {
+    sections.push(
+      `Time of day and lighting (highest priority): ${timeSpec.description}`
+    );
+    sections.push(`Time-of-day lock: ${timeSpec.lock}`);
+  }
+
+  // 3. Camera & Composition (dedicated section for T5 attention priority)
   const expandedViewpoint =
     VIEWPOINT_DESCRIPTIONS[viewpoint] ??
-    `${viewpoint[0].toUpperCase() + viewpoint.slice(1)}.`;
+    `${capitalize(viewpoint)}.`;
   sections.push(expandedViewpoint);
-
-  // 3. Lighting & Atmosphere
-  if (time) {
-    sections.push(`${time[0].toUpperCase() + time.slice(1)}.`);
-  }
 
   // 4. Colors & Materials (natural language, no labels)
   const fenixDesc = PROMPT_LANGUAGE === "en"
     ? fenixColor?.englishDescription
     : fenixColor?.description;
+  let colorSelectionSummary: string | undefined;
 
   if (isFenix && fenixColor) {
+    colorSelectionSummary = `FENIX ${fenixColor.name} (${fenixColor.hex})`;
     sections.push(
       `Furniture surfaces in ${fenixDesc}, FENIX ${fenixColor.name} (${fenixColor.hex}).`
     );
   } else if (isFrontfarbe && frontfarbe) {
+    const frontfarbeLabel =
+      PROMPT_LANGUAGE === "en" ? frontfarbe.labelEn : frontfarbe.labelDe;
+    const frontfarbeMaterial =
+      PROMPT_LANGUAGE === "en"
+        ? frontfarbe.materialTypeEn
+        : frontfarbe.materialTypeDe;
+    colorSelectionSummary = `${frontfarbeLabel} (${frontfarbe.id}, ${frontfarbeMaterial})`;
     sections.push(
-      `Front color "${frontfarbe.labelDe}" (Catalog ${frontfarbe.id}, ${frontfarbe.materialTypeDe}).`
+      `Front color "${frontfarbeLabel}" (Catalog ${frontfarbe.id}, ${frontfarbeMaterial}).`
     );
   } else if (colorLabel) {
+    colorSelectionSummary = colorLabel;
     const expandedColor =
       COLOR_DESCRIPTIONS[colorLabel.toLowerCase()] ??
       `${colorLabel} color palette.`;
     sections.push(expandedColor);
+  }
+
+  if (colorSelectionSummary) {
+    sections.push(`Color lock: keep the selected color direction "${colorSelectionSummary}" clearly dominant.`);
   }
 
   // 5. Flooring
@@ -265,14 +400,8 @@ export function buildPrompt({
   }
 
   // 9. Accessories / Decor
-  if (accessories) {
-    const accessoriesArray = Array.isArray(accessories)
-      ? accessories
-      : Object.keys(accessories).filter(key => (accessories as Record<string, boolean>)[key]);
-
-    if (accessoriesArray.length > 0) {
-      sections.push(`${accessoriesArray.join(", ")}.`);
-    }
+  if (accessoriesArray.length > 0) {
+    sections.push(`${accessoriesArray.join(", ")}.`);
   }
 
   // 10. Technical Requirements (positive phrasing — FLUX ignores negative prompts)
@@ -291,6 +420,11 @@ export function buildPrompt({
   if (wishes) {
     sections.push(`${wishes}.`);
   }
+
+  // 12. Final adherence reminder
+  sections.push(
+    "Final adherence priority: do not average out or ignore selected options. Keep every selected choice explicit, and make the chosen time-of-day lighting immediately recognizable."
+  );
 
   const prompt = sections.join(" ");
 

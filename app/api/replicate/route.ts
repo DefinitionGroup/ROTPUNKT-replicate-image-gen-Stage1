@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
         input: {
           prompt: finalPrompt,
           go_fast: false,
-          guidance: 5.0,
+          guidance: 6.0,
           image_size: "optimize_for_speed",
           lora_scale: kitchenMode ? 0.85 : 0.65,
           aspect_ratio: "16:9",
