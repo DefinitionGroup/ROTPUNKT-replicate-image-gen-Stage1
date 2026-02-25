@@ -37,13 +37,23 @@
       "presets": {
         "scandi": {
           "label": "Scandi Innenansicht",
-          "description": "Helle Holzoptik, viel Tageslicht und ein naturnahes Setting.",
-          "extraWishes": "Große Panoramafenster, matte Fronten, dezente schwarze Akzente, viel Grünpflanzen."
+          "description": "Helle Eichenoptik, ruhige Formensprache und eine sanfte Tageslichtküche mit Insel.",
+          "extraWishes": "Bodentiefe Fenster, schlanke matte Arbeitsplatte, Leinentextilien und dezente schwarze Details."
         },
         "luxury": {
-          "label": "Luxury Evening",
-          "description": "Burgunderrote Statement-Küche in eleganter Abendstimmung.",
-          "extraWishes": "Indirekte Beleuchtung, Marmorarbeitsplatten, einzelne goldene Armaturen, reflektierender Boden."
+          "label": "Luxus am Abend",
+          "description": "Burgunderrote Penthouse-Küche mit poliertem Marmor und eleganter Abendatmosphäre.",
+          "extraWishes": "Skulpturale Pendelleuchten, hochwertige Steinadern, Messingakzente und cinematische Lichtstimmung."
+        },
+        "urbanLoft": {
+          "label": "Urbaner Loft-Kontrast",
+          "description": "Schwarze Fronten, Betonmaterialien und ein markanter metropolitaner Loft-Look.",
+          "extraWishes": "Sichtbare Strukturen, Rauchglas-Details, kuratierte Objekte und gerichtetes Akzentlicht."
+        },
+        "organicModern": {
+          "label": "Organisch Modern",
+          "description": "Warme Naturmaterialien, griffloses Design und ein entspannt moderner Landhaus-Charakter.",
+          "extraWishes": "Offene Regalmomente, handgefertigte Keramik, warme Eichtöne und weiche Sonnenuntergangsreflexe."
         }
       }
     },

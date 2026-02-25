@@ -37,13 +37,23 @@
       "presets": {
         "scandi": {
           "label": "Scandi Interior",
-          "description": "Light wood, lots of daylight, and a nature-inspired setting.",
-          "extraWishes": "Large panoramic windows, matte fronts, subtle black accents, lots of green plants."
+          "description": "Bright oak textures, calm styling, and a soft daylight kitchen with island.",
+          "extraWishes": "Floor-to-ceiling windows, thin matte worktop, linen textiles, and subtle black details."
         },
         "luxury": {
           "label": "Luxury Evening",
-          "description": "Burgundy statement kitchen in an elegant evening atmosphere.",
-          "extraWishes": "Indirect lighting, marble countertops, selected gold fixtures, reflective flooring."
+          "description": "A rich burgundy penthouse kitchen with polished marble and warm evening mood.",
+          "extraWishes": "Architectural pendant lights, premium stone veining, brass highlights, and cinematic ambient glow."
+        },
+        "urbanLoft": {
+          "label": "Urban Loft Contrast",
+          "description": "Black fronts, concrete base materials, and a bold metropolitan loft expression.",
+          "extraWishes": "Exposed structure, smoked glass details, curated objects, and directional accent lighting."
+        },
+        "organicModern": {
+          "label": "Organic Modern",
+          "description": "Warm natural materials, handleless fronts, and a relaxed modern country-house feel.",
+          "extraWishes": "Open shelving moments, handcrafted ceramics, warm oak tones, and soft sunset reflections."
         }
       }
     },

@@ -80,7 +80,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       options: preset.options,
       extraWishes: tIntroPresets(`${preset.id}.extraWishes`),
     });
-    wizardActions.setStep(0);
+    wizardActions.setStep(totalSteps);
   };
 
   const startBlank = () => {
