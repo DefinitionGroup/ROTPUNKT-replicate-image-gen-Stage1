@@ -1267,7 +1267,7 @@
   {
     "id": "266ME",
     "materialTypeDe": "Front mit Metalloberfläche",
-    "materialTypeEn": "Metal surface front",
+    "materialTypeEn": "Real Metal surface door",
     "subcategory": "ME",
     "colorCode": "266",
     "labelDe": "COPPER (ME)",
@@ -1278,7 +1278,7 @@
   {
     "id": "267ME",
     "materialTypeDe": "Front mit Metalloberfläche",
-    "materialTypeEn": "Metal surface front",
+    "materialTypeEn": "Real Metal surface door",
     "subcategory": "ME",
     "colorCode": "267",
     "labelDe": "BRASS (ME)",
@@ -1289,7 +1289,7 @@
   {
     "id": "268ME",
     "materialTypeDe": "Front mit Metalloberfläche",
-    "materialTypeEn": "Metal surface front",
+    "materialTypeEn": "Real Metal surface door",
     "subcategory": "ME",
     "colorCode": "268",
     "labelDe": "INOX (ME)",
