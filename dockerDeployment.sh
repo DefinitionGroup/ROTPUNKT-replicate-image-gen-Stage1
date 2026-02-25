@@ -6,55 +6,64 @@ trap 'echo "ERROR: Deployment failed at line $LINENO with exit code $?" >&2; exi
 
 # Variables
 IMAGE_NAME="rotpunkt-image-gen"
+IMAGE_NEW="${IMAGE_NAME}:new"
 CONTAINER_NAME="my-rotpunkt-image-gen"
 DOCKERFILE_PATH="."
 PORT_MAPPING="7000:7000"
 
-# Function to remove old images (optional)
+# Function to remove dangling/unused images
 cleanup_images() {
-  echo "Cleaning up old images..."
-  docker image prune -a -f
-  echo "Image cleanup complete."
+    echo "Cleaning up unused images..."
+    docker image prune -f
+    echo "Image cleanup complete."
 }
 
 cleanup_build_cache() {
-  echo "Cleaning build cache"
-  docker builder prune -f
-  docker system prune -af --filter "until=$((30*24))h"
+    echo "Cleaning build cache (older than 7 days)..."
+    docker builder prune -f --filter "until=168h"
 }
 
-# Function to stop and remove the old container if it exists
-clean_up() {
-    echo "Stopping and removing old container if it exists..."
-    # These may fail if container doesn't exist - that's OK
+# Function to build the Docker image (tagged as :new first)
+build_image() {
+    echo "Building new Docker image as ${IMAGE_NEW}..."
+    DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NEW" "$DOCKERFILE_PATH"
+}
+
+# Function to swap: stop old container, retag image, start new container
+swap_containers() {
+    echo "Build succeeded — swapping containers..."
+
+    # Stop and remove the old container (if running)
+    echo "Stopping old container..."
     docker stop "$CONTAINER_NAME" 2>/dev/null || true
     docker rm "$CONTAINER_NAME" 2>/dev/null || true
-    cleanup_images
-    cleanup_build_cache
-}
 
-# Function to build the Docker image
-build_image() {
-    echo "Building new Docker image..."
-    DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" "$DOCKERFILE_PATH"
-}
+    # Remove old image tag and promote the new one
+    docker rmi "$IMAGE_NAME" 2>/dev/null || true
+    docker tag "$IMAGE_NEW" "$IMAGE_NAME"
+    docker rmi "$IMAGE_NEW" 2>/dev/null || true
 
-# Function to run the Docker container
-run_container() {
-    echo "Running new Docker container..."
-    docker run -d --restart always -p "$PORT_MAPPING" -e PORT=7000 -e HOST=0.0.0.0 --name "$CONTAINER_NAME" "$IMAGE_NAME"
+    # Start the new container
+    echo "Starting new container..."
+    docker run -d --restart always \
+        -p "$PORT_MAPPING" \
+        -e PORT=7000 \
+        -e HOST=0.0.0.0 \
+        --name "$CONTAINER_NAME" \
+        "$IMAGE_NAME"
 }
 
 # Main script execution
 echo "Starting deployment process..."
 
-# Clean up old container
-clean_up
-
-# Build new image
+# 1) Build new image — old container keeps running during build
 build_image
 
-# Run new container
-run_container
+# 2) Build succeeded → stop old, start new
+swap_containers
+
+# 3) Clean up
+cleanup_images
+cleanup_build_cache
 
 echo "Deployment completed successfully."
