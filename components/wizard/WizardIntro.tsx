@@ -19,6 +19,7 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
   loading = false,
 }) => {
   const t = useTranslations('wizard.intro');
+  const tPresets = useTranslations("wizard.intro.presets");
   const logoSrc = useRotpunktLogoSrc();
 
   return (
@@ -55,8 +56,10 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {wizardPresets.map((preset) => (
           <PresetSelectionCard
-            key={preset.label}
+            key={preset.id}
             preset={preset}
+            label={tPresets(`${preset.id}.label`)}
+            description={tPresets(`${preset.id}.description`)}
             disabled={loading}
             onSelect={() => onPresetSelect(preset)}
           />
@@ -64,20 +67,20 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
 
         <motion.button
           type="button"
-          className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-dashed border-border bg-card/80 p-6 text-left transition hover:border-brand-primary-2/80 hover:bg-brand-primary-2/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/60"
+          className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-white/35 bg-brand-primary-2 p-6 text-left text-white shadow-[0_10px_32px_rgba(220,38,38,0.35)] transition hover:bg-red-600 hover:shadow-[0_16px_40px_rgba(220,38,38,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
           whileHover={{ translateY: -2 }}
           whileTap={{ scale: 0.99 }}
           onClick={onBlankStart}
           disabled={loading}
         >
-          <div className="flex items-center justify-center h-14 w-14 rounded-full bg-brand-primary-2/10 text-brand-primary-2">
+          <div className="flex items-center justify-center h-14 w-14 rounded-full border border-white/40 bg-white/10 text-white">
             <FaRegCompass className="h-6 w-6" />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-base font-semibold text-foreground">
+            <span className="text-base font-semibold text-white">
               {t('customCombination')}
             </span>
-            <p className="text-xxs text-muted-foreground leading-relaxed">
+            <p className="text-xxs text-white/90 leading-relaxed">
               {t('customDescription')}
             </p>
           </div>
@@ -89,11 +92,19 @@ export const WizardIntro: React.FC<WizardIntroProps> = ({
 
 interface PresetSelectionCardProps {
   preset: WizardPreset;
+  label: string;
+  description: string;
   onSelect: () => void;
   disabled: boolean;
 }
 
-function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCardProps) {
+function PresetSelectionCard({
+  preset,
+  label,
+  description,
+  onSelect,
+  disabled,
+}: PresetSelectionCardProps) {
   const [imageError, setImageError] = useState(false);
   const hasImage = typeof preset.previewImage === "string";
   const showImage = hasImage && !imageError;
@@ -111,7 +122,7 @@ function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCard
         {showImage ? (
           <Image
             src={preset.previewImage!}
-            alt={preset.label}
+            alt={label}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 320px"
@@ -122,12 +133,12 @@ function PresetSelectionCard({ preset, onSelect, disabled }: PresetSelectionCard
           <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-background" />
         )}
         <span className="absolute bottom-3 left-4 text-base font-semibold text-white drop-shadow">
-          {preset.label}
+          {label}
         </span>
       </div>
       <div className="p-4">
         <p className="text-xxs text-muted-foreground leading-relaxed">
-          {preset.description}
+          {description}
         </p>
       </div>
     </motion.button>

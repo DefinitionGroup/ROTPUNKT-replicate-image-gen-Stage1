@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { prompt } = await req.json();
+    const { prompt, isKitchen } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -43,6 +43,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Default to kitchen mode for backward compatibility
+    const kitchenMode = typeof isKitchen === "boolean" ? isKitchen : true;
 
     if (!MODEL_VERSION) {
       throw new Error("Replicate model version is not configured");
@@ -56,14 +59,14 @@ export async function POST(req: NextRequest) {
         input: {
           prompt: finalPrompt,
           go_fast: false,
-          guidance: 3.5,
+          guidance: 6.0,
           image_size: "optimize_for_speed",
-          lora_scale: 0.85,
+          lora_scale: kitchenMode ? 0.85 : 0.65,
           aspect_ratio: "16:9",
           output_format: "webp",
           enhance_prompt: false,
           output_quality: 80,
-          seed: 503461301,
+          seed: Math.floor(Math.random() * 2 ** 32),
           num_inference_steps: 28,
           num_outputs: 1,
         },

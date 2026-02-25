@@ -125,7 +125,7 @@ function Stylesheet() {
       }
 
       .title {
-        color: var(--foreground);
+        color: #fff;
         padding: 10px;
         font-size: 16px;
         font-weight: 600;
@@ -135,8 +135,8 @@ function Stylesheet() {
         justify-content: center;
         position: absolute;
         inset: 0;
-        text-shadow: 1px 1px 0px color-mix(in oklab, var(--background) 70%, transparent);
-        background: linear-gradient(180deg, transparent 40%, color-mix(in oklab, var(--background) 70%, transparent) 100%);
+        text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.7);
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.5) 100%);
       }
     `}</style>
   );

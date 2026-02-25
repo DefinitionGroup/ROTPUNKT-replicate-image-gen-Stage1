@@ -1,18 +1,20 @@
 "use client";
 
 import React from "react";
+import { useEffect } from "react";
 import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Header as HeaderType } from "@/sanity/sanity.types";
 import { $showWizard } from "@/app/store/modals";
-import { $prompt } from "@/app/store/prompt";
+import { $prompt, $isKitchenRoom } from "@/app/store/prompt";
 import { $pageStep } from "@/app/store/step";
 import { AnimatePresence } from "motion/react";
 import { IntroCard } from "@/components/wizard/IntroCard";
 import { useStore } from "@nanostores/react";
 import { KitchenWizardModal } from "@/components/wizard/KitchenWizardModal";
-import { wizardActions } from "@/app/store/wizardStore";
+import { useAuth } from "@clerk/nextjs";
+import { wizardActions, wizardStore } from "@/app/store/wizardStore";
 import ImageGenerator from "@/components/wizard/ImageGenerator";
 type Props = HeaderType & {
   logoImage?: string;
@@ -43,6 +45,26 @@ export default function Header({
   };
   const pageStep = useStore($pageStep);
   const showWizard = useStore($showWizard);
+  const wizardState = useStore(wizardStore);
+  const { isLoaded, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !wizardState.resumeAfterAuth) {
+      return;
+    }
+
+    if (wizardState.currentStep < 0) {
+      return;
+    }
+
+    $showWizard.set(true);
+    wizardActions.setAuthPrompt(false);
+  }, [
+    isLoaded,
+    isSignedIn,
+    wizardState.currentStep,
+    wizardState.resumeAfterAuth,
+  ]);
 
   const logoVariants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -168,8 +190,9 @@ export default function Header({
           <AnimatePresence>
             {showWizard && (
               <KitchenWizardModal
-                onPromptReady={(prompt) => {
+                onPromptReady={(prompt, isKitchen) => {
                   $prompt.set(prompt);
+                  $isKitchenRoom.set(isKitchen);
                   $showWizard.set(false);
                   $pageStep.set("imagegen");
                 }}

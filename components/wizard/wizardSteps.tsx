@@ -275,13 +275,13 @@ export const wizardSteps: WizardStepDefinition[] = [
             value: "early morning, dawn light, first light of day",
             labelKey: "wizard.options.frueherMorgen",
             germanLabel: "Früher Morgen",
-            image: "/wizard-presets/time-fruehmorgen.jpg",
+            image: "/wizard-presets/time-morgen.jpg",
           },
           {
             value: "late morning, mid-morning sunlight",
             labelKey: "wizard.options.spaeterVormittag",
             germanLabel: "Später Vormittag",
-            image: "/wizard-presets/time-spaetervormittag.jpg",
+            image: "/wizard-presets/time-vormittag.jpg",
           },
           {
             value: "noon, midday, high sun, harsh shadows",
@@ -299,13 +299,13 @@ export const wizardSteps: WizardStepDefinition[] = [
             value: "golden hour, magic hour, warm orange sunlight",
             labelKey: "wizard.options.goldeneStunde",
             germanLabel: "Goldene Stunde",
-            image: "/wizard-presets/time-goldenestunde.jpg",
+            image: "/wizard-presets/time-golden.jpg",
           },
           {
             value: "dusk, twilight, blue hour",
             labelKey: "wizard.options.abenddaemmerung",
             germanLabel: "Abenddämmerung",
-            image: "/wizard-presets/time-abenddaemmerung.jpg",
+            image: "/wizard-presets/time-abenddaemmerung.webp",
           },
           {
             value: "evening, interior lighting, ambient lamps",

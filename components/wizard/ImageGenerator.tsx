@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
-import { $prompt } from "@/store/prompt";
+import { $prompt, $isKitchenRoom } from "@/store/prompt";
 import { $pageStep } from "@/store/step";
 import { wizardActions } from "@/store/wizardStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -29,6 +29,7 @@ interface StatusGenerationResponse {
 
 interface StartGenerationParams {
   prompt: string;
+  isKitchen: boolean;
   signal: AbortSignal;
 }
 
@@ -40,10 +41,11 @@ interface PollGenerationParams {
 
 async function startGenerationApi({
   prompt,
+  isKitchen,
   signal,
 }: StartGenerationParams): Promise<StartGenerationResponse> {
   const res = await fetch("/api/replicate", {
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ prompt, isKitchen }),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -104,6 +106,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       const controller = new AbortController();
       const data = await startGenerationApi({
         prompt: p,
+        isKitchen: $isKitchenRoom.get(),
         signal: controller.signal,
       });
       if (isDev) console.log("[ImageGenerator] Prediction started:", data);

@@ -33,7 +33,29 @@
       "description": "Beginnen Sie mit einer unserer kuratierten Vorlagen oder stellen Sie Ihre eigene Kombination zusammen. Alle Einstellungen können anschließend noch angepasst werden.",
       "customCombination": "Eigene Kombination",
       "customDescription": "Starten Sie mit einer leeren Auswahl und bestimmen Sie jeden Schritt individuell.",
-      "startNow": "Jetzt starten"
+      "startNow": "Jetzt starten",
+      "presets": {
+        "scandi": {
+          "label": "Scandi Innenansicht",
+          "description": "Helle Eichenoptik, ruhige Formensprache und eine sanfte Tageslichtküche mit Insel.",
+          "extraWishes": "Bodentiefe Fenster, schlanke matte Arbeitsplatte, Leinentextilien und dezente schwarze Details."
+        },
+        "luxury": {
+          "label": "Luxus am Abend",
+          "description": "Burgunderrote Penthouse-Küche mit poliertem Marmor und eleganter Abendatmosphäre.",
+          "extraWishes": "Skulpturale Pendelleuchten, hochwertige Steinadern, Messingakzente und cinematische Lichtstimmung."
+        },
+        "urbanLoft": {
+          "label": "Urbaner Loft-Kontrast",
+          "description": "Schwarze Fronten, Betonmaterialien und ein markanter metropolitaner Loft-Look.",
+          "extraWishes": "Sichtbare Strukturen, Rauchglas-Details, kuratierte Objekte und gerichtetes Akzentlicht."
+        },
+        "organicModern": {
+          "label": "Organisch Modern",
+          "description": "Warme Naturmaterialien, griffloses Design und ein entspannt moderner Landhaus-Charakter.",
+          "extraWishes": "Offene Regalmomente, handgefertigte Keramik, warme Eichtöne und weiche Sonnenuntergangsreflexe."
+        }
+      }
     },
     "header": {
       "back": "Zurück",
@@ -196,6 +218,9 @@
     "auth": {
       "title": "Du musst eingeloggt sein, um ein Bild zu generieren.",
       "description": "Bitte melde dich an oder registriere dich. Danach kannst du direkt fortfahren."
+    },
+    "errors": {
+      "fillAllSteps": "Bitte alle Schritte ausfüllen."
     },
     "summary": {
       "progress": "Fortschritt",

@@ -1,5 +1,6 @@
 import { DocumentIcon } from '@sanity/icons'
 import { defineField, defineType } from 'sanity'
+import { pageBuilderMembers } from './pageBuilderType'
 
 export const pageType = defineType({
   name: 'page',
@@ -26,7 +27,9 @@ export const pageType = defineType({
     }),
     defineField({
       name: 'content',
-      type: 'pageBuilder',
+      title: 'Content',
+      type: 'array',
+      of: pageBuilderMembers,
     }),
     defineField({
       name: 'mainImage',
