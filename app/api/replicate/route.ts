@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
         input: {
           prompt: finalPrompt,
           go_fast: false,
-          guidance: 6.0,
+          guidance: 6.8,
           image_size: "optimize_for_speed",
           lora_scale: kitchenMode ? 0.85 : 0.65,
           aspect_ratio: "16:9",
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
           enhance_prompt: false,
           output_quality: 80,
           seed: Math.floor(Math.random() * 2 ** 32),
-          num_inference_steps: 28,
+          num_inference_steps: 32,
           num_outputs: 1,
         },
       }),

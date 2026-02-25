@@ -1,18 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
 import { $prompt, $isKitchenRoom } from "@/store/prompt";
 import { $pageStep } from "@/store/step";
-import { wizardActions } from "@/store/wizardStore";
+import { wizardActions, wizardStore } from "@/store/wizardStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
+import { buildPrompt } from "./promptBuilder";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -85,11 +86,34 @@ async function pollGenerationApi({
 
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
+  const wizardState = useStore(wizardStore);
   const t = useTranslations('imageGenerator');
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
   const [predictionId, setPredictionId] = useState<string | null>(null);
+  const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
+    .trim()
+    .replace(/^['"]|['"]$/g, "")
+    .toLowerCase();
+  const showPromptDebugPopover =
+    isDev &&
+    (promptDebugEnv === "true" ||
+      promptDebugEnv === "1" ||
+      promptDebugEnv === "yes" ||
+      promptDebugEnv === "on");
+  const [isPromptDebugOpen, setIsPromptDebugOpen] = useState(
+    showPromptDebugPopover
+  );
+
+  const summaryData = useMemo(
+    () =>
+      buildPrompt({
+        selections: wizardState.selectedOptions,
+        extraWishes: wizardState.extraWishes,
+      }),
+    [wizardState.selectedOptions, wizardState.extraWishes]
+  );
 
   // Ref to prevent duplicate starts for identical prompt strings.
   const hasTriggered = useRef<string | null>(null);
@@ -212,6 +236,66 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="w-full mx-autoflex flex-col justify-center items-center">
+      {showPromptDebugPopover && (
+        <div className="fixed top-4 right-4 z-[1000000000] w-[calc(100vw-2rem)] max-w-[36rem] pointer-events-auto">
+          <div className="rounded-xl border border-border/70 bg-card/95 shadow-xl backdrop-blur-md overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setIsPromptDebugOpen((value) => !value)}
+              className="w-full px-3 py-2 text-left text-xs font-semibold tracking-wide text-foreground bg-muted/70 hover:bg-muted transition-colors"
+            >
+              Prompt Debug
+            </button>
+
+            <AnimatePresence initial={false}>
+              {isPromptDebugOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.15 }}
+                  className="p-3"
+                >
+                  <p className="text-xs text-muted-foreground">
+                    Step:{" "}
+                    <span className="font-medium text-foreground">
+                      image generation
+                    </span>
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Missing:{" "}
+                    <span className="font-medium text-foreground">
+                      {summaryData.missingKeys.length > 0
+                        ? summaryData.missingKeys.join(", ")
+                        : "none"}
+                    </span>
+                  </p>
+
+                  <div className="mt-3 max-h-[50dvh] overflow-auto rounded-md border border-border/70 bg-background/80 p-3 text-left">
+                    {summaryData.sections.length > 0 ? (
+                      <div className="space-y-2">
+                        {summaryData.sections.map((section, index) => (
+                          <p
+                            key={`${index}-${section.slice(0, 24)}`}
+                            className="text-xs leading-relaxed text-foreground break-words"
+                          >
+                            {section}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs leading-relaxed text-foreground">
+                        {prompt || "Prompt is currently empty."}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
       {onBack && hasImages && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
 
       <AnimatePresence mode="wait">
