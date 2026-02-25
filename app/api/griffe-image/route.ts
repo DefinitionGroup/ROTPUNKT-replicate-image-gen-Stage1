@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
-const GRIFFE_DIR = path.resolve(process.cwd(), "grifffronten");
+const GRIFFE_DIR = path.resolve(process.cwd(), "public", "grifffronten");
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]);
 const VERBOSE_LOGS =
   process.env.DEBUG_IMAGE_PROXY === "true" ||
