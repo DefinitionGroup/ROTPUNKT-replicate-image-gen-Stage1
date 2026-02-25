@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
-const FRONTFARBEN_DIR = path.resolve(process.cwd(), "Frontfarben");
+const FRONTFARBEN_DIR = path.resolve(process.cwd(), "public", "Frontfarben");
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]);
 const VERBOSE_LOGS =
   process.env.DEBUG_IMAGE_PROXY === "true" ||
