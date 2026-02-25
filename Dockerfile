@@ -14,6 +14,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-l
 
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm run build
 
 FROM base
@@ -21,7 +22,7 @@ COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/.next /app/.next
 
 # Set the default port to 3000
-ENV PORT 3000
+ENV PORT=3000
 
 # Expose the port the app runs on
 EXPOSE $PORT
