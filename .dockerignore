@@ -14,3 +14,24 @@ node_modules/
 apps/*/.next/
 apps/*/.turbo/
 apps/*/node_modules/
+
+# Training data & docs (not needed for build)
+Frontfarben/
+Griffe/
+grifffronten/
+DOCS/
+scripts/
+debug-*.js
+
+# Git & editor
+.git
+.gitignore
+*.md
+!README.md
+.vscode/
+*.code-workspace
+
+# Docker
+Dockerfile
+dockerDeployment.sh
+.dockerignore

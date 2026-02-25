@@ -9,22 +9,24 @@ RUN corepack prepare pnpm@^10 --activate
 COPY . /app
 WORKDIR /app
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
-
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm run build
 
-FROM base
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/.next /app/.next
+# Production image — uses Next.js standalone output
+FROM node:22-slim AS runner
+WORKDIR /app
 
-# Set the default port to 3000
+ENV NODE_ENV=production
 ENV PORT=3000
 
-# Expose the port the app runs on
+# Copy standalone server (includes required node_modules)
+COPY --from=build /app/.next/standalone ./
+# Copy static assets and public files
+COPY --from=build /app/.next/static ./.next/static
+COPY --from=build /app/public ./public
+
 EXPOSE $PORT
 
-CMD [ "pnpm", "start" ]
+CMD ["node", "server.js"]
