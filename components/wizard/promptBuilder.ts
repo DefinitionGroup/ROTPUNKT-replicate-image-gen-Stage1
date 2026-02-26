@@ -351,9 +351,11 @@ function contextualizeHandleCaption(
 export function buildPrompt({
   selections,
   extraWishes,
+  pipelineV2Enabled = PROMPT_PIPELINE_V2_ENABLED,
 }: {
   selections: WizardState["selectedOptions"];
   extraWishes?: string;
+  pipelineV2Enabled?: boolean;
 }): PromptBuildResult {
   const missingKeys = getSelectionKeys()
     .filter((key) => {
@@ -709,8 +711,8 @@ export function buildPrompt({
   );
 
   const modelPrompt = modelSections.join(" ");
-  const prompt = PROMPT_PIPELINE_V2_ENABLED ? modelPrompt : debugPrompt;
-  const uiSections = PROMPT_PIPELINE_V2_ENABLED ? modelSections : debugSections;
+  const prompt = pipelineV2Enabled ? modelPrompt : debugPrompt;
+  const uiSections = pipelineV2Enabled ? modelSections : debugSections;
 
   return {
     prompt,

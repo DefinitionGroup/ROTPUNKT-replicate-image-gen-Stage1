@@ -1,0 +1,4 @@
+# Runtime feature switches for client prompt behavior
+# Values: true/false, 1/0, yes/no, on/off
+NEXT_PUBLIC_PROMPT_PIPELINE_V2=true
+
