@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 const STORAGE_KEY = "wizard_prompt_debug_open";
 
@@ -21,6 +22,11 @@ export function PromptDebugPopover({
   fallbackText = "Prompt is currently empty.",
 }: PromptDebugPopoverProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -48,29 +54,45 @@ export function PromptDebugPopover({
     });
   };
 
-  if (!enabled) return null;
+  if (!enabled || !mounted) return null;
 
-  return (
-    <div className="fixed top-4 right-4 z-[2147483646] pointer-events-auto">
-      <AnimatePresence mode="wait" initial={false}>
-        {isOpen ? (
-          <motion.div
-            key="prompt-debug-expanded"
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.15 }}
-            className="w-[calc(100vw-2rem)] max-w-[36rem] rounded-xl border border-border/70 bg-card/95 shadow-xl backdrop-blur-md overflow-hidden"
+  return createPortal(
+    <div
+      className="fixed top-4 right-4 z-[2147483647] pointer-events-auto"
+      onPointerDown={(event) => event.stopPropagation()}
+      onMouseDown={(event) => event.stopPropagation()}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: -6, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.15 }}
+        className={`rounded-xl border border-border/70 bg-card/95 shadow-xl backdrop-blur-md overflow-hidden ${
+          isOpen ? "w-[calc(100vw-2rem)] max-w-[36rem]" : "w-auto"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3 px-3 py-2 bg-muted/70 border-b border-border/70">
+          <p className="text-xs font-semibold tracking-wide text-foreground">
+            Prompt Debug
+          </p>
+          <button
+            type="button"
+            onClick={toggleOpen}
+            className="rounded-md border border-border/70 bg-background/80 px-2 py-1 text-[11px] font-semibold text-foreground hover:bg-muted transition-colors"
           >
-            <button
-              type="button"
-              onClick={toggleOpen}
-              className="w-full px-3 py-2 text-left text-xs font-semibold tracking-wide text-foreground bg-muted/70 hover:bg-muted transition-colors"
-            >
-              Prompt Debug
-            </button>
+            {isOpen ? "Collapse" : "Expand"}
+          </button>
+        </div>
 
-            <div className="p-3">
+        <AnimatePresence initial={false}>
+          {isOpen && (
+            <motion.div
+              key="prompt-debug-body"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.15 }}
+              className="p-3"
+            >
               <p className="text-xs text-muted-foreground text-left">
                 Step: <span className="font-medium text-foreground">{stepLabel}</span>
               </p>
@@ -99,24 +121,11 @@ export function PromptDebugPopover({
                   </p>
                 )}
               </div>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.button
-            key="prompt-debug-collapsed"
-            type="button"
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.15 }}
-            onClick={toggleOpen}
-            className="rounded-full border border-border/70 bg-card/95 px-3 py-2 text-xs font-semibold tracking-wide text-foreground shadow-lg backdrop-blur-md hover:bg-muted/50 transition-colors"
-          >
-            Prompt Debug
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>,
+    document.body
   );
 }
-
