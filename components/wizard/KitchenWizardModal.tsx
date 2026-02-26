@@ -11,6 +11,10 @@ import {
   wizardActions,
   WizardState,
 } from "../../app/store/wizardStore";
+import {
+  $promptPipelineV2Enabled,
+  loadRuntimeConfig,
+} from "../../app/store/runtimeConfig";
 import { WizardHeader } from "./WizardHeader";
 import { WizardIntro } from "./WizardIntro";
 import { WizardStep } from "./WizardStep";
@@ -43,6 +47,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const tIntroPresets = useTranslations("wizard.intro.presets");
   const tErrors = useTranslations("wizard.errors");
   const wizardState = useStore(wizardStore);
+  const promptPipelineV2Enabled = useStore($promptPipelineV2Enabled);
   const { isSignedIn } = useAuth();
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const stepContainerRef = useRef<HTMLDivElement | null>(null);
@@ -67,8 +72,13 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       buildPrompt({
         selections: wizardState.selectedOptions,
         extraWishes: wizardState.extraWishes,
+        pipelineV2Enabled: promptPipelineV2Enabled,
       }),
-    [wizardState.selectedOptions, wizardState.extraWishes]
+    [
+      wizardState.selectedOptions,
+      wizardState.extraWishes,
+      promptPipelineV2Enabled,
+    ]
   );
 
   const isFinalStep = wizardState.currentStep === totalSteps;
@@ -114,6 +124,10 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
+
+  useEffect(() => {
+    void loadRuntimeConfig();
+  }, []);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;

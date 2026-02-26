@@ -15,6 +15,10 @@ import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { buildPrompt } from "./promptBuilder";
 import { PromptDebugPopover } from "./PromptDebugPopover";
+import {
+  $promptPipelineV2Enabled,
+  loadRuntimeConfig,
+} from "@/store/runtimeConfig";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -88,6 +92,7 @@ async function pollGenerationApi({
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
   const wizardState = useStore(wizardStore);
+  const promptPipelineV2Enabled = useStore($promptPipelineV2Enabled);
   const t = useTranslations('imageGenerator');
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -109,8 +114,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       buildPrompt({
         selections: wizardState.selectedOptions,
         extraWishes: wizardState.extraWishes,
+        pipelineV2Enabled: promptPipelineV2Enabled,
       }),
-    [wizardState.selectedOptions, wizardState.extraWishes]
+    [wizardState.selectedOptions, wizardState.extraWishes, promptPipelineV2Enabled]
   );
 
   // Ref to prevent duplicate starts for identical prompt strings.
@@ -189,6 +195,10 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       setPredictionId(null);
     }
   }, [statusData]);
+
+  useEffect(() => {
+    void loadRuntimeConfig();
+  }, []);
 
   useEffect(() => {
     if (prompt && hasTriggered.current !== prompt) {
