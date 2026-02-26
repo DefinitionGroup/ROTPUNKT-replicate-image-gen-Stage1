@@ -25,6 +25,7 @@ import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
 import { WizardHandleStep } from "./WizardHandleStep";
 import { WizardKitchenLayoutPanel } from "./WizardKitchenLayoutPanel";
+import { PromptDebugPopover } from "./PromptDebugPopover";
 import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
@@ -58,9 +59,6 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       promptDebugEnv === "1" ||
       promptDebugEnv === "yes" ||
       promptDebugEnv === "on");
-  const [isPromptDebugOpen, setIsPromptDebugOpen] = useState(
-    showPromptDebugPopover
-  );
 
   const totalSteps = wizardSteps.length;
 
@@ -235,65 +233,12 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
         aria-modal="true"
         aria-labelledby="wizard-title"
       >
-        {showPromptDebugPopover && (
-          <div className="fixed top-4 right-4 z-[1000000000] w-[calc(100vw-2rem)] max-w-[36rem] pointer-events-auto">
-            <div className="rounded-xl border border-border/70 bg-card/95 shadow-xl backdrop-blur-md overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setIsPromptDebugOpen((value) => !value)}
-                className="w-full px-3 py-2 text-left text-xs font-semibold tracking-wide text-foreground bg-muted/70 hover:bg-muted transition-colors"
-              >
-                Prompt Debug
-              </button>
-
-              <AnimatePresence initial={false}>
-                {isPromptDebugOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.15 }}
-                    className="p-3"
-                  >
-                    <p className="text-xs text-muted-foreground">
-                      Step:{" "}
-                      <span className="font-medium text-foreground">
-                        {debugStepLabel}
-                      </span>
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Missing:{" "}
-                      <span className="font-medium text-foreground">
-                        {missingKeys.length > 0
-                          ? missingKeys.join(", ")
-                          : "none"}
-                      </span>
-                    </p>
-
-                    <div className="mt-3 max-h-[50dvh] overflow-auto rounded-md border border-border/70 bg-background/80 p-3 text-left">
-                      {summaryData.sections.length > 0 ? (
-                        <div className="space-y-2">
-                          {summaryData.sections.map((section, index) => (
-                            <p
-                              key={`${index}-${section.slice(0, 24)}`}
-                              className="text-xs leading-relaxed text-foreground break-words"
-                            >
-                              {section}
-                            </p>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-xs leading-relaxed text-foreground">
-                          Prompt is currently empty.
-                        </p>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        )}
+        <PromptDebugPopover
+          enabled={showPromptDebugPopover}
+          stepLabel={debugStepLabel}
+          missingKeys={missingKeys}
+          sections={summaryData.sections}
+        />
 
         <motion.div
           initial={{ scale: 0.97, opacity: 0 }}
