@@ -98,7 +98,7 @@ export default function MediaHeroSection({
     <section
       id={id}
       className={cn(
-        "relative grid grid-cols-12 min-h-[50vh] isolate overflow-hidden selection:bg-brand-primary-2 selection:text-brand-secondary-1",
+        "relative grid grid-cols-12 min-h-[50vh]  isolate overflow-hidden selection:bg-brand-primary-2 selection:text-brand-secondary-1",
         className
       )}
     >
@@ -121,10 +121,10 @@ export default function MediaHeroSection({
           duration={animation.duration ?? 0.5}
           distance={animation.distance ?? 80}
         >
-          <h2 className="text-7xl leading-compress text-foreground max-w-3xl font-light text-center  tracking-tightleading-tighter mb-2">
+          <h2 className="text-7xl leading-compress text-white max-w-3xl font-light text-center  tracking-tight leading-tighter mb-2">
             {heading}
           </h2>
-          <p className="text-xl text-foreground font-medium text-center max-w-2xl mx-auto">
+          <p className="text-xl text-white font-medium text-center max-w-2xl mx-auto">
             {subheading}
           </p>
 

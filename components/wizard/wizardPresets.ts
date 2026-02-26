@@ -60,7 +60,7 @@ export const wizardPresets: WizardPreset[] = [
       kind: "kueche",
       kitchenLook: "kuechenzeile",
       color: "schwarz",
-      handle: "handle:std-205",
+      handle: "handle:std-491",
       style: "urban",
       environment: "loft-industriegebaeude",
       viewpoint: "wide shot, long shot, establishing shot",

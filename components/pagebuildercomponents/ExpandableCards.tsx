@@ -45,7 +45,7 @@ export default function ExpandableCards({
   items,
   defaultLogoSrc,
 }: ExpandableCardsProps) {
-  const [active, setActive] = useState<TransformedItem | boolean | null>(null);
+  const [active, setActive] = useState<TransformedItem | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
   const themeLogoSrc = useRotpunktLogoSrc();
@@ -60,16 +60,25 @@ export default function ExpandableCards({
   );
 
   useEffect(() => {
+    if (!active) return;
+
+    const previousOverflow = document.body.style.overflow;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setActive(false);
+      if (event.key === "Escape") setActive(null);
     };
-    document.body.style.overflow =
-      active && typeof active === "object" ? "hidden" : "auto";
+
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [active]);
 
-  useOutsideClick(ref, () => setActive(null));
+  useOutsideClick(ref, () => {
+    if (active) setActive(null);
+  });
 
   const transformedItems: TransformedItem[] =
     items?.map((item) => ({
@@ -93,44 +102,43 @@ export default function ExpandableCards({
     <>
       {/* Backdrop */}
       <AnimatePresence>
-        {active && typeof active === "object" && (
+        {active && (
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/80 h-full w-full z-10"
+            className="fixed inset-0 z-[2147483647] bg-background/80 backdrop-blur-[2px]"
           />
         )}
       </AnimatePresence>
 
       {/* Modal */}
       <AnimatePresence>
-        {active && typeof active === "object" ? (
-          <div className="fixed inset-0 grid place-items-center z-[100]">
-            <motion.button
-              key={`button-${active.title}-${id}`}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.05 } }}
-              className="flex absolute top-3 right-3 lg:hidden items-center justify-center rounded-full h-8 w-8 bg-background/90 text-foreground border border-border"
-              onClick={() => setActive(null)}
-              aria-label="Close"
-            >
-              <CloseIcon />
-            </motion.button>
-
+        {active ? (
+          <div className="fixed inset-0 z-[2147483647] flex items-end justify-center sm:items-center sm:p-4">
             <motion.div
               layoutId={`card-${active.title}-${id}`}
               ref={ref}
-              className="w-full max-w-[900px] min-h-[70vh] relative h-full md:h-fit md:max-h-[90%] rounded-xl flex flex-col bg-card/95 border border-border shadow-2xl overflow-hidden"
+              className="relative z-10 flex h-[100dvh] w-full flex-col overflow-hidden rounded-t-2xl border border-border bg-card/95 shadow-2xl sm:h-auto sm:max-h-[90vh] sm:max-w-[900px] sm:rounded-2xl"
               role="dialog"
               aria-modal="true"
             >
-              {/* Hero image */}
+              <motion.button
+                key={`button-${active.title}-${id}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.05 } }}
+                className="absolute right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-30 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/90 text-foreground"
+                onClick={() => setActive(null)}
+                aria-label="Close"
+              >
+                <CloseIcon />
+              </motion.button>
+
+              {/* Hero image + heading */}
               <motion.div
-                className="w-full absolute sm:rounded-t-xl opacity-80 object-cover object-top"
+                className="relative h-52 w-full shrink-0 sm:h-72"
                 layoutId={`image-${active.title}-${id}`}
               >
                 <img
@@ -138,72 +146,65 @@ export default function ExpandableCards({
                   height={900}
                   src={active.imageSrc}
                   alt={active.imageAlt || active.title}
-                  className="w-full h-100 absolute min-h-[70vh] sm:rounded-t-xl opacity-50 object-cover object-top"
+                  className="absolute inset-0 h-full w-full object-cover object-top opacity-60"
                 />
-              </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/35 to-card/95" />
 
-              {/* Logo */}
-              <motion.img
-                layoutId={`logo-${active.title}-${id}`}
-                src={active.logoSrc}
-                alt={`${active.title} logo`}
-                className="w-24 h-20 object-contain absolute top-12 left-8"
-              />
+                {/* Logo */}
+                <motion.img
+                  layoutId={`logo-${active.title}-${id}`}
+                  src={active.logoSrc}
+                  alt={`${active.title} logo`}
+                  className="absolute left-4 top-4 h-12 w-16 object-contain sm:left-6 sm:top-6 sm:h-16 sm:w-24"
+                />
 
-              {/* Content */}
-              <div className="flex justify-start border-t absolute top-30 items-start m-8 pt-8 z-10 gap-8">
-                <div className="flex justify-start items-start z-10">
-                  <div>
+                <div className="absolute inset-x-0 bottom-0 z-20 px-4 pb-4 sm:px-6 sm:pb-6">
+                  <div className="max-w-3xl">
                     {active.description && (
                       <motion.p
                         layoutId={`description-${active.description}-${id}`}
-                        className="text-foreground text-5xl"
+                        className="text-foreground text-2xl leading-tight sm:text-4xl"
                       >
                         {active.description}
                       </motion.p>
                     )}
                     <motion.h3
                       layoutId={`title-${active.title}-${id}`}
-                      className="text-xl text-foreground  mt-4"
+                      className="mt-2 text-lg text-foreground sm:mt-3 sm:text-xl"
                     >
                       {active.title}
                     </motion.h3>
                   </div>
                 </div>
+              </motion.div>
 
-                <div className="relative px-0 md:px-8 min-h-full ">
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-foreground text-md md:text-base lg:text-base mb-4 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto font-medium [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
-                  >
-                    {Array.isArray(active.body) ? (
-                      <PortableText value={active.body as PortableTextBlock[]} />
-                    ) : typeof active.body === "string" ? (
-                      <p>{active.body}</p>
-                    ) : null}
-                  </motion.div>
+              {/* Body content */}
+              <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4 sm:px-6 sm:pb-8 sm:pt-6">
+                <motion.div
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="mb-6 flex flex-col gap-4 text-sm font-medium leading-relaxed text-foreground sm:text-base"
+                >
+                  {Array.isArray(active.body) ? (
+                    <PortableText value={active.body as PortableTextBlock[]} />
+                  ) : typeof active.body === "string" ? (
+                    <p>{active.body}</p>
+                  ) : null}
+                </motion.div>
 
-                  {active.ctaHref && active.ctaText && (
-                    <Button
-                      asChild
-                      variant="redCta"
-                      size="cta"
-                      layoutId={`button-${active.title}-${id}`}
-                      enableMotion
+                {active.ctaHref && active.ctaText && (
+                  <Button asChild variant="redCta" size="cta" enableMotion>
+                    <a
+                      href={active.ctaHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      <a
-                        href={active.ctaHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {active.ctaText}
-                      </a>
-                    </Button>
-                  )}
-                </div>
+                      {active.ctaText}
+                    </a>
+                  </Button>
+                )}
               </div>
             </motion.div>
           </div>
@@ -211,14 +212,15 @@ export default function ExpandableCards({
       </AnimatePresence>
 
       {/* Grid */}
-      <ul className={`w-full max-w-5xl mx-auto ${className ?? ""}`}>
+      <div className={`w-full mx-auto md:max-w-5xl ${className ?? ""}`}>
         <StaggeredSlideUp className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto w-full">
           {transformedItems.map((card) => (
-            <motion.div
+            <motion.button
+              type="button"
               layoutId={`card-${card.title}-${id}`}
               key={card._key ?? `${card.title}-${id}`}
               onClick={() => setActive(card)}
-              className="col-span-1 grid grid-cols-1 grid-rows-1 min-h-[360px] rounded-lg overflow-hidden h-[200px] cursor-pointer"
+              className="group col-span-1 grid h-[220px] min-h-[220px] w-full grid-cols-1 grid-rows-1 overflow-hidden rounded-lg text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2/70 sm:h-[260px]"
             >
               <motion.div
                 layoutId={`image-${card.title}-${id}`}
@@ -257,10 +259,10 @@ export default function ExpandableCards({
                   </motion.h3>
                 </div>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
         </StaggeredSlideUp>
-      </ul>
+      </div>
     </>
   );
 }

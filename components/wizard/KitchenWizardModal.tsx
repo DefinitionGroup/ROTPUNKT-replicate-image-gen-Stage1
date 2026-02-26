@@ -25,6 +25,7 @@ import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
 import { WizardHandleStep } from "./WizardHandleStep";
 import { WizardKitchenLayoutPanel } from "./WizardKitchenLayoutPanel";
+import { PromptDebugPopover } from "./PromptDebugPopover";
 import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
@@ -48,6 +49,16 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(true);
   const [showKitchenLayout, setShowKitchenLayout] = useState(false);
   const translatedSteps = useTranslatedWizardSteps();
+  const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
+    .trim()
+    .replace(/^['"]|['"]$/g, "")
+    .toLowerCase();
+  const showPromptDebugPopover =
+    process.env.NODE_ENV === "development" &&
+    (promptDebugEnv === "true" ||
+      promptDebugEnv === "1" ||
+      promptDebugEnv === "yes" ||
+      promptDebugEnv === "on");
 
   const totalSteps = wizardSteps.length;
 
@@ -73,6 +84,11 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
   const isFloorStep = currentStepDefinition?.key === "floor";
   const isKindStepWithLayout = currentStepDefinition?.key === "kind" && showKitchenLayout;
+  const debugStepLabel = isIntro
+    ? "intro"
+    : isFinalStep
+      ? "final"
+      : `${wizardState.currentStep + 1}/${totalSteps} (${currentStepDefinition?.key ?? "unknown"})`;
 
   const startWithPreset = (preset: WizardPreset) => {
     setIsSummaryCollapsed(true);
@@ -157,10 +173,11 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
     if (currentStepKey === "kind" && option !== "kueche") {
       const current = wizardStore.get();
       if (current.selectedOptions.kitchenLook) {
-        const { kitchenLook: _, ...rest } = current.selectedOptions;
+        const nextSelectedOptions = { ...current.selectedOptions };
+        delete nextSelectedOptions.kitchenLook;
         wizardStore.set({
           ...current,
-          selectedOptions: rest,
+          selectedOptions: nextSelectedOptions,
         });
       }
     }
@@ -216,6 +233,13 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
         aria-modal="true"
         aria-labelledby="wizard-title"
       >
+        <PromptDebugPopover
+          enabled={showPromptDebugPopover}
+          stepLabel={debugStepLabel}
+          missingKeys={missingKeys}
+          sections={summaryData.sections}
+        />
+
         <motion.div
           initial={{ scale: 0.97, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

@@ -21,7 +21,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   }) as Promise<T>;
 }
 
-const MODEL = "rotpunkt007/basemodel-4-2026:0200979b0fa5fd320620d0af8ac046d806fa80e5406dc5e070722fbb91889be6";
+const MODEL = "rotpunkt007/basemodel-5-2026:0672a9098a0c17393feeb70989b90488a89e80404be9543ccabe9c87aca4ac08";
 const MODEL_VERSION = MODEL.split(":")[1];
 
 export async function POST(req: NextRequest) {
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
         input: {
           prompt: finalPrompt,
           go_fast: false,
-          guidance: 6.0,
+          guidance: 6.8,
           image_size: "optimize_for_speed",
           lora_scale: kitchenMode ? 0.85 : 0.65,
           aspect_ratio: "16:9",
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
           enhance_prompt: false,
           output_quality: 80,
           seed: Math.floor(Math.random() * 2 ** 32),
-          num_inference_steps: 28,
+          num_inference_steps: 32,
           num_outputs: 1,
         },
       }),

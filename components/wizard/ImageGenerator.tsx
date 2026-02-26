@@ -1,18 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
 import { $prompt, $isKitchenRoom } from "@/store/prompt";
 import { $pageStep } from "@/store/step";
-import { wizardActions } from "@/store/wizardStore";
+import { wizardActions, wizardStore } from "@/store/wizardStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
+import { buildPrompt } from "./promptBuilder";
+import { PromptDebugPopover } from "./PromptDebugPopover";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -85,11 +87,31 @@ async function pollGenerationApi({
 
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
+  const wizardState = useStore(wizardStore);
   const t = useTranslations('imageGenerator');
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
   const [predictionId, setPredictionId] = useState<string | null>(null);
+  const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
+    .trim()
+    .replace(/^['"]|['"]$/g, "")
+    .toLowerCase();
+  const showPromptDebugPopover =
+    isDev &&
+    (promptDebugEnv === "true" ||
+      promptDebugEnv === "1" ||
+      promptDebugEnv === "yes" ||
+      promptDebugEnv === "on");
+
+  const summaryData = useMemo(
+    () =>
+      buildPrompt({
+        selections: wizardState.selectedOptions,
+        extraWishes: wizardState.extraWishes,
+      }),
+    [wizardState.selectedOptions, wizardState.extraWishes]
+  );
 
   // Ref to prevent duplicate starts for identical prompt strings.
   const hasTriggered = useRef<string | null>(null);
@@ -212,6 +234,14 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="w-full mx-autoflex flex-col justify-center items-center">
+      <PromptDebugPopover
+        enabled={showPromptDebugPopover}
+        stepLabel="image generation"
+        missingKeys={summaryData.missingKeys}
+        sections={summaryData.sections}
+        fallbackText={prompt || "Prompt is currently empty."}
+      />
+
       {onBack && hasImages && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
 
       <AnimatePresence mode="wait">

@@ -116,20 +116,25 @@ export async function POST(req: NextRequest) {
       deterministicPrefix: `prediction-${predictionId}`,
     });
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        global: {
-          fetch: async (url, options = {}) => {
-            const token = await getToken({ template: "supabase" });
-            const headers = new Headers(options.headers);
-            if (token) headers.set("Authorization", `Bearer ${token}`);
-            return fetch(url, { ...options, headers });
+    const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      )
+      : createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            fetch: async (url, options = {}) => {
+              const token = await getToken({ template: "supabase" });
+              const headers = new Headers(options.headers);
+              if (token) headers.set("Authorization", `Bearer ${token}`);
+              return fetch(url, { ...options, headers });
+            },
           },
-        },
-      }
-    );
+        }
+      );
 
     const insertPayload = minioUrls.map((url) => ({
       url,
@@ -158,6 +163,8 @@ export async function POST(req: NextRequest) {
         console.error("Supabase insert error:", dbError);
         return NextResponse.json({ error: "DB insert failed" }, { status: 500 });
       }
+    } else if (isDev) {
+      console.log(`[${requestId}] ℹ️ No new DB rows to insert (already persisted).`);
     }
 
     return NextResponse.json({

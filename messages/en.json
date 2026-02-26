@@ -69,8 +69,8 @@
         "description": "What type of room should be visualized? Choose the focus for the scene."
       },
       "color": {
-        "label": "Color World",
-        "description": "Define the dominant color scheme for furniture, fronts and accents – choose from the Frontfarben catalog or original FENIX NTM® color tones."
+        "label": "Colour World",
+        "description": "Define the dominant colour scheme for furniture, doors and accents – choose from the  catalog or original FENIX® colour tones."
       },
       "handle": {
         "label": "Handles & Rails",
@@ -246,9 +246,9 @@
       "remove": "Remove"
     },
     "colorTabs": {
-      "frontfarbenLabel": "Front Colors",
+      "frontfarbenLabel": "Door Colours",
       "frontfarbenDescription": "Material and color variants from the Frontfarben dataset with image and training-caption references.",
-      "fenixLabel": "FENIX® Colors",
+      "fenixLabel": "FENIX® Colours",
       "fenixDescription": "Original FENIX NTM® surface colors.",
       "allMaterials": "All Categories",
       "trainingCaptionLabel": "Training caption"
