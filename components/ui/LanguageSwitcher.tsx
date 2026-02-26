@@ -46,7 +46,7 @@ export function LanguageSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="bg-popover/95 border-border backdrop-blur-sm"
+        className="z-[2147483647] bg-popover/95 border-border backdrop-blur-sm"
       >
         {locales.map((loc) => (
           <DropdownMenuItem

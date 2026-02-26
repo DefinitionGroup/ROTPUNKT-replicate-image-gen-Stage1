@@ -198,7 +198,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
         "description": "What type of room should be visualized?"
       },
       "color": {
-        "label": "Color World",
+        "label": "Colour World",
         "description": "Define the dominant color palette"
       },
       "style": {
