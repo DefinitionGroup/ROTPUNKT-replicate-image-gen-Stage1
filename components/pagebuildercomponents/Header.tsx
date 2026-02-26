@@ -112,14 +112,14 @@ export default function Header({
       role="banner"
     >
       <motion.div
-        className="w-full  border-red-500  bg-black col-span-1 min-h-full  row-span-1 col-start-1 flex items-stretch row-start-1 rounded-2xl overflow-hidden drop-shadow-lg"
         variants={backgroundImageVariants}
+        className="w-[90%] mx-auto  md:w-full  border-red-500  bg-black col-span-1 min-h-full  row-span-1 col-start-1 flex items-stretch row-start-1 rounded-2xl overflow-hidden drop-shadow-lg"
         initial="initial"
         animate="animate"
         aria-hidden="true"
       >
         <img
-          className=" rounded-2xl opacity-50 "
+          className=" rounded-2xl opacity-50 object-cover"
           src={backgroundImage?.secure_url}
           alt={subheadline}
           role="presentation"
@@ -138,7 +138,7 @@ export default function Header({
         >
           <h1
             id="hero-title"
-            className="text-7xl leading-relaxed tracking-tight font-medium text-center text-white"
+            className=" text-3xl md:text-7xl md:leading-relaxed md:tracking-tight font-medium text-center text-white"
           >
             {title}
           </h1>
@@ -151,7 +151,7 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-white mx-auto tracking-wide text-2xl max-w-2xl text-center font-semibold"
+          <p className="text-white mx-auto tracking-wide text-xl md:text-2xl max-w-2xl text-center font-semibold"
 
             role="doc-subtitle"
           >
@@ -166,7 +166,7 @@ export default function Header({
           initial="initial"
           animate="animate"
         >
-          <p className="text-white font-medium  mt-4 leading-relaxed text-center">
+          <p className="text-white text-sm md:text-base font-medium px-8   mt-4 leading-relaxed text-center">
 
             {description}
           </p>

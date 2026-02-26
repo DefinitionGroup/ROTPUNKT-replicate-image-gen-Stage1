@@ -48,7 +48,7 @@ const HeaderImageVideoComp2: React.FC<HeaderImageVideoCompProps> = ({
           ease: [0.16, 1, 0.3, 1],
           opacity: { duration: 0.8 },
         }}
-        className="absolute mx-auto rounded-sm inset-0 overflow-hidden "
+        className="absolute mx-auto rounded-sm bg-black inset-0 overflow-hidden "
       >
         {useVideo ? (
           <video
@@ -68,7 +68,7 @@ const HeaderImageVideoComp2: React.FC<HeaderImageVideoCompProps> = ({
           />
         )}
         <motion.div
-          className="absolute inset-0 bg-background"
+          className="absolute inset-0 bg-black"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity } : { opacity: 0 }}
           transition={{

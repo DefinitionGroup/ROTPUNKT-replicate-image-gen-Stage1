@@ -110,7 +110,9 @@ export default function Navbar({
         className={
           mobile
             ? cn(
-              "block text-foreground text-2xl tracking-wider font-light"
+              "block text-foreground text-2xl tracking-wider font-bold transition-colors",
+              "hover:text-foreground/80",
+              active && "text-foreground"
             )
             : cn(
               "text-sm font-medium tracking-wide transition-all duration-300 relative group",
@@ -132,11 +134,11 @@ export default function Navbar({
   // ----------------------------------------
 
   return (
-    <div className="fixed top-0 md:top-4 inset-x-0 z-10 px-0 md:px-20 flex justify-center w-full">
+    <div className="fixed top-0 md:top-4 inset-x-0 z-[2147483646] px-0 md:px-20 flex justify-center w-full">
       <nav
         className={cn(
           "relative mx-auto w-full md:w-full max-w-none md:max-w-4xl flex items-center justify-between",
-          "rounded-none md:rounded-full px-4 md:pl-6 md:pr-4 py-4 md:py-3 shadow-lg",
+          "rounded-none md:rounded-full px-4 md:pl-6 md:pr-4 py-4 md:py-3 ",
           "bg-card/70 backdrop-blur-md border border-border/70",
           "text-foreground transition-all duration-300"
         )}
@@ -145,24 +147,42 @@ export default function Navbar({
           <Image
             src={resolvedLogo}
             alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
-            className="h-12 w-auto block text-foreground"
+            className="h-8 md:h-12 w-auto block text-foreground"
             width={240}
             height={80}
             unoptimized
           />
         </Link>
 
-        {/* Mobile menu toggle */}
-        <button
-          type="button"
-          className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-accent/60 transition"
-          aria-label="Toggle menu"
-          aria-controls="mobile-nav"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <TiThMenu className="w-6 h-6" />
-        </button>
+        {/* Mobile top-bar controls */}
+        <div className="md:hidden flex items-center gap-1.5">
+          <ThemeSwitcher />
+          <Link
+            href="/my-images"
+            className="inline-flex items-center px-2.5 h-9 rounded-full border border-border/60 bg-background/40 text-[11px] font-semibold tracking-wide text-foreground hover:bg-accent transition-colors"
+          >
+            {t('myImages')}
+          </Link>
+          {mounted && (
+            <SignedIn>
+              <UserButton
+                appearance={{
+                  elements: { userButtonAvatarBox: "w-8 h-8" },
+                }}
+              />
+            </SignedIn>
+          )}
+          <button
+            type="button"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-accent/60 transition"
+            aria-label="Toggle menu"
+            aria-controls="mobile-nav"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <TiThMenu className="w-6 h-6" />
+          </button>
+        </div>
 
         {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-6 md:gap-8">
@@ -218,7 +238,7 @@ export default function Navbar({
           <motion.div
             id="mobile-nav"
             aria-hidden={!open}
-            className="fixed inset-0 z-[60] md:hidden"
+            className="fixed inset-0 z-[2147483647] md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -226,7 +246,7 @@ export default function Navbar({
             <motion.button
               aria-label="Close menu"
               onClick={closeMenu}
-              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              className="absolute inset-0  bg-background/70 backdrop-blur-md"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -248,16 +268,21 @@ export default function Navbar({
                   <img
                     src={resolvedLogo}
                     alt={navbarLogoAlt ?? "Rotpunkt Küchen"}
-                    className="h-4 w-auto block"
+                    className="h-12 w-auto block"
                   />
                 </Link>
                 <button
                   type="button"
                   aria-label="Close menu"
                   onClick={closeMenu}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-background/80 hover:bg-background/90 text-foreground border border-border/70"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 hover:rotate-90 transition-transform duration-200 text-white font-medium text-2xl leading-compress"
                 >
-                  ×
+
+                  <svg viewBox="0 0 24 24" className="w-3 h-3">
+                    <line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                    <line x1="20" y1="4" x2="4" y2="20" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                  </svg>
+
                 </button>
               </div>
 
@@ -270,28 +295,12 @@ export default function Navbar({
               >
                 <ul className="space-y-1">
                   {menuItems?.map((item) => (
-                    <motion.li key={item._key} variants={itemVariants}>
+                    <motion.li key={item._key} variants={itemVariants} className="bold">
                       {renderLink(item, true)}
                     </motion.li>
                   ))}
-                  {mounted && (
-                    <SignedIn>
-                      <motion.li variants={itemVariants}>
-                        <Link
-                          href="/my-images"
-                          onClick={closeMenu}
-                          className="block text-foreground text-xl font-medium tracking-tight"
-                        >
-                          {t('myImages')}
-                        </Link>
-                      </motion.li>
-                    </SignedIn>
-                  )}
                   <motion.li variants={itemVariants} className="pt-4">
                     <LanguageSwitcher />
-                    <div className="mt-3">
-                      <ThemeSwitcher />
-                    </div>
                   </motion.li>
                 </ul>
               </motion.nav>
@@ -325,13 +334,6 @@ export default function Navbar({
                         </SignUpButton>
                       </div>
                     </SignedOut>
-                    <SignedIn>
-                      <UserButton
-                        appearance={{
-                          elements: { userButtonAvatarBox: "w-9 h-9" },
-                        }}
-                      />
-                    </SignedIn>
                   </>
                 ) : (
                   <div className="flex gap-2">
