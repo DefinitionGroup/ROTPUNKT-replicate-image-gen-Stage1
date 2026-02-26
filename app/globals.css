@@ -328,3 +328,18 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure Clerk modals/popovers render above the fixed navbar layers */
+.cl-modalBackdrop {
+  z-index: 2147483646 !important;
+}
+
+.cl-modalContent,
+.cl-modalCloseButton,
+.cl-userButtonPopoverRootBox,
+.cl-userButtonPopoverCard,
+.cl-userButtonPopoverMain,
+.cl-userButtonPopoverActions,
+.cl-userButtonPopoverFooter {
+  z-index: 2147483647 !important;
+}
