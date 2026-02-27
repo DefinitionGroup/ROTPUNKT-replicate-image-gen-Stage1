@@ -111,65 +111,79 @@ export async function POST(req: NextRequest) {
       throw new Error("No output received");
     }
 
-    // Deterministic object names keep finalization idempotent when polling.
-    const minioUrls = await uploadImages(generatedUrls, {
-      deterministicPrefix: `prediction-${predictionId}`,
-    });
-
-    const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
-      ? createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
-      )
-      : createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          global: {
-            fetch: async (url, options = {}) => {
-              const token = await getToken({ template: "supabase" });
-              const headers = new Headers(options.headers);
-              if (token) headers.set("Authorization", `Bearer ${token}`);
-              return fetch(url, { ...options, headers });
-            },
-          },
-        }
+    // Uploading and DB writes are best-effort in production.
+    // If persistence fails, we still return succeeded with Replicate CDN URLs.
+    let finalUrls = generatedUrls;
+    try {
+      // Deterministic object names keep finalization idempotent when polling.
+      finalUrls = await uploadImages(generatedUrls, {
+        deterministicPrefix: `prediction-${predictionId}`,
+      });
+    } catch (storageError) {
+      console.error(
+        `[${requestId}] MinIO upload failed; falling back to Replicate URLs:`,
+        storageError
       );
-
-    const insertPayload = minioUrls.map((url) => ({
-      url,
-      imageprompt: prompt,
-      user_id: userId,
-    }));
-
-    const { data: existingRows, error: existingRowsError } = await supabase
-      .from("images")
-      .select("url")
-      .eq("user_id", userId)
-      .in("url", minioUrls);
-
-    if (existingRowsError) {
-      console.error("Supabase dedupe query error:", existingRowsError);
+      finalUrls = generatedUrls;
     }
 
-    const existingUrls = new Set(
-      (existingRows ?? []).map((row) => row.url as string)
-    );
-    const rowsToInsert = insertPayload.filter((row) => !existingUrls.has(row.url));
+    try {
+      const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+        ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        )
+        : createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            global: {
+              fetch: async (url, options = {}) => {
+                const token = await getToken({ template: "supabase" });
+                const headers = new Headers(options.headers);
+                if (token) headers.set("Authorization", `Bearer ${token}`);
+                return fetch(url, { ...options, headers });
+              },
+            },
+          }
+        );
 
-    if (rowsToInsert.length > 0) {
-      const { error: dbError } = await supabase.from("images").insert(rowsToInsert);
-      if (dbError) {
-        console.error("Supabase insert error:", dbError);
-        return NextResponse.json({ error: "DB insert failed" }, { status: 500 });
+      const insertPayload = finalUrls.map((url) => ({
+        url,
+        imageprompt: prompt,
+        user_id: userId,
+      }));
+
+      const { data: existingRows, error: existingRowsError } = await supabase
+        .from("images")
+        .select("url")
+        .eq("user_id", userId)
+        .in("url", finalUrls);
+
+      if (existingRowsError) {
+        console.error("Supabase dedupe query error:", existingRowsError);
       }
-    } else if (isDev) {
-      console.log(`[${requestId}] ℹ️ No new DB rows to insert (already persisted).`);
+
+      const existingUrls = new Set(
+        (existingRows ?? []).map((row) => row.url as string)
+      );
+      const rowsToInsert = insertPayload.filter((row) => !existingUrls.has(row.url));
+
+      if (rowsToInsert.length > 0) {
+        const { error: dbError } = await supabase.from("images").insert(rowsToInsert);
+        if (dbError) {
+          console.error("Supabase insert error:", dbError);
+        }
+      } else if (isDev) {
+        console.log(`[${requestId}] ℹ️ No new DB rows to insert (already persisted).`);
+      }
+    } catch (dbError) {
+      console.error(`[${requestId}] Failed to persist generation metadata:`, dbError);
     }
 
     return NextResponse.json({
       status: "succeeded",
-      urls: minioUrls,
+      urls: finalUrls,
     });
   } catch (error) {
     console.error("Replicate status route error:", error);
