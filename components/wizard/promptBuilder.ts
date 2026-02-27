@@ -464,10 +464,18 @@ export function buildPrompt({
   let colorSelectionSummary: string | undefined;
 
   if (isFenix && fenixColor) {
-    colorSelectionSummary = `FENIX ${fenixColor.name} (${fenixColor.hex})`;
+    colorSelectionSummary = `FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex})`;
     sections.push(
-      `Furniture surfaces in ${fenixDesc}, FENIX ${fenixColor.name} (${fenixColor.hex}).`
+      `Furniture surfaces in ${fenixDesc}, FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}).`
     );
+    sections.push(
+      "Surface finish: glossy plastic fronts with a polished character, smooth refined reflections, and premium lacquer-like clarity."
+    );
+    if (fenixColor.isMetallic) {
+      sections.push(
+        "Metallic decor lock: keep a premium metallic look with subtle metal particle sheen and elegant satin-metal reflections across cabinet fronts."
+      );
+    }
   } else if (isFrontfarbe && frontfarbe) {
     const frontfarbeLabel =
       PROMPT_LANGUAGE === "en" ? frontfarbe.labelEn : frontfarbe.labelDe;
@@ -638,8 +646,16 @@ export function buildPrompt({
 
   if (isFenix && fenixColor) {
     modelSections.push(
-      `Front color direction: FENIX ${fenixColor.name} (${fenixColor.hex}), clearly dominant across visible cabinet fronts.`
+      `Front color direction: FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}), clearly dominant across visible cabinet fronts.`
     );
+    modelSections.push(
+      "Surface finish: glossy plastic fronts with a polished character and clean refined reflections."
+    );
+    if (fenixColor.isMetallic) {
+      modelSections.push(
+        "Metallic look: subtle metal-particle sheen with elegant satin-metal reflections on the selected cabinet fronts."
+      );
+    }
   } else if (isFrontfarbe && frontfarbe) {
     const frontfarbeLabel =
       PROMPT_LANGUAGE === "en" ? frontfarbe.labelEn : frontfarbe.labelDe;
