@@ -12,20 +12,14 @@ type ObjectMetaData = Record<string, string | number>
 type UploadImagesOptions = {
   deterministicPrefix?: string
 }
+type MinioConfig = {
+  domain: string
+  accessKey: string
+  secretKey: string
+}
 
 const BUCKET = 'vision-images' as const
 const streamPipeline = promisify(pipeline)
-
-function assertMinioConfig() {
-  const missing: string[] = []
-  if (!process.env.MINIO_DOMAIN) missing.push('MINIO_DOMAIN')
-  if (!process.env.MINIO_ACCESS_KEY) missing.push('MINIO_ACCESS_KEY')
-  if (!process.env.MINIO_SECRET_KEY) missing.push('MINIO_SECRET_KEY')
-
-  if (missing.length > 0) {
-    throw new Minio_Error(`Missing MinIO env variables: ${missing.join(', ')}`)
-  }
-}
 
 function getSafeObjectName(originURL: string): string {
   let baseName = 'image'
@@ -60,24 +54,52 @@ function getDeterministicObjectName(originURL: string, index: number, prefix: st
   return `${safePrefix}-${index}${getObjectExtension(originURL)}`
 }
 
-export function getObjectUrl(objectName: string): string {
-  assertMinioConfig()
-  return `https://${process.env.MINIO_DOMAIN}/${BUCKET}/${objectName}`
-}
-
-const minioClient = new Client({
-  endPoint: process.env.MINIO_DOMAIN,
-  port: 443,
-  useSSL: true,
-  accessKey: process.env.MINIO_ACCESS_KEY,
-  secretKey: process.env.MINIO_SECRET_KEY,
-});
-
 export class Minio_Error extends Error {
   constructor(message: string | undefined) {
     super(message)
     this.name = 'Minio_Error'
   }
+}
+
+function getMinioConfig(): MinioConfig {
+  const domain = process.env.MINIO_DOMAIN
+  const accessKey = process.env.MINIO_ACCESS_KEY
+  const secretKey = process.env.MINIO_SECRET_KEY
+
+  const missing: string[] = []
+  if (!domain) missing.push('MINIO_DOMAIN')
+  if (!accessKey) missing.push('MINIO_ACCESS_KEY')
+  if (!secretKey) missing.push('MINIO_SECRET_KEY')
+
+  if (missing.length > 0) {
+    throw new Minio_Error(`Missing MinIO env variables: ${missing.join(', ')}`)
+  }
+
+  return {
+    domain: domain!,
+    accessKey: accessKey!,
+    secretKey: secretKey!,
+  }
+}
+
+let minioClient: Client | null = null
+function getMinioClient(): Client {
+  if (minioClient) return minioClient
+
+  const config = getMinioConfig()
+  minioClient = new Client({
+    endPoint: config.domain,
+    port: 443,
+    useSSL: true,
+    accessKey: config.accessKey,
+    secretKey: config.secretKey,
+  })
+  return minioClient
+}
+
+export function getObjectUrl(objectName: string): string {
+  const { domain } = getMinioConfig()
+  return `https://${domain}/${BUCKET}/${objectName}`
 }
 
 /**
@@ -87,11 +109,10 @@ export class Minio_Error extends Error {
  * @param metadata
  */
 async function uploadImage(sourcePath: string, destinationName: string, metadata: ObjectMetaData) {
-  assertMinioConfig()
   console.debug('Uploading image', sourcePath, destinationName)
   try {
     console.debug('uploading', sourcePath, destinationName, metadata)
-    const result = await minioClient.fPutObject(BUCKET, destinationName, sourcePath, metadata)
+    const result = await getMinioClient().fPutObject(BUCKET, destinationName, sourcePath, metadata)
     if (!result) throw new Error('No result')
     console.debug('✅ Uploaded image successfully!', result)
     return result
