@@ -248,6 +248,25 @@ const TIME_OF_DAY_BRIEF: Record<string, string> = {
     "nighttime scene with dark exterior context and clear warm interior light glow",
 };
 
+const TIME_OF_DAY_EXTERIOR_LOCKS: Record<string, string> = {
+  "early morning, dawn light, first light of day":
+    "Exterior view push: the outdoor environment through windows must be clearly visible and strongly time-matched to early morning, with cool dawn sky brightness and a subtle warm sunrise tint near the horizon.",
+  "late morning, mid-morning sunlight":
+    "Exterior view push: the outdoor environment through windows must be strongly visible with clear bright late-morning daylight and unmistakable daytime sky cues.",
+  "noon, midday, high sun, harsh shadows":
+    "Exterior view push: the outdoor environment through windows must be strongly visible with intense bright midday sky and high daylight contrast.",
+  "afternoon, warm afternoon light":
+    "Exterior view push: the outdoor environment through windows must be strongly visible with warm afternoon daylight and clear sunlit exterior cues.",
+  "golden hour, magic hour, warm orange sunlight":
+    "Exterior view push: the outdoor environment through windows must be strongly visible with pronounced red-orange sunset hues and low-angle golden light.",
+  "dusk, twilight, blue hour":
+    "Exterior view push: the outdoor environment must clearly read as dim blue twilight, visibly darker than daytime while still legible through windows.",
+  "evening, interior lighting, ambient lamps":
+    "Exterior view push: the outdoor environment must read as dark evening; outside should be noticeably dark, with a remaining reddish sunset glow only where sky is visible.",
+  "night, nighttime, dark exterior, interior lights glowing":
+    "Exterior view push: the outdoor environment must read as near-black night with only minimal distant ambient light points.",
+};
+
 function capitalize(value: string): string {
   if (!value) return value;
   return value[0].toUpperCase() + value.slice(1);
@@ -261,6 +280,14 @@ function getTimeOfDaySpec(time?: string): TimeOfDaySpec | undefined {
       description: `${capitalize(time)}.`,
       lock: `Time-of-day selection "${time}" must be clearly visible in the final image.`,
     }
+  );
+}
+
+function getExteriorTimeLock(time?: string): string | undefined {
+  if (!time) return undefined;
+  return (
+    TIME_OF_DAY_EXTERIOR_LOCKS[time] ??
+    `Exterior view push: keep the outside environment clearly visible through windows and tightly matched to "${time}".`
   );
 }
 
@@ -384,6 +411,7 @@ export function buildPrompt({
   const environment = getLabel("environment", selections.environment);
   const time = selections.time;
   const timeSpec = getTimeOfDaySpec(time);
+  const exteriorTimeLock = getExteriorTimeLock(time);
   const handleSelection = getHandlePromptDescriptor(selections.handle);
   const handleEntry = getHandleSelectionByValue(selections.handle);
   const viewpoint = selections.viewpoint || "eye level shot";
@@ -449,6 +477,9 @@ export function buildPrompt({
       `Time of day and lighting (highest priority): ${timeSpec.description}`
     );
     sections.push(`Time-of-day lock: ${timeSpec.lock}`);
+  }
+  if (exteriorTimeLock) {
+    sections.push(exteriorTimeLock);
   }
 
   // 3. Camera & Composition (dedicated section for T5 attention priority)
@@ -640,6 +671,9 @@ export function buildPrompt({
     modelSections.push(
       `Lighting priority: ${timeSpec.description}`
     );
+  }
+  if (exteriorTimeLock) {
+    modelSections.push(exteriorTimeLock);
   }
 
   const primaryViewpoint = getPrimaryViewpointLabel(viewpoint);
