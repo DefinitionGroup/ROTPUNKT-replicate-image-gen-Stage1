@@ -469,7 +469,10 @@ export function buildPrompt({
       `Furniture surfaces in ${fenixDesc}, FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}).`
     );
     sections.push(
-      "Surface finish: glossy plastic fronts with a polished character, smooth refined reflections, and premium lacquer-like clarity."
+      `Color code lock: FENIX code ${fenixColor.code} named "${fenixColor.name}" with the color identity "${fenixDesc}". Keep this exact hue and depth clearly dominant across visible fronts.`
+    );
+    sections.push(
+      "Material lock: highly polished glossy plastic fronts, smooth sealed surface, crisp specular highlights, premium lacquer-like clarity, and refined showroom reflections."
     );
     if (fenixColor.isMetallic) {
       sections.push(
@@ -649,7 +652,10 @@ export function buildPrompt({
       `Front color direction: FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}), clearly dominant across visible cabinet fronts.`
     );
     modelSections.push(
-      "Surface finish: glossy plastic fronts with a polished character and clean refined reflections."
+      `Color code lock: FENIX code ${fenixColor.code} named "${fenixColor.name}" with color identity "${fenixDesc}", rendered with strong color fidelity.`
+    );
+    modelSections.push(
+      "Finish lock: highly polished glossy plastic fronts with a smooth sealed surface, crisp highlights, and refined premium reflections."
     );
     if (fenixColor.isMetallic) {
       modelSections.push(
