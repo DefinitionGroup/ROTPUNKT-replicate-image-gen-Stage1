@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { FaCheck } from "react-icons/fa6";
-import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
 import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 import { useLocale, useTranslations } from "next-intl";
@@ -400,11 +399,19 @@ export function WizardColorStep({
                   onClick={() => onSelect(value)}
                 >
                   <div className="relative p-3 pb-0">
-                    <span
-                      className={`block h-12 sm:h-14 w-full rounded-lg border shadow-inner transition-all duration-300 ${isSelected ? "border-brand-primary-2/40 brightness-110" : "border-border/60"}`}
+                    <div
+                      className={`relative block h-12 sm:h-14 w-full overflow-hidden rounded-lg border shadow-inner transition-all duration-300 ${isSelected ? "border-brand-primary-2/40 brightness-110" : "border-border/60"}`}
                       style={{ backgroundColor: color.hex }}
-                      aria-hidden="true"
-                    />
+                    >
+                      <Image
+                        src={getFrontfarbenImageSrc(color.imagePath)}
+                        alt={`${color.fxId} ${color.name}`}
+                        fill
+                        unoptimized
+                        className={`object-cover transition-all duration-500 ${isSelected ? "scale-105 brightness-110" : "group-hover:scale-[1.04] group-hover:brightness-105"}`}
+                        sizes="(max-width: 768px) 50vw, 180px"
+                      />
+                    </div>
                     <AnimatePresence>
                       {isSelected && (
                         <motion.div
