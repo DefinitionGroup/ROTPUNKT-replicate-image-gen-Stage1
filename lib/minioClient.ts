@@ -13,10 +13,19 @@ type UploadImagesOptions = {
   deterministicPrefix?: string
 }
 
-if (!process.env.MINIO_DOMAIN) throw new Error('Missing MINIO_DOMAIN in env variables')
-
 const BUCKET = 'vision-images' as const
 const streamPipeline = promisify(pipeline)
+
+function assertMinioConfig() {
+  const missing: string[] = []
+  if (!process.env.MINIO_DOMAIN) missing.push('MINIO_DOMAIN')
+  if (!process.env.MINIO_ACCESS_KEY) missing.push('MINIO_ACCESS_KEY')
+  if (!process.env.MINIO_SECRET_KEY) missing.push('MINIO_SECRET_KEY')
+
+  if (missing.length > 0) {
+    throw new Minio_Error(`Missing MinIO env variables: ${missing.join(', ')}`)
+  }
+}
 
 function getSafeObjectName(originURL: string): string {
   let baseName = 'image'
@@ -52,6 +61,7 @@ function getDeterministicObjectName(originURL: string, index: number, prefix: st
 }
 
 export function getObjectUrl(objectName: string): string {
+  assertMinioConfig()
   return `https://${process.env.MINIO_DOMAIN}/${BUCKET}/${objectName}`
 }
 
@@ -77,6 +87,7 @@ export class Minio_Error extends Error {
  * @param metadata
  */
 async function uploadImage(sourcePath: string, destinationName: string, metadata: ObjectMetaData) {
+  assertMinioConfig()
   console.debug('Uploading image', sourcePath, destinationName)
   try {
     console.debug('uploading', sourcePath, destinationName, metadata)
