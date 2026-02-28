@@ -237,7 +237,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       <motion.div
         key="wizard-popover"
         ref={overlayRef}
-        className="fixed inset-0 z-9999990 flex items-center justify-center overflow-y-auto bg-background/20 backdrop-blur-lg p-2 sm:p-4"
+        className="fixed inset-x-0 bottom-0 top-[calc(4.75rem+env(safe-area-inset-top))] md:inset-0 z-[2147483645] md:z-[2147483647] flex items-start md:items-center justify-center overflow-y-auto bg-background/20 backdrop-blur-lg p-2 md:p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -259,7 +259,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ duration: 0.25, type: "spring" }}
-          className="relative w-full max-w-[980px] h-[calc(100dvh-1rem)] sm:h-[96vh] max-h-[90vh] min-h-0 z-[999999999]"
+          className="relative w-full max-w-[980px] h-full md:h-[96vh] md:max-h-[90vh] min-h-0 z-[999999999]"
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
