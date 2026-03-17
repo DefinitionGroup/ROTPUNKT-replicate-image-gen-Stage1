@@ -14,26 +14,21 @@ import ImageGenerator from "./ImageGenerator";
 export default function Wizard() {
   const pageStep = useStore($pageStep);
   const showWizard = useStore($showWizard);
-  const wizardState = useStore(wizardStore);
   const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !wizardState.resumeAfterAuth) {
+    if (!isLoaded || !isSignedIn) {
       return;
     }
 
-    if (wizardState.currentStep < 0) {
+    const { currentStep, resumeAfterAuth } = wizardStore.get();
+    if (!resumeAfterAuth || currentStep < 0) {
       return;
     }
 
     $showWizard.set(true);
     wizardActions.setAuthPrompt(false);
-  }, [
-    isLoaded,
-    isSignedIn,
-    wizardState.currentStep,
-    wizardState.resumeAfterAuth,
-  ]);
+  }, [isLoaded, isSignedIn]);
 
   return (
     <div className="text-center my-8 min-h-[25rem]  flex flex-col items-center justify-center">

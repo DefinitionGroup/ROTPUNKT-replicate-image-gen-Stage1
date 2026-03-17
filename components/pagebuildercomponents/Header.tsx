@@ -45,26 +45,21 @@ export default function Header({
   };
   const pageStep = useStore($pageStep);
   const showWizard = useStore($showWizard);
-  const wizardState = useStore(wizardStore);
   const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !wizardState.resumeAfterAuth) {
+    if (!isLoaded || !isSignedIn) {
       return;
     }
 
-    if (wizardState.currentStep < 0) {
+    const { currentStep, resumeAfterAuth } = wizardStore.get();
+    if (!resumeAfterAuth || currentStep < 0) {
       return;
     }
 
     $showWizard.set(true);
     wizardActions.setAuthPrompt(false);
-  }, [
-    isLoaded,
-    isSignedIn,
-    wizardState.currentStep,
-    wizardState.resumeAfterAuth,
-  ]);
+  }, [isLoaded, isSignedIn]);
 
   const logoVariants: Variants = {
     initial: { opacity: 0, y: 20 },

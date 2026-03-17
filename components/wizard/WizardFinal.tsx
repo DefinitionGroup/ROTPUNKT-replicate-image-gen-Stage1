@@ -100,7 +100,6 @@ export const WizardFinal: React.FC<WizardFinalProps> = ({
         onChange={(e) => onExtraWishesChange(e.target.value)}
         disabled={loading}
         maxLength={300}
-        tabIndex={-1}
       />
 
       {showSubmitButton && (
