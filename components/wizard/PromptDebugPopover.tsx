@@ -11,7 +11,7 @@ interface PromptDebugPopoverProps {
   stepLabel: string;
   missingKeys: string[];
   sections: string[];
-  fallbackText?: string;
+  prompt?: string;
 }
 
 export function PromptDebugPopover({
@@ -19,7 +19,7 @@ export function PromptDebugPopover({
   stepLabel,
   missingKeys,
   sections,
-  fallbackText = "Prompt is currently empty.",
+  prompt = "Prompt is currently empty.",
 }: PromptDebugPopoverProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -117,7 +117,7 @@ export function PromptDebugPopover({
                   </div>
                 ) : (
                   <p className="text-sm leading-relaxed text-foreground text-left">
-                    {fallbackText}
+                    {prompt}
                   </p>
                 )}
               </div>

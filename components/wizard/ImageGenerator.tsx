@@ -248,8 +248,8 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         enabled={showPromptDebugPopover}
         stepLabel="image generation"
         missingKeys={summaryData.missingKeys}
-        sections={summaryData.sections}
-        fallbackText={prompt || "Prompt is currently empty."}
+        sections={summaryData.modelSections}
+        prompt={summaryData.modelPrompt || prompt || "Prompt is currently empty."}
       />
 
       {onBack && hasImages && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}

@@ -251,7 +251,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
           enabled={showPromptDebugPopover}
           stepLabel={debugStepLabel}
           missingKeys={missingKeys}
-          sections={summaryData.sections}
+          sections={summaryData.modelSections}
+          prompt={summaryData.modelPrompt}
         />
 
         <motion.div
