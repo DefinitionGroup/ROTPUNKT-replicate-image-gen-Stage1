@@ -312,6 +312,40 @@ const CAMERA_TREATMENTS: Record<string, string> = {
     "Architectural material-detail photography, shot on a full-frame camera with a 90mm macro lens, crisp texture rendering and precise finish detail.",
 };
 
+const VIEWPOINT_SCENE_INTROS: Record<string, string> = {
+  "eye level shot":
+    "Photorealistic architectural interior photo of Rotpunkt {room} cabinetry and built-in furniture",
+  "low angle shot, worm's eye view":
+    "Photorealistic low-angle architectural interior photo of Rotpunkt {room} cabinetry",
+  "high angle shot, bird's eye view":
+    "Photorealistic high-angle architectural interior photo of Rotpunkt {room} cabinetry",
+  "dutch angle, tilted frame":
+    "Photorealistic tilted architectural interior photo of Rotpunkt {room} cabinetry",
+  "wide shot, long shot, establishing shot":
+    "Photorealistic wide architectural interior view of a Rotpunkt {room}",
+  "medium shot, mid shot":
+    "Photorealistic architectural interior shot of the main Rotpunkt {room} cabinet composition",
+  "close-up shot":
+    "Photorealistic architectural detail shot of Rotpunkt {room} cabinetry, focused on cabinet fronts, materials, and handle hardware",
+  "full room view, interior panorama":
+    "Photorealistic full-room architectural interior view of a Rotpunkt {room}",
+  "extreme close-up, detail shot, macro":
+    "Photorealistic macro architectural detail shot of Rotpunkt {room} cabinetry, focused on surface texture, finish, and handle detail",
+};
+
+const VIEWPOINT_PRIORITY_LINES: Record<string, string> = {
+  "wide shot, long shot, establishing shot":
+    "Framing priority: wide room coverage with the full cabinet composition clearly visible.",
+  "medium shot, mid shot":
+    "Framing priority: mid-distance composition centered on the primary cabinet grouping.",
+  "close-up shot":
+    "Framing priority: tight detail composition centered on cabinet fronts, materials, and handle hardware.",
+  "full room view, interior panorama":
+    "Framing priority: full-room panorama with the cabinetry readable within the whole interior.",
+  "extreme close-up, detail shot, macro":
+    "Framing priority: macro detail composition centered on surface texture, finish, and handle geometry.",
+};
+
 function normalizeAccessories(
   accessories?: WizardState["selectedOptions"]["accessories"]
 ): string[] {
@@ -329,6 +363,29 @@ function normalizeAccessoryDescriptor(accessory: string): string {
 function getPrimaryViewpointLabel(viewpoint: string): string {
   const [first] = viewpoint.split(",");
   return (first ?? viewpoint).trim();
+}
+
+function getModelSceneIntro({
+  viewpoint,
+  roomLabel,
+  style,
+  environment,
+  timeBrief,
+}: {
+  viewpoint: string;
+  roomLabel: string;
+  style?: string;
+  environment?: string;
+  timeBrief?: string;
+}) {
+  const template =
+    VIEWPOINT_SCENE_INTROS[viewpoint] ??
+    "Photorealistic architectural interior photo of Rotpunkt {room} cabinetry and built-in furniture";
+  const introParts = [template.replace("{room}", roomLabel)];
+  if (style) introParts.push(`${style} style`);
+  if (environment) introParts.push(`in a ${environment}`);
+  if (timeBrief) introParts.push(timeBrief);
+  return `${introParts.join(", ")}.`;
 }
 
 /**
@@ -442,6 +499,12 @@ export function buildPrompt({
   const cameraTreatment =
     CAMERA_TREATMENTS[viewpoint] ??
     "Architectural interior photography, shot on a full-frame camera with a 24mm lens at f/8, realistic room proportions.";
+  const isDetailView =
+    viewpoint === "close-up shot" ||
+    viewpoint === "extreme close-up, detail shot, macro";
+  const isWideView =
+    viewpoint === "wide shot, long shot, establishing shot" ||
+    viewpoint === "full room view, interior panorama";
 
   // 1. Opening + Subject & Style as natural language
   let opening = isKitchenRoom
@@ -679,13 +742,15 @@ export function buildPrompt({
     effectiveKind ??
     (isKitchenRoom ? "kitchen" : isLivingRoom ? "living room" : "interior");
   const timeBrief = time ? TIME_OF_DAY_BRIEF[time] : undefined;
-  const sceneIntroParts = [
-    `Photorealistic Rotpunkt ${roomLabel} with cabinetry and built-in furniture as the main subject`,
-  ];
-  if (style) sceneIntroParts.push(`${style} style`);
-  if (environment) sceneIntroParts.push(`in a ${environment}`);
-  if (timeBrief) sceneIntroParts.push(timeBrief);
-  modelSections.push(`${sceneIntroParts.join(", ")}.`);
+  modelSections.push(
+    getModelSceneIntro({
+      viewpoint,
+      roomLabel,
+      style,
+      environment,
+      timeBrief,
+    })
+  );
 
   if (timeBrief) {
     modelSections.push(
@@ -705,6 +770,10 @@ export function buildPrompt({
   compositionParts.push(cameraTreatment);
   if (floor) compositionParts.push(`Flooring: ${floor}.`);
   modelSections.push(compositionParts.join(" "));
+  const viewpointPriority = VIEWPOINT_PRIORITY_LINES[viewpoint];
+  if (viewpointPriority) {
+    modelSections.push(viewpointPriority);
+  }
 
   if (isFenix && fenixColor) {
     modelSections.push(
@@ -752,14 +821,20 @@ export function buildPrompt({
   if (isKitchenRoom) {
     if (kitchenLayoutLabel) {
       modelSections.push(
-        `Kitchen layout: ${kitchenLayoutLabel} with Rotpunkt kitchen cabinetry as the hero furniture.`
+        isDetailView
+          ? `Kitchen layout reference: ${kitchenLayoutLabel}, expressed through cabinetry details, materials, and surrounding kitchen context.`
+          : `Kitchen layout: ${kitchenLayoutLabel} with Rotpunkt kitchen cabinetry as the hero furniture.`
       );
     } else {
       modelSections.push(
-        "Kitchen scene with Rotpunkt kitchen cabinetry as the hero furniture."
+        isDetailView
+          ? "Kitchen context expressed through cabinetry details, worktop relationships, and believable surrounding kitchen elements."
+          : "Kitchen scene with Rotpunkt kitchen cabinetry as the hero furniture."
       );
     }
-    modelSections.push("Exactly one sink with one faucet.");
+    if (!isDetailView) {
+      modelSections.push("Exactly one sink with one faucet.");
+    }
   } else if (isLivingRoom) {
     modelSections.push(
       "Living-room furniture focus: built-in storage wall, sideboards, shelving, lounge context, and cabinet compositions that read immediately as living-room cabinetry."
@@ -770,10 +845,9 @@ export function buildPrompt({
     );
   }
 
-  const cappedAccessories = normalizedAccessories.slice(0, 3);
-  if (cappedAccessories.length > 0) {
+  if (normalizedAccessories.length > 0) {
     modelSections.push(
-      `Visible accessories: ${cappedAccessories.join(", ")}.`
+      `Visible accessories: ${normalizedAccessories.join(", ")}.`
     );
   }
 
@@ -783,7 +857,11 @@ export function buildPrompt({
   }
 
   modelSections.push(
-    "All selected choices must be visible together in one coherent scene with consistent materials and physically plausible lighting."
+    isDetailView
+      ? "Framing rule: prioritize detail fidelity above completeness. The selected front, finish, material, and handle details must dominate the frame; broader room cues only need to appear as supporting context."
+      : isWideView
+        ? "Framing rule: all major selected choices should be visible together in one coherent scene with consistent materials and physically plausible lighting."
+        : "Framing rule: keep the primary selected choices legible within one coherent scene, while preserving consistent materials and physically plausible lighting."
   );
 
   const modelPrompt = modelSections.join(" ");

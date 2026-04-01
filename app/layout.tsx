@@ -33,6 +33,14 @@ export default function RootLayout({
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: themeScript }}
         />
+        <Script
+          id="Cookiebot"
+          src="https://consent.cookiebot.com/uc.js"
+          strategy="beforeInteractive"
+          data-cbid="3dadf7ea-3074-4369-9ff3-fa95a8cb52c2"
+          data-blockingmode="auto"
+          type="text/javascript"
+        />
       </head>
       <body className="antialiased">{children}</body>
     </html>
