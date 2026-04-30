@@ -15,7 +15,7 @@
     "fix": "eslint . --fix"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.29.0",
+    "@clerk/nextjs": "^6.39.3",
     "@lottiefiles/dotlottie-react": "^0.14.4",
     "@nanostores/persistent": "^1.1.0",
     "@nanostores/react": "^1.0.0",
