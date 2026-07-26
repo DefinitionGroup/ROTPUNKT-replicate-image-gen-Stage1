@@ -407,6 +407,28 @@ function sanitizeHandlePromptCaption(caption: string): string {
       /\bdark matte kitchen fronts? with\s*/gi,
       ""
     )
+    .replace(/\ba detail photograph showing\s*/gi, "")
+    .replace(/\bmultiple\s+/gi, "")
+    .replace(
+      /\bfour handles visible in diagonal perspective on stacked white drawers with black stone countertop\b/gi,
+      ""
+    )
+    .replace(
+      /\bon white Rotpunkt kitchen drawer fronts?\b/gi,
+      ""
+    )
+    .replace(
+      /\bon (?:a )?white Rotpunkt kitchen cabinet fronts?\b/gi,
+      ""
+    )
+    .replace(
+      /\bdark teal-green Rotpunkt kitchen cabinet fronts?\b/gi,
+      ""
+    )
+    .replace(/\bdark charcoal-black cabinet front\b/gi, "")
+    .replace(/\bdark blue-black cabinet front\b/gi, "")
+    .replace(/\bwhite countertop edge visible above\b/gi, "")
+    .replace(/\bwhite countertop above dark cabinets\b/gi, "")
     .replace(
       /\bon Rotpunkt kitchen cabinet fronts?\b/gi,
       ""
@@ -424,6 +446,103 @@ function sanitizeHandlePromptCaption(caption: string): string {
     .replace(/^[,.\s]+|[,.\s]+$/g, "");
 }
 
+type HandlePromptKind =
+  | "handleless"
+  | "tokyo_grip"
+  | "t_bar"
+  | "bar_pull"
+  | "knob"
+  | "generic";
+
+function getHandlePromptKind({
+  category,
+  promptCaption,
+}: {
+  category: string;
+  promptCaption: string;
+}): HandlePromptKind {
+  if (category === "handleless") return "handleless";
+  if (category === "tokyo_grip") return "tokyo_grip";
+
+  const normalizedCaption = promptCaption.toLowerCase();
+  if (normalizedCaption.includes("t-bar")) return "t_bar";
+  if (
+    normalizedCaption.includes("bar pull") ||
+    normalizedCaption.includes("bar handle")
+  ) {
+    return "bar_pull";
+  }
+  if (normalizedCaption.includes("knob")) return "knob";
+  return "generic";
+}
+
+function buildHandleModelSections({
+  category,
+  promptCaption,
+  label,
+  isKitchen,
+}: {
+  category: string;
+  promptCaption: string;
+  label?: string;
+  isKitchen: boolean;
+}): string[] {
+  const contextualCaption = contextualizeHandleCaption(
+    promptCaption,
+    isKitchen
+  );
+  const sanitizedCaption = sanitizeHandlePromptCaption(contextualCaption);
+  const descriptor = sanitizedCaption || label || "selected cabinet handle";
+  const kind = getHandlePromptKind({ category, promptCaption });
+
+  if (kind === "handleless") {
+    return [
+      "Opening system: Rotpunkt handleless cabinetry with smooth uninterrupted fronts and a recessed finger-pull channel directly below the worktop as the only opening detail.",
+      "Front geometry: every door and drawer remains an independent operable panel, separated from neighboring fronts by crisp visible seams.",
+    ];
+  }
+
+  if (kind === "tokyo_grip") {
+    return [
+      `Opening system: Rotpunkt Tokyo integrated grip, milled into the top edge of each individual front as a horizontal projecting lip with a curved finger recess underneath. Selected surface and finish: ${descriptor}.`,
+      "Tokyo mounting geometry: each visible door or drawer has its own separate grip profile, fully contained within that single front. Crisp visible seams and a clear gap separate all neighboring fronts so every panel opens independently.",
+    ];
+  }
+
+  const commonMountingRule =
+    "Panel mounting rule: every visible handle belongs to one individual operable door or drawer front. The complete handle and all mounting points stay inside that panel's boundaries. Neighboring fronts retain crisp visible seams and paired doors open independently.";
+
+  if (kind === "t_bar") {
+    return [
+      `Handle hardware: ${descriptor}. Keep this T-bar silhouette, knurled profile, backplate geometry, and finish clearly identifiable.`,
+      `${commonMountingRule} Each T-bar uses one central pedestal or backplate positioned entirely within its own front.`,
+    ];
+  }
+
+  if (kind === "bar_pull") {
+    return [
+      `Handle hardware: ${descriptor}. Keep this bar-pull silhouette, profile, bracket geometry, and finish clearly identifiable.`,
+      `${commonMountingRule} Both bracket feet attach to the same front, and both bar ends terminate before that front's side edges.`,
+    ];
+  }
+
+  if (kind === "knob") {
+    return [
+      `Handle hardware: ${descriptor}. Keep this knob silhouette, mounting base, texture, and finish clearly identifiable.`,
+      `${commonMountingRule} Each knob uses one mounting point positioned entirely within its own front.`,
+    ];
+  }
+
+  return [
+    `Handle hardware: ${descriptor}. Keep the selected silhouette, profile, mounting style, and finish clearly identifiable.`,
+    commonMountingRule,
+  ];
+}
+
+function buildKitchenFixtureTopology(): string {
+  return "Kitchen fixture topology (primary spatial constraint): the complete kitchen has one compact wet zone on a wall-side worktop, consisting of a single undermount sink basin paired with one mixer faucet. Every remaining worktop, including any island or peninsula, is a dry continuous preparation surface with an uninterrupted countertop.";
+}
+
 function buildReferenceTag(
   prefix: string,
   value: string | undefined
@@ -433,8 +552,8 @@ function buildReferenceTag(
 
 /**
  * Replace "kitchen" references in handle promptCaptions for non-kitchen rooms.
- * All 97 handle entries contain "kitchen" which contradicts the non-kitchen
- * opening text and confuses the model into generating kitchen elements.
+ * Catalog captions can contain "kitchen", which contradicts the non-kitchen
+ * opening text and can pull kitchen elements into other room types.
  * Ordered from most-specific to least-specific to prevent double replacement.
  */
 function contextualizeHandleCaption(
@@ -752,6 +871,22 @@ export function buildPrompt({
     })
   );
 
+  if (isKitchenRoom && !isDetailView) {
+    modelSections.push(buildKitchenFixtureTopology());
+  }
+
+  if (handleEntry) {
+    modelSections.push(
+      ...buildHandleModelSections({
+        category: handleEntry.category,
+        promptCaption:
+          handleSelection?.promptCaption ?? handleEntry.promptCaption,
+        label: handleEntry.labelEn,
+        isKitchen: isKitchenRoom,
+      })
+    );
+  }
+
   if (timeBrief) {
     modelSections.push(
       `Lighting priority: ${timeBrief}; the selected time of day must read immediately.`
@@ -805,19 +940,6 @@ export function buildPrompt({
     );
   }
 
-  if (handleEntry) {
-    const handleDescriptor = sanitizeHandlePromptCaption(
-      contextualizeHandleCaption(handleSelection?.promptCaption ?? handleEntry.promptCaption, isKitchenRoom)
-    );
-    modelSections.push(
-      `Handle hardware: ${handleDescriptor || handleEntry.labelEn}. Keep the selected handle silhouette, profile, mounting style, and finish family clearly identifiable.`
-    );
-  } else if (handleSelection) {
-    modelSections.push(
-      "Selected handle/grip must stay clearly identifiable by shape, mounting style, and finish."
-    );
-  }
-
   if (isKitchenRoom) {
     if (kitchenLayoutLabel) {
       modelSections.push(
@@ -831,9 +953,6 @@ export function buildPrompt({
           ? "Kitchen context expressed through cabinetry details, worktop relationships, and believable surrounding kitchen elements."
           : "Kitchen scene with Rotpunkt kitchen cabinetry as the hero furniture."
       );
-    }
-    if (!isDetailView) {
-      modelSections.push("Exactly one sink with one faucet.");
     }
   } else if (isLivingRoom) {
     modelSections.push(
@@ -856,9 +975,16 @@ export function buildPrompt({
     modelSections.push(`User wishes: ${modelWishes}.`);
   }
 
+  const detailHardwareFocus =
+    handleEntry?.category === "handleless"
+      ? "integrated recessed opening channel"
+      : handleEntry?.category === "tokyo_grip"
+        ? "integrated Tokyo grip profile"
+        : "selected handle geometry";
+
   modelSections.push(
     isDetailView
-      ? "Framing rule: prioritize detail fidelity above completeness. The selected front, finish, material, and handle details must dominate the frame; broader room cues only need to appear as supporting context."
+      ? `Framing rule: prioritize detail fidelity above completeness. The selected front, finish, material, and ${detailHardwareFocus} must dominate the frame; broader room cues only need to appear as supporting context.`
       : isWideView
         ? "Framing rule: all major selected choices should be visible together in one coherent scene with consistent materials and physically plausible lighting."
         : "Framing rule: keep the primary selected choices legible within one coherent scene, while preserving consistent materials and physically plausible lighting."
