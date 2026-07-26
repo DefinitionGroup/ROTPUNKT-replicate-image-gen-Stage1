@@ -3,6 +3,13 @@ import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { uploadImages } from "@/lib/minioClient";
 import { createClient } from "@supabase/supabase-js";
+import {
+  isGenerationContext,
+  isGenerationQualityExpectations,
+  type GenerationCandidate,
+  type GenerationContext,
+  type GenerationQualityExpectations,
+} from "@/lib/imageGenerationContract";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
@@ -77,8 +84,18 @@ async function persistImagesToSupabase(params: {
   prompt: string;
   urls: string[];
   getToken: ReturnType<typeof getAuth>["getToken"];
+  generation: GenerationContext | null;
+  qualityExpectations: GenerationQualityExpectations | null;
 }): Promise<PersistenceResult> {
-  const { requestId, userId, prompt, urls, getToken } = params;
+  const {
+    requestId,
+    userId,
+    prompt,
+    urls,
+    getToken,
+    generation,
+    qualityExpectations,
+  } = params;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!supabaseUrl) {
@@ -132,10 +149,18 @@ async function persistImagesToSupabase(params: {
     };
   }
 
-  const insertPayload = urls.map((url) => ({
+  const insertPayload = urls.map((url, candidateIndex) => ({
     url,
     imageprompt: prompt,
     user_id: userId,
+    generation_metadata: generation
+      ? {
+          ...generation,
+          candidateIndex,
+          qualityStatus: "not_evaluated",
+          qualityExpectations,
+        }
+      : null,
   }));
 
   const errors: string[] = [];
@@ -165,7 +190,18 @@ async function persistImagesToSupabase(params: {
         return { persisted: true, transport: name, inserted: 0 };
       }
 
-      const { error: dbError } = await client.from("images").insert(rowsToInsert);
+      let { error: dbError } = await client.from("images").insert(rowsToInsert);
+      if (
+        dbError &&
+        /generation_metadata/i.test(dbError.message)
+      ) {
+        const legacyRows = rowsToInsert.map((row) => ({
+          url: row.url,
+          imageprompt: row.imageprompt,
+          user_id: row.user_id,
+        }));
+        ({ error: dbError } = await client.from("images").insert(legacyRows));
+      }
       if (dbError) {
         throw new Error(`insert failed: ${dbError.message}`);
       }
@@ -195,7 +231,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { predictionId, prompt } = await req.json();
+    const {
+      predictionId,
+      prompt,
+      generation: requestedGeneration,
+      qualityExpectations: requestedQualityExpectations,
+    } = await req.json();
 
     if (!predictionId || typeof predictionId !== "string") {
       return NextResponse.json(
@@ -209,6 +250,14 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    const generation = isGenerationContext(requestedGeneration)
+      ? requestedGeneration
+      : null;
+    const qualityExpectations = isGenerationQualityExpectations(
+      requestedQualityExpectations
+    )
+      ? requestedQualityExpectations
+      : null;
 
     const prediction = await withTimeout(
       replicate.predictions.get(predictionId),
@@ -220,6 +269,8 @@ export async function POST(req: NextRequest) {
     if (status !== "succeeded") {
       return NextResponse.json({
         status,
+        generation,
+        qualityExpectations,
         error:
           status === "failed" || status === "canceled"
             ? toErrorMessage(prediction.error)
@@ -254,6 +305,8 @@ export async function POST(req: NextRequest) {
       prompt,
       urls: finalUrls,
       getToken,
+      generation,
+      qualityExpectations,
     });
     if (!persistence.persisted) {
       console.error(
@@ -262,9 +315,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const candidates: GenerationCandidate[] = finalUrls.map((url, index) => ({
+      index,
+      url,
+      quality: {
+        status: "not_evaluated",
+        reasons: [],
+      },
+    }));
+
     return NextResponse.json({
       status: "succeeded",
       urls: finalUrls,
+      candidates,
+      generation,
+      qualityExpectations,
       persistedToSupabase: persistence.persisted,
       persistenceTransport: persistence.transport ?? null,
     });

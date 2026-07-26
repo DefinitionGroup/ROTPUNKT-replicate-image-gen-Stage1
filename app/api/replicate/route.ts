@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
+import {
+  PROMPT_VERSION,
+  isGenerationQualityExpectations,
+  withLoraTrigger,
+  type GenerationContext,
+  type PromptVersion,
+} from "@/lib/imageGenerationContract";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
@@ -23,6 +30,30 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
 
 const MODEL = "rotpunkt007/basemodel-5-2026:0672a9098a0c17393feeb70989b90488a89e80404be9543ccabe9c87aca4ac08";
 const MODEL_VERSION = MODEL.split(":")[1];
+const GUIDANCE_SCALE = 3.2;
+const KITCHEN_LORA_SCALE = 0.85;
+const INTERIOR_LORA_SCALE = 0.65;
+const NUM_INFERENCE_STEPS = 28;
+
+function clampInteger(
+  value: unknown,
+  fallback: number,
+  min: number,
+  max: number
+) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(value)));
+}
+
+function getCandidateCount(kitchenMode: boolean): number {
+  if (!kitchenMode) return 1;
+  const configured = Number(process.env.REPLICATE_KITCHEN_CANDIDATES ?? "2");
+  return clampInteger(configured, 2, 1, 4);
+}
+
+function normalizePromptVersion(value: unknown): PromptVersion {
+  return value === "legacy-debug" ? "legacy-debug" : PROMPT_VERSION;
+}
 
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
@@ -35,7 +66,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { prompt, isKitchen } = await req.json();
+    const {
+      prompt,
+      isKitchen,
+      seed: requestedSeed,
+      promptVersion: requestedPromptVersion,
+      qualityExpectations: requestedQualityExpectations,
+    } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -51,7 +88,32 @@ export async function POST(req: NextRequest) {
       throw new Error("Replicate model version is not configured");
     }
 
-    const finalPrompt = `RDTDOT ${prompt.trim()}`;
+    const finalPrompt = withLoraTrigger(prompt);
+    const seed = clampInteger(
+      requestedSeed,
+      Math.floor(Math.random() * 2 ** 32),
+      0,
+      2 ** 32 - 1
+    );
+    const numOutputs = getCandidateCount(kitchenMode);
+    const loraScale = kitchenMode
+      ? KITCHEN_LORA_SCALE
+      : INTERIOR_LORA_SCALE;
+    const promptVersion = normalizePromptVersion(requestedPromptVersion);
+    const qualityExpectations = isGenerationQualityExpectations(
+      requestedQualityExpectations
+    )
+      ? requestedQualityExpectations
+      : null;
+    const generation: GenerationContext = {
+      promptVersion,
+      seed,
+      numOutputs,
+      modelVersion: MODEL_VERSION,
+      guidanceScale: GUIDANCE_SCALE,
+      loraScale,
+      numInferenceSteps: NUM_INFERENCE_STEPS,
+    };
 
     const prediction = await withTimeout(
       replicate.predictions.create({
@@ -59,15 +121,15 @@ export async function POST(req: NextRequest) {
         input: {
           prompt: finalPrompt,
           go_fast: false,
-          guidance_scale: 3.2,
+          guidance_scale: GUIDANCE_SCALE,
           megapixels: "1",
-          lora_scale: kitchenMode ? 0.85 : 0.65,
+          lora_scale: loraScale,
           aspect_ratio: "16:9",
           output_format: "webp",
           output_quality: 80,
-          seed: Math.floor(Math.random() * 2 ** 32),
-          num_inference_steps: 28,
-          num_outputs: 1,
+          seed,
+          num_inference_steps: NUM_INFERENCE_STEPS,
+          num_outputs: numOutputs,
         },
       }),
       START_TIMEOUT_MS,
@@ -86,6 +148,8 @@ export async function POST(req: NextRequest) {
       {
         predictionId: prediction.id,
         status: prediction.status ?? "starting",
+        generation,
+        qualityExpectations,
       },
       { status: 202 }
     );

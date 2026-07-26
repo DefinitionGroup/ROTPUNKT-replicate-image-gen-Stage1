@@ -19,39 +19,61 @@ import {
   $promptPipelineV2Enabled,
   loadRuntimeConfig,
 } from "@/store/runtimeConfig";
+import type {
+  GenerationCandidate,
+  GenerationContext,
+  GenerationQualityExpectations,
+  PromptVersion,
+} from "@/lib/imageGenerationContract";
 
 const isDev = process.env.NODE_ENV === "development";
 
 interface StartGenerationResponse {
   predictionId: string;
   status: string;
+  generation: GenerationContext;
+  qualityExpectations: GenerationQualityExpectations | null;
 }
 
 interface StatusGenerationResponse {
   status: string;
   urls?: string[];
+  candidates?: GenerationCandidate[];
+  generation?: GenerationContext | null;
+  qualityExpectations?: GenerationQualityExpectations | null;
   error?: string | null;
 }
 
 interface StartGenerationParams {
   prompt: string;
   isKitchen: boolean;
+  promptVersion: PromptVersion;
+  qualityExpectations: GenerationQualityExpectations;
   signal: AbortSignal;
 }
 
 interface PollGenerationParams {
   prompt: string;
   predictionId: string;
+  generation: GenerationContext;
+  qualityExpectations: GenerationQualityExpectations | null;
   signal: AbortSignal;
 }
 
 async function startGenerationApi({
   prompt,
   isKitchen,
+  promptVersion,
+  qualityExpectations,
   signal,
 }: StartGenerationParams): Promise<StartGenerationResponse> {
   const res = await fetch("/api/replicate", {
-    body: JSON.stringify({ prompt, isKitchen }),
+    body: JSON.stringify({
+      prompt,
+      isKitchen,
+      promptVersion,
+      qualityExpectations,
+    }),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -70,10 +92,17 @@ async function startGenerationApi({
 async function pollGenerationApi({
   prompt,
   predictionId,
+  generation,
+  qualityExpectations,
   signal,
 }: PollGenerationParams): Promise<StatusGenerationResponse> {
   const res = await fetch("/api/replicate/status", {
-    body: JSON.stringify({ prompt, predictionId }),
+    body: JSON.stringify({
+      prompt,
+      predictionId,
+      generation,
+      qualityExpectations,
+    }),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -98,6 +127,8 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
   const [predictionId, setPredictionId] = useState<string | null>(null);
+  const [generationContext, setGenerationContext] =
+    useState<GenerationContext | null>(null);
   const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
     .trim()
     .replace(/^['"]|['"]$/g, "")
@@ -135,6 +166,8 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       const data = await startGenerationApi({
         prompt: p,
         isKitchen: $isKitchenRoom.get(),
+        promptVersion: summaryData.promptVersion,
+        qualityExpectations: summaryData.qualityExpectations,
         signal: controller.signal,
       });
       if (isDev) console.log("[ImageGenerator] Prediction started:", data);
@@ -142,6 +175,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     },
     onSuccess: (data) => {
       setPredictionId(data.predictionId);
+      setGenerationContext(data.generation);
     },
     retry: 1,
     retryDelay: 3000,
@@ -153,12 +187,14 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     isError: isStatusError,
     refetch: refetchStatus,
   } = useQuery<StatusGenerationResponse, Error>({
-    queryKey: ["replicate-status", predictionId, prompt],
-    enabled: Boolean(predictionId && prompt),
+    queryKey: ["replicate-status", predictionId, prompt, generationContext?.seed],
+    enabled: Boolean(predictionId && prompt && generationContext),
     queryFn: ({ signal }) =>
       pollGenerationApi({
         prompt: prompt!,
         predictionId: predictionId!,
+        generation: generationContext!,
+        qualityExpectations: summaryData.qualityExpectations,
         signal,
       }),
     refetchInterval: (query) => {
@@ -177,6 +213,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     setGeneratedImages(statusData.urls);
     setSelectedImage(statusData.urls[0]);
     setPredictionId(null);
+    setGenerationContext(null);
     // Clear the prompt to avoid accidental regeneration on remount.
     $prompt.set(null);
   }, [statusData]);
@@ -184,6 +221,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const handleRetry = useCallback(() => {
     resetMutation();
     setPredictionId(null);
+    setGenerationContext(null);
 
     if (!prompt) return;
     hasTriggered.current = prompt;
@@ -193,6 +231,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   useEffect(() => {
     if (statusData?.status === "failed" || statusData?.status === "canceled") {
       setPredictionId(null);
+      setGenerationContext(null);
     }
   }, [statusData]);
 
