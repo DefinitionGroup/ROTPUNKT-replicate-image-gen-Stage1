@@ -297,7 +297,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="w-full mx-autoflex flex-col justify-center items-center">
+    <div className="mx-auto flex w-full flex-col items-center justify-center px-4 lg:px-0">
       <PromptDebugPopover
         enabled={showPromptDebugPopover}
         stepLabel="image generation"
@@ -325,6 +325,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
+            className="w-full"
           >
             <div className="mx-auto mb-8 max-w-2xl text-center">
               <h2 className="text-2xl font-semibold text-foreground">
@@ -347,12 +348,16 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
               }
             />
             {selectedBestImageId && (
-              <p className="mt-5 text-center text-sm text-emerald-500">
+              <p
+                className="mt-5 text-center text-sm text-emerald-500"
+                role="status"
+                aria-live="polite"
+              >
                 {t("comparison.saved")}
               </p>
             )}
             {isBestSelectionError && (
-              <p className="mt-5 text-center text-sm text-destructive">
+              <p className="mt-5 text-center text-sm text-destructive" role="alert">
                 {t("comparison.saveError")}
               </p>
             )}
@@ -530,57 +535,171 @@ function ImagesGrid({
   onSelectBest: (candidate: GenerationCandidate) => void;
 }) {
   const t = useTranslations("imageGenerator.comparison");
+  const [activeCandidateId, setActiveCandidateId] = useState<string | null>(
+    () => selectedBestImageId ?? candidates[0]?.imageId ?? null
+  );
+  const activeCandidate =
+    candidates.find((candidate) => candidate.imageId === activeCandidateId) ??
+    candidates.find((candidate) => candidate.imageId === selectedBestImageId) ??
+    candidates[0];
+
+  if (!activeCandidate) return null;
 
   return (
-    <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
-      {candidates.map((candidate) => {
-        const isBest = selectedBestImageId === candidate.imageId;
-        return (
-          <div
-            key={candidate.imageId}
-            className={`relative overflow-hidden rounded-xl border bg-card transition ${
-              isBest
-                ? "border-emerald-400 ring-2 ring-emerald-400/40"
-                : "border-border"
-            }`}
+    <>
+      <div className="w-full md:hidden">
+        <div
+          className={`overflow-hidden rounded-xl border bg-card transition ${
+            selectedBestImageId === activeCandidate.imageId
+              ? "border-emerald-400 ring-2 ring-emerald-400/40"
+              : "border-border"
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => onImageClick(activeCandidate.url)}
+            aria-label={t("variantAlt", { number: activeCandidate.index + 1 })}
+            className="group block w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary-2"
           >
-            <img
-              src={candidate.url}
-              alt={t("variantAlt", { number: candidate.index + 1 })}
+            <motion.img
+              key={activeCandidate.imageId}
+              src={activeCandidate.url}
+              alt={t("variantAlt", { number: activeCandidate.index + 1 })}
               crossOrigin="anonymous"
-              className="w-full cursor-pointer transition-transform hover:scale-[1.01]"
-              onClick={() => onImageClick(candidate.url)}
+              initial={{ opacity: 0.7 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.18 }}
+              className="aspect-[7/4] w-full object-cover transition-transform group-hover:scale-[1.01]"
             />
-            <div className="flex items-center justify-between gap-3 p-3">
-              <span className="text-xs text-muted-foreground">
-                {t("variant", { number: candidate.index + 1 })}
-              </span>
-              <button
-                type="button"
-                aria-pressed={isBest}
-                aria-label={
-                  isBest
-                    ? t("selectedAria", { number: candidate.index + 1 })
-                    : t("selectAria", { number: candidate.index + 1 })
+          </button>
+          <div className="flex items-center justify-between gap-3 p-3">
+            <span className="text-sm font-medium text-foreground">
+              {t("variant", { number: activeCandidate.index + 1 })}
+            </span>
+            <button
+              type="button"
+              aria-pressed={selectedBestImageId === activeCandidate.imageId}
+              aria-label={
+                selectedBestImageId === activeCandidate.imageId
+                  ? t("selectedAria", { number: activeCandidate.index + 1 })
+                  : t("selectAria", { number: activeCandidate.index + 1 })
+              }
+              disabled={isSavingBest}
+              onClick={() => onSelectBest(activeCandidate)}
+              className={`inline-flex size-12 shrink-0 items-center justify-center rounded-full border transition disabled:cursor-wait disabled:opacity-60 ${
+                selectedBestImageId === activeCandidate.imageId
+                  ? "border-emerald-400 bg-emerald-400 text-black"
+                  : "border-border bg-background/80 text-muted-foreground hover:border-emerald-400 hover:text-emerald-400"
+              }`}
+            >
+              <Star
+                className="size-5"
+                fill={
+                  selectedBestImageId === activeCandidate.imageId
+                    ? "currentColor"
+                    : "none"
                 }
-                disabled={isSavingBest}
-                onClick={() => onSelectBest(candidate)}
-                className={`inline-flex size-10 items-center justify-center rounded-full border transition disabled:cursor-wait disabled:opacity-60 ${
-                  isBest
-                    ? "border-emerald-400 bg-emerald-400 text-black"
-                    : "border-border bg-background/80 text-muted-foreground hover:border-emerald-400 hover:text-emerald-400"
+              />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {candidates.map((candidate) => {
+            const isActive = activeCandidate.imageId === candidate.imageId;
+            const isBest = selectedBestImageId === candidate.imageId;
+
+            return (
+              <button
+                key={candidate.imageId}
+                type="button"
+                aria-pressed={isActive}
+                aria-label={t("variantAlt", { number: candidate.index + 1 })}
+                onClick={() => setActiveCandidateId(candidate.imageId)}
+                className={`relative overflow-hidden rounded-lg border bg-card text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2 ${
+                  isActive
+                    ? "border-brand-primary-2 ring-1 ring-brand-primary-2/50"
+                    : "border-border"
                 }`}
               >
-                <Star
-                  className="size-5"
-                  fill={isBest ? "currentColor" : "none"}
+                <img
+                  src={candidate.url}
+                  alt=""
+                  crossOrigin="anonymous"
+                  className="aspect-[7/4] w-full object-cover"
+                />
+                <span className="flex items-center justify-between gap-1 px-2 py-1.5 text-[11px] text-muted-foreground">
+                  {t("variant", { number: candidate.index + 1 })}
+                  {isBest && (
+                    <Star
+                      aria-hidden="true"
+                      className="size-3.5 shrink-0 text-emerald-400"
+                      fill="currentColor"
+                    />
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="hidden w-full grid-cols-3 gap-4 md:grid lg:gap-6">
+        {candidates.map((candidate) => {
+          const isBest = selectedBestImageId === candidate.imageId;
+          return (
+            <div
+              key={candidate.imageId}
+              className={`relative overflow-hidden rounded-xl border bg-card transition ${
+                isBest
+                  ? "border-emerald-400 ring-2 ring-emerald-400/40"
+                  : "border-border"
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => onImageClick(candidate.url)}
+                aria-label={t("variantAlt", { number: candidate.index + 1 })}
+                className="group block w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary-2"
+              >
+                <img
+                  src={candidate.url}
+                  alt={t("variantAlt", { number: candidate.index + 1 })}
+                  crossOrigin="anonymous"
+                  className="aspect-[7/4] w-full object-cover transition-transform group-hover:scale-[1.01]"
                 />
               </button>
+              <div className="flex items-center justify-between gap-3 p-3">
+                <span className="text-xs text-muted-foreground">
+                  {t("variant", { number: candidate.index + 1 })}
+                </span>
+                <button
+                  type="button"
+                  aria-pressed={isBest}
+                  aria-label={
+                    isBest
+                      ? t("selectedAria", { number: candidate.index + 1 })
+                      : t("selectAria", { number: candidate.index + 1 })
+                  }
+                  disabled={isSavingBest}
+                  onClick={() => onSelectBest(candidate)}
+                  className={`inline-flex size-11 items-center justify-center rounded-full border transition disabled:cursor-wait disabled:opacity-60 ${
+                    isBest
+                      ? "border-emerald-400 bg-emerald-400 text-black"
+                      : "border-border bg-background/80 text-muted-foreground hover:border-emerald-400 hover:text-emerald-400"
+                  }`}
+                >
+                  <Star
+                    className="size-5"
+                    fill={isBest ? "currentColor" : "none"}
+                  />
+                </button>
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
