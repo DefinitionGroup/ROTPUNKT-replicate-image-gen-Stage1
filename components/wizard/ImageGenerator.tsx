@@ -10,6 +10,7 @@ import { $prompt } from "@/store/prompt";
 import { wizardStore } from "@/store/wizardStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
+import AiGeneratedLabel from "@/components/AiGeneratedLabel";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Star } from "lucide-react";
@@ -334,6 +335,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
               <p className="mt-2 text-sm text-muted-foreground">
                 {t("comparison.description")}
               </p>
+              <AiGeneratedLabel variant="inline" className="mt-4" />
             </div>
             <ImagesGrid
               candidates={generatedCandidates!}

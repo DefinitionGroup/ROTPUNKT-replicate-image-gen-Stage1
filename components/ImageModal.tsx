@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import { FaSquareXTwitter } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
 import Image from "next/image";
 import UpscaleModal from "@/components/UpscaleModal";
+import AiGeneratedLabel from "@/components/AiGeneratedLabel";
 import { useTranslations } from "next-intl";
 import { downloadImageBlob } from "@/lib/downloadImage";
 
@@ -42,9 +43,7 @@ export default function ImageModal({
         typeof window !== "undefined" &&
         typeof window.matchMedia === "function" &&
         window.matchMedia("(pointer: coarse)").matches;
-      const touch =
-        (navigator as any).maxTouchPoints &&
-        (navigator as any).maxTouchPoints > 1;
+      const touch = navigator.maxTouchPoints > 1;
       return mobileRe.test(ua) || coarse || touch;
     };
     setIsMobileEnv(isMobile());
@@ -75,16 +74,16 @@ export default function ImageModal({
         setShareOpen(true);
         return;
       }
-      const payload: any = { url: normalizedUrl };
+      const payload: ShareData = { url: normalizedUrl };
       if (
-        typeof (navigator as any).canShare === "function" &&
-        !(navigator as any).canShare(payload)
+        typeof navigator.canShare === "function" &&
+        !navigator.canShare(payload)
       ) {
         setShareOpen(true);
         return;
       }
-      if (typeof navigator !== "undefined" && (navigator as any).share) {
-        await (navigator as any).share(payload);
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share(payload);
         return;
       }
       setShareOpen(true);
@@ -138,14 +137,17 @@ export default function ImageModal({
           <span className="text-lg">×</span>
         </motion.button>
 
-        <Image
-          src={src}
-          width={800}
-          height={800}
-          alt="Generated image - full size"
-          unoptimized
-          className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
-        />
+        <div className="relative">
+          <Image
+            src={src}
+            width={800}
+            height={800}
+            alt="Generated image - full size"
+            unoptimized
+            className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
+          />
+          <AiGeneratedLabel className="pointer-events-none absolute bottom-2 left-2" />
+        </div>
 
         <div className="mt-4 flex justify-between gap-3">
           <DropdownMenu open={shareOpen} onOpenChange={setShareOpen}>

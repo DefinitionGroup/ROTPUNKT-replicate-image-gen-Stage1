@@ -326,6 +326,10 @@
     "scrollMore": "Scroll for more images",
     "allImages": "That's all your images ✨"
   },
+  "aiDisclosure": {
+    "label": "AI-generated visualisation",
+    "description": "This visualisation was generated entirely with AI. Materials, colours, proportions and product details may differ from real products."
+  },
   "imageModal": {
     "closeAriaLabel": "Close",
     "share": "Share",

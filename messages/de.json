@@ -326,6 +326,10 @@
     "scrollMore": "Scrolle weiter für mehr Bilder",
     "allImages": "Das sind alle deine Bilder ✨"
   },
+  "aiDisclosure": {
+    "label": "KI-generierte Visualisierung",
+    "description": "Diese Visualisierung wurde vollständig mit KI erzeugt. Materialien, Farben, Proportionen und Produktdetails können von realen Ausführungen abweichen."
+  },
   "imageModal": {
     "closeAriaLabel": "Schließen",
     "share": "Share",

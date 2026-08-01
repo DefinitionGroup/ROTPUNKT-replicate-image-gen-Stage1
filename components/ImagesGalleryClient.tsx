@@ -8,6 +8,7 @@ import { getPaginatedImages, type ImageRow } from "@/lib/actions/images";
 import { Loader2, Star } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
+import AiGeneratedLabel from "@/components/AiGeneratedLabel";
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8, y: 50 },
@@ -114,14 +115,17 @@ export default function ImagesGalleryClient() {
                 <Star className="size-4" fill="currentColor" />
               </div>
             )}
-            <Image
-              src={img.url}
-              alt="Generated"
-              width={800}
-              height={800}
-              unoptimized
-              className="w-full h-auto object-cover"
-            />
+            <div className="relative">
+              <Image
+                src={img.url}
+                alt="Generated"
+                width={800}
+                height={800}
+                unoptimized
+                className="w-full h-auto object-cover"
+              />
+              <AiGeneratedLabel className="pointer-events-none absolute bottom-2 left-2" />
+            </div>
             <div
               className="px-4 py-3 text-xs text-muted-foreground group-hover:text-foreground transition"
               suppressHydrationWarning

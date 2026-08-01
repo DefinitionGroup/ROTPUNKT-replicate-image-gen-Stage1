@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { downloadImageBlob } from "@/lib/downloadImage";
+import AiGeneratedLabel from "@/components/AiGeneratedLabel";
 
 interface UpscaleModalProps {
   src: string;
@@ -155,14 +156,17 @@ export default function UpscaleModal({ src, prompt, onClose }: UpscaleModalProps
                 </p>
               </div>
 
-              <Image
-                src={upscaledImage}
-                width={1200}
-                height={800}
-                alt="Upscaled high-res image"
-                unoptimized
-                className="w-full h-auto max-h-[60vh] object-contain rounded-xl"
-              />
+              <div className="relative w-full">
+                <Image
+                  src={upscaledImage}
+                  width={1200}
+                  height={800}
+                  alt="Upscaled high-res image"
+                  unoptimized
+                  className="w-full h-auto max-h-[60vh] object-contain rounded-xl"
+                />
+                <AiGeneratedLabel className="pointer-events-none absolute bottom-2 left-2" />
+              </div>
 
               <div className="mt-4 flex justify-center gap-3">
                 <Button
