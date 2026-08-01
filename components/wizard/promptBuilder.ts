@@ -8,7 +8,15 @@ import {
 import {
   getHandlePromptDescriptor,
   getHandleSelectionByValue,
+  type HandleGeometrySpec,
 } from "./handleCatalog";
+import {
+  MODEL_PROMPT_WORD_BUDGET,
+  PROMPT_VERSION,
+  countPromptWords,
+  type GenerationQualityExpectations,
+  type WetZoneLocation,
+} from "@/lib/imageGenerationContract";
 
 export type PromptBuildResult = {
   // Prompt actually sent to image generation.
@@ -22,6 +30,11 @@ export type PromptBuildResult = {
   sections: string[];
   missingKeys: string[];
   isKitchenRoom: boolean;
+  promptVersion: typeof PROMPT_VERSION | "legacy-debug";
+  wordCount: number;
+  budgetExceeded: boolean;
+  omittedModelSections: string[];
+  qualityExpectations: GenerationQualityExpectations;
 };
 
 /**
@@ -291,27 +304,6 @@ function getExteriorTimeLock(time?: string): string | undefined {
   );
 }
 
-const CAMERA_TREATMENTS: Record<string, string> = {
-  "eye level shot":
-    "Architectural interior photography, shot on a full-frame camera with a 24mm tilt-shift lens at f/8, straight verticals, realistic room proportions.",
-  "low angle shot, worm's eye view":
-    "Architectural interior photography, shot on a full-frame camera with a 21mm tilt-shift lens at f/8 from a low viewpoint, straight verticals, realistic room proportions.",
-  "high angle shot, bird's eye view":
-    "Architectural interior photography, shot on a full-frame camera with a 24mm tilt-shift lens at f/8 from a high viewpoint, straight verticals, realistic room proportions.",
-  "dutch angle, tilted frame":
-    "Architectural interior photography, shot on a full-frame camera with a 24mm lens at f/8, intentionally tilted framing with realistic material rendering.",
-  "wide shot, long shot, establishing shot":
-    "Architectural interior photography, shot on a full-frame camera with a 20mm tilt-shift lens at f/8, wide room coverage, straight verticals, realistic room proportions.",
-  "medium shot, mid shot":
-    "Architectural interior photography, shot on a full-frame camera with a 35mm lens at f/8, balanced furniture framing, realistic room proportions.",
-  "close-up shot":
-    "Architectural detail photography, shot on a full-frame camera with a 50mm lens at f/5.6, crisp surface detail, realistic material rendering.",
-  "full room view, interior panorama":
-    "Architectural interior photography, shot on a full-frame camera with a 19mm tilt-shift lens at f/8, full-room coverage, straight verticals, realistic room proportions.",
-  "extreme close-up, detail shot, macro":
-    "Architectural material-detail photography, shot on a full-frame camera with a 90mm macro lens, crisp texture rendering and precise finish detail.",
-};
-
 const VIEWPOINT_SCENE_INTROS: Record<string, string> = {
   "eye level shot":
     "Photorealistic architectural interior photo of Rotpunkt {room} cabinetry and built-in furniture",
@@ -407,6 +399,28 @@ function sanitizeHandlePromptCaption(caption: string): string {
       /\bdark matte kitchen fronts? with\s*/gi,
       ""
     )
+    .replace(/\ba detail photograph showing\s*/gi, "")
+    .replace(/\bmultiple\s+/gi, "")
+    .replace(
+      /\bfour handles visible in diagonal perspective on stacked white drawers with black stone countertop\b/gi,
+      ""
+    )
+    .replace(
+      /\bon white Rotpunkt kitchen drawer fronts?\b/gi,
+      ""
+    )
+    .replace(
+      /\bon (?:a )?white Rotpunkt kitchen cabinet fronts?\b/gi,
+      ""
+    )
+    .replace(
+      /\bdark teal-green Rotpunkt kitchen cabinet fronts?\b/gi,
+      ""
+    )
+    .replace(/\bdark charcoal-black cabinet front\b/gi, "")
+    .replace(/\bdark blue-black cabinet front\b/gi, "")
+    .replace(/\bwhite countertop edge visible above\b/gi, "")
+    .replace(/\bwhite countertop above dark cabinets\b/gi, "")
     .replace(
       /\bon Rotpunkt kitchen cabinet fronts?\b/gi,
       ""
@@ -424,6 +438,168 @@ function sanitizeHandlePromptCaption(caption: string): string {
     .replace(/^[,.\s]+|[,.\s]+$/g, "");
 }
 
+function compactDescriptor(value: string, maxWords = 24): string {
+  const clauses = value
+    .split(",")
+    .map((clause) => clause.trim())
+    .filter(Boolean);
+  const selected: string[] = [];
+
+  for (const clause of clauses) {
+    const candidate = [...selected, clause].join(", ");
+    if (countPromptWords(candidate) > maxWords) break;
+    selected.push(clause);
+  }
+
+  if (selected.length > 0) return selected.join(", ");
+  return value.trim().split(/\s+/).slice(0, maxWords).join(" ");
+}
+
+function buildHandleModelSections({
+  geometry,
+  promptCaption,
+  label,
+  isKitchen,
+}: {
+  geometry: HandleGeometrySpec;
+  promptCaption: string;
+  label?: string;
+  isKitchen: boolean;
+}): string[] {
+  const contextualCaption = contextualizeHandleCaption(
+    promptCaption,
+    isKitchen
+  );
+  const sanitizedCaption = sanitizeHandlePromptCaption(contextualCaption);
+  const descriptor = compactDescriptor(
+    sanitizedCaption || label || "selected cabinet handle"
+  );
+  const kind = geometry.kind;
+
+  if (kind === "handleless") {
+    return [
+      "Opening system: Rotpunkt handleless fronts with a recessed finger-pull channel below the worktop as the only opening detail. Every door and drawer remains an independent panel separated by crisp seams.",
+    ];
+  }
+
+  if (kind === "tokyo_grip") {
+    return [
+      `Opening system: Rotpunkt Tokyo grip milled into each front's top edge as a projecting lip with a curved finger recess. Surface: ${descriptor}. Each panel has its own contained profile; crisp free seams separate operable fronts.`,
+    ];
+  }
+
+  const commonMountingRule =
+    "Each handle stays entirely within one operable front; crisp free seams separate adjacent doors and drawers.";
+
+  if (kind === "t_bar") {
+    return [
+      `Handle: ${descriptor}. Preserve the T-bar silhouette, profile, backplate, and finish. One central pedestal is fully inside its own front. ${commonMountingRule}`,
+    ];
+  }
+
+  if (kind === "bar_pull") {
+    return [
+      `Handle: ${descriptor}. Preserve the bar-pull silhouette, brackets, and finish. Both feet attach to the same front and both ends stop before its edges. ${commonMountingRule}`,
+    ];
+  }
+
+  if (kind === "knob") {
+    return [
+      `Handle: ${descriptor}. Preserve the knob silhouette, base, texture, and finish. Its single mounting point is fully inside its own front. ${commonMountingRule}`,
+    ];
+  }
+
+  return [
+    `Handle: ${descriptor}. Preserve its silhouette, mounting style, and finish. ${commonMountingRule}`,
+  ];
+}
+
+function resolveWetZoneLocation(extraWishes?: string): WetZoneLocation {
+  const wishes = extraWishes?.toLowerCase() ?? "";
+  const mentionsWetFixture =
+    /\b(sink|basin|faucet|tap|wet zone|spüle|spuelbecken|spülbecken|armatur|wasserhahn)\b/i.test(
+      wishes
+    );
+
+  if (!mentionsWetFixture) return "wall_run";
+  if (/\b(island|kitchen island|insel|kücheninsel|kuecheninsel)\b/i.test(wishes)) {
+    return "island";
+  }
+  if (/\b(peninsula|halbinsel)\b/i.test(wishes)) {
+    return "peninsula";
+  }
+  return "wall_run";
+}
+
+function removeCompiledWetZoneWishes(value: string): string {
+  return value
+    .split(/(?<=[.!?])\s+/)
+    .filter(
+      (sentence) =>
+        !/\b(sink|basin|faucet|tap|wet zone|spüle|spuelbecken|spülbecken|armatur|wasserhahn)\b/i.test(
+          sentence
+        )
+    )
+    .join(" ")
+    .trim();
+}
+
+function buildKitchenFixtureTopology(location: WetZoneLocation): string {
+  if (location === "island") {
+    return "Topology: the island contains the kitchen's only wet zone: one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, peninsula, and all other worktops are dry continuous preparation surfaces.";
+  }
+  if (location === "peninsula") {
+    return "Topology: the peninsula contains the kitchen's only wet zone: one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, island, and all other worktops are dry continuous preparation surfaces.";
+  }
+  return "Topology: one wall-side worktop contains the kitchen's only wet zone: one undermount sink basin paired with one mixer faucet mounted directly behind it. Island, peninsula, and all other worktops are dry continuous preparation surfaces.";
+}
+
+type ModelPromptSection = {
+  id: string;
+  text: string;
+  required: boolean;
+  priority: number;
+};
+
+function buildBudgetedModelPrompt(sections: ModelPromptSection[]) {
+  const selectedIds = new Set(
+    sections.filter((section) => section.required).map((section) => section.id)
+  );
+  let selectedWordCount = countPromptWords(
+    sections
+      .filter((section) => selectedIds.has(section.id))
+      .map((section) => section.text)
+      .join(" ")
+  );
+
+  const optionalSections = sections
+    .filter((section) => !section.required)
+    .sort((a, b) => b.priority - a.priority);
+
+  for (const section of optionalSections) {
+    const sectionWords = countPromptWords(section.text);
+    if (selectedWordCount + sectionWords > MODEL_PROMPT_WORD_BUDGET) continue;
+    selectedIds.add(section.id);
+    selectedWordCount += sectionWords;
+  }
+
+  const selectedSections = sections
+    .filter((section) => selectedIds.has(section.id))
+    .map((section) => section.text);
+  const omittedSections = sections
+    .filter((section) => !selectedIds.has(section.id))
+    .map((section) => section.id);
+  const prompt = selectedSections.join(" ");
+
+  return {
+    sections: selectedSections,
+    prompt,
+    wordCount: countPromptWords(prompt),
+    budgetExceeded: selectedWordCount > MODEL_PROMPT_WORD_BUDGET,
+    omittedSections,
+  };
+}
+
 function buildReferenceTag(
   prefix: string,
   value: string | undefined
@@ -433,8 +609,8 @@ function buildReferenceTag(
 
 /**
  * Replace "kitchen" references in handle promptCaptions for non-kitchen rooms.
- * All 97 handle entries contain "kitchen" which contradicts the non-kitchen
- * opening text and confuses the model into generating kitchen elements.
+ * Catalog captions can contain "kitchen", which contradicts the non-kitchen
+ * opening text and can pull kitchen elements into other room types.
  * Ordered from most-specific to least-specific to prevent double replacement.
  */
 function contextualizeHandleCaption(
@@ -496,9 +672,6 @@ export function buildPrompt({
   const floor = selections.floor;
   const accessoriesArray = normalizeAccessories(selections.accessories);
   const normalizedAccessories = accessoriesArray.map(normalizeAccessoryDescriptor);
-  const cameraTreatment =
-    CAMERA_TREATMENTS[viewpoint] ??
-    "Architectural interior photography, shot on a full-frame camera with a 24mm lens at f/8, realistic room proportions.";
   const isDetailView =
     viewpoint === "close-up shot" ||
     viewpoint === "extreme close-up, detail shot, macro";
@@ -735,138 +908,222 @@ export function buildPrompt({
   const debugSections = [...sections];
   const debugPrompt = debugSections.join(" ");
 
-  // V2 model-facing prompt: shorter, positive, and priority-ordered.
-  const modelSections: string[] = [];
+  // V3 model-facing prompt: relationship-first, bounded, and priority-ordered.
+  const modelSectionCandidates: ModelPromptSection[] = [];
+  const addModelSection = (
+    id: string,
+    text: string | undefined,
+    options: { required?: boolean; priority?: number } = {}
+  ) => {
+    if (!text?.trim()) return;
+    modelSectionCandidates.push({
+      id,
+      text: text.trim(),
+      required: options.required ?? false,
+      priority: options.priority ?? 0,
+    });
+  };
 
   const roomLabel =
     effectiveKind ??
     (isKitchenRoom ? "kitchen" : isLivingRoom ? "living room" : "interior");
   const timeBrief = time ? TIME_OF_DAY_BRIEF[time] : undefined;
-  modelSections.push(
+  addModelSection(
+    "subject",
     getModelSceneIntro({
       viewpoint,
       roomLabel,
-      style,
-      environment,
-      timeBrief,
-    })
+    }),
+    { required: true }
   );
 
-  if (timeBrief) {
-    modelSections.push(
-      `Lighting priority: ${timeBrief}; the selected time of day must read immediately.`
+  const wetZoneLocation = resolveWetZoneLocation(extraWishes);
+  if (isKitchenRoom && !isDetailView) {
+    addModelSection(
+      "wet-zone",
+      buildKitchenFixtureTopology(wetZoneLocation),
+      { required: true }
     );
-  } else if (timeSpec) {
-    modelSections.push(
-      `Lighting priority: ${timeSpec.description}`
-    );
-  }
-  if (exteriorTimeLock) {
-    modelSections.push(exteriorTimeLock);
   }
 
-  const primaryViewpoint = getPrimaryViewpointLabel(viewpoint);
-  const compositionParts = [`Camera perspective: ${primaryViewpoint}.`];
-  compositionParts.push(cameraTreatment);
-  if (floor) compositionParts.push(`Flooring: ${floor}.`);
-  modelSections.push(compositionParts.join(" "));
-  const viewpointPriority = VIEWPOINT_PRIORITY_LINES[viewpoint];
-  if (viewpointPriority) {
-    modelSections.push(viewpointPriority);
+  if (handleEntry && handleSelection) {
+    const handleSections = buildHandleModelSections({
+      geometry: handleSelection.geometry,
+      promptCaption: handleSelection.promptCaption,
+      label: handleEntry.labelEn,
+      isKitchen: isKitchenRoom,
+    });
+    handleSections.forEach((section, index) => {
+      addModelSection(`handle-${index + 1}`, section, { required: true });
+    });
   }
 
   if (isFenix && fenixColor) {
-    modelSections.push(
-      `Front color direction: FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}), clearly dominant across visible cabinet fronts.`
-    );
-    modelSections.push(
-      `Color code lock: FENIX code ${fenixColor.code} named "${fenixColor.name}" with color identity "${fenixDesc}", rendered with strong color fidelity.`
-    );
-    modelSections.push(
-      "Finish lock: premium furniture fronts with a smooth sealed surface, crisp material definition, and controlled reflections."
+    addModelSection(
+      "front",
+      `Cabinet fronts: FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}), ${fenixDesc}; dominant color, smooth sealed surface, crisp material definition, controlled reflections.`,
+      { required: true }
     );
     if (fenixColor.isMetallic) {
-      modelSections.push(
-        "Metallic look: subtle metal-particle sheen with elegant satin-metal reflections on the selected cabinet fronts."
+      addModelSection(
+        "front-metallic",
+        "Finish: subtle metal-particle sheen with satin-metal reflections.",
+        { priority: 60 }
       );
     }
   } else if (isFrontfarbe && frontfarbe) {
-    modelSections.push(
-      `Cabinet fronts: ${frontfarbe.trainingCaption}. Keep this exact front identity, finish family, and material impression dominant.`
+    addModelSection(
+      "front",
+      `Cabinet fronts: ${frontfarbe.trainingCaption}; preserve this exact catalog identity, finish family, and material impression.`,
+      { required: true }
     );
     if (frontfarbe.subcategory === "HL" || frontfarbe.subcategory === "LX") {
-      modelSections.push(
-        "Surface finish: ultra high-gloss lacquer with clean mirror-like reflections."
+      addModelSection(
+        "front-gloss",
+        "Surface finish: ultra high-gloss lacquer with clean mirror-like reflections.",
+        { priority: 65 }
       );
     }
   } else if (colorLabel) {
-    modelSections.push(
-      `Front color direction: ${colorLabel}, clearly dominant across visible cabinet fronts.`
-    );
-  }
-
-  if (handleEntry) {
-    const handleDescriptor = sanitizeHandlePromptCaption(
-      contextualizeHandleCaption(handleSelection?.promptCaption ?? handleEntry.promptCaption, isKitchenRoom)
-    );
-    modelSections.push(
-      `Handle hardware: ${handleDescriptor || handleEntry.labelEn}. Keep the selected handle silhouette, profile, mounting style, and finish family clearly identifiable.`
-    );
-  } else if (handleSelection) {
-    modelSections.push(
-      "Selected handle/grip must stay clearly identifiable by shape, mounting style, and finish."
+    addModelSection(
+      "front",
+      `Cabinet fronts: ${colorLabel}, clearly dominant across all visible fronts.`,
+      { required: true }
     );
   }
 
   if (isKitchenRoom) {
     if (kitchenLayoutLabel) {
-      modelSections.push(
+      addModelSection(
+        "layout",
         isDetailView
           ? `Kitchen layout reference: ${kitchenLayoutLabel}, expressed through cabinetry details, materials, and surrounding kitchen context.`
-          : `Kitchen layout: ${kitchenLayoutLabel} with Rotpunkt kitchen cabinetry as the hero furniture.`
+          : `Kitchen layout: ${kitchenLayoutLabel} with Rotpunkt cabinetry as the hero furniture.`,
+        { required: true }
       );
     } else {
-      modelSections.push(
+      addModelSection(
+        "layout",
         isDetailView
           ? "Kitchen context expressed through cabinetry details, worktop relationships, and believable surrounding kitchen elements."
-          : "Kitchen scene with Rotpunkt kitchen cabinetry as the hero furniture."
+          : "Kitchen scene with Rotpunkt kitchen cabinetry as the hero furniture.",
+        { required: true }
       );
     }
-    if (!isDetailView) {
-      modelSections.push("Exactly one sink with one faucet.");
-    }
   } else if (isLivingRoom) {
-    modelSections.push(
-      "Living-room furniture focus: built-in storage wall, sideboards, shelving, lounge context, and cabinet compositions that read immediately as living-room cabinetry."
+    addModelSection(
+      "layout",
+      "Living-room furniture focus: built-in storage wall, sideboards, shelving, and lounge context.",
+      { required: true }
     );
   } else {
-    modelSections.push(
-      "Residential hallway furniture focus with built-in wardrobes, storage benches, mirrors, circulation space, and cabinetry that reads immediately as an entrance or hallway."
+    addModelSection(
+      "layout",
+      "Residential hallway furniture focus: built-in wardrobes, storage benches, mirrors, and clear circulation space.",
+      { required: true }
     );
+  }
+
+  if (style || environment) {
+    addModelSection(
+      "style-setting",
+      `Style and setting: ${[style, environment].filter(Boolean).join(", ")}.`,
+      { priority: 90 }
+    );
+  }
+
+  const primaryViewpoint = getPrimaryViewpointLabel(viewpoint);
+  const compactCameraTreatment = isDetailView
+    ? "50mm architectural detail lens, crisp surface definition, realistic proportions."
+    : "24mm tilt-shift lens at f/8, straight verticals, realistic room proportions.";
+  addModelSection(
+    "camera",
+    `Camera: ${primaryViewpoint}; ${compactCameraTreatment}`,
+    { priority: 85 }
+  );
+
+  const viewpointPriority = VIEWPOINT_PRIORITY_LINES[viewpoint];
+  if (viewpointPriority) {
+    addModelSection("framing-priority", viewpointPriority, { priority: 50 });
+  }
+
+  if (timeBrief) {
+    addModelSection(
+      "lighting",
+      `Lighting: ${timeBrief}; the selected time of day reads immediately.`,
+      { priority: 88 }
+    );
+  } else if (timeSpec) {
+    addModelSection("lighting", `Lighting: ${timeSpec.description}`, {
+      priority: 88,
+    });
+  }
+  if (exteriorTimeLock) {
+    addModelSection("exterior-light", exteriorTimeLock, { priority: 45 });
+  }
+  if (floor) {
+    addModelSection("floor", `Flooring: ${floor}.`, { priority: 55 });
   }
 
   if (normalizedAccessories.length > 0) {
-    modelSections.push(
-      `Visible accessories: ${normalizedAccessories.join(", ")}.`
+    addModelSection(
+      "accessories",
+      `Visible accessories: ${normalizedAccessories.join(", ")}.`,
+      { priority: 25 }
     );
   }
 
-  const modelWishes = extraWishes?.trim();
+  const modelWishes =
+    isKitchenRoom && !isDetailView
+      ? removeCompiledWetZoneWishes(extraWishes?.trim() ?? "")
+      : extraWishes?.trim();
   if (modelWishes) {
-    modelSections.push(`User wishes: ${modelWishes}.`);
+    addModelSection(
+      "user-wishes",
+      `User wishes: ${compactDescriptor(modelWishes, 36)}.`,
+      { priority: 70 }
+    );
   }
 
-  modelSections.push(
+  const detailHardwareFocus =
+    handleEntry?.category === "handleless"
+      ? "integrated recessed opening channel"
+      : handleEntry?.category === "tokyo_grip"
+        ? "integrated Tokyo grip profile"
+        : "selected handle geometry";
+
+  addModelSection(
+    "framing-rule",
     isDetailView
-      ? "Framing rule: prioritize detail fidelity above completeness. The selected front, finish, material, and handle details must dominate the frame; broader room cues only need to appear as supporting context."
+      ? `Framing rule: prioritize detail fidelity above completeness. The selected front, finish, material, and ${detailHardwareFocus} must dominate the frame; broader room cues only need to appear as supporting context.`
       : isWideView
         ? "Framing rule: all major selected choices should be visible together in one coherent scene with consistent materials and physically plausible lighting."
-        : "Framing rule: keep the primary selected choices legible within one coherent scene, while preserving consistent materials and physically plausible lighting."
+        : "Framing rule: keep the primary selected choices legible in one coherent scene with consistent materials and plausible lighting.",
+    { required: isDetailView, priority: 40 }
   );
 
-  const modelPrompt = modelSections.join(" ");
+  const budgetedModelPrompt = buildBudgetedModelPrompt(modelSectionCandidates);
+  const modelSections = budgetedModelPrompt.sections;
+  const modelPrompt = budgetedModelPrompt.prompt;
   const prompt = pipelineV2Enabled ? modelPrompt : debugPrompt;
   const uiSections = pipelineV2Enabled ? modelSections : debugSections;
+  const handleGeometry = handleSelection?.geometry;
+  const wetZoneRequired = isKitchenRoom && !isDetailView;
+  const qualityExpectations: GenerationQualityExpectations = {
+    sceneType: isKitchenRoom ? "kitchen" : "interior",
+    wetZone: {
+      required: wetZoneRequired,
+      location: wetZoneRequired ? wetZoneLocation : null,
+      sinkCount: wetZoneRequired ? 1 : null,
+      faucetCount: wetZoneRequired ? 1 : null,
+    },
+    handle: {
+      kind: handleGeometry?.kind ?? null,
+      mountingPoints: handleGeometry?.mountingPoints ?? null,
+      requiresPanelContainment:
+        handleGeometry?.requiresPanelContainment ?? false,
+    },
+  };
 
   return {
     prompt,
@@ -877,5 +1134,11 @@ export function buildPrompt({
     sections: uiSections,
     missingKeys,
     isKitchenRoom,
+    promptVersion: pipelineV2Enabled ? PROMPT_VERSION : "legacy-debug",
+    wordCount: countPromptWords(prompt),
+    budgetExceeded:
+      pipelineV2Enabled && budgetedModelPrompt.budgetExceeded,
+    omittedModelSections: budgetedModelPrompt.omittedSections,
+    qualityExpectations,
   };
 }

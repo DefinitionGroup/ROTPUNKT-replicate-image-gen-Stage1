@@ -9,6 +9,9 @@ export type ImageRow = {
     created_at: string;
     imageprompt: string | null;
     is_upscaled: boolean;
+    generation_set_id: string | null;
+    lora_scale: number | null;
+    is_selected_best: boolean;
     user_id?: string;
 };
 
@@ -25,7 +28,7 @@ export async function getPaginatedImages(page: number, pageSize: number = 12) {
 
     const { data, error, count } = await supabase
         .from("images")
-        .select("id, url, created_at, imageprompt, is_upscaled, user_id", { count: "exact" })
+        .select("id, url, created_at, imageprompt, is_upscaled, generation_set_id, lora_scale, is_selected_best, user_id", { count: "exact" })
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .range(from, to);

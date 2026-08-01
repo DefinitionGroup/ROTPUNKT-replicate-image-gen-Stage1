@@ -1,4 +1,5 @@
 import handleCatalogData from "./handleCatalogData.json";
+import type { HandleGeometryKind } from "@/lib/imageGenerationContract";
 
 export type HandleCatalogEntry = {
   id: string;
@@ -22,6 +23,13 @@ export type HandleCategoryTab = {
   labelDe: string;
   labelEn: string;
   count: number;
+};
+
+export type HandleGeometrySpec = {
+  kind: HandleGeometryKind;
+  mountingPoints: 0 | 1 | 2 | null;
+  integratedIntoFront: boolean;
+  requiresPanelContainment: boolean;
 };
 
 export const HANDLE_SELECTION_PREFIX = "handle:";
@@ -119,6 +127,67 @@ export function getHandleSelectionByValue(
   return handleCatalogById.get(id);
 }
 
+export function getHandleGeometry(
+  entry: HandleCatalogEntry
+): HandleGeometrySpec {
+  if (entry.category === "handleless") {
+    return {
+      kind: "handleless",
+      mountingPoints: 0,
+      integratedIntoFront: true,
+      requiresPanelContainment: false,
+    };
+  }
+
+  if (entry.category === "tokyo_grip") {
+    return {
+      kind: "tokyo_grip",
+      mountingPoints: 0,
+      integratedIntoFront: true,
+      requiresPanelContainment: true,
+    };
+  }
+
+  const descriptor = `${entry.labelEn} ${entry.promptCaption}`.toLowerCase();
+  if (descriptor.includes("t-bar")) {
+    return {
+      kind: "t_bar",
+      mountingPoints: 1,
+      integratedIntoFront: false,
+      requiresPanelContainment: true,
+    };
+  }
+
+  if (
+    descriptor.includes("bar pull") ||
+    descriptor.includes("bar handle") ||
+    descriptor.includes("pull handle")
+  ) {
+    return {
+      kind: "bar_pull",
+      mountingPoints: 2,
+      integratedIntoFront: false,
+      requiresPanelContainment: true,
+    };
+  }
+
+  if (descriptor.includes("knob")) {
+    return {
+      kind: "knob",
+      mountingPoints: 1,
+      integratedIntoFront: false,
+      requiresPanelContainment: true,
+    };
+  }
+
+  return {
+    kind: "generic",
+    mountingPoints: null,
+    integratedIntoFront: false,
+    requiresPanelContainment: true,
+  };
+}
+
 function normalizeLocale(locale?: string): "de" | "en" {
   return locale?.startsWith("de") ? "de" : "en";
 }
@@ -145,6 +214,7 @@ export function getHandlePromptDescriptor(value?: string | null) {
   return {
     promptCaption: entry.promptCaption,
     category: entry.category,
+    geometry: getHandleGeometry(entry),
   };
 }
 

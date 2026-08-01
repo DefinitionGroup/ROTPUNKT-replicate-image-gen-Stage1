@@ -6,52 +6,72 @@ import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
-import { $prompt, $isKitchenRoom } from "@/store/prompt";
-import { $pageStep } from "@/store/step";
-import { wizardActions, wizardStore } from "@/store/wizardStore";
+import { $prompt } from "@/store/prompt";
+import { wizardStore } from "@/store/wizardStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 import { useTranslations } from "next-intl";
-import { useRouter, Link } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
+import { Star } from "lucide-react";
 import { buildPrompt } from "./promptBuilder";
 import { PromptDebugPopover } from "./PromptDebugPopover";
 import {
   $promptPipelineV2Enabled,
   loadRuntimeConfig,
 } from "@/store/runtimeConfig";
+import type {
+  GenerationCandidate,
+  GenerationSetContext,
+  GenerationQualityExpectations,
+  PromptVersion,
+} from "@/lib/imageGenerationContract";
 
 const isDev = process.env.NODE_ENV === "development";
 
 interface StartGenerationResponse {
-  predictionId: string;
-  status: string;
+  generationSet: GenerationSetContext;
+  qualityExpectations: GenerationQualityExpectations | null;
 }
 
 interface StatusGenerationResponse {
   status: string;
-  urls?: string[];
+  candidates?: GenerationCandidate[];
+  generationSetId: string;
+  selectedImageId?: string | null;
+  qualityExpectations?: GenerationQualityExpectations | null;
   error?: string | null;
 }
 
 interface StartGenerationParams {
   prompt: string;
-  isKitchen: boolean;
+  promptVersion: PromptVersion;
+  qualityExpectations: GenerationQualityExpectations;
   signal: AbortSignal;
 }
 
 interface PollGenerationParams {
-  prompt: string;
-  predictionId: string;
+  generationSetId: string;
   signal: AbortSignal;
+}
+
+interface SelectBestResponse {
+  generationSetId: string;
+  selectedImageId: string;
+  selectedAt: string;
 }
 
 async function startGenerationApi({
   prompt,
-  isKitchen,
+  promptVersion,
+  qualityExpectations,
   signal,
 }: StartGenerationParams): Promise<StartGenerationResponse> {
   const res = await fetch("/api/replicate", {
-    body: JSON.stringify({ prompt, isKitchen }),
+    body: JSON.stringify({
+      prompt,
+      promptVersion,
+      qualityExpectations,
+    }),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,12 +88,11 @@ async function startGenerationApi({
 }
 
 async function pollGenerationApi({
-  prompt,
-  predictionId,
+  generationSetId,
   signal,
 }: PollGenerationParams): Promise<StatusGenerationResponse> {
   const res = await fetch("/api/replicate/status", {
-    body: JSON.stringify({ prompt, predictionId }),
+    body: JSON.stringify({ generationSetId }),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -89,15 +108,41 @@ async function pollGenerationApi({
   return res.json();
 }
 
+async function selectBestImageApi({
+  generationSetId,
+  imageId,
+}: {
+  generationSetId: string;
+  imageId: string;
+}): Promise<SelectBestResponse> {
+  const res = await fetch("/api/generation-sets/select-best", {
+    body: JSON.stringify({ generationSetId, imageId }),
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const errorData = await res
+      .json()
+      .catch(() => ({ error: `Server error: ${res.status}` }));
+    throw new Error(errorData.error || "Auswahl konnte nicht gespeichert werden");
+  }
+  return res.json();
+}
+
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
   const wizardState = useStore(wizardStore);
   const promptPipelineV2Enabled = useStore($promptPipelineV2Enabled);
   const t = useTranslations('imageGenerator');
-  const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [generatedImages, setGeneratedImages] = useState<string[] | null>(null);
-  const [predictionId, setPredictionId] = useState<string | null>(null);
+  const [completedPrompt, setCompletedPrompt] = useState<string | null>(null);
+  const [generatedCandidates, setGeneratedCandidates] = useState<
+    GenerationCandidate[] | null
+  >(null);
+  const [generationSetId, setGenerationSetId] = useState<string | null>(null);
+  const [selectedBestImageId, setSelectedBestImageId] = useState<string | null>(
+    null
+  );
   const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
     .trim()
     .replace(/^['"]|['"]$/g, "")
@@ -134,31 +179,31 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       const controller = new AbortController();
       const data = await startGenerationApi({
         prompt: p,
-        isKitchen: $isKitchenRoom.get(),
+        promptVersion: summaryData.promptVersion,
+        qualityExpectations: summaryData.qualityExpectations,
         signal: controller.signal,
       });
       if (isDev) console.log("[ImageGenerator] Prediction started:", data);
       return data;
     },
     onSuccess: (data) => {
-      setPredictionId(data.predictionId);
+      setGenerationSetId(data.generationSet.generationSetId);
     },
-    retry: 1,
-    retryDelay: 3000,
+    // Starting a set is not retried automatically: a lost response must not
+    // create and charge a second three-prediction comparison.
+    retry: 0,
   });
 
   const {
     data: statusData,
     error: statusError,
     isError: isStatusError,
-    refetch: refetchStatus,
   } = useQuery<StatusGenerationResponse, Error>({
-    queryKey: ["replicate-status", predictionId, prompt],
-    enabled: Boolean(predictionId && prompt),
+    queryKey: ["replicate-status", generationSetId],
+    enabled: Boolean(generationSetId && prompt),
     queryFn: ({ signal }) =>
       pollGenerationApi({
-        prompt: prompt!,
-        predictionId: predictionId!,
+        generationSetId: generationSetId!,
         signal,
       }),
     refetchInterval: (query) => {
@@ -172,29 +217,46 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   useEffect(() => {
     if (!statusData) return;
     if (statusData.status !== "succeeded") return;
-    if (!Array.isArray(statusData.urls) || statusData.urls.length === 0) return;
+    if (!Array.isArray(statusData.candidates) || statusData.candidates.length !== 3) return;
 
-    setGeneratedImages(statusData.urls);
-    setSelectedImage(statusData.urls[0]);
-    setPredictionId(null);
+    setGeneratedCandidates(statusData.candidates);
+    setSelectedBestImageId(statusData.selectedImageId ?? null);
+    setCompletedPrompt(prompt);
     // Clear the prompt to avoid accidental regeneration on remount.
     $prompt.set(null);
-  }, [statusData]);
+  }, [prompt, statusData]);
+
+  const {
+    mutate: selectBestImage,
+    isPending: isSavingBest,
+    isError: isBestSelectionError,
+  } = useMutation<
+    SelectBestResponse,
+    Error,
+    { generationSetId: string; imageId: string }
+  >({
+    mutationFn: selectBestImageApi,
+    onSuccess: (data) => {
+      setSelectedBestImageId(data.selectedImageId);
+      setGeneratedCandidates((current) =>
+        current?.map((candidate) => ({
+          ...candidate,
+          isSelectedBest: candidate.imageId === data.selectedImageId,
+        })) ?? null
+      );
+    },
+  });
 
   const handleRetry = useCallback(() => {
     resetMutation();
-    setPredictionId(null);
+    setGenerationSetId(null);
+    setGeneratedCandidates(null);
+    setSelectedBestImageId(null);
 
     if (!prompt) return;
     hasTriggered.current = prompt;
     startGeneration(prompt);
   }, [prompt, resetMutation, startGeneration]);
-
-  useEffect(() => {
-    if (statusData?.status === "failed" || statusData?.status === "canceled") {
-      setPredictionId(null);
-    }
-  }, [statusData]);
 
   useEffect(() => {
     void loadRuntimeConfig();
@@ -208,24 +270,16 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     }
   }, [prompt, startGeneration]);
 
-  // When the image modal is closed after generation, reset and go to my-images
-  const handleModalClose = useCallback(() => {
-    setSelectedImage(null);
-    // Reset the entire app state
-    $prompt.set(null);
-    $pageStep.set("intro");
-    wizardActions.reset();
-    // Navigate to my-images gallery
-    router.push("/my-images");
-  }, [router]);
-
-  const hasImages = Array.isArray(generatedImages) && generatedImages.length > 0;
+  const hasImages =
+    Array.isArray(generatedCandidates) && generatedCandidates.length > 0;
   const status = statusData?.status;
-  const isTerminalFailure = status === "failed" || status === "canceled";
+  const isTerminalFailure =
+    status === "failed" || status === "partial_failed";
   const isPending =
     !hasImages &&
     (isStarting ||
-      (!!predictionId && (status === undefined || status === "starting" || status === "processing")));
+      (!!generationSetId &&
+        (status === undefined || status === "starting" || status === "processing")));
   const errorMessage =
     isTerminalFailure
       ? statusData?.error || t("error.unknown")
@@ -237,7 +291,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       isPending,
       isError,
       hasImages,
-      predictionId,
+      generationSetId,
       status,
     });
   }
@@ -261,13 +315,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
           <ErrorState
             key="error"
             message={errorMessage}
-            onRetry={() => {
-              if (predictionId && prompt) {
-                void refetchStatus();
-                return;
-              }
-              handleRetry();
-            }}
+            onRetry={handleRetry}
           />
         )}
 
@@ -278,8 +326,37 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
           >
-            <ImagesGrid images={generatedImages!} onImageClick={setSelectedImage} />
-            <QuickLink />
+            <div className="mx-auto mb-8 max-w-2xl text-center">
+              <h2 className="text-2xl font-semibold text-foreground">
+                {t("comparison.title")}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t("comparison.description")}
+              </p>
+            </div>
+            <ImagesGrid
+              candidates={generatedCandidates!}
+              selectedBestImageId={selectedBestImageId}
+              isSavingBest={isSavingBest}
+              onImageClick={setSelectedImage}
+              onSelectBest={(candidate) =>
+                selectBestImage({
+                  generationSetId: candidate.generationSetId,
+                  imageId: candidate.imageId,
+                })
+              }
+            />
+            {selectedBestImageId && (
+              <p className="mt-5 text-center text-sm text-emerald-500">
+                {t("comparison.saved")}
+              </p>
+            )}
+            {isBestSelectionError && (
+              <p className="mt-5 text-center text-sm text-destructive">
+                {t("comparison.saveError")}
+              </p>
+            )}
+            {selectedBestImageId && <QuickLink />}
           </motion.div>
         )}
       </AnimatePresence>
@@ -288,8 +365,8 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         {selectedImage && (
           <ImageModal
             src={selectedImage}
-            onClose={handleModalClose}
-            prompt={prompt ?? undefined}
+            onClose={() => setSelectedImage(null)}
+            prompt={completedPrompt ?? undefined}
           />
         )}
       </AnimatePresence>
@@ -440,25 +517,69 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 function ImagesGrid({
-  images = [],
+  candidates = [],
+  selectedBestImageId,
+  isSavingBest,
   onImageClick,
+  onSelectBest,
 }: {
-  images?: string[];
+  candidates?: GenerationCandidate[];
+  selectedBestImageId: string | null;
+  isSavingBest: boolean;
   onImageClick: (src: string) => void;
+  onSelectBest: (candidate: GenerationCandidate) => void;
 }) {
+  const t = useTranslations("imageGenerator.comparison");
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-      {images.map((img) => (
-        <div key={img} className="flex items-center justify-center">
-          <img
-            src={img}
-            alt="Generated image"
-            crossOrigin="anonymous"
-            className="rounded-xl shadow-2xl w-full cursor-pointer hover:scale-[1.02] transition-transform"
-            onClick={() => onImageClick(img)}
-          />
-        </div>
-      ))}
+    <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
+      {candidates.map((candidate) => {
+        const isBest = selectedBestImageId === candidate.imageId;
+        return (
+          <div
+            key={candidate.imageId}
+            className={`relative overflow-hidden rounded-xl border bg-card transition ${
+              isBest
+                ? "border-emerald-400 ring-2 ring-emerald-400/40"
+                : "border-border"
+            }`}
+          >
+            <img
+              src={candidate.url}
+              alt={t("variantAlt", { number: candidate.index + 1 })}
+              crossOrigin="anonymous"
+              className="w-full cursor-pointer transition-transform hover:scale-[1.01]"
+              onClick={() => onImageClick(candidate.url)}
+            />
+            <div className="flex items-center justify-between gap-3 p-3">
+              <span className="text-xs text-muted-foreground">
+                {t("variant", { number: candidate.index + 1 })}
+              </span>
+              <button
+                type="button"
+                aria-pressed={isBest}
+                aria-label={
+                  isBest
+                    ? t("selectedAria", { number: candidate.index + 1 })
+                    : t("selectAria", { number: candidate.index + 1 })
+                }
+                disabled={isSavingBest}
+                onClick={() => onSelectBest(candidate)}
+                className={`inline-flex size-10 items-center justify-center rounded-full border transition disabled:cursor-wait disabled:opacity-60 ${
+                  isBest
+                    ? "border-emerald-400 bg-emerald-400 text-black"
+                    : "border-border bg-background/80 text-muted-foreground hover:border-emerald-400 hover:text-emerald-400"
+                }`}
+              >
+                <Star
+                  className="size-5"
+                  fill={isBest ? "currentColor" : "none"}
+                />
+              </button>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

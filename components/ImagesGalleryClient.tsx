@@ -5,7 +5,7 @@ import Image from "next/image";
 import ImageModal from "./ImageModal";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPaginatedImages, type ImageRow } from "@/lib/actions/images";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 
@@ -104,6 +104,14 @@ export default function ImagesGalleryClient() {
             {img.is_upscaled && (
               <div className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-[10px] font-medium text-white">
                 ✨ High-Res
+              </div>
+            )}
+            {img.is_selected_best && (
+              <div
+                className="absolute left-2 top-2 z-10 inline-flex size-8 items-center justify-center rounded-full bg-emerald-400 text-black shadow-lg"
+                title={t("selectedBest")}
+              >
+                <Star className="size-4" fill="currentColor" />
               </div>
             )}
             <Image

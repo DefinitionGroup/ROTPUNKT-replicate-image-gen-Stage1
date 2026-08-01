@@ -12,7 +12,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "fix": "eslint . --fix"
+    "fix": "eslint . --fix",
+    "audit:prompts": "tsx --tsconfig tsconfig.prompt-audit.json scripts/audit-flux1-v3-prompts.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.29.0",
