@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseUserClient } from "@/lib/supabaseServer";
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function getServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
-    throw new Error("Supabase service role is not configured");
-  }
-  return createClient(url, serviceRoleKey, {
-    auth: { persistSession: false },
-  });
-}
-
 export async function POST(req: NextRequest) {
-  const { userId } = await getAuth(req);
+  const { userId, getToken } = await getAuth(req);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -36,11 +25,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = getServiceClient();
+    const supabase = createSupabaseUserClient(() =>
+      getToken({ template: "supabase" })
+    );
     const { data, error } = await supabase.rpc("select_generation_best", {
       p_set_id: generationSetId,
       p_image_id: imageId,
-      p_user_id: userId,
     });
 
     if (error) {

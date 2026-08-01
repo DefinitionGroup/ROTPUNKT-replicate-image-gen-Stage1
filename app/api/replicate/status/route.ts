@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
-import { createClient } from "@supabase/supabase-js";
 import Replicate from "replicate";
 import { uploadImages } from "@/lib/minioClient";
+import { createSupabaseUserClient } from "@/lib/supabaseServer";
 import {
   isGenerationQualityExpectations,
   isGenerationVariantManifest,
@@ -60,17 +60,6 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   }) as Promise<T>;
 }
 
-function getServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
-    throw new Error("Supabase service role is not configured");
-  }
-  return createClient(url, serviceRoleKey, {
-    auth: { persistSession: false },
-  });
-}
-
 function extractUrls(output: unknown): string[] {
   const urls: string[] = [];
   const processItem = (item: unknown) => {
@@ -118,7 +107,7 @@ function toCandidate(row: CandidateRow): GenerationCandidate {
 }
 
 async function getExistingCandidate(
-  supabase: ReturnType<typeof getServiceClient>,
+  supabase: ReturnType<typeof createSupabaseUserClient>,
   setId: string,
   userId: string,
   candidateIndex: number
@@ -138,7 +127,7 @@ async function getExistingCandidate(
 }
 
 async function finalizeVariant(params: {
-  supabase: ReturnType<typeof getServiceClient>;
+  supabase: ReturnType<typeof createSupabaseUserClient>;
   set: GenerationSetRow;
   variant: GenerationVariantContext;
   userId: string;
@@ -233,7 +222,7 @@ async function finalizeVariant(params: {
 
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
-  const { userId } = await getAuth(req);
+  const { userId, getToken } = await getAuth(req);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -247,7 +236,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = getServiceClient();
+    const supabase = createSupabaseUserClient(() =>
+      getToken({ template: "supabase" })
+    );
     const { data, error: setError } = await supabase
       .from("generation_sets")
       .select(
