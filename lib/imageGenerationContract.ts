@@ -1,7 +1,15 @@
 export const PROMPT_VERSION = "flux1-v3" as const;
 export const MODEL_PROMPT_WORD_BUDGET = 180;
 export const LORA_TRIGGER_WORD = "RDTDOT";
+export const LORA_COMPARISON_SCALES = [0.65, 0.75, 0.85] as const;
 export type PromptVersion = typeof PROMPT_VERSION | "legacy-debug";
+export type LoraComparisonScale = (typeof LORA_COMPARISON_SCALES)[number];
+export type GenerationSetStatus =
+  | "starting"
+  | "processing"
+  | "succeeded"
+  | "failed"
+  | "partial_failed";
 
 export type HandleGeometryKind =
   | "handleless"
@@ -28,14 +36,22 @@ export type GenerationQualityExpectations = {
   };
 };
 
-export type GenerationContext = {
+export type GenerationVariantContext = {
+  predictionId: string;
+  status: string;
+  candidateIndex: number;
+  loraScale: LoraComparisonScale;
+};
+
+export type GenerationSetContext = {
+  generationSetId: string;
+  status: GenerationSetStatus;
   promptVersion: PromptVersion;
   seed: number;
-  numOutputs: number;
   modelVersion: string;
   guidanceScale: number;
-  loraScale: number;
   numInferenceSteps: number;
+  variants: GenerationVariantContext[];
 };
 
 export type CandidateQualityStatus =
@@ -44,8 +60,12 @@ export type CandidateQualityStatus =
   | "rejected";
 
 export type GenerationCandidate = {
+  imageId: string;
+  generationSetId: string;
   index: number;
   url: string;
+  loraScale: LoraComparisonScale;
+  isSelectedBest: boolean;
   quality: {
     status: CandidateQualityStatus;
     reasons: string[];
@@ -62,6 +82,15 @@ export function withLoraTrigger(prompt: string): string {
     .trim()
     .replace(new RegExp(`^(?:${LORA_TRIGGER_WORD}\\s+)+`, "i"), "");
   return `${LORA_TRIGGER_WORD} ${withoutLeadingTrigger}`;
+}
+
+export function isLoraComparisonScale(
+  value: unknown
+): value is LoraComparisonScale {
+  return (
+    typeof value === "number" &&
+    LORA_COMPARISON_SCALES.some((scale) => scale === value)
+  );
 }
 
 export function isGenerationQualityExpectations(
@@ -98,25 +127,34 @@ export function isGenerationQualityExpectations(
   );
 }
 
-export function isGenerationContext(value: unknown): value is GenerationContext {
+export function isGenerationVariantContext(
+  value: unknown
+): value is GenerationVariantContext {
   if (!value || typeof value !== "object") return false;
-  const candidate = value as Partial<GenerationContext>;
+  const candidate = value as Partial<GenerationVariantContext>;
   return Boolean(
-    (candidate.promptVersion === PROMPT_VERSION ||
-      candidate.promptVersion === "legacy-debug") &&
-      Number.isInteger(candidate.seed) &&
-      typeof candidate.seed === "number" &&
-      candidate.seed >= 0 &&
-      candidate.seed <= 2 ** 32 - 1 &&
-      Number.isInteger(candidate.numOutputs) &&
-      typeof candidate.numOutputs === "number" &&
-      candidate.numOutputs >= 1 &&
-      candidate.numOutputs <= 4 &&
-      typeof candidate.modelVersion === "string" &&
-      candidate.modelVersion.length > 0 &&
-      typeof candidate.guidanceScale === "number" &&
-      typeof candidate.loraScale === "number" &&
-      Number.isInteger(candidate.numInferenceSteps) &&
-      typeof candidate.numInferenceSteps === "number"
+    typeof candidate.predictionId === "string" &&
+      candidate.predictionId.length > 0 &&
+      typeof candidate.status === "string" &&
+      Number.isInteger(candidate.candidateIndex) &&
+      typeof candidate.candidateIndex === "number" &&
+      candidate.candidateIndex >= 0 &&
+      candidate.candidateIndex < LORA_COMPARISON_SCALES.length &&
+      isLoraComparisonScale(candidate.loraScale)
+  );
+}
+
+export function isGenerationVariantManifest(
+  value: unknown
+): value is GenerationVariantContext[] {
+  return (
+    Array.isArray(value) &&
+    value.length === LORA_COMPARISON_SCALES.length &&
+    value.every(
+      (variant, index) =>
+        isGenerationVariantContext(variant) &&
+        variant.candidateIndex === index &&
+        variant.loraScale === LORA_COMPARISON_SCALES[index]
+    )
   );
 }

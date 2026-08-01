@@ -10,7 +10,8 @@ Die bestehende FLUX.1-Dev-LoRA soll ohne erneutes Training zuverlässiger genau 
 - Konstruktive Beziehungen stehen am Promptanfang und vor Stil, Licht und Dekor.
 - Der Modell-Prompt erhält ein Arbeitsbudget von 180 Wörtern. Pflichtabschnitte werden nie abgeschnitten; optionale Abschnitte werden nach Priorität aufgenommen.
 - Das LoRA-Triggerwort wird serverseitig genau einmal ergänzt.
-- Küchen erzeugen zunächst zwei Kandidaten in einem Replicate-Lauf; andere Räume weiterhin einen.
+- Jede Konfiguration erzeugt drei parallele Predictions mit LoRA Scale `0.65`, `0.75` und `0.85`.
+- Prompt, Seed und sämtliche übrigen Modellparameter bleiben über alle drei Varianten identisch.
 - Seed, Promptversion und Modellparameter werden für reproduzierbare Vergleiche durch den gesamten Request geführt.
 
 ## Umsetzung
@@ -45,12 +46,14 @@ Der Promptbuilder arbeitet mit diesen Daten und nicht mehr mit verstreuter Freit
 
 - Promptversion: `flux1-v3`
 - Guidance Scale: `3.2`
-- LoRA Scale Küche: `0.85`
-- LoRA Scale sonstige Räume: `0.65`
+- Vergleichsskalen: `0.65`, `0.75`, `0.85`
 - Inferenzschritte: `28`
-- Küchen-Kandidaten: `2`
+- Kandidaten: drei einzelne Predictions mit je einem Output
 - Seed: zufällig, aber in Start- und Statusantwort enthalten; optional explizit wiederholbar
-- Persistenz: `generation_metadata` speichert Seed, Parameter, Kandidatenindex und QA-Erwartungen; bis die additive SQL-Migration eingespielt ist, fällt die Route kompatibel auf das bisherige `images`-Schema zurück.
+- Persistenz: `generation_sets` speichert Prompt, gemeinsamen Seed, Prediction-Manifest, Status und das ausgewählte Gewinnerbild.
+- Bildzuordnung: Jede Bildzeile speichert `generation_set_id`, `candidate_index`, `lora_scale`, Parameter und den Gewinnerstatus.
+- Bewertung: Der Benutzer markiert genau einen Favoriten. Die Auswahl wird atomar in Supabase gespeichert und kann später geändert werden.
+- Rollout-Gate: Die additive SQL-Migration muss vor dem Deployment dieses Vergleichsflusses ausgeführt werden.
 
 ### 4. Quality-Gate-Vertrag
 

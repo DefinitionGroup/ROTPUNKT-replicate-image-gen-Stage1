@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import type { WizardState } from "../app/store/wizardStore";
 import {
   MODEL_PROMPT_WORD_BUDGET,
+  LORA_COMPARISON_SCALES,
   PROMPT_VERSION,
   withLoraTrigger,
   type HandleGeometryKind,
@@ -12,6 +13,8 @@ import {
   handleCatalog,
 } from "../components/wizard/handleCatalog";
 import { buildPrompt } from "../components/wizard/promptBuilder";
+
+assert.deepEqual(LORA_COMPARISON_SCALES, [0.65, 0.75, 0.85]);
 
 const baseSelections: WizardState["selectedOptions"] = {
   environment: "stadtwohnung",

@@ -276,9 +276,19 @@
     "backToWizard": "Back to Kitchen Wizard",
     "goToMyImages": "Go to \"My Images\"",
     "generatedImageAlt": "Generated image",
+    "comparison": {
+      "title": "Which image works best?",
+      "description": "Compare the three variants and mark your favorite with the star. Your choice helps us find the right image balance.",
+      "variant": "Variant {number}",
+      "variantAlt": "Generated variant {number}",
+      "selectAria": "Select variant {number} as the best image",
+      "selectedAria": "Variant {number} is selected as the best image",
+      "saved": "Your favorite has been saved.",
+      "saveError": "The selection could not be saved. Please try again."
+    },
     "loading": {
       "messages": {
-        "generating": "Generating your image...",
+        "generating": "Generating your three variants...",
         "aiWorking": "The AI is working on your design...",
         "takingLonger": "This is taking a bit longer today – please be patient...",
         "serverWakingUp": "The servers are just waking up ☕ – almost there!",
@@ -312,6 +322,7 @@
     "error": "Error loading your images.",
     "empty": "You don't have any images yet. Create your first image in the Wizard!",
     "generatedImageAlt": "Generated image",
+    "selectedBest": "Selected as best image",
     "scrollMore": "Scroll for more images",
     "allImages": "That's all your images ✨"
   },

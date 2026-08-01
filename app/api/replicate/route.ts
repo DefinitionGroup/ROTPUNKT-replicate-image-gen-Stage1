@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
+import { createClient } from "@supabase/supabase-js";
 import Replicate from "replicate";
 import {
+  LORA_COMPARISON_SCALES,
   PROMPT_VERSION,
   isGenerationQualityExpectations,
   withLoraTrigger,
-  type GenerationContext,
+  type GenerationSetContext,
+  type GenerationVariantContext,
   type PromptVersion,
 } from "@/lib/imageGenerationContract";
 
@@ -15,6 +18,11 @@ const replicate = new Replicate({
 
 const isDev = process.env.NODE_ENV === "development";
 const START_TIMEOUT_MS = 30_000;
+const MODEL =
+  "rotpunkt007/basemodel-5-2026:0672a9098a0c17393feeb70989b90488a89e80404be9543ccabe9c87aca4ac08";
+const MODEL_VERSION = MODEL.split(":")[1];
+const GUIDANCE_SCALE = 3.2;
+const NUM_INFERENCE_STEPS = 28;
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -28,47 +36,40 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   }) as Promise<T>;
 }
 
-const MODEL = "rotpunkt007/basemodel-5-2026:0672a9098a0c17393feeb70989b90488a89e80404be9543ccabe9c87aca4ac08";
-const MODEL_VERSION = MODEL.split(":")[1];
-const GUIDANCE_SCALE = 3.2;
-const KITCHEN_LORA_SCALE = 0.85;
-const INTERIOR_LORA_SCALE = 0.65;
-const NUM_INFERENCE_STEPS = 28;
-
-function clampInteger(
-  value: unknown,
-  fallback: number,
-  min: number,
-  max: number
-) {
-  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
-  return Math.min(max, Math.max(min, Math.trunc(value)));
-}
-
-function getCandidateCount(kitchenMode: boolean): number {
-  if (!kitchenMode) return 1;
-  const configured = Number(process.env.REPLICATE_KITCHEN_CANDIDATES ?? "2");
-  return clampInteger(configured, 2, 1, 4);
+function clampSeed(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return Math.floor(Math.random() * 2 ** 32);
+  }
+  return Math.min(2 ** 32 - 1, Math.max(0, Math.trunc(value)));
 }
 
 function normalizePromptVersion(value: unknown): PromptVersion {
   return value === "legacy-debug" ? "legacy-debug" : PROMPT_VERSION;
 }
 
+function getServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceRoleKey) {
+    throw new Error("Supabase service role is not configured");
+  }
+  return createClient(url, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
+}
+
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
-  if (isDev) console.log(`[${requestId}] 🚀 New async generation request received`);
-
+  let generationSetId: string | null = null;
   const { userId } = await getAuth(req);
+
   if (!userId) {
-    if (isDev) console.log(`[${requestId}] ❌ Unauthorized`);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const {
       prompt,
-      isKitchen,
       seed: requestedSeed,
       promptVersion: requestedPromptVersion,
       qualityExpectations: requestedQualityExpectations,
@@ -80,92 +81,168 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Default to kitchen mode for backward compatibility
-    const kitchenMode = typeof isKitchen === "boolean" ? isKitchen : true;
-
     if (!MODEL_VERSION) {
       throw new Error("Replicate model version is not configured");
     }
 
-    const finalPrompt = withLoraTrigger(prompt);
-    const seed = clampInteger(
-      requestedSeed,
-      Math.floor(Math.random() * 2 ** 32),
-      0,
-      2 ** 32 - 1
-    );
-    const numOutputs = getCandidateCount(kitchenMode);
-    const loraScale = kitchenMode
-      ? KITCHEN_LORA_SCALE
-      : INTERIOR_LORA_SCALE;
+    const supabase = getServiceClient();
+    generationSetId = crypto.randomUUID();
+    const seed = clampSeed(requestedSeed);
     const promptVersion = normalizePromptVersion(requestedPromptVersion);
     const qualityExpectations = isGenerationQualityExpectations(
       requestedQualityExpectations
     )
       ? requestedQualityExpectations
       : null;
-    const generation: GenerationContext = {
-      promptVersion,
-      seed,
-      numOutputs,
-      modelVersion: MODEL_VERSION,
-      guidanceScale: GUIDANCE_SCALE,
-      loraScale,
-      numInferenceSteps: NUM_INFERENCE_STEPS,
-    };
+    const finalPrompt = withLoraTrigger(prompt);
+    const now = new Date().toISOString();
 
-    const prediction = await withTimeout(
-      replicate.predictions.create({
-        version: MODEL_VERSION,
-        input: {
-          prompt: finalPrompt,
-          go_fast: false,
-          guidance_scale: GUIDANCE_SCALE,
-          megapixels: "1",
-          lora_scale: loraScale,
-          aspect_ratio: "16:9",
-          output_format: "webp",
-          output_quality: 80,
-          seed,
-          num_inference_steps: NUM_INFERENCE_STEPS,
-          num_outputs: numOutputs,
-        },
-      }),
-      START_TIMEOUT_MS,
-      "Replicate prediction start"
-    );
+    const { error: setInsertError } = await supabase
+      .from("generation_sets")
+      .insert({
+        id: generationSetId,
+        user_id: userId,
+        prompt: prompt.trim(),
+        prompt_version: promptVersion,
+        seed,
+        model_version: MODEL_VERSION,
+        guidance_scale: GUIDANCE_SCALE,
+        num_inference_steps: NUM_INFERENCE_STEPS,
+        requested_lora_scales: [...LORA_COMPARISON_SCALES],
+        quality_expectations: qualityExpectations,
+        status: "starting",
+        updated_at: now,
+      });
 
-    if (!prediction?.id) {
-      throw new Error("Replicate did not return a prediction id");
+    if (setInsertError) {
+      throw new Error(`Generation set insert failed: ${setInsertError.message}`);
     }
 
+    const starts = await Promise.allSettled(
+      LORA_COMPARISON_SCALES.map((loraScale, candidateIndex) =>
+        withTimeout(
+          replicate.predictions.create({
+            version: MODEL_VERSION,
+            input: {
+              prompt: finalPrompt,
+              go_fast: false,
+              guidance_scale: GUIDANCE_SCALE,
+              megapixels: "1",
+              lora_scale: loraScale,
+              aspect_ratio: "16:9",
+              output_format: "webp",
+              output_quality: 80,
+              seed,
+              num_inference_steps: NUM_INFERENCE_STEPS,
+              num_outputs: 1,
+            },
+          }).then((prediction) => {
+            if (!prediction.id) {
+              throw new Error(`No prediction id for LoRA ${loraScale}`);
+            }
+            return {
+              predictionId: prediction.id,
+              status: prediction.status ?? "starting",
+              candidateIndex,
+              loraScale,
+            } satisfies GenerationVariantContext;
+          }),
+          START_TIMEOUT_MS,
+          `Replicate prediction start for LoRA ${loraScale}`
+        )
+      )
+    );
+
+    const variants = starts.flatMap((result) =>
+      result.status === "fulfilled" ? [result.value] : []
+    );
+
+    if (variants.length !== LORA_COMPARISON_SCALES.length) {
+      await Promise.allSettled(
+        variants.map((variant) =>
+          replicate.predictions.cancel(variant.predictionId)
+        )
+      );
+      await supabase
+        .from("generation_sets")
+        .update({
+          prediction_manifest: variants,
+          status: "failed",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", generationSetId)
+        .eq("user_id", userId);
+      throw new Error("Not all three LoRA variants could be started");
+    }
+
+    const { error: manifestError } = await supabase
+      .from("generation_sets")
+      .update({
+        prediction_manifest: variants,
+        status: "processing",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", generationSetId)
+      .eq("user_id", userId);
+
+    if (manifestError) {
+      await Promise.allSettled(
+        variants.map((variant) =>
+          replicate.predictions.cancel(variant.predictionId)
+        )
+      );
+      throw new Error(`Prediction manifest update failed: ${manifestError.message}`);
+    }
+
+    const generationSet: GenerationSetContext = {
+      generationSetId,
+      status: "processing",
+      promptVersion,
+      seed,
+      modelVersion: MODEL_VERSION,
+      guidanceScale: GUIDANCE_SCALE,
+      numInferenceSteps: NUM_INFERENCE_STEPS,
+      variants,
+    };
+
     if (isDev) {
-      console.log(`[${requestId}] ✅ Prediction started: ${prediction.id}`);
+      console.log(
+        `[${requestId}] Started comparison set ${generationSetId} with seed ${seed}`
+      );
     }
 
     return NextResponse.json(
-      {
-        predictionId: prediction.id,
-        status: prediction.status ?? "starting",
-        generation,
-        qualityExpectations,
-      },
+      { generationSet, qualityExpectations },
       { status: 202 }
     );
   } catch (error) {
-    console.error("Replicate start route error:", error);
+    console.error("Replicate comparison start route error:", error);
+    if (generationSetId) {
+      try {
+        await getServiceClient()
+          .from("generation_sets")
+          .update({ status: "failed", updated_at: new Date().toISOString() })
+          .eq("id", generationSetId)
+          .eq("user_id", userId);
+      } catch (setUpdateError) {
+        console.error(
+          `Could not mark generation set ${generationSetId} as failed:`,
+          setUpdateError
+        );
+      }
+    }
     const message =
       error instanceof Error ? error.message : "Failed to start generation";
-    if (message.toLowerCase().includes("timed out")) {
-      return NextResponse.json(
-        { error: "Generation start timed out" },
-        { status: 504 }
-      );
-    }
+    const status = message.toLowerCase().includes("timed out") ? 504 : 500;
     return NextResponse.json(
-      { error: "Failed to start generation" },
-      { status: 500 }
+      {
+        error:
+          status === 504
+            ? "Generation start timed out"
+            : "Failed to start comparison generation",
+        generationSetId,
+      },
+      { status }
     );
   }
 }
