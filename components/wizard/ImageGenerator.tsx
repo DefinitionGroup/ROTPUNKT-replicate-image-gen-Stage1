@@ -14,7 +14,11 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buildPrompt } from "./promptBuilder";
 import { PromptDebugPopover } from "./PromptDebugPopover";
-import { LORA_GENERATION_SCALE } from "@/lib/imageGenerationContract";
+import {
+  DEFAULT_GENERATION_SEED,
+  LORA_GENERATION_SCALE,
+  MAX_GENERATION_SEED,
+} from "@/lib/imageGenerationContract";
 import {
   $promptPipelineV2Enabled,
   loadRuntimeConfig,
@@ -44,6 +48,7 @@ interface StatusGenerationResponse {
 
 interface StartGenerationParams {
   prompt: string;
+  seed: number;
   promptVersion: PromptVersion;
   qualityExpectations: GenerationQualityExpectations;
   signal: AbortSignal;
@@ -54,8 +59,14 @@ interface PollGenerationParams {
   signal: AbortSignal;
 }
 
+interface StartGenerationMutationParams {
+  prompt: string;
+  seed: number;
+}
+
 async function startGenerationApi({
   prompt,
+  seed,
   promptVersion,
   qualityExpectations,
   signal,
@@ -63,6 +74,7 @@ async function startGenerationApi({
   const res = await fetch("/api/replicate", {
     body: JSON.stringify({
       prompt,
+      seed,
       promptVersion,
       qualityExpectations,
     }),
@@ -113,6 +125,12 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     null
   );
   const [generationSetId, setGenerationSetId] = useState<string | null>(null);
+  const [generationSeed, setGenerationSeed] = useState<number>(
+    DEFAULT_GENERATION_SEED
+  );
+  const [lastGenerationSeed, setLastGenerationSeed] = useState<number | null>(
+    null
+  );
   const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
     .trim()
     .replace(/^['"]|['"]$/g, "")
@@ -143,12 +161,17 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     isError: isStartError,
     error: startError,
     reset: resetMutation,
-  } = useMutation<StartGenerationResponse, Error, string>({
-    mutationFn: async (p) => {
+  } = useMutation<
+    StartGenerationResponse,
+    Error,
+    StartGenerationMutationParams
+  >({
+    mutationFn: async ({ prompt: generationPrompt, seed }) => {
       if (isDev) console.log("[ImageGenerator] Starting generation...");
       const controller = new AbortController();
       const data = await startGenerationApi({
-        prompt: p,
+        prompt: generationPrompt,
+        seed,
         promptVersion: summaryData.promptVersion,
         qualityExpectations: summaryData.qualityExpectations,
         signal: controller.signal,
@@ -158,6 +181,8 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     },
     onSuccess: (data) => {
       setGenerationSetId(data.generationSet.generationSetId);
+      setGenerationSeed(data.generationSet.seed);
+      setLastGenerationSeed(data.generationSet.seed);
     },
     // Starting a set is not retried automatically: a lost response must not
     // create and charge a second prediction.
@@ -170,7 +195,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     isError: isStatusError,
   } = useQuery<StatusGenerationResponse, Error>({
     queryKey: ["replicate-status", generationSetId],
-    enabled: Boolean(generationSetId && prompt),
+    enabled: Boolean(generationSetId && (prompt || completedPrompt)),
     queryFn: ({ signal }) =>
       pollGenerationApi({
         generationSetId: generationSetId!,
@@ -194,7 +219,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         (candidate) => candidate.loraScale === LORA_GENERATION_SCALE
       ) ?? statusData.candidates[0];
     setGeneratedImage(strongestCandidate);
-    setCompletedPrompt(prompt);
+    setCompletedPrompt((current) => prompt ?? current);
     // Clear the prompt to avoid accidental regeneration on remount.
     $prompt.set(null);
   }, [prompt, statusData]);
@@ -206,8 +231,19 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
 
     if (!prompt) return;
     hasTriggered.current = prompt;
-    startGeneration(prompt);
-  }, [prompt, resetMutation, startGeneration]);
+    startGeneration({ prompt, seed: generationSeed });
+  }, [generationSeed, prompt, resetMutation, startGeneration]);
+
+  const handleDevRegenerate = useCallback(() => {
+    const promptToRegenerate = completedPrompt ?? prompt;
+    if (!promptToRegenerate) return;
+
+    resetMutation();
+    setGenerationSetId(null);
+    setGeneratedImage(null);
+    hasTriggered.current = promptToRegenerate;
+    startGeneration({ prompt: promptToRegenerate, seed: generationSeed });
+  }, [completedPrompt, generationSeed, prompt, resetMutation, startGeneration]);
 
   useEffect(() => {
     void loadRuntimeConfig();
@@ -217,9 +253,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     if (prompt && hasTriggered.current !== prompt) {
       hasTriggered.current = prompt;
       if (isDev) console.log("[ImageGenerator] Triggering generation");
-      startGeneration(prompt);
+      startGeneration({ prompt, seed: generationSeed });
     }
-  }, [prompt, startGeneration]);
+  }, [generationSeed, prompt, startGeneration]);
 
   const hasImage = Boolean(generatedImage);
   const status = statusData?.status;
@@ -289,6 +325,14 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
               candidate={generatedImage}
               onImageClick={setSelectedImage}
             />
+            {isDev && (
+              <DevSeedControls
+                seed={generationSeed}
+                lastGenerationSeed={lastGenerationSeed}
+                onSeedChange={setGenerationSeed}
+                onRegenerate={handleDevRegenerate}
+              />
+            )}
             <QuickLink />
           </motion.div>
         )}
@@ -303,6 +347,51 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
           />
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function DevSeedControls({
+  seed,
+  lastGenerationSeed,
+  onSeedChange,
+  onRegenerate,
+}: {
+  seed: number;
+  lastGenerationSeed: number | null;
+  onSeedChange: (seed: number) => void;
+  onRegenerate: () => void;
+}) {
+  return (
+    <div className="mx-auto mt-5 flex w-full max-w-5xl flex-wrap items-end justify-between gap-4 border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-left">
+      <div>
+        <p className="text-sm font-semibold text-foreground">Development seed</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Last generated seed: {lastGenerationSeed ?? "not started"}
+        </p>
+        <label className="mt-3 flex flex-col gap-1 text-xs font-medium text-foreground" htmlFor="generation-seed">
+          Seed
+          <input
+            id="generation-seed"
+            type="number"
+            min={0}
+            max={MAX_GENERATION_SEED}
+            step={1}
+            value={seed}
+            onChange={(event) => {
+              const nextSeed = Number(event.target.value);
+              if (!Number.isFinite(nextSeed)) return;
+              onSeedChange(
+                Math.min(MAX_GENERATION_SEED, Math.max(0, Math.trunc(nextSeed)))
+              );
+            }}
+            className="h-9 w-48 border border-border bg-background px-2 text-sm text-foreground"
+          />
+        </label>
+      </div>
+      <Button type="button" onClick={onRegenerate}>
+        Regenerate with this seed
+      </Button>
     </div>
   );
 }

@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import type { WizardState } from "../app/store/wizardStore";
 import {
   ACTIVE_LORA_SCALES,
+  DEFAULT_GENERATION_SEED,
   LORA_GENERATION_SCALE,
   MODEL_PROMPT_WORD_BUDGET,
   PROMPT_VERSION,
   isGenerationVariantManifest,
+  normalizeGenerationSeed,
   withLoraTrigger,
   type HandleGeometryKind,
 } from "../lib/imageGenerationContract";
@@ -14,10 +16,14 @@ import {
   getHandleGeometry,
   handleCatalog,
 } from "../components/wizard/handleCatalog";
+import { encodeFrontfarbenColorValue } from "../components/wizard/frontfarbenCatalog";
 import { buildPrompt } from "../components/wizard/promptBuilder";
 
 assert.equal(LORA_GENERATION_SCALE, 0.85);
 assert.deepEqual(ACTIVE_LORA_SCALES, [0.85]);
+assert.equal(normalizeGenerationSeed(undefined), DEFAULT_GENERATION_SEED);
+assert.equal(normalizeGenerationSeed(42.9), 42);
+assert.equal(normalizeGenerationSeed(-4), 0);
 assert.equal(
   isGenerationVariantManifest([
     {
@@ -94,6 +100,7 @@ const rows = requiredKinds.map((kind) => {
     true
   );
   assert.equal(/multiple handles|four handles visible/i.test(result.prompt), false);
+  assert.equal(/product photography|white background/i.test(result.prompt), false);
 
   const triggered = withLoraTrigger(`RDTDOT RDTDOT ${result.prompt}`);
   assert.equal((triggered.match(/\bRDTDOT\b/g) ?? []).length, 1);
@@ -138,6 +145,26 @@ assert.match(
 );
 assert.equal((islandResult.prompt.match(/\bsink\b/gi) ?? []).length, 1);
 assert.equal((islandResult.prompt.match(/\bfaucet\b/gi) ?? []).length, 1);
+
+const blackTBar = handleCatalog.find(
+  (entry) => entry.id === "bp-230821-rp-mk11-griff-th-01322"
+);
+assert(blackTBar, "Missing black Buster & Punch T-bar fixture");
+const frontIdentityResult = buildPrompt({
+  selections: {
+    ...baseSelections,
+    color: encodeFrontfarbenColorValue("844HL"),
+    handle: encodeHandleSelectionValue(blackTBar.id),
+  },
+  pipelineV2Enabled: true,
+});
+assert.match(frontIdentityResult.prompt, /Rotpunkt MOSS \(HL\), catalog 844HL/);
+assert.match(frontIdentityResult.prompt, /dark green high gloss smooth kitchen door surface/);
+assert.match(frontIdentityResult.prompt, /Selected hardware reference: Matte Black Knurled/);
+assert.doesNotMatch(
+  frontIdentityResult.prompt,
+  /white Rotpunkt kitchen cabinet front|dark countertop|product photography/i
+);
 
 console.table(rows);
 console.log(

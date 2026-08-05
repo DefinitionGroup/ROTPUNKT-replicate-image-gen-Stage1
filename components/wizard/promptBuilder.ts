@@ -4,10 +4,12 @@ import { getFenixColorByValue, isFenixColorValue } from "./fenixColors";
 import {
   getFrontfarbenColorByValue,
   isFrontfarbenColorValue,
+  type FrontfarbenCatalogEntry,
 } from "./frontfarbenCatalog";
 import {
   getHandlePromptDescriptor,
   getHandleSelectionByValue,
+  type HandleCatalogEntry,
   type HandleGeometrySpec,
 } from "./handleCatalog";
 import {
@@ -430,6 +432,12 @@ function sanitizeHandlePromptCaption(caption: string): string {
       ""
     )
     .replace(/\bwith warm lighting\b/gi, "")
+    .replace(/\ba (?:close-up|macro|detail|product|lifestyle) photograph of\b/gi, "")
+    .replace(/\b(?:professional|studio|close-up) product photography\b/gi, "")
+    .replace(/\bisolated on (?:a )?white background\b/gi, "")
+    .replace(/\bagainst (?:a )?white background\b/gi, "")
+    .replace(/\b(?:industrial-luxury|industrial-modern) (?:kitchen )?design aesthetic\b/gi, "")
+    .replace(/\bmodern minimalist kitchen design\b/gi, "")
     .replace(/\s{2,}/g, " ")
     .replace(/\s+,/g, ",")
     .replace(/\s+\./g, ".")
@@ -456,14 +464,14 @@ function compactDescriptor(value: string, maxWords = 24): string {
 }
 
 function buildHandleModelSections({
+  entry,
   geometry,
   promptCaption,
-  label,
   isKitchen,
 }: {
+  entry: HandleCatalogEntry;
   geometry: HandleGeometrySpec;
   promptCaption: string;
-  label?: string;
   isKitchen: boolean;
 }): string[] {
   const contextualCaption = contextualizeHandleCaption(
@@ -471,47 +479,54 @@ function buildHandleModelSections({
     isKitchen
   );
   const sanitizedCaption = sanitizeHandlePromptCaption(contextualCaption);
-  const descriptor = compactDescriptor(
-    sanitizedCaption || label || "selected cabinet handle"
+  const visualTraits = compactDescriptor(
+    sanitizedCaption || entry.labelEn || "selected cabinet handle",
+    15
   );
   const kind = geometry.kind;
 
   if (kind === "handleless") {
     return [
-      "Opening system: Rotpunkt handleless fronts with a recessed finger-pull channel below the worktop as the only opening detail. Every door and drawer remains an independent panel separated by crisp seams.",
+      "Opening system: Rotpunkt handleless fronts with a recessed finger-pull channel below the worktop as the only opening detail. Every door and drawer remains an independent panel separated by crisp seams. Cabinet front color and material remain governed by the selected front.",
     ];
   }
 
   if (kind === "tokyo_grip") {
     return [
-      `Opening system: Rotpunkt Tokyo grip milled into each front's top edge as a projecting lip with a curved finger recess. Surface: ${descriptor}. Each panel has its own contained profile; crisp free seams separate operable fronts.`,
+      `Opening system: Rotpunkt Tokyo grip milled into each front's top edge as a projecting lip with a curved finger recess. Selected grip reference: ${entry.labelEn}; ${visualTraits}. Each panel has its own contained profile; crisp free seams separate operable fronts. The selected front still governs all broad cabinet-surface color and material.`,
     ];
   }
 
   const commonMountingRule =
-    "Each handle stays entirely within one operable front; crisp free seams separate adjacent doors and drawers.";
+    "Each handle stays entirely within one operable front; crisp free seams separate adjacent doors and drawers. Cabinet color and material come only from the selected front.";
+  const hardwareIdentity = `Selected hardware reference: ${entry.labelEn}; visual traits: ${visualTraits}.`;
 
   if (kind === "t_bar") {
     return [
-      `Handle: ${descriptor}. Preserve the T-bar silhouette, profile, backplate, and finish. One central pedestal is fully inside its own front. ${commonMountingRule}`,
+      `Handle: ${hardwareIdentity} Preserve the T-bar silhouette, profile, backplate, and finish. One central pedestal is fully inside its own front. ${commonMountingRule}`,
     ];
   }
 
   if (kind === "bar_pull") {
     return [
-      `Handle: ${descriptor}. Preserve the bar-pull silhouette, brackets, and finish. Both feet attach to the same front and both ends stop before its edges. ${commonMountingRule}`,
+      `Handle: ${hardwareIdentity} Preserve the bar-pull silhouette, brackets, and finish. Both feet attach to the same front and both ends stop before its edges. ${commonMountingRule}`,
     ];
   }
 
   if (kind === "knob") {
     return [
-      `Handle: ${descriptor}. Preserve the knob silhouette, base, texture, and finish. Its single mounting point is fully inside its own front. ${commonMountingRule}`,
+      `Handle: ${hardwareIdentity} Preserve the knob silhouette, base, texture, and finish. Its single mounting point is fully inside its own front. ${commonMountingRule}`,
     ];
   }
 
   return [
-    `Handle: ${descriptor}. Preserve its silhouette, mounting style, and finish. ${commonMountingRule}`,
+    `Handle: ${hardwareIdentity} Preserve its silhouette, mounting style, and finish. ${commonMountingRule}`,
   ];
+}
+
+function buildFrontIdentitySection(front: FrontfarbenCatalogEntry): string {
+  const visualAnchor = compactDescriptor(front.trainingCaption, 16);
+  return `Cabinet fronts: Rotpunkt ${front.labelEn}, catalog ${front.id}, ${front.materialTypeEn}; training visual anchor: ${visualAnchor}. The selected catalog identity governs hue, material, and finish.`;
 }
 
 function resolveWetZoneLocation(extraWishes?: string): WetZoneLocation {
@@ -948,9 +963,9 @@ export function buildPrompt({
 
   if (handleEntry && handleSelection) {
     const handleSections = buildHandleModelSections({
+      entry: handleEntry,
       geometry: handleSelection.geometry,
       promptCaption: handleSelection.promptCaption,
-      label: handleEntry.labelEn,
       isKitchen: isKitchenRoom,
     });
     handleSections.forEach((section, index) => {
@@ -974,7 +989,7 @@ export function buildPrompt({
   } else if (isFrontfarbe && frontfarbe) {
     addModelSection(
       "front",
-      `Cabinet fronts: ${frontfarbe.trainingCaption}; preserve this exact catalog identity, finish family, and material impression.`,
+      buildFrontIdentitySection(frontfarbe),
       { required: true }
     );
     if (frontfarbe.subcategory === "HL" || frontfarbe.subcategory === "LX") {

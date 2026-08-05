@@ -4,8 +4,10 @@ import Replicate from "replicate";
 import { createSupabaseUserClient } from "@/lib/supabaseServer";
 import {
   ACTIVE_LORA_SCALES,
+  DEFAULT_GENERATION_SEED,
   PROMPT_VERSION,
   isGenerationQualityExpectations,
+  normalizeGenerationSeed,
   withLoraTrigger,
   type GenerationSetContext,
   type GenerationVariantContext,
@@ -34,13 +36,6 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   return Promise.race([promise, timeout]).finally(() => {
     if (timeoutId) clearTimeout(timeoutId);
   }) as Promise<T>;
-}
-
-function clampSeed(value: unknown): number {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    return Math.floor(Math.random() * 2 ** 32);
-  }
-  return Math.min(2 ** 32 - 1, Math.max(0, Math.trunc(value)));
 }
 
 function normalizePromptVersion(value: unknown): PromptVersion {
@@ -79,7 +74,9 @@ export async function POST(req: NextRequest) {
       getToken({ template: "supabase" })
     );
     generationSetId = crypto.randomUUID();
-    const seed = clampSeed(requestedSeed);
+    const seed = isDev
+      ? normalizeGenerationSeed(requestedSeed)
+      : DEFAULT_GENERATION_SEED;
     const promptVersion = normalizePromptVersion(requestedPromptVersion);
     const qualityExpectations = isGenerationQualityExpectations(
       requestedQualityExpectations

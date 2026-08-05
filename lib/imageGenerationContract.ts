@@ -4,6 +4,10 @@ export const LORA_TRIGGER_WORD = "RDTDOT";
 export const LORA_COMPARISON_SCALES = [0.65, 0.75, 0.85] as const;
 export const LORA_GENERATION_SCALE = 0.85 as const;
 export const ACTIVE_LORA_SCALES = [LORA_GENERATION_SCALE] as const;
+// Keep the same baseline reproducible in local development and production.
+// A new seed may be supplied explicitly for development experiments.
+export const DEFAULT_GENERATION_SEED = 260805 as const;
+export const MAX_GENERATION_SEED = 2 ** 32 - 1;
 export type PromptVersion = typeof PROMPT_VERSION | "legacy-debug";
 export type LoraComparisonScale = (typeof LORA_COMPARISON_SCALES)[number];
 export type GenerationSetStatus =
@@ -93,6 +97,14 @@ export function isLoraComparisonScale(
     typeof value === "number" &&
     LORA_COMPARISON_SCALES.some((scale) => scale === value)
   );
+}
+
+export function normalizeGenerationSeed(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return DEFAULT_GENERATION_SEED;
+  }
+
+  return Math.min(MAX_GENERATION_SEED, Math.max(0, Math.trunc(value)));
 }
 
 export function isGenerationQualityExpectations(
