@@ -3,7 +3,7 @@ import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { createSupabaseUserClient } from "@/lib/supabaseServer";
 import {
-  LORA_COMPARISON_SCALES,
+  ACTIVE_LORA_SCALES,
   PROMPT_VERSION,
   isGenerationQualityExpectations,
   withLoraTrigger,
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         model_version: MODEL_VERSION,
         guidance_scale: GUIDANCE_SCALE,
         num_inference_steps: NUM_INFERENCE_STEPS,
-        requested_lora_scales: [...LORA_COMPARISON_SCALES],
+        requested_lora_scales: [...ACTIVE_LORA_SCALES],
         quality_expectations: qualityExpectations,
         status: "starting",
         updated_at: now,
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     }
 
     const starts = await Promise.allSettled(
-      LORA_COMPARISON_SCALES.map((loraScale, candidateIndex) =>
+      ACTIVE_LORA_SCALES.map((loraScale, candidateIndex) =>
         withTimeout(
           replicate.predictions.create({
             version: MODEL_VERSION,
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       result.status === "fulfilled" ? [result.value] : []
     );
 
-    if (variants.length !== LORA_COMPARISON_SCALES.length) {
+    if (variants.length !== ACTIVE_LORA_SCALES.length) {
       await Promise.allSettled(
         variants.map((variant) =>
           replicate.predictions.cancel(variant.predictionId)
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
         })
         .eq("id", generationSetId)
         .eq("user_id", userId);
-      throw new Error("Not all three LoRA variants could be started");
+      throw new Error("The LoRA generation could not be started");
     }
 
     const { error: manifestError } = await supabase
@@ -199,7 +199,7 @@ export async function POST(req: NextRequest) {
 
     if (isDev) {
       console.log(
-        `[${requestId}] Started comparison set ${generationSetId} with seed ${seed}`
+        `[${requestId}] Started generation set ${generationSetId} with LoRA ${ACTIVE_LORA_SCALES[0]} and seed ${seed}`
       );
     }
 
@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
       { status: 202 }
     );
   } catch (error) {
-    console.error("Replicate comparison start route error:", error);
+    console.error("Replicate generation start route error:", error);
     if (generationSetId && supabase) {
       try {
         await supabase
@@ -231,7 +231,7 @@ export async function POST(req: NextRequest) {
         error:
           status === 504
             ? "Generation start timed out"
-            : "Failed to start comparison generation",
+            : "Failed to start generation",
         generationSetId,
       },
       { status }

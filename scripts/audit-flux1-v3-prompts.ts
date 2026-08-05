@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import type { WizardState } from "../app/store/wizardStore";
 import {
+  ACTIVE_LORA_SCALES,
+  LORA_GENERATION_SCALE,
   MODEL_PROMPT_WORD_BUDGET,
-  LORA_COMPARISON_SCALES,
   PROMPT_VERSION,
+  isGenerationVariantManifest,
   withLoraTrigger,
   type HandleGeometryKind,
 } from "../lib/imageGenerationContract";
@@ -14,7 +16,30 @@ import {
 } from "../components/wizard/handleCatalog";
 import { buildPrompt } from "../components/wizard/promptBuilder";
 
-assert.deepEqual(LORA_COMPARISON_SCALES, [0.65, 0.75, 0.85]);
+assert.equal(LORA_GENERATION_SCALE, 0.85);
+assert.deepEqual(ACTIVE_LORA_SCALES, [0.85]);
+assert.equal(
+  isGenerationVariantManifest([
+    {
+      predictionId: "active-prediction",
+      status: "starting",
+      candidateIndex: 0,
+      loraScale: 0.85,
+    },
+  ]),
+  true
+);
+assert.equal(
+  isGenerationVariantManifest(
+    [0.65, 0.75, 0.85].map((loraScale, candidateIndex) => ({
+      predictionId: `legacy-prediction-${candidateIndex}`,
+      status: "starting",
+      candidateIndex,
+      loraScale,
+    }))
+  ),
+  true
+);
 
 const baseSelections: WizardState["selectedOptions"] = {
   environment: "stadtwohnung",

@@ -35,15 +35,14 @@ Offizielle Quellen:
 
 ### Umsetzung
 
-- Offizielles EU-Icon für vollständig KI-generierte Inhalte als unverändertes SVG-Asset einbinden.
-- Mit lokalisiertem Klartext kombinieren:
-  - Deutsch: „KI-generierte Visualisierung“
-  - Englisch: „AI-generated visualisation“
+- Eine kleine, zurückhaltende Klartext-Kennzeichnung direkt über dem Bild einblenden:
+  - Deutsch: „KI-generiert“
+  - Englisch: „AI-generated“
 - Ergänzende Erklärung über den zugänglichen Namen und die native Detailanzeige:
   - Deutsch: „Diese Visualisierung wurde vollständig mit KI erzeugt. Materialien, Farben, Proportionen und Produktdetails können von realen Ausführungen abweichen.“
   - Englisch: „This visualisation was generated entirely with AI. Materials, colours, proportions and product details may differ from real products.“
 - Kennzeichnung an allen relevanten Bildansichten:
-  - Ergebnisvergleich der drei Varianten
+  - Generiertes Ergebnis
   - Galerie „Meine Bilder“
   - Vollbild-/Detailmodal
   - Upscale-Ergebnis
@@ -54,7 +53,7 @@ Offizielle Quellen:
 - Die Kennzeichnung ist beim ersten Anzeigen der generierten Ergebnisse sichtbar, ohne dass der Benutzer interagieren muss.
 - In Galerie, Detailmodal und Upscale-Ergebnis ist jedes Bild eindeutig zugeordnet gekennzeichnet.
 - Deutsche und englische Texte werden über `next-intl` ausgeliefert.
-- Das Icon stammt aus dem offiziellen EU-Download und wird nicht grafisch verändert.
+- Das offizielle EU-Icon bleibt als unverändertes Asset für spätere Download- und Provenienzschritte verfügbar, wird in der kompakten UI-Kennzeichnung aber nicht angezeigt.
 - TypeScript-Prüfung, gezielter Lint aller geänderten Quellcodedateien, Produktions-Build und erreichbare Browserzustände sind fehlerfrei.
 
 Hinweis zur Repository-QA: Der globale Befehl `pnpm lint` erfasst aktuell auch den generierten `.next`-Ordner und schlägt zusätzlich an bereits bestehenden, von dieser Phase unabhängigen Quellcodefehlern an. Diese Konfiguration sollte separat bereinigt werden; sie ist kein durch Phase 1 verursachter Fehler.
@@ -114,8 +113,8 @@ Vor einer Migration: SQL separat prüfen, Backup-Stand bestätigen, Staging anwe
 
 ## Asset-Provenienz
 
-- Asset: offizielles EU-Label „AI GENERATED“ für vollständig KI-generierte Inhalte
+- Asset: optionales offizielles EU-Label „AI GENERATED“ für vollständig KI-generierte Inhalte
 - Format: SVG, schwarze Variante
 - Quelle: EU-Kommission, Seite „EU icons for labelling AI-generated content“
 - Abrufdatum: 1. August 2026
-- Lokaler Zielpfad: `public/UI/eu-ai-generated.svg`
+- Lokaler Pfad: `public/UI/eu-ai-generated.svg` (derzeit nicht in der kompakten UI-Kennzeichnung gerendert)

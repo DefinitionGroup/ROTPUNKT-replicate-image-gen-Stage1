@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
@@ -13,9 +12,9 @@ import ImageModal from "@/components/ImageModal";
 import AiGeneratedLabel from "@/components/AiGeneratedLabel";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { Star } from "lucide-react";
 import { buildPrompt } from "./promptBuilder";
 import { PromptDebugPopover } from "./PromptDebugPopover";
+import { LORA_GENERATION_SCALE } from "@/lib/imageGenerationContract";
 import {
   $promptPipelineV2Enabled,
   loadRuntimeConfig,
@@ -53,12 +52,6 @@ interface StartGenerationParams {
 interface PollGenerationParams {
   generationSetId: string;
   signal: AbortSignal;
-}
-
-interface SelectBestResponse {
-  generationSetId: string;
-  selectedImageId: string;
-  selectedAt: string;
 }
 
 async function startGenerationApi({
@@ -109,27 +102,6 @@ async function pollGenerationApi({
   return res.json();
 }
 
-async function selectBestImageApi({
-  generationSetId,
-  imageId,
-}: {
-  generationSetId: string;
-  imageId: string;
-}): Promise<SelectBestResponse> {
-  const res = await fetch("/api/generation-sets/select-best", {
-    body: JSON.stringify({ generationSetId, imageId }),
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  });
-  if (!res.ok) {
-    const errorData = await res
-      .json()
-      .catch(() => ({ error: `Server error: ${res.status}` }));
-    throw new Error(errorData.error || "Auswahl konnte nicht gespeichert werden");
-  }
-  return res.json();
-}
-
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const prompt = useStore($prompt);
   const wizardState = useStore(wizardStore);
@@ -137,13 +109,10 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const t = useTranslations('imageGenerator');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [completedPrompt, setCompletedPrompt] = useState<string | null>(null);
-  const [generatedCandidates, setGeneratedCandidates] = useState<
-    GenerationCandidate[] | null
-  >(null);
-  const [generationSetId, setGenerationSetId] = useState<string | null>(null);
-  const [selectedBestImageId, setSelectedBestImageId] = useState<string | null>(
+  const [generatedImage, setGeneratedImage] = useState<GenerationCandidate | null>(
     null
   );
+  const [generationSetId, setGenerationSetId] = useState<string | null>(null);
   const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
     .trim()
     .replace(/^['"]|['"]$/g, "")
@@ -191,7 +160,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       setGenerationSetId(data.generationSet.generationSetId);
     },
     // Starting a set is not retried automatically: a lost response must not
-    // create and charge a second three-prediction comparison.
+    // create and charge a second prediction.
     retry: 0,
   });
 
@@ -218,41 +187,22 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   useEffect(() => {
     if (!statusData) return;
     if (statusData.status !== "succeeded") return;
-    if (!Array.isArray(statusData.candidates) || statusData.candidates.length !== 3) return;
+    if (!Array.isArray(statusData.candidates) || statusData.candidates.length === 0) return;
 
-    setGeneratedCandidates(statusData.candidates);
-    setSelectedBestImageId(statusData.selectedImageId ?? null);
+    const strongestCandidate =
+      statusData.candidates.find(
+        (candidate) => candidate.loraScale === LORA_GENERATION_SCALE
+      ) ?? statusData.candidates[0];
+    setGeneratedImage(strongestCandidate);
     setCompletedPrompt(prompt);
     // Clear the prompt to avoid accidental regeneration on remount.
     $prompt.set(null);
   }, [prompt, statusData]);
 
-  const {
-    mutate: selectBestImage,
-    isPending: isSavingBest,
-    isError: isBestSelectionError,
-  } = useMutation<
-    SelectBestResponse,
-    Error,
-    { generationSetId: string; imageId: string }
-  >({
-    mutationFn: selectBestImageApi,
-    onSuccess: (data) => {
-      setSelectedBestImageId(data.selectedImageId);
-      setGeneratedCandidates((current) =>
-        current?.map((candidate) => ({
-          ...candidate,
-          isSelectedBest: candidate.imageId === data.selectedImageId,
-        })) ?? null
-      );
-    },
-  });
-
   const handleRetry = useCallback(() => {
     resetMutation();
     setGenerationSetId(null);
-    setGeneratedCandidates(null);
-    setSelectedBestImageId(null);
+    setGeneratedImage(null);
 
     if (!prompt) return;
     hasTriggered.current = prompt;
@@ -271,13 +221,12 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     }
   }, [prompt, startGeneration]);
 
-  const hasImages =
-    Array.isArray(generatedCandidates) && generatedCandidates.length > 0;
+  const hasImage = Boolean(generatedImage);
   const status = statusData?.status;
   const isTerminalFailure =
     status === "failed" || status === "partial_failed";
   const isPending =
-    !hasImages &&
+    !hasImage &&
     (isStarting ||
       (!!generationSetId &&
         (status === undefined || status === "starting" || status === "processing")));
@@ -285,13 +234,13 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     isTerminalFailure
       ? statusData?.error || t("error.unknown")
       : startError?.message || statusError?.message || t("error.unknown");
-  const isError = !hasImages && (isStartError || isStatusError || isTerminalFailure);
+  const isError = !hasImage && (isStartError || isStatusError || isTerminalFailure);
 
   if (isDev) {
     console.log("[ImageGenerator] State:", {
       isPending,
       isError,
-      hasImages,
+      hasImage,
       generationSetId,
       status,
     });
@@ -307,12 +256,12 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         prompt={summaryData.modelPrompt || prompt || "Prompt is currently empty."}
       />
 
-      {onBack && hasImages && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
+      {onBack && hasImage && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
 
       <AnimatePresence mode="wait">
-        {isPending && !hasImages && <LoadingState key="loading" />}
+        {isPending && !hasImage && <LoadingState key="loading" />}
 
-        {!isPending && isError && !hasImages && (
+        {!isPending && isError && !hasImage && (
           <ErrorState
             key="error"
             message={errorMessage}
@@ -320,7 +269,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
           />
         )}
 
-        {!isPending && hasImages && (
+        {!isPending && hasImage && generatedImage && (
           <motion.div
             key="images"
             initial={{ opacity: 0, y: 16 }}
@@ -330,40 +279,17 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
           >
             <div className="mx-auto mb-8 max-w-2xl text-center">
               <h2 className="text-2xl font-semibold text-foreground">
-                {t("comparison.title")}
+                {t("result.title")}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                {t("comparison.description")}
+                {t("result.description")}
               </p>
-              <AiGeneratedLabel variant="inline" className="mt-4" />
             </div>
-            <ImagesGrid
-              candidates={generatedCandidates!}
-              selectedBestImageId={selectedBestImageId}
-              isSavingBest={isSavingBest}
+            <GeneratedImage
+              candidate={generatedImage}
               onImageClick={setSelectedImage}
-              onSelectBest={(candidate) =>
-                selectBestImage({
-                  generationSetId: candidate.generationSetId,
-                  imageId: candidate.imageId,
-                })
-              }
             />
-            {selectedBestImageId && (
-              <p
-                className="mt-5 text-center text-sm text-emerald-500"
-                role="status"
-                aria-live="polite"
-              >
-                {t("comparison.saved")}
-              </p>
-            )}
-            {isBestSelectionError && (
-              <p className="mt-5 text-center text-sm text-destructive" role="alert">
-                {t("comparison.saveError")}
-              </p>
-            )}
-            {selectedBestImageId && <QuickLink />}
+            <QuickLink />
           </motion.div>
         )}
       </AnimatePresence>
@@ -523,185 +449,35 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
   );
 }
 
-function ImagesGrid({
-  candidates = [],
-  selectedBestImageId,
-  isSavingBest,
+function GeneratedImage({
+  candidate,
   onImageClick,
-  onSelectBest,
 }: {
-  candidates?: GenerationCandidate[];
-  selectedBestImageId: string | null;
-  isSavingBest: boolean;
+  candidate: GenerationCandidate;
   onImageClick: (src: string) => void;
-  onSelectBest: (candidate: GenerationCandidate) => void;
 }) {
-  const t = useTranslations("imageGenerator.comparison");
-  const [activeCandidateId, setActiveCandidateId] = useState<string | null>(
-    () => selectedBestImageId ?? candidates[0]?.imageId ?? null
-  );
-  const activeCandidate =
-    candidates.find((candidate) => candidate.imageId === activeCandidateId) ??
-    candidates.find((candidate) => candidate.imageId === selectedBestImageId) ??
-    candidates[0];
-
-  if (!activeCandidate) return null;
+  const t = useTranslations("imageGenerator");
 
   return (
-    <>
-      <div className="w-full md:hidden">
-        <div
-          className={`overflow-hidden rounded-xl border bg-card transition ${
-            selectedBestImageId === activeCandidate.imageId
-              ? "border-emerald-400 ring-2 ring-emerald-400/40"
-              : "border-border"
-          }`}
-        >
-          <button
-            type="button"
-            onClick={() => onImageClick(activeCandidate.url)}
-            aria-label={t("variantAlt", { number: activeCandidate.index + 1 })}
-            className="group block w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary-2"
-          >
-            <motion.img
-              key={activeCandidate.imageId}
-              src={activeCandidate.url}
-              alt={t("variantAlt", { number: activeCandidate.index + 1 })}
-              crossOrigin="anonymous"
-              initial={{ opacity: 0.7 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.18 }}
-              className="aspect-[7/4] w-full object-cover transition-transform group-hover:scale-[1.01]"
-            />
-          </button>
-          <div className="flex items-center justify-between gap-3 p-3">
-            <span className="text-sm font-medium text-foreground">
-              {t("variant", { number: activeCandidate.index + 1 })}
-            </span>
-            <button
-              type="button"
-              aria-pressed={selectedBestImageId === activeCandidate.imageId}
-              aria-label={
-                selectedBestImageId === activeCandidate.imageId
-                  ? t("selectedAria", { number: activeCandidate.index + 1 })
-                  : t("selectAria", { number: activeCandidate.index + 1 })
-              }
-              disabled={isSavingBest}
-              onClick={() => onSelectBest(activeCandidate)}
-              className={`inline-flex size-12 shrink-0 items-center justify-center rounded-full border transition disabled:cursor-wait disabled:opacity-60 ${
-                selectedBestImageId === activeCandidate.imageId
-                  ? "border-emerald-400 bg-emerald-400 text-black"
-                  : "border-border bg-background/80 text-muted-foreground hover:border-emerald-400 hover:text-emerald-400"
-              }`}
-            >
-              <Star
-                className="size-5"
-                fill={
-                  selectedBestImageId === activeCandidate.imageId
-                    ? "currentColor"
-                    : "none"
-                }
-              />
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {candidates.map((candidate) => {
-            const isActive = activeCandidate.imageId === candidate.imageId;
-            const isBest = selectedBestImageId === candidate.imageId;
-
-            return (
-              <button
-                key={candidate.imageId}
-                type="button"
-                aria-pressed={isActive}
-                aria-label={t("variantAlt", { number: candidate.index + 1 })}
-                onClick={() => setActiveCandidateId(candidate.imageId)}
-                className={`relative overflow-hidden rounded-lg border bg-card text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2 ${
-                  isActive
-                    ? "border-brand-primary-2 ring-1 ring-brand-primary-2/50"
-                    : "border-border"
-                }`}
-              >
-                <img
-                  src={candidate.url}
-                  alt=""
-                  crossOrigin="anonymous"
-                  className="aspect-[7/4] w-full object-cover"
-                />
-                <span className="flex items-center justify-between gap-1 px-2 py-1.5 text-[11px] text-muted-foreground">
-                  {t("variant", { number: candidate.index + 1 })}
-                  {isBest && (
-                    <Star
-                      aria-hidden="true"
-                      className="size-3.5 shrink-0 text-emerald-400"
-                      fill="currentColor"
-                    />
-                  )}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="hidden w-full grid-cols-3 gap-4 md:grid lg:gap-6">
-        {candidates.map((candidate) => {
-          const isBest = selectedBestImageId === candidate.imageId;
-          return (
-            <div
-              key={candidate.imageId}
-              className={`relative overflow-hidden rounded-xl border bg-card transition ${
-                isBest
-                  ? "border-emerald-400 ring-2 ring-emerald-400/40"
-                  : "border-border"
-              }`}
-            >
-              <button
-                type="button"
-                onClick={() => onImageClick(candidate.url)}
-                aria-label={t("variantAlt", { number: candidate.index + 1 })}
-                className="group block w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary-2"
-              >
-                <img
-                  src={candidate.url}
-                  alt={t("variantAlt", { number: candidate.index + 1 })}
-                  crossOrigin="anonymous"
-                  className="aspect-[7/4] w-full object-cover transition-transform group-hover:scale-[1.01]"
-                />
-              </button>
-              <div className="flex items-center justify-between gap-3 p-3">
-                <span className="text-xs text-muted-foreground">
-                  {t("variant", { number: candidate.index + 1 })}
-                </span>
-                <button
-                  type="button"
-                  aria-pressed={isBest}
-                  aria-label={
-                    isBest
-                      ? t("selectedAria", { number: candidate.index + 1 })
-                      : t("selectAria", { number: candidate.index + 1 })
-                  }
-                  disabled={isSavingBest}
-                  onClick={() => onSelectBest(candidate)}
-                  className={`inline-flex size-11 items-center justify-center rounded-full border transition disabled:cursor-wait disabled:opacity-60 ${
-                    isBest
-                      ? "border-emerald-400 bg-emerald-400 text-black"
-                      : "border-border bg-background/80 text-muted-foreground hover:border-emerald-400 hover:text-emerald-400"
-                  }`}
-                >
-                  <Star
-                    className="size-5"
-                    fill={isBest ? "currentColor" : "none"}
-                  />
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </>
+    <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card">
+      <button
+        type="button"
+        onClick={() => onImageClick(candidate.url)}
+        aria-label={t("generatedImageAlt")}
+        className="group relative block w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary-2"
+      >
+        <motion.img
+          src={candidate.url}
+          alt={t("generatedImageAlt")}
+          crossOrigin="anonymous"
+          initial={{ opacity: 0.7 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          className="aspect-video w-full object-cover transition-transform group-hover:scale-[1.01]"
+        />
+        <AiGeneratedLabel className="pointer-events-none absolute bottom-2 left-2" />
+      </button>
+    </div>
   );
 }
 
@@ -710,7 +486,7 @@ function QuickLink() {
   return (
     <Link
       href="/my-images"
-      className="mt-6 inline-block px-6 py-3 bg-brand-primary-2 text-white rounded-full font-semibold shadow hover:bg-red-600 transition hover:scale-105"
+      className="mx-auto mt-6 flex w-fit px-6 py-3 bg-brand-primary-2 text-white rounded-full font-semibold shadow hover:bg-red-600 transition hover:scale-105"
     >
       📁 {t('goToMyImages')}
     </Link>

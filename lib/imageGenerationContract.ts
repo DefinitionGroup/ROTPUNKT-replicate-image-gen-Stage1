@@ -2,6 +2,8 @@ export const PROMPT_VERSION = "flux1-v3" as const;
 export const MODEL_PROMPT_WORD_BUDGET = 180;
 export const LORA_TRIGGER_WORD = "RDTDOT";
 export const LORA_COMPARISON_SCALES = [0.65, 0.75, 0.85] as const;
+export const LORA_GENERATION_SCALE = 0.85 as const;
+export const ACTIVE_LORA_SCALES = [LORA_GENERATION_SCALE] as const;
 export type PromptVersion = typeof PROMPT_VERSION | "legacy-debug";
 export type LoraComparisonScale = (typeof LORA_COMPARISON_SCALES)[number];
 export type GenerationSetStatus =
@@ -147,14 +149,24 @@ export function isGenerationVariantContext(
 export function isGenerationVariantManifest(
   value: unknown
 ): value is GenerationVariantContext[] {
-  return (
-    Array.isArray(value) &&
+  if (!Array.isArray(value)) return false;
+
+  const isActiveSingleImageManifest =
+    value.length === ACTIVE_LORA_SCALES.length &&
+    value.every(
+      (variant, index) =>
+        isGenerationVariantContext(variant) &&
+        variant.candidateIndex === index &&
+        variant.loraScale === ACTIVE_LORA_SCALES[index]
+    );
+  const isLegacyComparisonManifest =
     value.length === LORA_COMPARISON_SCALES.length &&
     value.every(
       (variant, index) =>
         isGenerationVariantContext(variant) &&
         variant.candidateIndex === index &&
         variant.loraScale === LORA_COMPARISON_SCALES[index]
-    )
-  );
+    );
+
+  return isActiveSingleImageManifest || isLegacyComparisonManifest;
 }

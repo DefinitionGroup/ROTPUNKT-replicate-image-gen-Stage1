@@ -276,19 +276,13 @@
     "backToWizard": "Back to Kitchen Wizard",
     "goToMyImages": "Go to \"My Images\"",
     "generatedImageAlt": "Generated image",
-    "comparison": {
-      "title": "Which image works best?",
-      "description": "Compare the three variants and mark your favorite with the star. Your choice helps us find the right image balance.",
-      "variant": "Variant {number}",
-      "variantAlt": "Generated variant {number}",
-      "selectAria": "Select variant {number} as the best image",
-      "selectedAria": "Variant {number} is selected as the best image",
-      "saved": "Your favorite has been saved.",
-      "saveError": "The selection could not be saved. Please try again."
+    "result": {
+      "title": "Your visualisation",
+      "description": "Click the image to open it at full size."
     },
     "loading": {
       "messages": {
-        "generating": "Generating your three variants...",
+        "generating": "Generating your visualisation...",
         "aiWorking": "The AI is working on your design...",
         "takingLonger": "This is taking a bit longer today – please be patient...",
         "serverWakingUp": "The servers are just waking up ☕ – almost there!",
@@ -300,7 +294,7 @@
         "neverGiveUp": "Just one more moment – we won't give up! 💪"
       },
       "subMessages": {
-        "usually30s": "Images are usually generated within 30 seconds.",
+        "usually30s": "The image is usually generated within 30 seconds.",
         "highLoad": "During high load, it can take up to 1-2 minutes.",
         "warmingUp": "Sometimes the AI model needs to warm up first.",
         "coldStart": "A cold start can take up to 3 minutes – but it's worth it!",
@@ -327,7 +321,7 @@
     "allImages": "That's all your images ✨"
   },
   "aiDisclosure": {
-    "label": "AI-generated visualisation",
+    "label": "AI-generated",
     "description": "This visualisation was generated entirely with AI. Materials, colours, proportions and product details may differ from real products."
   },
   "imageModal": {

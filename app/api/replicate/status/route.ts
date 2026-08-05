@@ -312,7 +312,7 @@ export async function POST(req: NextRequest) {
 
     if (isDev) {
       console.log(
-        `[${requestId}] Set ${generationSetId}: ${status}, ${candidates.length}/3 candidates persisted`
+        `[${requestId}] Set ${generationSetId}: ${status}, ${candidates.length}/${set.prediction_manifest.length} candidates persisted`
       );
     }
 
@@ -325,7 +325,7 @@ export async function POST(req: NextRequest) {
       error: errors.length > 0 ? errors.join("; ") : null,
     });
   } catch (error) {
-    console.error("Replicate comparison status route error:", error);
+    console.error("Replicate generation status route error:", error);
     const message =
       error instanceof Error ? error.message : "Failed to check generation status";
     if (message.toLowerCase().includes("timed out")) {
@@ -335,7 +335,7 @@ export async function POST(req: NextRequest) {
       );
     }
     return NextResponse.json(
-      { error: "Failed to check comparison status" },
+      { error: "Failed to check generation status" },
       { status: 500 }
     );
   }

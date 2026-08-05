@@ -276,19 +276,13 @@
     "backToWizard": "Zurück zum Küchen-Wizard",
     "goToMyImages": "Zu \"Meine Bilder\"",
     "generatedImageAlt": "Generiertes Bild",
-    "comparison": {
-      "title": "Welches Bild passt am besten?",
-      "description": "Vergleiche die drei Varianten und markiere deinen Favoriten mit dem Stern. Deine Auswahl hilft uns, die richtige Bildabstimmung zu finden.",
-      "variant": "Variante {number}",
-      "variantAlt": "Generierte Variante {number}",
-      "selectAria": "Variante {number} als bestes Bild auswählen",
-      "selectedAria": "Variante {number} ist als bestes Bild ausgewählt",
-      "saved": "Dein Favorit wurde gespeichert.",
-      "saveError": "Die Auswahl konnte nicht gespeichert werden. Bitte versuche es erneut."
+    "result": {
+      "title": "Deine Visualisierung",
+      "description": "Klicke auf das Bild, um es in voller Größe zu öffnen."
     },
     "loading": {
       "messages": {
-        "generating": "Ich generiere gerade deine drei Varianten...",
+        "generating": "Ich generiere gerade deine Visualisierung...",
         "aiWorking": "Die KI arbeitet an deinem Design...",
         "takingLonger": "Das dauert heute etwas länger – bitte hab noch einen Moment Geduld...",
         "serverWakingUp": "Die Server wachen gerade erst auf ☕ – fast geschafft!",
@@ -300,7 +294,7 @@
         "neverGiveUp": "Noch einen kleinen Moment – wir geben nicht auf! 💪"
       },
       "subMessages": {
-        "usually30s": "Die Bilder werden in aller Regel innerhalb von 30\u00A0s generiert.",
+        "usually30s": "Das Bild wird in aller Regel innerhalb von 30\u00A0s generiert.",
         "highLoad": "Bei hoher Auslastung kann es bis zu 1-2 Minuten dauern.",
         "warmingUp": "Manchmal muss das KI-Modell erst aufgewärmt werden.",
         "coldStart": "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!",
@@ -327,7 +321,7 @@
     "allImages": "Das sind alle deine Bilder ✨"
   },
   "aiDisclosure": {
-    "label": "KI-generierte Visualisierung",
+    "label": "KI-generiert",
     "description": "Diese Visualisierung wurde vollständig mit KI erzeugt. Materialien, Farben, Proportionen und Produktdetails können von realen Ausführungen abweichen."
   },
   "imageModal": {
