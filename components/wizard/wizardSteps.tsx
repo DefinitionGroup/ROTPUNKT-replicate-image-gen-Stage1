@@ -230,6 +230,12 @@ export const wizardSteps: WizardStepDefinition[] = [
             image: "/wizard-presets/viewpoint-vogel.jpg",
           },
           {
+            value: "top-down shot, overhead view",
+            labelKey: "wizard.options.draufsicht",
+            germanLabel: "Draufsicht",
+            image: "/wizard-presets/viewpoint-draufsicht.webp",
+          },
+          {
             value: "dutch angle, tilted frame",
             labelKey: "wizard.options.hollaendischerWinkel",
             germanLabel: "Holländischer Winkel",

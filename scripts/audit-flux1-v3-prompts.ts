@@ -17,6 +17,7 @@ import {
   handleCatalog,
 } from "../components/wizard/handleCatalog";
 import { encodeFrontfarbenColorValue } from "../components/wizard/frontfarbenCatalog";
+import { getFenixColorByValue } from "../components/wizard/fenixColors";
 import { buildPrompt } from "../components/wizard/promptBuilder";
 
 assert.equal(LORA_GENERATION_SCALE, 0.85);
@@ -125,6 +126,51 @@ const rows = requiredKinds.map((kind) => {
     omitted: result.omittedModelSections.join(",") || "none",
   };
 });
+
+const cameraCoverage: Record<string, RegExp> = {
+  "eye level shot": /150cm above the floor/i,
+  "low angle shot, worm's eye view": /below waist height looking upward/i,
+  "high angle shot, bird's eye view": /bird's-eye view from above/i,
+  "top-down shot, overhead view": /true top-down architectural overhead camera/i,
+  "dutch angle, tilted frame": /camera intentionally tilted 20 degrees/i,
+  "wide shot, long shot, establishing shot": /wide establishing shot/i,
+  "medium shot, mid shot": /medium shot framing/i,
+  "close-up shot": /close-up shot of cabinet details/i,
+  "full room view, interior panorama": /full panoramic room view/i,
+  "extreme close-up, detail shot, macro": /extreme close-up macro detail shot/i,
+};
+
+for (const [viewpoint, expectedCameraDescription] of Object.entries(
+  cameraCoverage
+)) {
+  const result = buildPrompt({
+    selections: {
+      ...baseSelections,
+      color: "fenix:Black",
+      viewpoint,
+      handle: encodeHandleSelectionValue("grifflos"),
+    },
+    pipelineV2Enabled: true,
+  });
+
+  assert.equal(result.budgetExceeded, false);
+  assert(
+    result.modelSections.some((section) =>
+      section.startsWith("Camera and composition:")
+    ),
+    `${viewpoint} must remain a high-priority model camera section`
+  );
+  assert.match(result.modelPrompt, expectedCameraDescription);
+  assert.match(result.modelPrompt, /FENIX Nero Ingo \(0720; Rotpunkt catalog 212FX\)/);
+  assert.match(result.modelPrompt, /super-matte/i);
+  assert.equal(/highly polished|glossy plastic|specular highlights/i.test(result.modelPrompt), false);
+  if (viewpoint === "dutch angle, tilted frame") {
+    assert.equal(/straight verticals/i.test(result.modelPrompt), false);
+  }
+}
+
+assert.equal(getFenixColorByValue("fenix:Black")?.name, "Nero Ingo");
+assert.equal(getFenixColorByValue("fenix:Orio Cortez")?.name, "Oro Cortez");
 
 const islandEntry = handleCatalog.find(
   (entry) => getHandleGeometry(entry).kind === "bar_pull"

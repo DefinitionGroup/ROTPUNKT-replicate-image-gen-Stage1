@@ -1,5 +1,8 @@
 export type FenixColor = {
   name: string;
+  // Stable value used in existing saved wizard selections. The display name may
+  // follow the official FENIX terminology without invalidating old selections.
+  selectionValue?: string;
   code: string; // Official FENIX code (e.g. 0720)
   fxId: string; // Matching Frontfarben FX catalog id (e.g. 212FX)
   hex: string;
@@ -18,7 +21,8 @@ function getFenixImagePath(fxId: string) {
 
 export const fenixColors: FenixColor[] = [
   {
-    name: "Bianco Male",
+    name: "Bianco Malé",
+    selectionValue: "Bianco Male",
     code: "0029",
     fxId: "351FX",
     hex: "#FFFBF6",
@@ -72,7 +76,8 @@ export const fenixColors: FenixColor[] = [
     englishDescription: "refined sand beige with golden flair",
   },
   {
-    name: "Black",
+    name: "Nero Ingo",
+    selectionValue: "Black",
     code: "0720",
     fxId: "212FX",
     hex: "#141414",
@@ -81,7 +86,8 @@ export const fenixColors: FenixColor[] = [
     englishDescription: "rich velvety deep black",
   },
   {
-    name: "Grey",
+    name: "Grigio Bromo",
+    selectionValue: "Grey",
     code: "0724",
     fxId: "213FX",
     hex: "#35373C",
@@ -117,7 +123,8 @@ export const fenixColors: FenixColor[] = [
     englishDescription: "rich cocoa brown with warm depth",
   },
   {
-    name: "Green",
+    name: "Verde Comodoro",
+    selectionValue: "Green",
     code: "0750",
     fxId: "223FX",
     hex: "#667373",
@@ -126,7 +133,8 @@ export const fenixColors: FenixColor[] = [
     englishDescription: "muted pine green with cool freshness",
   },
   {
-    name: "Red",
+    name: "Rosso Jaipur",
+    selectionValue: "Red",
     code: "0751",
     fxId: "224FX",
     hex: "#774a48",
@@ -144,7 +152,8 @@ export const fenixColors: FenixColor[] = [
     englishDescription: "cool industrial grey with steel character",
   },
   {
-    name: "Blue",
+    name: "Blu Fes",
+    selectionValue: "Blue",
     code: "0754",
     fxId: "225FX",
     hex: "#394459",
@@ -162,7 +171,8 @@ export const fenixColors: FenixColor[] = [
     englishDescription: "volcanic brick red with rugged warmth",
   },
   {
-    name: "Azzuro Naxos",
+    name: "Azzurro Naxos",
+    selectionValue: "Azzuro Naxos",
     code: "0771",
     fxId: "366FX",
     hex: "#5b6e82",
@@ -254,7 +264,8 @@ export const fenixColors: FenixColor[] = [
     englishDescription: "soft silver grey with pearly sheen",
   },
   {
-    name: "Orio Cortez",
+    name: "Oro Cortez",
+    selectionValue: "Orio Cortez",
     code: "5003",
     fxId: "369FX",
     hex: "#C2B6A9",
@@ -276,7 +287,9 @@ export function isFenixColorValue(value?: string | null): value is string {
 export function getFenixColorByValue(value?: string) {
   if (!isFenixColorValue(value)) return undefined;
   const name = value.slice(FENIX_COLOR_PREFIX.length);
-  return fenixColors.find((color) => color.name === name);
+  return fenixColors.find(
+    (color) => color.name === name || color.selectionValue === name
+  );
 }
 
 export function getFenixColorLabel(value?: string) {

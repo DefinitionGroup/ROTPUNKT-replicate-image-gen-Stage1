@@ -380,7 +380,9 @@ export function WizardColorStep({
         ) : (
           <div className="grid grid-cols-2 min-[430px]:grid-cols-3 lg:grid-cols-4 gap-2 pb-4 p-1">
             {fenixColors.map((color) => {
-              const value = encodeFenixColorValue(color.name);
+              const value = encodeFenixColorValue(
+                color.selectionValue ?? color.name
+              );
               const isSelected = selectedValue === value;
 
               return (

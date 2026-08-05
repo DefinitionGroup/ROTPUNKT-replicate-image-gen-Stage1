@@ -1,7 +1,12 @@
 import type { WizardState } from "@/app/store/wizardStore";
 import { wizardSteps, kitchenLayoutOptions } from "./wizardSteps";
-import { getFenixColorByValue, isFenixColorValue } from "./fenixColors";
 import {
+  getFenixColorByValue,
+  isFenixColorValue,
+  type FenixColor,
+} from "./fenixColors";
+import {
+  encodeFrontfarbenColorValue,
   getFrontfarbenColorByValue,
   isFrontfarbenColorValue,
   type FrontfarbenCatalogEntry,
@@ -118,13 +123,15 @@ function getSelectionKeys(): (keyof WizardState["selectedOptions"])[] {
  */
 const VIEWPOINT_DESCRIPTIONS: Record<string, string> = {
   "eye level shot":
-    "Eye level perspective, camera at standing height approximately 150cm, natural horizontal viewing angle with a straight-on composition.",
+    "Camera at natural standing eye height, approximately 150cm above the floor, with a level horizon and a straight-on architectural composition.",
   "low angle shot, worm's eye view":
     "Low angle perspective, camera positioned below waist height looking upward, emphasizing ceiling height and vertical proportions of the cabinetry.",
   "high angle shot, bird's eye view":
-    "High angle overhead perspective, camera elevated above head height angled downward, revealing countertops and room layout from above.",
+    "Elevated architectural camera well above standing eye height, looking down at an oblique 35-degree angle across the countertops; bird's-eye view from above with cabinet fronts and room layout readable.",
+  "top-down shot, overhead view":
+    "True top-down architectural overhead camera directly above the kitchen, lens axis perpendicular to the floor plane; plan-like composition prioritizing the worktops, circulation, and complete room layout.",
   "dutch angle, tilted frame":
-    "Dutch angle composition with the camera intentionally tilted 20 degrees from the horizontal axis, creating a dramatic diagonal horizon line across the entire frame, the vertical lines of walls and cabinets run diagonally.",
+    "Dutch angle composition with the camera intentionally tilted 20 degrees from the horizontal axis, creating a diagonal horizon and intentionally diagonal cabinet and wall lines.",
   "wide shot, long shot, establishing shot":
     "Wide establishing shot capturing the full room from wall to wall, camera pulled back with a wide-angle lens to show the complete interior space.",
   "medium shot, mid shot":
@@ -313,6 +320,8 @@ const VIEWPOINT_SCENE_INTROS: Record<string, string> = {
     "Photorealistic low-angle architectural interior photo of Rotpunkt {room} cabinetry",
   "high angle shot, bird's eye view":
     "Photorealistic high-angle architectural interior photo of Rotpunkt {room} cabinetry",
+  "top-down shot, overhead view":
+    "Photorealistic top-down architectural interior view of a Rotpunkt {room} layout",
   "dutch angle, tilted frame":
     "Photorealistic tilted architectural interior photo of Rotpunkt {room} cabinetry",
   "wide shot, long shot, establishing shot":
@@ -328,6 +337,12 @@ const VIEWPOINT_SCENE_INTROS: Record<string, string> = {
 };
 
 const VIEWPOINT_PRIORITY_LINES: Record<string, string> = {
+  "eye level shot":
+    "Framing priority: a natural eye-height view with a level horizon and true-to-life room proportions.",
+  "high angle shot, bird's eye view":
+    "Framing priority: an elevated oblique view from above that clearly reveals the worktops, cabinet fronts, and room layout.",
+  "top-down shot, overhead view":
+    "Framing priority: a true overhead plan-like view with the worktops, circulation, and full room layout clearly readable.",
   "wide shot, long shot, establishing shot":
     "Framing priority: wide room coverage with the full cabinet composition clearly visible.",
   "medium shot, mid shot":
@@ -352,11 +367,6 @@ function normalizeAccessories(
 
 function normalizeAccessoryDescriptor(accessory: string): string {
   return ACCESSORY_CANONICAL_LABELS[accessory] ?? accessory;
-}
-
-function getPrimaryViewpointLabel(viewpoint: string): string {
-  const [first] = viewpoint.split(",");
-  return (first ?? viewpoint).trim();
 }
 
 function getModelSceneIntro({
@@ -529,6 +539,20 @@ function buildFrontIdentitySection(front: FrontfarbenCatalogEntry): string {
   return `Cabinet fronts: Rotpunkt ${front.labelEn}, catalog ${front.id}, ${front.materialTypeEn}; training visual anchor: ${visualAnchor}. The selected catalog identity governs hue, material, and finish.`;
 }
 
+function buildFenixFrontIdentitySection(
+  color: FenixColor,
+  linkedFront?: FrontfarbenCatalogEntry
+): string {
+  const materialIdentity = color.isMetallic
+    ? "FENIX NTA super-matte real-metal surface with low light reflectivity and delicate diffuse metallic depth"
+    : "FENIX super-matte soft-touch surface with low light reflectivity and diffuse, controlled highlights";
+  const visualAnchor = linkedFront
+    ? ` Training visual anchor: ${compactDescriptor(linkedFront.trainingCaption, 16)}.`
+    : "";
+
+  return `Cabinet fronts: FENIX ${color.name} (${color.code}; Rotpunkt catalog ${color.fxId}), ${color.englishDescription}; ${materialIdentity}.${visualAnchor} The selected FENIX identity governs hue, material, and finish across all visible fronts.`;
+}
+
 function resolveWetZoneLocation(extraWishes?: string): WetZoneLocation {
   const wishes = extraWishes?.toLowerCase() ?? "";
   const mentionsWetFixture =
@@ -672,6 +696,11 @@ export function buildPrompt({
   const isFenix = isFenixColorValue(colorSelection);
   const isFrontfarbe = isFrontfarbenColorValue(colorSelection);
   const fenixColor = isFenix ? getFenixColorByValue(colorSelection) : undefined;
+  const linkedFenixFront = fenixColor
+    ? getFrontfarbenColorByValue(
+        encodeFrontfarbenColorValue(fenixColor.fxId)
+      )
+    : undefined;
   const frontfarbe = isFrontfarbe
     ? getFrontfarbenColorByValue(colorSelection)
     : undefined;
@@ -692,7 +721,8 @@ export function buildPrompt({
     viewpoint === "extreme close-up, detail shot, macro";
   const isWideView =
     viewpoint === "wide shot, long shot, establishing shot" ||
-    viewpoint === "full room view, interior panorama";
+    viewpoint === "full room view, interior panorama" ||
+    viewpoint === "top-down shot, overhead view";
 
   // 1. Opening + Subject & Style as natural language
   let opening = isKitchenRoom
@@ -770,19 +800,21 @@ export function buildPrompt({
   let colorSelectionSummary: string | undefined;
 
   if (isFenix && fenixColor) {
-    colorSelectionSummary = `FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex})`;
+    colorSelectionSummary = `FENIX ${fenixColor.name} (${fenixColor.code})`;
     sections.push(
-      `Furniture surfaces in ${fenixDesc}, FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}).`
+      `Furniture surfaces in ${fenixDesc}, FENIX ${fenixColor.name} (${fenixColor.code}).`
     );
     sections.push(
       `Color code lock: FENIX code ${fenixColor.code} named "${fenixColor.name}" with the color identity "${fenixDesc}". Keep this exact hue and depth clearly dominant across visible fronts.`
     );
     sections.push(
-      "Material lock: highly polished glossy plastic fronts, smooth sealed surface, crisp specular highlights, premium lacquer-like clarity, and refined showroom reflections."
+      fenixColor.isMetallic
+        ? "Material lock: FENIX NTA super-matte real-metal surface, low light reflectivity, soft-touch character, and subtle diffuse metallic depth."
+        : "Material lock: FENIX super-matte soft-touch surface, very low light reflectivity, anti-fingerprint appearance, and soft diffuse highlights."
     );
     if (fenixColor.isMetallic) {
       sections.push(
-        "Metallic decor lock: keep a premium metallic look with subtle metal particle sheen and elegant satin-metal reflections across cabinet fronts."
+        "Metallic decor lock: preserve the subdued real-metal character with restrained, diffuse metallic variation across cabinet fronts."
       );
     }
   } else if (isFrontfarbe && frontfarbe) {
@@ -976,13 +1008,13 @@ export function buildPrompt({
   if (isFenix && fenixColor) {
     addModelSection(
       "front",
-      `Cabinet fronts: FENIX ${fenixColor.name} (${fenixColor.code}, ${fenixColor.hex}), ${fenixDesc}; dominant color, smooth sealed surface, crisp material definition, controlled reflections.`,
+      buildFenixFrontIdentitySection(fenixColor, linkedFenixFront),
       { required: true }
     );
     if (fenixColor.isMetallic) {
       addModelSection(
         "front-metallic",
-        "Finish: subtle metal-particle sheen with satin-metal reflections.",
+        "Finish: restrained diffuse real-metal character with low light reflectivity.",
         { priority: 60 }
       );
     }
@@ -1014,7 +1046,7 @@ export function buildPrompt({
         isDetailView
           ? `Kitchen layout reference: ${kitchenLayoutLabel}, expressed through cabinetry details, materials, and surrounding kitchen context.`
           : `Kitchen layout: ${kitchenLayoutLabel} with Rotpunkt cabinetry as the hero furniture.`,
-        { required: true }
+        { priority: 110 }
       );
     } else {
       addModelSection(
@@ -1022,20 +1054,20 @@ export function buildPrompt({
         isDetailView
           ? "Kitchen context expressed through cabinetry details, worktop relationships, and believable surrounding kitchen elements."
           : "Kitchen scene with Rotpunkt kitchen cabinetry as the hero furniture.",
-        { required: true }
+        { priority: 110 }
       );
     }
   } else if (isLivingRoom) {
     addModelSection(
       "layout",
       "Living-room furniture focus: built-in storage wall, sideboards, shelving, and lounge context.",
-      { required: true }
+      { priority: 110 }
     );
   } else {
     addModelSection(
       "layout",
       "Residential hallway furniture focus: built-in wardrobes, storage benches, mirrors, and clear circulation space.",
-      { required: true }
+      { priority: 110 }
     );
   }
 
@@ -1047,14 +1079,17 @@ export function buildPrompt({
     );
   }
 
-  const primaryViewpoint = getPrimaryViewpointLabel(viewpoint);
   const compactCameraTreatment = isDetailView
     ? "50mm architectural detail lens, crisp surface definition, realistic proportions."
-    : "24mm tilt-shift lens at f/8, straight verticals, realistic room proportions.";
+    : viewpoint === "top-down shot, overhead view"
+      ? "35mm overhead architectural lens, vertically aligned to the floor plane, accurate plan-like geometry."
+      : viewpoint === "dutch angle, tilted frame"
+        ? "24mm architectural lens with the camera intentionally rotated, maintaining the selected diagonal composition."
+        : "24mm tilt-shift lens at f/8, straight verticals, realistic room proportions.";
   addModelSection(
     "camera",
-    `Camera: ${primaryViewpoint}; ${compactCameraTreatment}`,
-    { priority: 85 }
+    `Camera and composition: ${expandedViewpoint} ${compactCameraTreatment}`,
+    { required: true }
   );
 
   const viewpointPriority = VIEWPOINT_PRIORITY_LINES[viewpoint];
