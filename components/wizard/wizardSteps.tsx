@@ -8,6 +8,7 @@ import {
   FaRug,
   FaLeaf,
 } from "react-icons/fa6";
+import { BIRD_EYE_VIEWPOINT } from "./viewpointConfig";
 
 export type WizardOption = {
   value: string;
@@ -224,16 +225,10 @@ export const wizardSteps: WizardStepDefinition[] = [
             image: "/wizard-presets/viewpoint-frosch.jpg",
           },
           {
-            value: "high angle shot, bird's eye view",
+            value: BIRD_EYE_VIEWPOINT,
             labelKey: "wizard.options.vogelperspektive",
             germanLabel: "Vogelperspektive",
-            image: "/wizard-presets/viewpoint-vogel.jpg",
-          },
-          {
-            value: "top-down shot, overhead view",
-            labelKey: "wizard.options.draufsicht",
-            germanLabel: "Draufsicht",
-            image: "/wizard-presets/viewpoint-draufsicht.webp",
+            image: "/wizard-presets/viewpoint-vogel.webp",
           },
           {
             value: "dutch angle, tilted frame",

@@ -1,4 +1,8 @@
 import { atom, onMount } from 'nanostores'
+import {
+  DEFAULT_VIEWPOINT,
+  normalizeViewpoint,
+} from '@/components/wizard/viewpointConfig'
 
 export interface WizardState {
   currentStep: number
@@ -47,15 +51,20 @@ if (typeof window !== 'undefined') {
           typeof parsed.currentStep === 'number'
             ? Math.max(-1, Math.trunc(parsed.currentStep))
             : initialState.currentStep
+        const selectedOptions = {
+          ...initialState.selectedOptions,
+          ...(parsed.selectedOptions ?? {})
+        }
+
+        if (selectedOptions.viewpoint) {
+          selectedOptions.viewpoint = normalizeViewpoint(selectedOptions.viewpoint)
+        }
 
         wizardStore.set({
           ...initialState,
           ...parsed,
           currentStep: hydratedStep,
-          selectedOptions: {
-            ...initialState.selectedOptions,
-            ...(parsed.selectedOptions ?? {})
-          },
+          selectedOptions,
           extraWishes:
             typeof parsed.extraWishes === 'string'
               ? parsed.extraWishes
@@ -92,9 +101,14 @@ export const wizardActions = {
 
   selectOption: (key: keyof WizardState['selectedOptions'], value: string) => {
     const current = wizardStore.get()
+    const normalizedValue =
+      key === 'viewpoint'
+        ? normalizeViewpoint(value) ?? DEFAULT_VIEWPOINT
+        : value
+
     wizardStore.set({
       ...current,
-      selectedOptions: { ...current.selectedOptions, [key]: value },
+      selectedOptions: { ...current.selectedOptions, [key]: normalizedValue },
       error: ''
     })
   },
@@ -143,10 +157,16 @@ export const wizardActions = {
 
   applyPreset: (payload: { options: Partial<WizardState['selectedOptions']>; extraWishes?: string }) => {
     const current = wizardStore.get()
+    const selectedOptions = { ...current.selectedOptions, ...payload.options }
+
+    if (selectedOptions.viewpoint) {
+      selectedOptions.viewpoint = normalizeViewpoint(selectedOptions.viewpoint)
+    }
+
     wizardStore.set({
       ...current,
       currentStep: Math.max(0, current.currentStep),
-      selectedOptions: { ...current.selectedOptions, ...payload.options },
+      selectedOptions,
       extraWishes: payload.extraWishes ?? current.extraWishes,
       showAuthPrompt: false,
       resumeAfterAuth: false,

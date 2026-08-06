@@ -24,6 +24,10 @@ import {
   type GenerationQualityExpectations,
   type WetZoneLocation,
 } from "@/lib/imageGenerationContract";
+import {
+  DEFAULT_VIEWPOINT,
+  normalizeViewpoint,
+} from "./viewpointConfig";
 
 export type PromptBuildResult = {
   // Prompt actually sent to image generation.
@@ -123,15 +127,13 @@ function getSelectionKeys(): (keyof WizardState["selectedOptions"])[] {
  */
 const VIEWPOINT_DESCRIPTIONS: Record<string, string> = {
   "eye level shot":
-    "Camera at natural standing eye height, approximately 150cm above the floor, with a level horizon and a straight-on architectural composition.",
+    "Architectural camera at natural standing eye height, 150cm above the floor, with a level horizon and straight-on composition.",
   "low angle shot, worm's eye view":
-    "Low angle perspective, camera positioned below waist height looking upward, emphasizing ceiling height and vertical proportions of the cabinetry.",
+    "Low-angle architectural camera 70cm above the floor and tilted 12 degrees upward, emphasizing cabinet height and vertical proportions.",
   "high angle shot, bird's eye view":
-    "Elevated architectural camera well above standing eye height, looking down at an oblique 35-degree angle across the countertops; bird's-eye view from above with cabinet fronts and room layout readable.",
-  "top-down shot, overhead view":
-    "True top-down architectural overhead camera directly above the kitchen, lens axis perpendicular to the floor plane; plan-like composition prioritizing the worktops, circulation, and complete room layout.",
+    "Elevated oblique bird's-eye camera, aimed 50 degrees downward (range 45-60). Never vertical or 90-degree overhead; retain readable worktops, fronts, handles, and layout.",
   "dutch angle, tilted frame":
-    "Dutch angle composition with the camera intentionally tilted 20 degrees from the horizontal axis, creating a diagonal horizon and intentionally diagonal cabinet and wall lines.",
+    "Creative Dutch angle: camera rolled 12 degrees, with a deliberate diagonal horizon, cabinet lines, and wall lines.",
   "wide shot, long shot, establishing shot":
     "Wide establishing shot capturing the full room from wall to wall, camera pulled back with a wide-angle lens to show the complete interior space.",
   "medium shot, mid shot":
@@ -319,9 +321,7 @@ const VIEWPOINT_SCENE_INTROS: Record<string, string> = {
   "low angle shot, worm's eye view":
     "Photorealistic low-angle architectural interior photo of Rotpunkt {room} cabinetry",
   "high angle shot, bird's eye view":
-    "Photorealistic high-angle architectural interior photo of Rotpunkt {room} cabinetry",
-  "top-down shot, overhead view":
-    "Photorealistic top-down architectural interior view of a Rotpunkt {room} layout",
+    "Photorealistic elevated oblique bird's-eye architectural interior photo of Rotpunkt {room} cabinetry",
   "dutch angle, tilted frame":
     "Photorealistic tilted architectural interior photo of Rotpunkt {room} cabinetry",
   "wide shot, long shot, establishing shot":
@@ -339,10 +339,12 @@ const VIEWPOINT_SCENE_INTROS: Record<string, string> = {
 const VIEWPOINT_PRIORITY_LINES: Record<string, string> = {
   "eye level shot":
     "Framing priority: a natural eye-height view with a level horizon and true-to-life room proportions.",
+  "low angle shot, worm's eye view":
+    "Framing priority: a clearly low viewing position with the cabinet fronts and vertical room proportions emphasized.",
   "high angle shot, bird's eye view":
-    "Framing priority: an elevated oblique view from above that clearly reveals the worktops, cabinet fronts, and room layout.",
-  "top-down shot, overhead view":
-    "Framing priority: a true overhead plan-like view with the worktops, circulation, and full room layout clearly readable.",
+    "Framing priority: an elevated, oblique 45-to-60-degree bird's-eye view that clearly reveals the worktops, cabinet fronts, handles, and room layout without becoming a plan view.",
+  "dutch angle, tilted frame":
+    "Framing priority: a deliberately diagonal creative composition; preserve the selected tilt rather than correcting the verticals.",
   "wide shot, long shot, establishing shot":
     "Framing priority: wide room coverage with the full cabinet composition clearly visible.",
   "medium shot, mid shot":
@@ -353,6 +355,27 @@ const VIEWPOINT_PRIORITY_LINES: Record<string, string> = {
     "Framing priority: full-room panorama with the cabinetry readable within the whole interior.",
   "extreme close-up, detail shot, macro":
     "Framing priority: macro detail composition centered on surface texture, finish, and handle geometry.",
+};
+
+const VIEWPOINT_CAMERA_TREATMENTS: Record<string, string> = {
+  "eye level shot":
+    "32mm tilt-shift lens at f/8, corrected verticals, realistic proportions.",
+  "low angle shot, worm's eye view":
+    "24mm architectural lens at f/8, low position, controlled vertical convergence.",
+  "high angle shot, bird's eye view":
+    "32mm tilt-shift lens at f/8, obliquely aimed 50 degrees downward, never vertically aligned to the floor.",
+  "dutch angle, tilted frame":
+    "28mm lens at f/8, deliberate 12-degree roll; retain the diagonal composition.",
+  "wide shot, long shot, establishing shot":
+    "20mm tilt-shift lens at f/8, wide coverage, corrected verticals, no fisheye.",
+  "medium shot, mid shot":
+    "40mm lens at f/8, balanced mid-distance framing and natural cabinet geometry.",
+  "close-up shot":
+    "65mm detail lens, selected material and hardware in controlled shallow depth of field.",
+  "full room view, interior panorama":
+    "18mm ultra-wide lens at f/8, full-room coverage, corrected verticals, no fisheye.",
+  "extreme close-up, detail shot, macro":
+    "100mm macro lens, precise focus on the selected detail, shallow depth, true-to-scale hardware.",
 };
 
 function normalizeAccessories(
@@ -712,7 +735,7 @@ export function buildPrompt({
   const exteriorTimeLock = getExteriorTimeLock(time);
   const handleSelection = getHandlePromptDescriptor(selections.handle);
   const handleEntry = getHandleSelectionByValue(selections.handle);
-  const viewpoint = selections.viewpoint || "eye level shot";
+  const viewpoint = normalizeViewpoint(selections.viewpoint) || DEFAULT_VIEWPOINT;
   const floor = selections.floor;
   const accessoriesArray = normalizeAccessories(selections.accessories);
   const normalizedAccessories = accessoriesArray.map(normalizeAccessoryDescriptor);
@@ -722,7 +745,7 @@ export function buildPrompt({
   const isWideView =
     viewpoint === "wide shot, long shot, establishing shot" ||
     viewpoint === "full room view, interior panorama" ||
-    viewpoint === "top-down shot, overhead view";
+    viewpoint === "high angle shot, bird's eye view";
 
   // 1. Opening + Subject & Style as natural language
   let opening = isKitchenRoom
@@ -1079,13 +1102,9 @@ export function buildPrompt({
     );
   }
 
-  const compactCameraTreatment = isDetailView
-    ? "50mm architectural detail lens, crisp surface definition, realistic proportions."
-    : viewpoint === "top-down shot, overhead view"
-      ? "35mm overhead architectural lens, vertically aligned to the floor plane, accurate plan-like geometry."
-      : viewpoint === "dutch angle, tilted frame"
-        ? "24mm architectural lens with the camera intentionally rotated, maintaining the selected diagonal composition."
-        : "24mm tilt-shift lens at f/8, straight verticals, realistic room proportions.";
+  const compactCameraTreatment =
+    VIEWPOINT_CAMERA_TREATMENTS[viewpoint] ??
+    "32mm tilt-shift architectural lens at f/8, corrected verticals, and realistic room proportions.";
   addModelSection(
     "camera",
     `Camera and composition: ${expandedViewpoint} ${compactCameraTreatment}`,
