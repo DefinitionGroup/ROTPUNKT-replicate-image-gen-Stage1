@@ -30,6 +30,14 @@ import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
 import { WizardHandleStep } from "./WizardHandleStep";
 import { WizardKitchenLayoutPanel } from "./WizardKitchenLayoutPanel";
+import { WizardKitchenZonesPanel } from "./WizardKitchenZonesPanel";
+import {
+  DEFAULT_ISLAND_COOKTOP_LOCATION,
+  DEFAULT_ISLAND_SINK_LOCATION,
+  ISLAND_LAYOUT_VALUE,
+  isKitchenZoneLocation,
+  resolveKitchenZones,
+} from "./kitchenZones";
 import { PromptDebugPopover } from "./PromptDebugPopover";
 import { useTranslations } from "next-intl";
 
@@ -54,6 +62,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const stepContainerRef = useRef<HTMLDivElement | null>(null);
   const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(true);
   const [showKitchenLayout, setShowKitchenLayout] = useState(false);
+  const [showKitchenZones, setShowKitchenZones] = useState(false);
   const translatedSteps = useTranslatedWizardSteps();
   const promptDebugEnv = (process.env.NEXT_PUBLIC_WIZARD_PROMPT_DEBUG ?? "")
     .trim()
@@ -95,6 +104,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const isMultiSelectStep = currentStepDefinition?.multiSelect === true;
   const isFloorStep = currentStepDefinition?.key === "floor";
   const isKindStepWithLayout = currentStepDefinition?.key === "kind" && showKitchenLayout;
+  const isKindStepWithZones = currentStepDefinition?.key === "kind" && showKitchenZones;
+  const kitchenZones = resolveKitchenZones(wizardState.selectedOptions);
   const debugStepLabel = isIntro
     ? "intro"
     : isFinalStep
@@ -155,11 +166,17 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   useEffect(() => {
     if (wizardState.currentStep !== kindStepIndex) {
       setShowKitchenLayout(false);
+      setShowKitchenZones(false);
     }
   }, [wizardState.currentStep, kindStepIndex]);
 
-  // Override back button to go back to kind grid from kitchen layout panel
+  // Override back button to step back through the kitchen sub-panels first
   const handleBack = () => {
+    if (showKitchenZones) {
+      setShowKitchenZones(false);
+      setShowKitchenLayout(true);
+      return;
+    }
     if (showKitchenLayout) {
       setShowKitchenLayout(false);
       return;
@@ -184,17 +201,9 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       return;
     }
 
-    // Clear kitchenLook when selecting a non-kitchen kind
+    // Kitchen-only sub-selections have no meaning for other room kinds
     if (currentStepKey === "kind" && option !== "kueche") {
-      const current = wizardStore.get();
-      if (current.selectedOptions.kitchenLook) {
-        const nextSelectedOptions = { ...current.selectedOptions };
-        delete nextSelectedOptions.kitchenLook;
-        wizardStore.set({
-          ...current,
-          selectedOptions: nextSelectedOptions,
-        });
-      }
+      wizardActions.clearOptions("kitchenLook", "sinkLocation", "cooktopLocation");
     }
 
     wizardActions.selectOption(currentStepKey, option);
@@ -204,11 +213,34 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
   const handleKitchenLayoutSelect = (value: string) => {
     wizardActions.selectOption("kitchenLook", value);
     setShowKitchenLayout(false);
+
+    if (value === ISLAND_LAYOUT_VALUE) {
+      const current = wizardStore.get().selectedOptions;
+      if (!isKitchenZoneLocation(current.sinkLocation)) {
+        wizardActions.selectOption("sinkLocation", DEFAULT_ISLAND_SINK_LOCATION);
+      }
+      if (!isKitchenZoneLocation(current.cooktopLocation)) {
+        wizardActions.selectOption(
+          "cooktopLocation",
+          DEFAULT_ISLAND_COOKTOP_LOCATION
+        );
+      }
+      setShowKitchenZones(true);
+      return;
+    }
+
+    wizardActions.clearOptions("sinkLocation", "cooktopLocation");
     wizardActions.nextStep(totalSteps);
   };
 
   const handleKitchenLayoutSkip = () => {
     setShowKitchenLayout(false);
+    wizardActions.clearOptions("kitchenLook", "sinkLocation", "cooktopLocation");
+    wizardActions.nextStep(totalSteps);
+  };
+
+  const handleKitchenZonesContinue = () => {
+    setShowKitchenZones(false);
     wizardActions.nextStep(totalSteps);
   };
 
@@ -273,7 +305,7 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                 totalSteps={wizardSteps.length}
                 onBack={handleBack}
                 onClose={onClose}
-                canGoBack={canGoBack || showKitchenLayout}
+                canGoBack={canGoBack || showKitchenLayout || showKitchenZones}
                 loading={loading}
               />
             </CardHeader>
@@ -321,7 +353,25 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
                     )}
 
                     {!isIntro && !isFinalStep && currentStepDefinition && (
-                      isKindStepWithLayout ? (
+                      isKindStepWithZones ? (
+                        <WizardKitchenZonesPanel
+                          key={`${wizardState.currentStep}-kitchen-zones`}
+                          sinkLocation={
+                            kitchenZones.sinkLocation === "island"
+                              ? "island"
+                              : "wall_run"
+                          }
+                          cooktopLocation={kitchenZones.cooktopLocation}
+                          onSelectSink={(value) =>
+                            wizardActions.selectOption("sinkLocation", value)
+                          }
+                          onSelectCooktop={(value) =>
+                            wizardActions.selectOption("cooktopLocation", value)
+                          }
+                          onContinue={handleKitchenZonesContinue}
+                          loading={loading}
+                        />
+                      ) : isKindStepWithLayout ? (
                         <WizardKitchenLayoutPanel
                           key={`${wizardState.currentStep}-kitchen-layout`}
                           onSelect={handleKitchenLayoutSelect}

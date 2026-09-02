@@ -18,6 +18,7 @@ import {
   type HandleGeometrySpec,
 } from "./handleCatalog";
 import {
+  COOKING_ZONE_TOPOLOGY_LEAD,
   LEGACY_KITCHEN_WET_ZONE_MARKER,
   MODEL_PROMPT_WORD_BUDGET,
   PROMPT_VERSION,
@@ -25,12 +26,16 @@ import {
   countPromptWords,
   type GenerationQualityExpectations,
   type GenerationRequestSpec,
-  type WetZoneLocation,
 } from "@/lib/imageGenerationContract";
 import {
   DEFAULT_VIEWPOINT,
   normalizeViewpoint,
 } from "./viewpointConfig";
+import {
+  kitchenZoneOptions,
+  resolveKitchenZones,
+  type ResolvedKitchenZones,
+} from "./kitchenZones";
 
 export type PromptBuildResult = {
   // Prompt actually sent to image generation.
@@ -579,29 +584,14 @@ function buildFenixFrontIdentitySection(
   return `Cabinet fronts: FENIX ${color.name} (${color.code}; Rotpunkt catalog ${color.fxId}), ${color.englishDescription}; ${materialIdentity}.${visualAnchor} The selected FENIX identity governs hue, material, and finish across all visible fronts.`;
 }
 
-function resolveWetZoneLocation(extraWishes?: string): WetZoneLocation {
-  const wishes = extraWishes?.toLowerCase() ?? "";
-  const mentionsWetFixture =
-    /\b(sink|basin|faucet|tap|wet zone|spüle|spuelbecken|spülbecken|armatur|wasserhahn)\b/i.test(
-      wishes
-    );
-
-  if (!mentionsWetFixture) return "wall_run";
-  if (/\b(island|kitchen island|insel|kücheninsel|kuecheninsel)\b/i.test(wishes)) {
-    return "island";
-  }
-  if (/\b(peninsula|halbinsel)\b/i.test(wishes)) {
-    return "peninsula";
-  }
-  return "wall_run";
-}
-
-function removeCompiledWetZoneWishes(value: string): string {
+// Sink and cooktop placement come from the structured wizard choice; free-text
+// mentions would only compete with it, so those sentences stay out of the model prompt.
+function removeCompiledZoneWishes(value: string): string {
   return value
     .split(/(?<=[.!?])\s+/)
     .filter(
       (sentence) =>
-        !/\b(sink|basin|faucet|tap|wet zone|spüle|spuelbecken|spülbecken|armatur|wasserhahn)\b/i.test(
+        !/\b(sink|basin|faucet|tap|wet zone|spüle|spuelbecken|spülbecken|armatur|wasserhahn|cooktop|hob|stove|kochfeld|herd)\b/i.test(
           sentence
         )
     )
@@ -609,15 +599,25 @@ function removeCompiledWetZoneWishes(value: string): string {
     .trim();
 }
 
-function buildKitchenFixtureTopology(location: WetZoneLocation): string {
-  const lead = WET_ZONE_TOPOLOGY_LEAD[location];
-  if (location === "island") {
-    return `${lead} one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, peninsula, and all other worktops are dry continuous preparation surfaces.`;
-  }
-  if (location === "peninsula") {
-    return `${lead} one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, island, and all other worktops are dry continuous preparation surfaces.`;
-  }
-  return `${lead} one undermount sink basin paired with one mixer faucet mounted directly behind it. Island, peninsula, and all other worktops are dry continuous preparation surfaces.`;
+function getKitchenZoneLabel(value: string): string {
+  const opt = kitchenZoneOptions.find((o) => o.value === value);
+  if (!opt) return value;
+  if (PROMPT_LANGUAGE === "en" && opt.englishLabel) return opt.englishLabel;
+  return opt.germanLabel;
+}
+
+function buildKitchenFixtureTopology(zones: ResolvedKitchenZones): string {
+  const wetZone = `${WET_ZONE_TOPOLOGY_LEAD[zones.sinkLocation]} one undermount sink with a single mixer faucet at its rear edge, spout over the basin.`;
+  const cooktopDetail =
+    zones.cooktopLocation === "island" && zones.sinkLocation === "island"
+      ? "one flush induction hob at the island's far end, amid dry worktop."
+      : "one flush induction hob amid dry worktop.";
+  const cookingZone = `${COOKING_ZONE_TOPOLOGY_LEAD[zones.cooktopLocation]} ${cooktopDetail}`;
+  const closing =
+    zones.islandCount === 0
+      ? "There is no island; all other worktops stay dry."
+      : "All other worktops stay dry.";
+  return `${wetZone} ${cookingZone} ${closing}`;
 }
 
 type ModelPromptSection = {
@@ -783,6 +783,13 @@ export function buildPrompt({
   if (effectiveKind) selectionLock.push(`Room concept: ${effectiveKind}`);
   if (selections.kitchenLook && kitchenLayoutLabel) {
     selectionLock.push(`Kitchen layout: ${kitchenLayoutLabel}`);
+  }
+  const kitchenZones = resolveKitchenZones(selections);
+  if (isKitchenRoom) {
+    selectionLock.push(
+      `Sink: ${getKitchenZoneLabel(kitchenZones.sinkLocation)}`,
+      `Cooktop: ${getKitchenZoneLabel(kitchenZones.cooktopLocation)}`
+    );
   }
   if (style) selectionLock.push(`Style: ${style}`);
   if (timeSpec) selectionLock.push(`Time of day: ${timeSpec.label}`);
@@ -1011,11 +1018,10 @@ export function buildPrompt({
     { required: true }
   );
 
-  const wetZoneLocation = resolveWetZoneLocation(extraWishes);
   if (isKitchenRoom && !isDetailView) {
     addModelSection(
       "wet-zone",
-      buildKitchenFixtureTopology(wetZoneLocation),
+      buildKitchenFixtureTopology(kitchenZones),
       { required: true }
     );
   }
@@ -1148,7 +1154,7 @@ export function buildPrompt({
 
   const modelWishes =
     isKitchenRoom && !isDetailView
-      ? removeCompiledWetZoneWishes(extraWishes?.trim() ?? "")
+      ? removeCompiledZoneWishes(extraWishes?.trim() ?? "")
       : extraWishes?.trim();
   if (modelWishes) {
     addModelSection(
@@ -1186,9 +1192,18 @@ export function buildPrompt({
     sceneType: isKitchenRoom ? "kitchen" : "interior",
     wetZone: {
       required: wetZoneRequired,
-      location: wetZoneRequired ? wetZoneLocation : null,
+      location: wetZoneRequired ? kitchenZones.sinkLocation : null,
       sinkCount: wetZoneRequired ? 1 : null,
       faucetCount: wetZoneRequired ? 1 : null,
+    },
+    cookingZone: {
+      required: wetZoneRequired,
+      location: wetZoneRequired ? kitchenZones.cooktopLocation : null,
+      cooktopCount: wetZoneRequired ? 1 : null,
+    },
+    islandCount: wetZoneRequired ? kitchenZones.islandCount : null,
+    camera: {
+      viewpoint,
     },
     handle: {
       kind: handleGeometry?.kind ?? null,

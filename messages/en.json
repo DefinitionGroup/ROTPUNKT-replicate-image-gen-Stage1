@@ -114,6 +114,8 @@
       }
     },
     "options": {
+      "zoneWallRun": "Wall run",
+      "zoneIsland": "Kitchen island",
       "kueche": "Kitchen",
       "wohnzimmer": "Living Room",
       "flur": "Hallway",
@@ -263,6 +265,15 @@
       "title": "Kitchen Layout",
       "description": "What type of kitchen layout would you like?",
       "skip": "Skip — standard layout"
+    },
+    "kitchenZones": {
+      "title": "Sink & Cooktop",
+      "description": "Where do the sink and the cooktop go? This pins down the layout of your island kitchen.",
+      "sink": "Sink",
+      "sinkHint": "Exactly one basin with a single faucet.",
+      "cooktop": "Cooktop",
+      "cooktopHint": "Exactly one induction cooktop.",
+      "continue": "Continue"
     },
     "handleMatrix": {
       "categoryLabel": "Handle Type",

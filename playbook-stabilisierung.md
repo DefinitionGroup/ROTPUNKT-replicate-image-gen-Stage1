@@ -1,7 +1,7 @@
 # Stabilisierung-Playbook: visuelle Qualitätsprüfung
 
 **Status:** geplant – Gate, Validator und Wiederholung sind noch nicht implementiert
-**Stand:** 2. September 2026 – Schritt 0 (Abschnitt 2a) ist umgesetzt; die Abschnitte 4, 5, 7 und 9 wurden gegen den tatsächlichen Code-Stand korrigiert
+**Stand:** 3. September 2026 – Schritt 0 (Abschnitt 2a) und Schritt 1 (Abschnitt 2b) sind umgesetzt; die Abschnitte 4, 5, 7 und 9 wurden gegen den tatsächlichen Code-Stand korrigiert. Validator: Replicate-gehostetes Vision-Modell (Entscheidung vom 3. September 2026)
 **Ziel:** Generierte Küchenbilder erst dann als gültig anzeigen und dauerhaft als Ergebnis speichern, wenn sie die fachlichen Bildregeln erfüllen. Das ergänzt das bestehende FLUX.1-dev-LoRA und vermeidet ein erneutes LoRA-Training.
 
 ## 1. Ausgangslage und Grundsatz
@@ -47,7 +47,7 @@ Regeln werden in drei Klassen eingeteilt:
 
 Die Regeln müssen je Preset und Kameraprofil bewusst eingeschränkt werden: Was außerhalb des Bildausschnitts liegen darf, darf der Validator nicht fälschlich als Fehler bewerten.
 
-Die Spülenposition wird heute aus dem Freitext der Zusatzwünsche per Regex abgeleitet (`resolveWetZoneLocation` in `components/wizard/promptBuilder.ts`). Der Regex kennt keine Negation: „keine Spüle auf der Insel“ ergibt `island`. Außerdem streicht `removeCompiledWetZoneWishes` jeden Satz, der eine Spüle erwähnt, vollständig aus dem Modell-Prompt – auch dann, wenn derselbe Satz weitere Wünsche enthält. Bevor der Validator die Spülenposition prüft, muss sie eine strukturierte Wizard-Auswahl werden; der Freitext darf sie nicht mehr bestimmen.
+Die Spülenposition wurde bis zum 3. September 2026 aus dem Freitext der Zusatzwünsche per Regex abgeleitet – ohne Negationsbehandlung („keine Spüle auf der Insel“ ergab `island`). Seit Schritt 1 (Abschnitt 2b) ist sie eine strukturierte Wizard-Auswahl; Freitext bestimmt sie nicht mehr. Sätze, die Spüle, Armatur oder Kochfeld erwähnen, werden weiterhin aus dem Modell-Prompt entfernt, damit sie nicht mit der Auswahl konkurrieren.
 
 ## 2a. Schritt 0 (umgesetzt am 2. September 2026): Prompt und Vertrag werden gemeinsam erzeugt
 
@@ -63,6 +63,16 @@ Die Spülenposition wird heute aus dem Freitext der Zusatzwünsche per Regex abg
 - `pnpm audit:prompts` enthält Regressionstests für exakt den früheren Fehlerfall (Küchen-Prompt mit leerem Vertrag) sowie für Orts- und Legacy-Widersprüche.
 
 Diese Prüfung ist bewusst eng: Sie stellt nur sicher, dass Prompt und Vertrag dieselbe Konfiguration beschreiben. Ob das *Bild* dem Vertrag entspricht, bleibt Aufgabe des Validators aus Abschnitt 6.
+
+## 2b. Schritt 1 (umgesetzt am 3. September 2026): strukturierte Topologie, erweiterter Vertrag, Prompt-Version v4
+
+**Wizard.** Nach der Küchenform erscheint bei der Inselküche ein zusätzliches Panel „Spüle & Kochfeld“ (`WizardKitchenZonesPanel`), in dem beide Zonen auf Wandzeile oder Insel gelegt werden; Standard ist Spüle an der Wand, Kochfeld auf der Insel. Küchenzeile und Küche über Eck haben keine Insel, beide Zonen liegen dort automatisch an der Wand; wer die Form überspringt, erhält Wandzeile für beide, aber keine Aussage zur Inselanzahl. Die Auswahl liegt in `selectedOptions.sinkLocation` und `cooktopLocation`, wird im Summary-Panel angezeigt, von den Presets gesetzt und beim Wechsel auf eine andere Form oder einen anderen Raumtyp gelöscht. Die Auflösung aus der Auswahl ist in `components/wizard/kitchenZones.ts` gekapselt.
+
+**Vertrag.** `GenerationQualityExpectations` enthält zusätzlich `cookingZone { required, location, cooktopCount }`, `islandCount` (0, 1 oder `null` bei übersprungener Form) und `camera { viewpoint }`. Der Type-Guard verlangt die neuen Felder; Verträge aus Sätzen vor diesem Stand gelten als ungültig und werden im Statusweg als `null` weitergereicht. `findPromptContractMismatch` prüft neben der Nasszone auch die Kochzone (gemeinsame Satzanfänge `COOKING_ZONE_TOPOLOGY_LEAD`) und verlangt `islandCount = 1`, sobald eine Zone auf der Insel liegt.
+
+**Prompt.** Die Topologie-Sektion nennt jetzt Spüle mit Armaturen-Beziehung („single mixer faucet at its rear edge, spout over the basin“), Kochfeld mit Ort und die Inselaussage in einem Block von rund 47 Wörtern. Dafür wurde `PROMPT_VERSION` auf `flux1-v4` gesetzt; Vergleiche mit v3-Ergebnissen sind nicht mehr seedgleich.
+
+**Wortbudget.** Die Messung beim Umbau hat einen Altfehler sichtbar gemacht: Mit dem bisherigen Budget von 180 Wörtern belegten die Pflichtsektionen fast alles, sodass bei vier von fünf Griffgeometrien die Sektionen `lighting`, `floor` und `layout` stillschweigend entfielen – die gewählte Tageszeit und der Boden erreichten das Modell nicht. Das Budget liegt jetzt bei 240 Wörtern (FLUX.1-dev liest über T5 bis 512 Tokens); das Audit prüft seitdem, dass diese drei Sektionen bei allen Griffgeometrien im Prompt bleiben. Für den Validator heißt das: Bilder vor v4 dürfen bei Licht- und Bodenregeln nicht als Referenz dienen.
 
 ## 3. Zielarchitektur
 
@@ -140,7 +150,7 @@ Für die Orchestrierung eignen sich Replicate-Webhooks plus eine serverseitige Q
 
 ## 6. Validator-Strategie
 
-Der Validator ist austauschbar. Vor der Produktiventscheidung wird mindestens ein schneller und ein stärkerer Vision-Language-Model-Kandidat auf einem gelabelten Testsatz verglichen. Entscheidend ist nicht die allgemeine Bildbeschreibung, sondern die Trefferquote auf Küchen-Topologie und falsche Freigaben.
+Der Validator ist austauschbar und läuft über Replicate (Entscheidung vom 3. September 2026: kein zusätzlicher Anbieter, gleicher Key und gleiche Abrechnung wie die Generierung). Vor der Produktiventscheidung wird mindestens ein schneller und ein stärkerer auf Replicate gehosteter Vision-Language-Model-Kandidat auf einem gelabelten Testsatz verglichen. Entscheidend ist nicht die allgemeine Bildbeschreibung, sondern die Trefferquote auf Küchen-Topologie und falsche Freigaben.
 
 Der Validator erhält:
 
@@ -234,4 +244,4 @@ Messgrößen:
 
 ## 12. Nicht Bestandteil dieses Schritts
 
-Umgesetzt ist ausschließlich Schritt 0 aus Abschnitt 2a. Datenbankmigration, Webhook, Worker, Validator-Aufruf, Wiederholung und Änderungen am LoRA sind weiterhin nicht Bestandteil. Das Playbook bleibt die technische Leitlinie, auf deren Basis die Implementierung in kleinen, rückrollbaren Schritten erfolgt.
+Umgesetzt sind Schritt 0 (Abschnitt 2a) und Schritt 1 (Abschnitt 2b). Datenbankmigration, Webhook, Worker, Validator-Aufruf, Wiederholung und Änderungen am LoRA sind weiterhin nicht Bestandteil. Das Playbook bleibt die technische Leitlinie, auf deren Basis die Implementierung in kleinen, rückrollbaren Schritten erfolgt.

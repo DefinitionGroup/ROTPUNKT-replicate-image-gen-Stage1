@@ -114,6 +114,8 @@
       }
     },
     "options": {
+      "zoneWallRun": "Wandzeile",
+      "zoneIsland": "Kücheninsel",
       "kueche": "Küche",
       "wohnzimmer": "Wohnzimmer",
       "flur": "Flur",
@@ -263,6 +265,15 @@
       "title": "Küchenform",
       "description": "Welche Küchenform soll dargestellt werden?",
       "skip": "Überspringen — Standardlayout"
+    },
+    "kitchenZones": {
+      "title": "Spüle & Kochfeld",
+      "description": "Wo sitzen Spüle und Kochfeld? Damit ist die Aufteilung Ihrer Inselküche eindeutig festgelegt.",
+      "sink": "Spüle",
+      "sinkHint": "Genau ein Becken mit einer Armatur.",
+      "cooktop": "Kochfeld",
+      "cooktopHint": "Genau ein Induktionskochfeld.",
+      "continue": "Weiter"
     },
     "handleMatrix": {
       "categoryLabel": "Griffart",

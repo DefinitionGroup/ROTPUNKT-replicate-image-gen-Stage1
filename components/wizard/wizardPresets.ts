@@ -19,6 +19,8 @@ export const wizardPresets: WizardPreset[] = [
     options: {
       kind: "kueche",
       kitchenLook: "kuecheninsel",
+      sinkLocation: "wall_run",
+      cooktopLocation: "island",
       color: "holz",
       handle: "handle:tokyo-holz-198",
       style: "minimalistisch",
@@ -79,6 +81,8 @@ export const wizardPresets: WizardPreset[] = [
     options: {
       kind: "kueche",
       kitchenLook: "kuecheninsel",
+      sinkLocation: "island",
+      cooktopLocation: "wall_run",
       color: "weiß",
       handle: "handle:grifflos",
       style: "gemütlich",

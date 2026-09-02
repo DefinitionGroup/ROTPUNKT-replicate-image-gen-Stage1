@@ -1,5 +1,10 @@
-export const PROMPT_VERSION = "flux1-v3" as const;
-export const MODEL_PROMPT_WORD_BUDGET = 180;
+// v4: sink and cooktop topology come from structured wizard choices and the
+// contract carries cookingZone, islandCount and camera.
+export const PROMPT_VERSION = "flux1-v4" as const;
+// FLUX.1-dev's T5 encoder reads up to 512 tokens; 240 words leaves room for the
+// required topology, handle and camera sections plus layout, lighting, floor and
+// the camera priority line.
+export const MODEL_PROMPT_WORD_BUDGET = 240;
 export const LORA_TRIGGER_WORD = "RDTDOT";
 export const LORA_COMPARISON_SCALES = [0.65, 0.75, 0.85] as const;
 export const LORA_GENERATION_SCALE = 0.85 as const;
@@ -26,6 +31,7 @@ export type HandleGeometryKind =
   | "generic";
 
 export type WetZoneLocation = "wall_run" | "island" | "peninsula";
+export type CookingZoneLocation = "wall_run" | "island";
 
 export type GenerationQualityExpectations = {
   sceneType: "kitchen" | "interior";
@@ -34,6 +40,16 @@ export type GenerationQualityExpectations = {
     location: WetZoneLocation | null;
     sinkCount: 1 | null;
     faucetCount: 1 | null;
+  };
+  cookingZone: {
+    required: boolean;
+    location: CookingZoneLocation | null;
+    cooktopCount: 1 | null;
+  };
+  // null when the scene is not a kitchen or the framing is a detail view.
+  islandCount: 0 | 1 | null;
+  camera: {
+    viewpoint: string | null;
   };
   handle: {
     kind: HandleGeometryKind | null;
@@ -56,10 +72,13 @@ export type GenerationRequestSpec = {
 // Shared sentence openers let the server verify that the prompt it receives
 // actually encodes the wet zone the contract claims.
 export const WET_ZONE_TOPOLOGY_LEAD: Record<WetZoneLocation, string> = {
-  island: "Topology: the island contains the kitchen's only wet zone:",
-  peninsula: "Topology: the peninsula contains the kitchen's only wet zone:",
-  wall_run:
-    "Topology: one wall-side worktop contains the kitchen's only wet zone:",
+  island: "Topology: the island holds the kitchen's only wet zone:",
+  peninsula: "Topology: the peninsula holds the kitchen's only wet zone:",
+  wall_run: "Topology: the wall run holds the kitchen's only wet zone:",
+};
+export const COOKING_ZONE_TOPOLOGY_LEAD: Record<CookingZoneLocation, string> = {
+  island: "Cooking zone: the island holds the kitchen's only cooktop:",
+  wall_run: "Cooking zone: the wall run holds the kitchen's only cooktop:",
 };
 export const LEGACY_KITCHEN_WET_ZONE_MARKER =
   "One clearly visible sink with a single faucet";
@@ -135,6 +154,8 @@ export function isGenerationQualityExpectations(
   if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<GenerationQualityExpectations>;
   const wetZone = candidate.wetZone;
+  const cookingZone = candidate.cookingZone;
+  const camera = candidate.camera;
   const handle = candidate.handle;
   return Boolean(
     (candidate.sceneType === "kitchen" ||
@@ -147,6 +168,17 @@ export function isGenerationQualityExpectations(
         wetZone.location === "peninsula") &&
       (wetZone.sinkCount === null || wetZone.sinkCount === 1) &&
       (wetZone.faucetCount === null || wetZone.faucetCount === 1) &&
+      cookingZone &&
+      typeof cookingZone.required === "boolean" &&
+      (cookingZone.location === null ||
+        cookingZone.location === "wall_run" ||
+        cookingZone.location === "island") &&
+      (cookingZone.cooktopCount === null || cookingZone.cooktopCount === 1) &&
+      (candidate.islandCount === null ||
+        candidate.islandCount === 0 ||
+        candidate.islandCount === 1) &&
+      camera &&
+      (camera.viewpoint === null || typeof camera.viewpoint === "string") &&
       handle &&
       (handle.kind === null ||
         handle.kind === "handleless" ||
@@ -176,7 +208,7 @@ export function findPromptContractMismatch({
   promptVersion: PromptVersion;
   qualityExpectations: GenerationQualityExpectations;
 }): string | null {
-  const { sceneType, wetZone } = qualityExpectations;
+  const { sceneType, wetZone, cookingZone, islandCount } = qualityExpectations;
 
   if (wetZone.required) {
     if (sceneType !== "kitchen") {
@@ -195,6 +227,26 @@ export function findPromptContractMismatch({
     wetZone.faucetCount !== null
   ) {
     return "wet zone details present although wetZone.required is false";
+  }
+
+  if (cookingZone.required !== wetZone.required) {
+    return "cookingZone.required must match wetZone.required";
+  }
+  if (cookingZone.required) {
+    if (cookingZone.location === null || cookingZone.cooktopCount !== 1) {
+      return "required cooking zone is missing location or cooktopCount";
+    }
+    const usesIsland =
+      wetZone.location === "island" || cookingZone.location === "island";
+    if (usesIsland && islandCount !== 1) {
+      return "a zone sits on the island but islandCount is not 1";
+    }
+  } else if (
+    cookingZone.location !== null ||
+    cookingZone.cooktopCount !== null ||
+    islandCount !== null
+  ) {
+    return "cooking zone or island details present although the scene needs none";
   }
 
   if (promptVersion === "legacy-debug") {
@@ -219,6 +271,22 @@ export function findPromptContractMismatch({
   }
   if (promptLocation && wetZone.location !== promptLocation) {
     return `prompt places the wet zone at ${promptLocation} but contract says ${wetZone.location}`;
+  }
+
+  const promptCooktopLocation = (
+    Object.keys(COOKING_ZONE_TOPOLOGY_LEAD) as CookingZoneLocation[]
+  ).find((location) =>
+    prompt.includes(COOKING_ZONE_TOPOLOGY_LEAD[location])
+  );
+
+  if (promptCooktopLocation && !cookingZone.required) {
+    return `prompt demands a ${promptCooktopLocation} cooktop but contract has cookingZone.required=false`;
+  }
+  if (!promptCooktopLocation && cookingZone.required) {
+    return "contract requires a cooking zone but prompt has no cooktop topology";
+  }
+  if (promptCooktopLocation && cookingZone.location !== promptCooktopLocation) {
+    return `prompt places the cooktop at ${promptCooktopLocation} but contract says ${cookingZone.location}`;
   }
 
   return null;

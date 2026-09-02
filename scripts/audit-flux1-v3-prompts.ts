@@ -78,7 +78,7 @@ const baseSelections: WizardState["selectedOptions"] = {
   time: "afternoon, warm afternoon light",
   viewpoint: "wide shot, long shot, establishing shot",
   floor: "light oak wood flooring",
-  kitchenLook: "kitchen island",
+  kitchenLook: "kuecheninsel",
   accessories: [],
 };
 
@@ -112,9 +112,23 @@ const rows = requiredKinds.map((kind) => {
   );
   assert.equal(result.qualityExpectations.wetZone.sinkCount, 1);
   assert.equal(result.qualityExpectations.wetZone.faucetCount, 1);
+  // Island layout without an explicit choice: sink at the wall, cooktop on the island.
+  assert.equal(result.qualityExpectations.wetZone.location, "wall_run");
+  assert.equal(result.qualityExpectations.cookingZone.location, "island");
+  assert.equal(result.qualityExpectations.cookingZone.cooktopCount, 1);
+  assert.equal(result.qualityExpectations.islandCount, 1);
+  assert.equal(result.qualityExpectations.camera.viewpoint, baseSelections.viewpoint);
   assert.equal(result.qualityExpectations.handle.kind, kind);
   assert.equal(findPromptContractMismatch(toGenerationRequestSpec(result)), null);
   assert.equal(result.modelSections[1]?.startsWith("Topology:"), true);
+  // The chosen time of day, floor and layout must actually reach the model.
+  for (const sectionId of ["layout", "lighting", "floor"]) {
+    assert.equal(
+      result.omittedModelSections.includes(sectionId),
+      false,
+      `${kind}: section "${sectionId}" was dropped by the word budget`
+    );
+  }
   assert.equal(
     result.modelSections[2]?.startsWith(
       kind === "handleless" || kind === "tokyo_grip"
@@ -214,23 +228,79 @@ const islandEntry = handleCatalog.find(
   (entry) => getHandleGeometry(entry).kind === "bar_pull"
 );
 assert(islandEntry);
+// Sink placement is a structured choice; free-text wishes about it are compiled away.
 const islandResult = buildPrompt({
   selections: {
     ...baseSelections,
     handle: encodeHandleSelectionValue(islandEntry.id),
+    sinkLocation: "island",
+    cooktopLocation: "island",
   },
-  extraWishes: "Place the sink and faucet on the kitchen island.",
+  extraWishes: "Place the sink and faucet on the kitchen island. Add a brass pendant lamp.",
   pipelineV2Enabled: true,
 });
 assert.equal(islandResult.qualityExpectations.wetZone.location, "island");
+assert.equal(islandResult.qualityExpectations.cookingZone.location, "island");
 assert.match(
   islandResult.modelSections[1] ?? "",
-  /the island contains the kitchen's only wet zone/
+  /the island holds the kitchen's only wet zone/
+);
+assert.match(
+  islandResult.modelSections[1] ?? "",
+  /the island holds the kitchen's only cooktop/
 );
 assert.equal((islandResult.prompt.match(/\bsink\b/gi) ?? []).length, 1);
 assert.equal((islandResult.prompt.match(/\bfaucet\b/gi) ?? []).length, 1);
+assert.equal((islandResult.prompt.match(/\bcooktop\b/gi) ?? []).length, 1);
+assert.match(islandResult.prompt, /brass pendant lamp/);
 const islandSpec = toGenerationRequestSpec(islandResult);
 assert.equal(findPromptContractMismatch(islandSpec), null);
+assert.match(
+  findPromptContractMismatch({
+    ...islandSpec,
+    qualityExpectations: {
+      ...islandSpec.qualityExpectations,
+      cookingZone: { ...islandSpec.qualityExpectations.cookingZone, location: "wall_run" },
+    },
+  }) ?? "",
+  /places the cooktop at island/
+);
+assert.match(
+  findPromptContractMismatch({
+    ...islandSpec,
+    qualityExpectations: { ...islandSpec.qualityExpectations, islandCount: 0 },
+  }) ?? "",
+  /islandCount is not 1/
+);
+
+// Free-text can no longer move the sink: the selection wins.
+const wishOnlyResult = buildPrompt({
+  selections: {
+    ...baseSelections,
+    kitchenLook: "kuechenzeile",
+    handle: encodeHandleSelectionValue("grifflos"),
+  },
+  extraWishes: "Place the sink on the kitchen island.",
+  pipelineV2Enabled: true,
+});
+assert.equal(wishOnlyResult.qualityExpectations.wetZone.location, "wall_run");
+assert.equal(wishOnlyResult.qualityExpectations.cookingZone.location, "wall_run");
+assert.equal(wishOnlyResult.qualityExpectations.islandCount, 0);
+assert.match(wishOnlyResult.modelSections[1] ?? "", /There is no island/);
+assert.equal(findPromptContractMismatch(toGenerationRequestSpec(wishOnlyResult)), null);
+
+// Skipped layout: both zones default to the wall run, but no island claim is made.
+const noLayoutResult = buildPrompt({
+  selections: {
+    ...baseSelections,
+    kitchenLook: undefined,
+    handle: encodeHandleSelectionValue("grifflos"),
+  },
+  pipelineV2Enabled: true,
+});
+assert.equal(noLayoutResult.qualityExpectations.islandCount, null);
+assert.equal(/There is no island/.test(noLayoutResult.modelSections[1] ?? ""), false);
+assert.equal(findPromptContractMismatch(toGenerationRequestSpec(noLayoutResult)), null);
 assert.match(
   findPromptContractMismatch({
     ...islandSpec,

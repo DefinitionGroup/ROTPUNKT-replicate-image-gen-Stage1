@@ -12,6 +12,9 @@ export interface WizardState {
     style?: string
     kind?: string
     kitchenLook?: string
+    // Only meaningful for the island layout; other layouts keep both zones on the wall run.
+    sinkLocation?: string
+    cooktopLocation?: string
     environment?: string
     time?: string
     background?: string
@@ -111,6 +114,20 @@ export const wizardActions = {
       selectedOptions: { ...current.selectedOptions, [key]: normalizedValue },
       error: ''
     })
+  },
+
+  clearOptions: (...keys: (keyof WizardState['selectedOptions'])[]) => {
+    const current = wizardStore.get()
+    const selectedOptions = { ...current.selectedOptions }
+    let changed = false
+    for (const key of keys) {
+      if (key in selectedOptions) {
+        delete selectedOptions[key]
+        changed = true
+      }
+    }
+    if (!changed) return
+    wizardStore.set({ ...current, selectedOptions, error: '' })
   },
 
   toggleMultiOption: (key: 'accessories', value: string) => {

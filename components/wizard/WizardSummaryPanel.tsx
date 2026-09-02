@@ -12,6 +12,11 @@ import { getWizardProgress } from "./wizardProgress";
 import { getFrontfarbenColorLabel } from "./frontfarbenCatalog";
 import { getHandleSelectionLabel } from "./handleCatalog";
 import { kitchenLayoutOptions } from "./wizardSteps";
+import {
+  hasIslandLayout,
+  kitchenZoneOptions,
+  resolveKitchenZones,
+} from "./kitchenZones";
 
 interface WizardSummaryPanelProps {
   selections: WizardState["selectedOptions"];
@@ -46,6 +51,7 @@ export function WizardSummaryPanel({
 
   const t = useTranslations("wizard.summary");
   const tLayout = useTranslations("wizard.kitchenLayout");
+  const tZones = useTranslations("wizard.kitchenZones");
   const tOptions = useTranslations();
   const locale = useLocale();
   const translatedSteps = useTranslatedWizardSteps();
@@ -151,10 +157,39 @@ export function WizardSummaryPanel({
           count: 1,
         });
       }
+
+      // Sink and cooktop placement only exist for the island layout
+      if (step.key === "kind" && hasIslandLayout(selections)) {
+        const zones = resolveKitchenZones(selections);
+        const zoneLabel = (value: string) => {
+          const opt = kitchenZoneOptions.find((o) => o.value === value);
+          return opt ? tOptions(opt.labelKey) : value;
+        };
+        items.push(
+          {
+            key: "sinkLocation",
+            stepIndex,
+            title: tZones("sink"),
+            description: tZones("sinkHint"),
+            selectedLabel: zoneLabel(zones.sinkLocation),
+            isMulti: false,
+            count: 1,
+          },
+          {
+            key: "cooktopLocation",
+            stepIndex,
+            title: tZones("cooktop"),
+            description: tZones("cooktopHint"),
+            selectedLabel: zoneLabel(zones.cooktopLocation),
+            isMulti: false,
+            count: 1,
+          }
+        );
+      }
     });
 
     return items;
-  }, [selections, translatedSteps, locale]);
+  }, [selections, translatedSteps, locale, tLayout, tOptions, tZones]);
 
   const renderPrimaryAction = () => {
     if (!isComplete) {
