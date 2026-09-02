@@ -24,7 +24,8 @@ import { WizardFinal } from "./WizardFinal";
 import { wizardSteps } from "./wizardSteps";
 import { useTranslatedWizardSteps } from "./useTranslatedWizardSteps";
 import { WizardSummaryPanel } from "./WizardSummaryPanel";
-import { buildPrompt } from "./promptBuilder";
+import { buildPrompt, toGenerationRequestSpec } from "./promptBuilder";
+import type { GenerationRequestSpec } from "@/lib/imageGenerationContract";
 import type { WizardPreset } from "./wizardPresets";
 import { WizardColorStep } from "./WizardColorStep";
 import { WizardHandleStep } from "./WizardHandleStep";
@@ -33,7 +34,7 @@ import { PromptDebugPopover } from "./PromptDebugPopover";
 import { useTranslations } from "next-intl";
 
 interface KitchenWizardModalProps {
-  onPromptReady: (prompt: string, isKitchenRoom: boolean) => void;
+  onPromptReady: (spec: GenerationRequestSpec) => void;
   loading?: boolean;
   onClose?: () => void;
 }
@@ -225,7 +226,8 @@ export const KitchenWizardModal: React.FC<KitchenWizardModalProps> = ({
       return;
     }
 
-    onPromptReady(summaryData.prompt, summaryData.isKitchenRoom);
+    // Capture prompt and contract together before onClose resets the wizard state.
+    onPromptReady(toGenerationRequestSpec(summaryData));
     if (onClose) onClose();
   };
 

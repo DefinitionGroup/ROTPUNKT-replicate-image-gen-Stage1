@@ -6,6 +6,7 @@ import {
   ACTIVE_LORA_SCALES,
   DEFAULT_GENERATION_SEED,
   PROMPT_VERSION,
+  findPromptContractMismatch,
   isGenerationQualityExpectations,
   normalizeGenerationSeed,
   withLoraTrigger,
@@ -78,11 +79,26 @@ export async function POST(req: NextRequest) {
       ? normalizeGenerationSeed(requestedSeed)
       : DEFAULT_GENERATION_SEED;
     const promptVersion = normalizePromptVersion(requestedPromptVersion);
-    const qualityExpectations = isGenerationQualityExpectations(
-      requestedQualityExpectations
-    )
-      ? requestedQualityExpectations
-      : null;
+    if (!isGenerationQualityExpectations(requestedQualityExpectations)) {
+      return NextResponse.json(
+        { error: "A valid quality contract is required" },
+        { status: 400 }
+      );
+    }
+    const qualityExpectations = requestedQualityExpectations;
+    const contractMismatch = findPromptContractMismatch({
+      prompt,
+      promptVersion,
+      qualityExpectations,
+    });
+    if (contractMismatch) {
+      return NextResponse.json(
+        {
+          error: `Prompt and quality contract are inconsistent: ${contractMismatch}`,
+        },
+        { status: 400 }
+      );
+    }
     const finalPrompt = withLoraTrigger(prompt);
     const now = new Date().toISOString();
 

@@ -42,6 +42,28 @@ export type GenerationQualityExpectations = {
   };
 };
 
+// Prompt and quality contract are derived from the same wizard state exactly
+// once and travel together; the generator must never rebuild one of them.
+export type GenerationRequestSpec = {
+  prompt: string;
+  promptVersion: PromptVersion;
+  qualityExpectations: GenerationQualityExpectations;
+  isKitchenRoom: boolean;
+  modelSections: string[];
+  missingKeys: string[];
+};
+
+// Shared sentence openers let the server verify that the prompt it receives
+// actually encodes the wet zone the contract claims.
+export const WET_ZONE_TOPOLOGY_LEAD: Record<WetZoneLocation, string> = {
+  island: "Topology: the island contains the kitchen's only wet zone:",
+  peninsula: "Topology: the peninsula contains the kitchen's only wet zone:",
+  wall_run:
+    "Topology: one wall-side worktop contains the kitchen's only wet zone:",
+};
+export const LEGACY_KITCHEN_WET_ZONE_MARKER =
+  "One clearly visible sink with a single faucet";
+
 export type GenerationVariantContext = {
   predictionId: string;
   status: string;
@@ -139,6 +161,67 @@ export function isGenerationQualityExpectations(
         handle.mountingPoints === 2) &&
       typeof handle.requiresPanelContainment === "boolean"
   );
+}
+
+/**
+ * Returns a human-readable reason when the prompt and the quality contract
+ * disagree about the scene, or null when they are consistent.
+ */
+export function findPromptContractMismatch({
+  prompt,
+  promptVersion,
+  qualityExpectations,
+}: {
+  prompt: string;
+  promptVersion: PromptVersion;
+  qualityExpectations: GenerationQualityExpectations;
+}): string | null {
+  const { sceneType, wetZone } = qualityExpectations;
+
+  if (wetZone.required) {
+    if (sceneType !== "kitchen") {
+      return `wet zone required for sceneType "${sceneType}"`;
+    }
+    if (
+      wetZone.location === null ||
+      wetZone.sinkCount !== 1 ||
+      wetZone.faucetCount !== 1
+    ) {
+      return "required wet zone is missing location, sinkCount or faucetCount";
+    }
+  } else if (
+    wetZone.location !== null ||
+    wetZone.sinkCount !== null ||
+    wetZone.faucetCount !== null
+  ) {
+    return "wet zone details present although wetZone.required is false";
+  }
+
+  if (promptVersion === "legacy-debug") {
+    const promptIsKitchen = prompt.includes(LEGACY_KITCHEN_WET_ZONE_MARKER);
+    if (promptIsKitchen !== (sceneType === "kitchen")) {
+      return promptIsKitchen
+        ? `prompt describes a kitchen but contract sceneType is "${sceneType}"`
+        : "contract sceneType is kitchen but prompt lacks the kitchen fixture rule";
+    }
+    return null;
+  }
+
+  const promptLocation = (
+    Object.keys(WET_ZONE_TOPOLOGY_LEAD) as WetZoneLocation[]
+  ).find((location) => prompt.includes(WET_ZONE_TOPOLOGY_LEAD[location]));
+
+  if (promptLocation && !wetZone.required) {
+    return `prompt demands a ${promptLocation} wet zone but contract has wetZone.required=false`;
+  }
+  if (!promptLocation && wetZone.required) {
+    return "contract requires a wet zone but prompt has no wet-zone topology";
+  }
+  if (promptLocation && wetZone.location !== promptLocation) {
+    return `prompt places the wet zone at ${promptLocation} but contract says ${wetZone.location}`;
+  }
+
+  return null;
 }
 
 export function isGenerationVariantContext(

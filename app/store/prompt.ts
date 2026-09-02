@@ -1,4 +1,7 @@
 import { atom } from "nanostores";
+import type { GenerationRequestSpec } from "@/lib/imageGenerationContract";
 
-export const $prompt = atom<string | null>(null);
+// Prompt and quality contract are captured together when the wizard submits;
+// the generator must never rebuild either from the (possibly reset) wizard state.
+export const $generationSpec = atom<GenerationRequestSpec | null>(null);
 export const $isKitchenRoom = atom<boolean>(true);

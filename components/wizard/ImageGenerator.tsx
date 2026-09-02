@@ -1,30 +1,26 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
-import { $prompt } from "@/store/prompt";
-import { wizardStore } from "@/store/wizardStore";
+import { $generationSpec } from "@/store/prompt";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 import AiGeneratedLabel from "@/components/AiGeneratedLabel";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { buildPrompt } from "./promptBuilder";
 import { PromptDebugPopover } from "./PromptDebugPopover";
 import {
   DEFAULT_GENERATION_SEED,
   LORA_GENERATION_SCALE,
   MAX_GENERATION_SEED,
 } from "@/lib/imageGenerationContract";
-import {
-  $promptPipelineV2Enabled,
-  loadRuntimeConfig,
-} from "@/store/runtimeConfig";
+import { loadRuntimeConfig } from "@/store/runtimeConfig";
 import type {
   GenerationCandidate,
+  GenerationRequestSpec,
   GenerationSetContext,
   GenerationQualityExpectations,
   PromptVersion,
@@ -60,7 +56,7 @@ interface PollGenerationParams {
 }
 
 interface StartGenerationMutationParams {
-  prompt: string;
+  spec: GenerationRequestSpec;
   seed: number;
 }
 
@@ -115,12 +111,12 @@ async function pollGenerationApi({
 }
 
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
-  const prompt = useStore($prompt);
-  const wizardState = useStore(wizardStore);
-  const promptPipelineV2Enabled = useStore($promptPipelineV2Enabled);
+  const spec = useStore($generationSpec);
   const t = useTranslations('imageGenerator');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [completedPrompt, setCompletedPrompt] = useState<string | null>(null);
+  const [completedSpec, setCompletedSpec] = useState<GenerationRequestSpec | null>(
+    null
+  );
   const [generatedImage, setGeneratedImage] = useState<GenerationCandidate | null>(
     null
   );
@@ -142,16 +138,6 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       promptDebugEnv === "yes" ||
       promptDebugEnv === "on");
 
-  const summaryData = useMemo(
-    () =>
-      buildPrompt({
-        selections: wizardState.selectedOptions,
-        extraWishes: wizardState.extraWishes,
-        pipelineV2Enabled: promptPipelineV2Enabled,
-      }),
-    [wizardState.selectedOptions, wizardState.extraWishes, promptPipelineV2Enabled]
-  );
-
   // Ref to prevent duplicate starts for identical prompt strings.
   const hasTriggered = useRef<string | null>(null);
 
@@ -166,14 +152,14 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     Error,
     StartGenerationMutationParams
   >({
-    mutationFn: async ({ prompt: generationPrompt, seed }) => {
+    mutationFn: async ({ spec: generationSpec, seed }) => {
       if (isDev) console.log("[ImageGenerator] Starting generation...");
       const controller = new AbortController();
       const data = await startGenerationApi({
-        prompt: generationPrompt,
+        prompt: generationSpec.prompt,
         seed,
-        promptVersion: summaryData.promptVersion,
-        qualityExpectations: summaryData.qualityExpectations,
+        promptVersion: generationSpec.promptVersion,
+        qualityExpectations: generationSpec.qualityExpectations,
         signal: controller.signal,
       });
       if (isDev) console.log("[ImageGenerator] Prediction started:", data);
@@ -195,7 +181,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     isError: isStatusError,
   } = useQuery<StatusGenerationResponse, Error>({
     queryKey: ["replicate-status", generationSetId],
-    enabled: Boolean(generationSetId && (prompt || completedPrompt)),
+    enabled: Boolean(generationSetId && (spec || completedSpec)),
     queryFn: ({ signal }) =>
       pollGenerationApi({
         generationSetId: generationSetId!,
@@ -219,44 +205,45 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         (candidate) => candidate.loraScale === LORA_GENERATION_SCALE
       ) ?? statusData.candidates[0];
     setGeneratedImage(strongestCandidate);
-    setCompletedPrompt((current) => prompt ?? current);
-    // Clear the prompt to avoid accidental regeneration on remount.
-    $prompt.set(null);
-  }, [prompt, statusData]);
+    setCompletedSpec((current) => spec ?? current);
+    // Clear the spec to avoid accidental regeneration on remount.
+    $generationSpec.set(null);
+  }, [spec, statusData]);
 
   const handleRetry = useCallback(() => {
     resetMutation();
     setGenerationSetId(null);
     setGeneratedImage(null);
 
-    if (!prompt) return;
-    hasTriggered.current = prompt;
-    startGeneration({ prompt, seed: generationSeed });
-  }, [generationSeed, prompt, resetMutation, startGeneration]);
+    if (!spec) return;
+    hasTriggered.current = spec.prompt;
+    startGeneration({ spec, seed: generationSeed });
+  }, [generationSeed, spec, resetMutation, startGeneration]);
 
   const handleDevRegenerate = useCallback(() => {
-    const promptToRegenerate = completedPrompt ?? prompt;
-    if (!promptToRegenerate) return;
+    const specToRegenerate = completedSpec ?? spec;
+    if (!specToRegenerate) return;
 
     resetMutation();
     setGenerationSetId(null);
     setGeneratedImage(null);
-    hasTriggered.current = promptToRegenerate;
-    startGeneration({ prompt: promptToRegenerate, seed: generationSeed });
-  }, [completedPrompt, generationSeed, prompt, resetMutation, startGeneration]);
+    hasTriggered.current = specToRegenerate.prompt;
+    startGeneration({ spec: specToRegenerate, seed: generationSeed });
+  }, [completedSpec, generationSeed, spec, resetMutation, startGeneration]);
 
   useEffect(() => {
     void loadRuntimeConfig();
   }, []);
 
   useEffect(() => {
-    if (prompt && hasTriggered.current !== prompt) {
-      hasTriggered.current = prompt;
+    if (spec && hasTriggered.current !== spec.prompt) {
+      hasTriggered.current = spec.prompt;
       if (isDev) console.log("[ImageGenerator] Triggering generation");
-      startGeneration({ prompt, seed: generationSeed });
+      startGeneration({ spec, seed: generationSeed });
     }
-  }, [generationSeed, prompt, startGeneration]);
+  }, [generationSeed, spec, startGeneration]);
 
+  const debugSpec = spec ?? completedSpec;
   const hasImage = Boolean(generatedImage);
   const status = statusData?.status;
   const isTerminalFailure =
@@ -287,9 +274,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       <PromptDebugPopover
         enabled={showPromptDebugPopover}
         stepLabel="image generation"
-        missingKeys={summaryData.missingKeys}
-        sections={summaryData.modelSections}
-        prompt={summaryData.modelPrompt || prompt || "Prompt is currently empty."}
+        missingKeys={debugSpec?.missingKeys ?? []}
+        sections={debugSpec?.modelSections ?? []}
+        prompt={debugSpec?.prompt ?? "Prompt is currently empty."}
       />
 
       {onBack && hasImage && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
@@ -343,7 +330,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
           <ImageModal
             src={selectedImage}
             onClose={() => setSelectedImage(null)}
-            prompt={completedPrompt ?? undefined}
+            prompt={completedSpec?.prompt}
           />
         )}
       </AnimatePresence>

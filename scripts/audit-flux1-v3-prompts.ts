@@ -6,6 +6,7 @@ import {
   LORA_GENERATION_SCALE,
   MODEL_PROMPT_WORD_BUDGET,
   PROMPT_VERSION,
+  findPromptContractMismatch,
   isGenerationVariantManifest,
   normalizeGenerationSeed,
   withLoraTrigger,
@@ -18,7 +19,10 @@ import {
 } from "../components/wizard/handleCatalog";
 import { encodeFrontfarbenColorValue } from "../components/wizard/frontfarbenCatalog";
 import { getFenixColorByValue } from "../components/wizard/fenixColors";
-import { buildPrompt } from "../components/wizard/promptBuilder";
+import {
+  buildPrompt,
+  toGenerationRequestSpec,
+} from "../components/wizard/promptBuilder";
 import { wizardSteps } from "../components/wizard/wizardSteps";
 import {
   BIRD_EYE_VIEWPOINT,
@@ -109,6 +113,7 @@ const rows = requiredKinds.map((kind) => {
   assert.equal(result.qualityExpectations.wetZone.sinkCount, 1);
   assert.equal(result.qualityExpectations.wetZone.faucetCount, 1);
   assert.equal(result.qualityExpectations.handle.kind, kind);
+  assert.equal(findPromptContractMismatch(toGenerationRequestSpec(result)), null);
   assert.equal(result.modelSections[1]?.startsWith("Topology:"), true);
   assert.equal(
     result.modelSections[2]?.startsWith(
@@ -171,6 +176,11 @@ for (const [viewpoint, expectedCameraDescription] of Object.entries(
   });
 
   assert.equal(result.budgetExceeded, false);
+  assert.equal(
+    findPromptContractMismatch(toGenerationRequestSpec(result)),
+    null,
+    `${viewpoint} prompt and contract must agree (detail views drop the wet zone)`
+  );
   assert(
     result.modelSections.some((section) =>
       section.startsWith("Camera and composition:")
@@ -219,6 +229,60 @@ assert.match(
 );
 assert.equal((islandResult.prompt.match(/\bsink\b/gi) ?? []).length, 1);
 assert.equal((islandResult.prompt.match(/\bfaucet\b/gi) ?? []).length, 1);
+const islandSpec = toGenerationRequestSpec(islandResult);
+assert.equal(findPromptContractMismatch(islandSpec), null);
+assert.match(
+  findPromptContractMismatch({
+    ...islandSpec,
+    qualityExpectations: {
+      ...islandSpec.qualityExpectations,
+      wetZone: { ...islandSpec.qualityExpectations.wetZone, location: "wall_run" },
+    },
+  }) ?? "",
+  /places the wet zone at island/
+);
+
+// Regression: the generator used to rebuild the contract after the wizard
+// store had been reset, so every kitchen prompt shipped with an empty
+// "interior" contract. The API boundary must reject that combination.
+const resetStateResult = buildPrompt({
+  selections: {},
+  extraWishes: "",
+  pipelineV2Enabled: true,
+});
+assert.equal(resetStateResult.qualityExpectations.sceneType, "interior");
+assert.equal(resetStateResult.qualityExpectations.wetZone.required, false);
+assert.match(
+  findPromptContractMismatch({
+    ...islandSpec,
+    qualityExpectations: resetStateResult.qualityExpectations,
+  }) ?? "",
+  /wetZone\.required=false/
+);
+assert.match(
+  findPromptContractMismatch({
+    ...toGenerationRequestSpec(resetStateResult),
+    qualityExpectations: islandSpec.qualityExpectations,
+  }) ?? "",
+  /no wet-zone topology/
+);
+
+const legacyKitchenResult = buildPrompt({
+  selections: { ...baseSelections, handle: encodeHandleSelectionValue("grifflos") },
+  pipelineV2Enabled: false,
+});
+assert.equal(legacyKitchenResult.promptVersion, "legacy-debug");
+assert.equal(
+  findPromptContractMismatch(toGenerationRequestSpec(legacyKitchenResult)),
+  null
+);
+assert.match(
+  findPromptContractMismatch({
+    ...toGenerationRequestSpec(legacyKitchenResult),
+    qualityExpectations: resetStateResult.qualityExpectations,
+  }) ?? "",
+  /describes a kitchen/
+);
 
 const blackTBar = handleCatalog.find(
   (entry) => entry.id === "bp-230821-rp-mk11-griff-th-01322"

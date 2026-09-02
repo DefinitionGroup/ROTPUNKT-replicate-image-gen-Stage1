@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Header as HeaderType } from "@/sanity/sanity.types";
 import { $showWizard } from "@/app/store/modals";
-import { $prompt, $isKitchenRoom } from "@/app/store/prompt";
+import { $generationSpec, $isKitchenRoom } from "@/app/store/prompt";
 import { $pageStep } from "@/app/store/step";
 import { AnimatePresence } from "motion/react";
 import { IntroCard } from "@/components/wizard/IntroCard";
@@ -174,7 +174,7 @@ export default function Header({
             <div className="">
               <ImageGenerator
                 onBack={() => {
-                  $prompt.set(null);
+                  $generationSpec.set(null);
                   $pageStep.set("intro");
                   $showWizard.set(true);
                 }}
@@ -185,9 +185,9 @@ export default function Header({
           <AnimatePresence>
             {showWizard && (
               <KitchenWizardModal
-                onPromptReady={(prompt, isKitchen) => {
-                  $prompt.set(prompt);
-                  $isKitchenRoom.set(isKitchen);
+                onPromptReady={(spec) => {
+                  $generationSpec.set(spec);
+                  $isKitchenRoom.set(spec.isKitchenRoom);
                   $showWizard.set(false);
                   $pageStep.set("imagegen");
                 }}

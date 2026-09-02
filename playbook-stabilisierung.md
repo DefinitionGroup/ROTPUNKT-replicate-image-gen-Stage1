@@ -1,6 +1,7 @@
 # Stabilisierung-Playbook: visuelle Qualitätsprüfung
 
-**Status:** geplant – keine Implementierung in diesem Schritt
+**Status:** geplant – Gate, Validator und Wiederholung sind noch nicht implementiert
+**Stand:** 2. September 2026 – Schritt 0 (Abschnitt 2a) ist umgesetzt; die Abschnitte 4, 5, 7 und 9 wurden gegen den tatsächlichen Code-Stand korrigiert
 **Ziel:** Generierte Küchenbilder erst dann als gültig anzeigen und dauerhaft als Ergebnis speichern, wenn sie die fachlichen Bildregeln erfüllen. Das ergänzt das bestehende FLUX.1-dev-LoRA und vermeidet ein erneutes LoRA-Training.
 
 ## 1. Ausgangslage und Grundsatz
@@ -46,6 +47,23 @@ Regeln werden in drei Klassen eingeteilt:
 
 Die Regeln müssen je Preset und Kameraprofil bewusst eingeschränkt werden: Was außerhalb des Bildausschnitts liegen darf, darf der Validator nicht fälschlich als Fehler bewerten.
 
+Die Spülenposition wird heute aus dem Freitext der Zusatzwünsche per Regex abgeleitet (`resolveWetZoneLocation` in `components/wizard/promptBuilder.ts`). Der Regex kennt keine Negation: „keine Spüle auf der Insel“ ergibt `island`. Außerdem streicht `removeCompiledWetZoneWishes` jeden Satz, der eine Spüle erwähnt, vollständig aus dem Modell-Prompt – auch dann, wenn derselbe Satz weitere Wünsche enthält. Bevor der Validator die Spülenposition prüft, muss sie eine strukturierte Wizard-Auswahl werden; der Freitext darf sie nicht mehr bestimmen.
+
+## 2a. Schritt 0 (umgesetzt am 2. September 2026): Prompt und Vertrag werden gemeinsam erzeugt
+
+**Befund.** Bis zu dieser Änderung war der gespeicherte Qualitätsvertrag bei jeder Produktionsgenerierung falsch. `KitchenWizardModal.handleSubmit` übergab zuerst den fertigen Prompt-String und rief unmittelbar danach `onClose()` auf; beide Aufrufer (`Wizard.tsx`, `Header.tsx`) führen darin `wizardActions.reset()` aus. Der anschließend gemountete `ImageGenerator` baute den Vertrag mit `buildPrompt` aus dem bereits geleerten Wizard-Zustand neu. Ergebnis für jede Küche: `sceneType: "interior"`, `wetZone.required: false`, `handle.kind: null` – unabhängig vom Prompt. Der Server prüfte nur die Form des Vertrags, nicht seine Übereinstimmung mit dem Prompt, und speicherte ihn so in `generation_sets.quality_expectations` und in `images.generation_metadata.qualityExpectations`.
+
+**Konsequenz für dieses Playbook.** Die ursprüngliche Annahme „der Vertrag wird bereits korrekt gespeichert, nur nicht ausgewertet“ war falsch. Ein Validator, der diesen Vertrag gelesen hätte, hätte bei jeder Küche die Nasszone gar nicht geprüft. Alle vor dem Deploy dieser Änderung entstandenen Vertragszeilen sind unbrauchbar und dürfen weder zur Kalibrierung noch als Referenz für Regeln verwendet werden. Historische Sätze lassen sich am Widerspruch erkennen: Der Prompt enthält eine `Topology:`-Nasszonensektion, der Vertrag sagt `wetZone.required: false`.
+
+**Umsetzung.**
+
+- `GenerationRequestSpec` (`lib/imageGenerationContract.ts`) bündelt Prompt, Prompt-Version, Vertrag, Raumtyp sowie die Debug-Sektionen. `toGenerationRequestSpec` erzeugt ihn genau einmal aus dem `buildPrompt`-Ergebnis im Wizard, bevor der Zustand zurückgesetzt wird.
+- Der Store `$prompt` (String) wurde durch `$generationSpec` ersetzt. `ImageGenerator` ruft `buildPrompt` nicht mehr auf; Start, Wiederholung und Entwicklungs-Regeneration verwenden ausschließlich den übergebenen Spec.
+- `POST /api/replicate` lehnt Anfragen ohne gültigen Vertrag mit 400 ab und prüft mit `findPromptContractMismatch`, ob Prompt und Vertrag zusammenpassen (Nasszone gefordert ⇔ Topologie-Sektion vorhanden, Ort der Nasszone identisch, Raumtyp konsistent). Die dafür nötigen Satzanfänge (`WET_ZONE_TOPOLOGY_LEAD`, `LEGACY_KITCHEN_WET_ZONE_MARKER`) sind gemeinsame Konstanten, die auch der Prompt-Builder verwendet; eine Textänderung kann die Prüfung dadurch nicht unbemerkt aushebeln.
+- `pnpm audit:prompts` enthält Regressionstests für exakt den früheren Fehlerfall (Küchen-Prompt mit leerem Vertrag) sowie für Orts- und Legacy-Widersprüche.
+
+Diese Prüfung ist bewusst eng: Sie stellt nur sicher, dass Prompt und Vertrag dieselbe Konfiguration beschreiben. Ob das *Bild* dem Vertrag entspricht, bleibt Aufgabe des Validators aus Abschnitt 6.
+
 ## 3. Zielarchitektur
 
 ```mermaid
@@ -66,18 +84,19 @@ Der Browser startet ausschließlich die Generation. Er entscheidet nie über ein
 
 ## 4. Geplantes Datenmodell
 
-Die künftige Migration bleibt additiv, damit bestehende Bilder und Konten unverändert bleiben.
+Die Migration verändert keine bestehenden Bilder oder Konten. Sie ist aber nicht rein additiv: `generation_sets` existiert bereits, und ihr Status-Constraint muss angepasst werden.
 
-### `generation_sets`
+### `generation_sets` (vorhanden, wird erweitert)
 
-Eine Zeile pro Nutzerauftrag bzw. Bildsatz. Sie verbindet Konfiguration, Kandidaten und Ergebnis.
+Die Tabelle wurde mit `scripts/supabase_add_generation_metadata.sql` angelegt und enthält bereits `id`, `user_id`, `prompt`, `prompt_version`, `seed`, `model_version`, `guidance_scale`, `num_inference_steps`, `requested_lora_scales`, `quality_expectations`, `prediction_manifest`, `status`, `selected_image_id`, `selected_at`, `created_at`, `updated_at`. Der Status ist per CHECK auf `starting`, `processing`, `succeeded`, `failed`, `partial_failed` begrenzt; der Typ `GenerationSetStatus` in `lib/imageGenerationContract.ts` und die Status-Route spiegeln genau diese Werte.
 
-- `id`, `user_id`, `created_at`
-- `generation_spec` (versioniertes JSON des Bildvertrags)
-- `prompt_version`, `model_version`, `lora_version`
-- `initial_seed`, `max_attempts`
-- `status`: `pending`, `generating`, `validating`, `accepted`, `failed`
-- `accepted_image_id` (nullable)
+Erweiterung per `ALTER TABLE`:
+
+- neue Statuswerte `validating` und `accepted` (CHECK-Constraint löschen und neu anlegen; bestehende Zeilen bleiben gültig, `GenerationSetStatus` und die Auswertung in `app/api/replicate/status/route.ts` werden erweitert)
+- `initial_seed` (der heutige `seed` bleibt als Seed des ersten Versuchs), `max_attempts`, `lora_version`
+- `quality_expectations` bleibt der Vertrag; ein separates `generation_spec` ist nicht nötig, weil Prompt, Version und Vertrag seit Schritt 0 gemeinsam entstehen und bereits in der Zeile liegen
+- akzeptiertes Bild: `selected_image_id` wiederverwenden und umbenennen oder `accepted_image_id` ergänzen – aber nicht beides parallel führen
+- die RPC `select_generation_best` verlangt exakt drei Bilder pro Satz und ist seit dem Umstieg auf ein Bild pro Satz für jeden neuen Satz funktionslos; sie und `app/api/generation-sets/select-best/route.ts` werden entfernt oder durch die Akzeptanzlogik ersetzt
 
 ### `generation_validation_attempts`
 
@@ -92,11 +111,21 @@ Unveränderbares Prüfprotokoll pro Kandidat.
 
 ### Bestehende Tabelle `images`
 
-Nur akzeptierte Nutzerbilder werden regulär darin referenziert. Ergänzende, nullable Felder wären `generation_set_id`, `validation_status` und `accepted_at`. Die bisherigen Zeilen bleiben gültig und werden als historische, nicht rückwirkend geprüfte Bilder behandelt.
+Nur akzeptierte Nutzerbilder werden regulär darin referenziert. `generation_set_id`, `candidate_index`, `lora_scale` und `generation_metadata` existieren bereits; `generation_metadata.qualityStatus` wird heute hart auf `not_evaluated` gesetzt, obwohl der Typ `CandidateQualityStatus` `accepted` und `rejected` schon kennt. Ergänzend nullable: `validation_status`, `accepted_at`. Die bisherigen Zeilen bleiben gültig und werden als historische, nicht rückwirkend geprüfte Bilder behandelt – ihr gespeicherter Vertrag ist wegen Abschnitt 2a nicht belastbar.
 
 Abgelehnte Kandidatdateien werden nicht dauerhaft als normale Galerie-Bilder geführt. Für Debugging und Kalibrierung gilt eine kurze, dokumentierte Aufbewahrungsfrist; das Prüfurteil bleibt ohne vollständiges Bild erhalten.
 
 ## 5. Asynchroner Ablauf
+
+**Ist-Zustand.** Heute übernimmt der Browser mehr als nur den Start: `POST /api/replicate/status` wird vom Client alle drei Sekunden gepollt, und erst dieser Aufruf lädt das Replicate-Ergebnis nach MinIO und legt die `images`-Zeile an (`finalizeVariant`). Schließt der Nutzer den Tab, wird das Bild nie persistiert; Replicate-Ausgabe-URLs verfallen. Es gibt keinen Webhook. Überlappende Polls (Timeout 20 s, ein Retry) laufen parallel durch `finalizeVariant`; doppelte Inserts fängt der Unique-Index ab, doppelte Validator-Aufrufe würde nichts abfangen.
+
+**Daraus folgt für die Umsetzung:**
+
+- Vor jedem Validator-Aufruf wird zuerst atomar eine Zeile in `generation_validation_attempts` beansprucht (Unique auf `generation_set_id, attempt_number`). Nur der Aufruf, dessen Insert gelingt, ruft den Validator; alle anderen melden `validating`.
+- Erster Umsetzungsschritt ist der Validator innerhalb der bestehenden Status-Route mit diesem Claim. Das erreicht das Qualitätsziel ohne neue Infrastruktur.
+- Webhook und Queue folgen als Härtung gegen geschlossene Tabs und für längere Wiederholungsketten.
+
+Zielablauf:
 
 1. Die bestehende API legt einen `generation_set` mit Bildvertrag und erstem Seed an.
 2. Replicate liefert den Kandidaten über einen signaturgeprüften Webhook oder über einen serverseitig überwachten Abschluss zurück.
@@ -146,6 +175,8 @@ Unklare Urteile dürfen nicht stillschweigend akzeptiert werden. Während der Ka
 - pro Versuch bleibt der Bildvertrag und der Prompt unverändert; nur der Seed wechselt;
 - jeder Seed, Kandidat und Prüfgrund wird gespeichert.
 
+Der Server ignoriert in Produktion jeden vom Client gesendeten Seed und setzt fest `260805` (`app/api/replicate/route.ts`). Die Seed-Folge muss daher serverseitig aus `initial_seed` und `attempt_number` abgeleitet werden; der Client bekommt keinen Einfluss. Nebenbefund: Der heutige „Erneut versuchen“-Button erzeugt in Produktion dasselbe Bild noch einmal, weil Prompt und Seed unverändert sind – erst die Wiederholungsstrategie des Gates macht ihn sinnvoll.
+
 Damit sind sowohl gute als auch schlechte Ergebnisse reproduzierbar. Eine spätere Änderung des Prompts oder Validators erhält eine neue Versionsnummer, statt alte Befunde zu überschreiben.
 
 ## 8. Nutzer- und Entwicklungsoberfläche
@@ -165,7 +196,8 @@ Entwicklung/Admin:
 ## 9. Sicherheit, Kosten und Aufbewahrung
 
 - Replicate-Webhooks müssen signaturgeprüft werden.
-- Der Validator erhält nur kurzlebige, signierte Objekt-URLs; keine MinIO- oder Supabase-Schlüssel im Browser.
+- MinIO liefert heute unsignierte Bucket-URLs (`getObjectUrl` in `lib/minioClient.ts`), die der Browser direkt lädt; der Bucket ist demnach öffentlich lesbar. Ein externer Validator kann Kandidaten damit sofort abrufen – aber abgelehnte Kandidaten sind so lange öffentlich erreichbar, wie sie existieren. Die Löschfrist unten ist deshalb Pflicht, signierte Kurzzeit-URLs sind eine spätere Härtung.
+- Keine MinIO- oder Supabase-Schlüssel im Browser.
 - Service-Role-Zugriff bleibt auf den serverseitigen Worker beschränkt; RLS erlaubt Nutzern nur eigene akzeptierte Bilder und eigene Sätze zu lesen.
 - Wiederholungen sind auf drei Generierungen und drei Validierungen begrenzt.
 - Fehlgeschlagene Kandidaten werden nach der definierten Retention automatisch entfernt.
@@ -173,6 +205,7 @@ Entwicklung/Admin:
 
 ## 10. Test- und Einführungsplan
 
+0. Vor jeder Prompt- oder Vertragsänderung `pnpm audit:prompts` ausführen. Das Skript prüft seit Schritt 0 auch die Übereinstimmung von Prompt und Vertrag an der API-Grenze; die reinen `buildPrompt`-Tests hätten den Reset-Fehler nicht gefunden, weil er zwischen zwei Aufrufen lag.
 1. Einen gelabelten Testsatz mit mindestens 50–100 repräsentativen Küchenbildern anlegen: korrekt, doppelte Armatur, doppelte/fehlende Spüle, falsche Kochfeldposition, Griffkonflikt, falsche Kamera.
 2. Validator-Kandidaten gegen diesen Satz messen: insbesondere False Accepts bei Hard-Fail-Regeln.
 3. Zuerst **Shadow Mode**: prüfen und protokollieren, aber noch nichts verwerfen.
@@ -201,4 +234,4 @@ Messgrößen:
 
 ## 12. Nicht Bestandteil dieses Schritts
 
-Dieses Playbook führt noch keine Datenbankmigration, keinen Webhook, keinen Worker, keinen Validator-Aufruf, keine Wiederholung und keine Änderung am LoRA durch. Es ist die freigegebene technische Leitlinie, auf deren Basis die spätere Implementierung in kleinen, rückrollbaren Schritten erfolgen kann.
+Umgesetzt ist ausschließlich Schritt 0 aus Abschnitt 2a. Datenbankmigration, Webhook, Worker, Validator-Aufruf, Wiederholung und Änderungen am LoRA sind weiterhin nicht Bestandteil. Das Playbook bleibt die technische Leitlinie, auf deren Basis die Implementierung in kleinen, rückrollbaren Schritten erfolgt.

@@ -18,10 +18,13 @@ import {
   type HandleGeometrySpec,
 } from "./handleCatalog";
 import {
+  LEGACY_KITCHEN_WET_ZONE_MARKER,
   MODEL_PROMPT_WORD_BUDGET,
   PROMPT_VERSION,
+  WET_ZONE_TOPOLOGY_LEAD,
   countPromptWords,
   type GenerationQualityExpectations,
+  type GenerationRequestSpec,
   type WetZoneLocation,
 } from "@/lib/imageGenerationContract";
 import {
@@ -607,13 +610,14 @@ function removeCompiledWetZoneWishes(value: string): string {
 }
 
 function buildKitchenFixtureTopology(location: WetZoneLocation): string {
+  const lead = WET_ZONE_TOPOLOGY_LEAD[location];
   if (location === "island") {
-    return "Topology: the island contains the kitchen's only wet zone: one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, peninsula, and all other worktops are dry continuous preparation surfaces.";
+    return `${lead} one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, peninsula, and all other worktops are dry continuous preparation surfaces.`;
   }
   if (location === "peninsula") {
-    return "Topology: the peninsula contains the kitchen's only wet zone: one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, island, and all other worktops are dry continuous preparation surfaces.";
+    return `${lead} one undermount sink basin paired with one mixer faucet mounted directly behind it. Wall-side, island, and all other worktops are dry continuous preparation surfaces.`;
   }
-  return "Topology: one wall-side worktop contains the kitchen's only wet zone: one undermount sink basin paired with one mixer faucet mounted directly behind it. Island, peninsula, and all other worktops are dry continuous preparation surfaces.";
+  return `${lead} one undermount sink basin paired with one mixer faucet mounted directly behind it. Island, peninsula, and all other worktops are dry continuous preparation surfaces.`;
 }
 
 type ModelPromptSection = {
@@ -952,7 +956,7 @@ export function buildPrompt({
   // 10. Technical Requirements (positive phrasing — FLUX ignores negative prompts)
   if (isKitchenRoom) {
     sections.push(
-      "All pull handles and bar handles mounted horizontally parallel to the countertop edge. Each handle centered on its own individual door panel near the opening edge. One clearly visible sink with a single faucet, physically anchored lighting fixtures, clean lines, consistent materials, and high-end Rotpunkt kitchen design language."
+      `All pull handles and bar handles mounted horizontally parallel to the countertop edge. Each handle centered on its own individual door panel near the opening edge. ${LEGACY_KITCHEN_WET_ZONE_MARKER}, physically anchored lighting fixtures, clean lines, consistent materials, and high-end Rotpunkt kitchen design language.`
     );
   } else if (isLivingRoom) {
     sections.push(
@@ -1209,5 +1213,18 @@ export function buildPrompt({
       pipelineV2Enabled && budgetedModelPrompt.budgetExceeded,
     omittedModelSections: budgetedModelPrompt.omittedSections,
     qualityExpectations,
+  };
+}
+
+export function toGenerationRequestSpec(
+  result: PromptBuildResult
+): GenerationRequestSpec {
+  return {
+    prompt: result.prompt,
+    promptVersion: result.promptVersion,
+    qualityExpectations: result.qualityExpectations,
+    isKitchenRoom: result.isKitchenRoom,
+    modelSections: result.modelSections,
+    missingKeys: result.missingKeys,
   };
 }
