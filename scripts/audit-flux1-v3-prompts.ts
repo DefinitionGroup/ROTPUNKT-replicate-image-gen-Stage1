@@ -23,6 +23,12 @@ import {
   buildPrompt,
   toGenerationRequestSpec,
 } from "../components/wizard/promptBuilder";
+import {
+  buildValidatorChecks,
+  buildValidatorInstruction,
+  deriveVerdict,
+  parseValidatorOutput,
+} from "../lib/visionValidator";
 import { wizardSteps } from "../components/wizard/wizardSteps";
 import {
   BIRD_EYE_VIEWPOINT,
@@ -374,7 +380,105 @@ assert.doesNotMatch(
   /white Rotpunkt kitchen cabinet front|dark countertop|product photography/i
 );
 
+// Vision validator: the instruction follows the contract and the verdict is
+// derived from the hard checks, never trusted from the model.
+const validatorChecks = buildValidatorChecks(islandSpec.qualityExpectations);
+const validatorCheckIds = validatorChecks.map((c) => c.id);
+for (const id of [
+  "scene_type",
+  "sink_count",
+  "faucet_count",
+  "sink_location",
+  "cooktop_count",
+  "cooktop_location",
+  "island_count",
+  "camera_mode",
+  "handle_kind",
+]) {
+  assert(validatorCheckIds.includes(id), `validator must check ${id}`);
+}
+assert.equal(
+  validatorChecks.find((c) => c.id === "sink_location")?.expected,
+  "kitchen island"
+);
+assert.equal(validatorChecks.find((c) => c.id === "island_count")?.expected, 1);
+const validatorInstruction = buildValidatorInstruction(islandSpec.qualityExpectations);
+assert.match(validatorInstruction, /faucet_count: expected 1/);
+assert.match(validatorInstruction, /camera_mode \(soft\)/);
+assert.match(validatorInstruction, /Respond with exactly this JSON shape/);
+
+const interiorChecks = buildValidatorChecks(resetStateResult.qualityExpectations);
+assert.equal(interiorChecks.some((c) => c.id === "sink_count"), false);
+assert.equal(interiorChecks.some((c) => c.id === "island_count"), false);
+
+const hardIds = validatorChecks.filter((c) => c.hard).map((c) => c.id);
+const allPass = Object.fromEntries(
+  validatorCheckIds.map((id) => [
+    id,
+    { passed: true, observed: 1, expected: 1, note: null },
+  ])
+);
+assert.equal(deriveVerdict(allPass, hardIds), "pass");
+assert.equal(
+  deriveVerdict(
+    { ...allPass, faucet_count: { passed: false, observed: 2, expected: 1, note: "second tap" } },
+    hardIds
+  ),
+  "fail"
+);
+assert.equal(
+  deriveVerdict(
+    { ...allPass, camera_mode: { passed: false, observed: "plan view", expected: "x", note: null } },
+    hardIds
+  ),
+  "pass",
+  "soft checks never fail the image on their own"
+);
+assert.equal(
+  deriveVerdict(
+    { ...allPass, sink_count: { passed: null, observed: null, expected: 1, note: "occluded" } },
+    hardIds
+  ),
+  "uncertain"
+);
+
+const fencedOutput = [
+  "```json",
+  JSON.stringify({
+    verdict: "pass",
+    confidence: 0.91,
+    checks: Object.fromEntries(
+      validatorCheckIds.map((id) => [
+        id,
+        id === "faucet_count"
+          ? { passed: false, observed: 2, expected: 1, note: "A second tap stands next to the hob." }
+          : { passed: true, observed: 1, expected: 1, note: "" },
+      ])
+    ),
+    reasons: ["Two faucets visible."],
+  }),
+  "```",
+].join("\n");
+const parsedReport = parseValidatorOutput(fencedOutput, islandSpec.qualityExpectations);
+assert.equal(parsedReport.verdict, "fail", "a failed hard check overrides the model's own pass");
+assert.equal(parsedReport.modelVerdict, "pass");
+assert.equal(parsedReport.confidence, 0.91);
+assert.equal(parsedReport.checks.faucet_count?.observed, 2);
+assert.deepEqual(parsedReport.reasons, ["Two faucets visible."]);
+
+const garbageReport = parseValidatorOutput("I cannot help with that.", islandSpec.qualityExpectations);
+assert.equal(garbageReport.verdict, "uncertain");
+assert.equal(garbageReport.confidence, 0);
+assert.match(garbageReport.reasons[0] ?? "", /no parseable JSON/);
+
+const partialReport = parseValidatorOutput(
+  JSON.stringify({ verdict: "pass", confidence: 0.8, checks: { scene_type: { passed: true } }, reasons: [] }),
+  islandSpec.qualityExpectations
+);
+assert.equal(partialReport.verdict, "uncertain", "missing hard checks cannot pass");
+assert.match(partialReport.reasons.join(" "), /omitted hard checks/);
+
 console.table(rows);
 console.log(
-  `FLUX.1 V3 prompt audit passed (${rows.length} handle geometries, budget ${MODEL_PROMPT_WORD_BUDGET} words).`
+  `FLUX.1 V4 prompt audit passed (${rows.length} handle geometries, budget ${MODEL_PROMPT_WORD_BUDGET} words, validator contract checked).`
 );

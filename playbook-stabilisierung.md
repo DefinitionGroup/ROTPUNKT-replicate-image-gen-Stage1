@@ -1,7 +1,7 @@
 # Stabilisierung-Playbook: visuelle Qualitätsprüfung
 
 **Status:** geplant – Gate, Validator und Wiederholung sind noch nicht implementiert
-**Stand:** 3. September 2026 – Schritt 0 (Abschnitt 2a) und Schritt 1 (Abschnitt 2b) sind umgesetzt; die Abschnitte 4, 5, 7 und 9 wurden gegen den tatsächlichen Code-Stand korrigiert. Validator: Replicate-gehostetes Vision-Modell (Entscheidung vom 3. September 2026)
+**Stand:** 3. September 2026 – Schritt 0 (Abschnitt 2a), Schritt 1 (Abschnitt 2b) und Schritt 2, der Validator im Shadow Mode (Abschnitt 2c), sind umgesetzt; Enforce-Modus und Wiederholung stehen aus. Die Abschnitte 4, 5, 7 und 9 wurden gegen den tatsächlichen Code-Stand korrigiert. Validator: Replicate-gehostetes Vision-Modell (Entscheidung vom 3. September 2026)
 **Ziel:** Generierte Küchenbilder erst dann als gültig anzeigen und dauerhaft als Ergebnis speichern, wenn sie die fachlichen Bildregeln erfüllen. Das ergänzt das bestehende FLUX.1-dev-LoRA und vermeidet ein erneutes LoRA-Training.
 
 ## 1. Ausgangslage und Grundsatz
@@ -74,6 +74,20 @@ Diese Prüfung ist bewusst eng: Sie stellt nur sicher, dass Prompt und Vertrag d
 
 **Wortbudget.** Die Messung beim Umbau hat einen Altfehler sichtbar gemacht: Mit dem bisherigen Budget von 180 Wörtern belegten die Pflichtsektionen fast alles, sodass bei vier von fünf Griffgeometrien die Sektionen `lighting`, `floor` und `layout` stillschweigend entfielen – die gewählte Tageszeit und der Boden erreichten das Modell nicht. Das Budget liegt jetzt bei 240 Wörtern (FLUX.1-dev liest über T5 bis 512 Tokens); das Audit prüft seitdem, dass diese drei Sektionen bei allen Griffgeometrien im Prompt bleiben. Für den Validator heißt das: Bilder vor v4 dürfen bei Licht- und Bodenregeln nicht als Referenz dienen.
 
+## 2c. Schritt 2 (umgesetzt am 3. September 2026): Validator im Shadow Mode
+
+**Was läuft.** Mit `QUALITY_GATE_MODE=shadow` wird jedes erfolgreich persistierte Bild im Hintergrund vom Vision-Validator bewertet; die Auslieferung an den Nutzer ändert sich nicht. Der Aufruf hängt in der bestehenden Status-Route (`app/api/replicate/status/route.ts`) hinter Next.js `after()`, läuft also erst nach der Antwort und verzögert das Polling nicht. Nur der Poll, der die `images`-Zeile tatsächlich eingefügt hat, plant die Validierung; zusätzlich beansprucht `runShadowValidation` (`lib/qualityGate.ts`) zuerst atomar die Zeile in `generation_validation_attempts` (Unique auf Satz, Kandidat, Versuch) und ruft den Validator erst danach – doppelte Läufe und doppelte Kosten sind damit ausgeschlossen. Verträge vor v4 fallen durch den Type-Guard und werden nicht validiert.
+
+**Validator.** `lib/visionValidator.ts` baut aus dem Vertrag eine Prüfliste mit harten Checks (`scene_type`, `sink_count`, `faucet_count`, `sink_location`, `cooktop_count`, `cooktop_location`, `island_count`) und weichen Checks (`faucet_orientation`, `camera_mode`, `handle_kind`, `handle_containment`), verlangt striktes JSON und leitet das Urteil **serverseitig** aus den harten Checks ab: ein fehlgeschlagener harter Check ist `fail`, ein unentscheidbarer oder fehlender ist `uncertain`; das Urteil des Modells wird nur als `modelVerdict` mitgeschrieben. Die Modelle sind über eine Registry austauschbar (`QUALITY_GATE_VALIDATOR_MODEL`): `google/gemini-2.5-flash` (Standard), `anthropic/claude-4-sonnet`, `openai/gpt-4.1-mini`, alle auf Replicate mit dem vorhandenen Token; die Eingabefelder unterscheiden sich pro Modell und sind dort hinterlegt. Prompt-Version des Validators: `validator-v1`.
+
+**Daten.** Migration `scripts/supabase_add_generation_validation.sql` legt `generation_validation_attempts` an (additiv; Verdict, Konfidenz, Checks, Gründe, Laufzeit, Fehler, plus `human_verdict`/`human_note` für die Kalibrierung). Geschrieben wird mit dem Service-Role-Key (`createSupabaseServiceClient`), weil die Arbeit die Nutzeranfrage überlebt; Nutzer dürfen per RLS nur eigene Zeilen lesen. `images` bleibt unverändert.
+
+**Review-Oberfläche.** `/{locale}/quality-gate` (Clerk-Login, Allowlist `QUALITY_GATE_ADMIN_USER_IDS`, in Entwicklung jeder angemeldete Nutzer) zeigt die letzten Urteile mit Bild, Check-Tabelle, Gründen und Metadaten und erlaubt „richtig / falsch" plus Notiz pro Urteil. Diese Markierungen sind der Testsatz aus Abschnitt 10.
+
+**Einschalten.** 1. Migration in Supabase ausführen. 2. `SUPABASE_SERVICE_ROLE_KEY` muss auf dem Server gesetzt sein (ist es bereits für den Clerk-Webhook). 3. `QUALITY_GATE_MODE=shadow` setzen, optional `QUALITY_GATE_VALIDATOR_MODEL` und `QUALITY_GATE_ADMIN_USER_IDS`. Ausschalten: `off`, ohne Datenänderung. `enforce` ist erkannt, aber noch nicht implementiert und verhält sich wie `shadow` mit Warnung im Log.
+
+**Noch offen.** Enforce mit serverseitiger Wiederholung (Abschnitt 7), Statuswerte `validating`/`accepted`, Webhook/Queue (Abschnitt 5) und der Modellvergleich auf dem gelabelten Testsatz.
+
 ## 3. Zielarchitektur
 
 ```mermaid
@@ -132,7 +146,7 @@ Abgelehnte Kandidatdateien werden nicht dauerhaft als normale Galerie-Bilder gef
 **Daraus folgt für die Umsetzung:**
 
 - Vor jedem Validator-Aufruf wird zuerst atomar eine Zeile in `generation_validation_attempts` beansprucht (Unique auf `generation_set_id, attempt_number`). Nur der Aufruf, dessen Insert gelingt, ruft den Validator; alle anderen melden `validating`.
-- Erster Umsetzungsschritt ist der Validator innerhalb der bestehenden Status-Route mit diesem Claim. Das erreicht das Qualitätsziel ohne neue Infrastruktur.
+- Erster Umsetzungsschritt ist der Validator innerhalb der bestehenden Status-Route mit diesem Claim (umgesetzt, Abschnitt 2c). Das erreicht das Qualitätsziel ohne neue Infrastruktur.
 - Webhook und Queue folgen als Härtung gegen geschlossene Tabs und für längere Wiederholungsketten.
 
 Zielablauf:
@@ -244,4 +258,4 @@ Messgrößen:
 
 ## 12. Nicht Bestandteil dieses Schritts
 
-Umgesetzt sind Schritt 0 (Abschnitt 2a) und Schritt 1 (Abschnitt 2b). Datenbankmigration, Webhook, Worker, Validator-Aufruf, Wiederholung und Änderungen am LoRA sind weiterhin nicht Bestandteil. Das Playbook bleibt die technische Leitlinie, auf deren Basis die Implementierung in kleinen, rückrollbaren Schritten erfolgt.
+Umgesetzt sind Schritt 0 (Abschnitt 2a), Schritt 1 (Abschnitt 2b) und Schritt 2 (Abschnitt 2c, Shadow Mode inklusive Migration und Validator-Aufruf). Enforce-Modus, Wiederholung, Webhook, Queue und Änderungen am LoRA sind weiterhin nicht Bestandteil. Das Playbook bleibt die technische Leitlinie, auf deren Basis die Implementierung in kleinen, rückrollbaren Schritten erfolgt.

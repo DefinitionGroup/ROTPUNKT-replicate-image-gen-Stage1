@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { uploadImages } from "@/lib/minioClient";
 import { createSupabaseUserClient } from "@/lib/supabaseServer";
+import { getQualityGateMode, runShadowValidation } from "@/lib/qualityGate";
 import {
   isGenerationQualityExpectations,
   isGenerationVariantManifest,
@@ -132,6 +133,11 @@ async function finalizeVariant(params: {
   variant: GenerationVariantContext;
   userId: string;
   qualityExpectations: GenerationQualityExpectations | null;
+  // Fires once per candidate, only from the poll that actually inserted it.
+  onCandidatePersisted?: (
+    candidate: GenerationCandidate,
+    variant: GenerationVariantContext
+  ) => void;
 }): Promise<VariantResult> {
   const { supabase, set, variant, userId, qualityExpectations } = params;
   const existing = await getExistingCandidate(
@@ -217,7 +223,9 @@ async function finalizeVariant(params: {
     return { status: "failed", error: `Image insert failed: ${error.message}` };
   }
 
-  return { status: "succeeded", candidate: toCandidate(data as CandidateRow) };
+  const candidate = toCandidate(data as CandidateRow);
+  params.onCandidatePersisted?.(candidate, variant);
+  return { status: "succeeded", candidate };
 }
 
 export async function POST(req: NextRequest) {
@@ -268,6 +276,37 @@ export async function POST(req: NextRequest) {
       ? set.quality_expectations
       : null;
 
+    // Shadow mode: validate after the response is sent so delivery is not
+    // delayed; the attempt row's unique index keeps it to one run per candidate.
+    const gateMode = getQualityGateMode();
+    const scheduleValidation =
+      gateMode !== "off" && qualityExpectations
+        ? (candidate: GenerationCandidate, variant: GenerationVariantContext) => {
+            after(async () => {
+              try {
+                await runShadowValidation({
+                  mode: gateMode,
+                  requestId,
+                  set: {
+                    id: set.id,
+                    userId,
+                    seed: Number(set.seed),
+                    promptVersion: set.prompt_version,
+                  },
+                  variant,
+                  candidate,
+                  qualityExpectations,
+                });
+              } catch (validationError) {
+                console.error(
+                  `[${requestId}] quality-gate background task crashed:`,
+                  validationError
+                );
+              }
+            });
+          }
+        : undefined;
+
     const results = await Promise.all(
       set.prediction_manifest.map((variant) =>
         finalizeVariant({
@@ -276,6 +315,7 @@ export async function POST(req: NextRequest) {
           variant,
           userId,
           qualityExpectations,
+          onCandidatePersisted: scheduleValidation,
         })
       )
     );
