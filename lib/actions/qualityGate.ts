@@ -77,6 +77,10 @@ export async function listValidationAttempts(
     .limit(Math.min(Math.max(limit, 1), 200));
 
   if (error) {
+    // PGRST205: PostgREST does not know the table -> migration not applied yet.
+    if (error.code === "PGRST205") {
+      throw new Error("MIGRATION_MISSING");
+    }
     console.error("Error listing validation attempts:", error.message);
     throw new Error("Failed to load validation attempts");
   }

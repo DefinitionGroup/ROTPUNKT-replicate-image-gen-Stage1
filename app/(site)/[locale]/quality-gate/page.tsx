@@ -27,7 +27,16 @@ export default async function QualityGatePage({ params }: Props) {
     notFound();
   }
 
-  const attempts = await listValidationAttempts(60);
+  let attempts: Awaited<ReturnType<typeof listValidationAttempts>> = [];
+  let loadError: "migration_missing" | "failed" | null = null;
+  try {
+    attempts = await listValidationAttempts(60);
+  } catch (error) {
+    loadError =
+      error instanceof Error && error.message === "MIGRATION_MISSING"
+        ? "migration_missing"
+        : "failed";
+  }
   const counts = attempts.reduce<Record<string, number>>((acc, attempt) => {
     const key = attempt.verdict ?? "pending";
     acc[key] = (acc[key] ?? 0) + 1;
@@ -62,7 +71,22 @@ export default async function QualityGatePage({ params }: Props) {
         </dl>
       </header>
 
-      <QualityGateReview attempts={attempts} />
+      {loadError === "migration_missing" ? (
+        <div className="rounded-2xl border border-brand-primary-2/40 bg-card p-6 text-sm text-foreground">
+          <p className="font-medium">Die Tabelle <code>generation_validation_attempts</code> existiert noch nicht.</p>
+          <p className="mt-2 text-muted-foreground">
+            Führe <code>scripts/supabase_add_generation_validation.sql</code> im Supabase-SQL-Editor
+            aus und lade die Seite neu. Bis dahin werden keine Urteile gespeichert; die
+            Bildauslieferung ist davon nicht betroffen.
+          </p>
+        </div>
+      ) : loadError === "failed" ? (
+        <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+          Die Urteile konnten nicht geladen werden. Details stehen im Server-Log.
+        </div>
+      ) : (
+        <QualityGateReview attempts={attempts} />
+      )}
     </main>
   );
 }
