@@ -68,9 +68,12 @@ Keine Datenbankmigration nötig: Score und Auswahl liegen im `report`-JSON der A
 
 Mit dem vorhandenen Batch-Harness 30 Inselaufträge mit zwei Kandidaten erzeugen, alle Kandidaten mit `full` prüfen und offline beide Strategien simulieren: Wie oft wählt `best` einen Kandidaten mit richtiger Platzierung, den `first` verpasst hätte? Wie oft wählt `best` schlechter (z. B. weil Luna den Ort falsch liest, siehe den wahrscheinlichen Fehlurteil bei Satz `43cab866`)? Erst wenn `best` messbar öfter richtig als falsch umentscheidet, wird `QUALITY_GATE_SELECTION=best` empfohlen.
 
-## 6. Offene Entscheidungen
+## 6. Entscheidungen
 
-- Sollen die Gewichte für Rotpunkt anders liegen – etwa Grifftyp höher als Kochfeld-Ort, weil die Produktidentität wichtiger ist als die Küchenplanung?
+**Entschieden (3. September 2026):** Kochfeld-Ort wiegt schwerer als Grifftyp. Die Gewichte aus Abschnitt 2 bleiben: Platzierung (Spüle, Kochfeld, Insel) je 3, Grifftyp und Kamera je 2, Details je 1.
+
+Offen:
+
 - Soll bei drei Kandidaten weiterhin auf alle gewartet werden, oder reicht „zwei bestanden, den besseren nehmen“ als Abbruchkriterium?
 - Sollen nicht gewählte, aber bestandene Kandidaten dem Nutzer später als Alternative angeboten werden (Galerie „weitere Varianten“) statt verworfen zu werden?
 - Ab wann kippt die Strenge von `counts` auf `full`, sodass Platzierung nicht mehr nur ein Score, sondern eine Bedingung ist?
