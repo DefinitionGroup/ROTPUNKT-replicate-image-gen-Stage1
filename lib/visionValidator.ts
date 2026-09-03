@@ -76,6 +76,16 @@ const geminiInput: ValidatorModelSpec["buildInput"] = ({ imageUrl, instruction, 
   max_output_tokens: 4096,
 });
 
+// Gemini 3 thinks by default and its thinking tokens count against
+// max_output_tokens; 4096 left a truncated JSON (verified 2026-09-03).
+const gemini3Input: ValidatorModelSpec["buildInput"] = ({ imageUrl, instruction, system }) => ({
+  images: [imageUrl],
+  prompt: instruction,
+  system_instruction: system,
+  temperature: 0,
+  max_output_tokens: 16384,
+});
+
 // Replicate downscales the image before sending it to Claude; keep the full
 // 1 MP render so small fixtures at the frame edge stay countable.
 const claudeInput: ValidatorModelSpec["buildInput"] = ({ imageUrl, instruction, system }) => ({
@@ -108,8 +118,8 @@ const VALIDATOR_MODELS: Record<string, ValidatorModelSpec> = {
   // thinking_budget: 0 makes Gemini 2.5 stop after ~100 output tokens on
   // Replicate (verified 2026-09-03), so thinking is left at its default.
   "google/gemini-2.5-flash": { buildInput: geminiInput },
-  "google/gemini-3-flash": { buildInput: geminiInput },
-  "google/gemini-3.1-pro": { buildInput: geminiInput },
+  "google/gemini-3-flash": { buildInput: gemini3Input },
+  "google/gemini-3.1-pro": { buildInput: gemini3Input },
   "anthropic/claude-4-sonnet": { buildInput: claudeInput },
   "anthropic/claude-sonnet-4.6": { buildInput: claudeInput },
   "anthropic/claude-sonnet-5": { buildInput: claudeInput },
@@ -399,7 +409,7 @@ export function parseValidatorOutput(
           const position =
             typeof raw.position === "string" ? raw.position.slice(0, 120) : "";
           // Some models enumerate an absence ("no cooktop visible"); that is not a fixture.
-          if (/\b(none|no\b|not visible|absent|missing|nicht)/i.test(position)) {
+          if (/\b(none|no\b|not (?:clearly )?visible|absent|missing|cannot confirm|nicht)/i.test(position)) {
             return null;
           }
           return { type, position };
