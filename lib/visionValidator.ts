@@ -8,9 +8,10 @@ import type {
 
 export const VALIDATOR_PROMPT_VERSION = "validator-v2" as const;
 // On the first real two-sink image (2026-09-03) Gemini 2.5 Flash and Claude 4
-// Sonnet missed the second sink; Gemini 3 Flash, GPT-5.2, Claude Sonnet 5 and
-// GPT-4.1 mini caught it. Gemini 3 Flash is the fastest of those.
-export const DEFAULT_VALIDATOR_MODEL = "google/gemini-3-flash";
+// Sonnet missed the second sink; GPT-5.6 Luna, Gemini 3 Flash, GPT-5.2, Claude
+// Sonnet 5 and GPT-4.1 mini caught it. Luna gave the most complete report
+// (positions, handles, island) at ~12 s; Gemini 3 Flash is the fastest alternative.
+export const DEFAULT_VALIDATOR_MODEL = "openai/gpt-5.6-luna";
 const VALIDATOR_TIMEOUT_MS = 90_000;
 const RAW_TEXT_LIMIT = 4_000;
 
@@ -115,6 +116,7 @@ const VALIDATOR_MODELS: Record<string, ValidatorModelSpec> = {
   "openai/gpt-4.1-mini": { buildInput: gpt41Input },
   "openai/gpt-5-mini": { buildInput: gpt5Input },
   "openai/gpt-5.2": { buildInput: gpt5Input },
+  "openai/gpt-5.6-luna": { buildInput: gpt5Input },
 };
 
 export const SUPPORTED_VALIDATOR_MODELS = Object.keys(VALIDATOR_MODELS);
