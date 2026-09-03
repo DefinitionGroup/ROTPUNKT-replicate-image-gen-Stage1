@@ -3,17 +3,23 @@ import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { createSupabaseUserClient } from "@/lib/supabaseServer";
 import {
-  ACTIVE_LORA_SCALES,
   DEFAULT_GENERATION_SEED,
+  LORA_GENERATION_SCALE,
   PROMPT_VERSION,
+  candidateSeeds,
   findPromptContractMismatch,
   isGenerationQualityExpectations,
+  isGenerationVariantManifest,
   normalizeGenerationSeed,
   withLoraTrigger,
   type GenerationSetContext,
   type GenerationVariantContext,
   type PromptVersion,
 } from "@/lib/imageGenerationContract";
+import {
+  getQualityGateCandidateCount,
+  getQualityGateMode,
+} from "@/lib/qualityGate";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
@@ -59,6 +65,7 @@ export async function POST(req: NextRequest) {
       seed: requestedSeed,
       promptVersion: requestedPromptVersion,
       qualityExpectations: requestedQualityExpectations,
+      previousGenerationSetId,
     } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
@@ -75,9 +82,29 @@ export async function POST(req: NextRequest) {
       getToken({ template: "supabase" })
     );
     generationSetId = crypto.randomUUID();
-    const seed = isDev
+    let seed = isDev
       ? normalizeGenerationSeed(requestedSeed)
       : DEFAULT_GENERATION_SEED;
+    // A retry continues the deterministic seed sequence instead of
+    // reproducing the very same image.
+    if (typeof previousGenerationSetId === "string" && previousGenerationSetId) {
+      const { data: previous } = await supabase
+        .from("generation_sets")
+        .select("seed, prediction_manifest")
+        .eq("id", previousGenerationSetId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (previous) {
+        const manifest = isGenerationVariantManifest(previous.prediction_manifest)
+          ? previous.prediction_manifest
+          : [];
+        const usedSeeds = [
+          Number(previous.seed),
+          ...manifest.map((variant) => variant.seed ?? Number(previous.seed)),
+        ];
+        seed = normalizeGenerationSeed(Math.max(...usedSeeds) + 1);
+      }
+    }
     const promptVersion = normalizePromptVersion(requestedPromptVersion);
     if (!isGenerationQualityExpectations(requestedQualityExpectations)) {
       return NextResponse.json(
@@ -101,6 +128,11 @@ export async function POST(req: NextRequest) {
     }
     const finalPrompt = withLoraTrigger(prompt);
     const now = new Date().toISOString();
+    // Enforce mode races several candidates so the validator can pick one.
+    const gateMode = getQualityGateMode();
+    const candidateCount =
+      gateMode === "enforce" ? getQualityGateCandidateCount() : 1;
+    const seeds = candidateSeeds(seed, candidateCount);
 
     const { error: setInsertError } = await supabase
       .from("generation_sets")
@@ -113,7 +145,7 @@ export async function POST(req: NextRequest) {
         model_version: MODEL_VERSION,
         guidance_scale: GUIDANCE_SCALE,
         num_inference_steps: NUM_INFERENCE_STEPS,
-        requested_lora_scales: [...ACTIVE_LORA_SCALES],
+        requested_lora_scales: seeds.map(() => LORA_GENERATION_SCALE),
         quality_expectations: qualityExpectations,
         status: "starting",
         updated_at: now,
@@ -124,7 +156,7 @@ export async function POST(req: NextRequest) {
     }
 
     const starts = await Promise.allSettled(
-      ACTIVE_LORA_SCALES.map((loraScale, candidateIndex) =>
+      seeds.map((variantSeed, candidateIndex) =>
         withTimeout(
           replicate.predictions.create({
             version: MODEL_VERSION,
@@ -133,27 +165,28 @@ export async function POST(req: NextRequest) {
               go_fast: false,
               guidance_scale: GUIDANCE_SCALE,
               megapixels: "1",
-              lora_scale: loraScale,
+              lora_scale: LORA_GENERATION_SCALE,
               aspect_ratio: "16:9",
               output_format: "webp",
               output_quality: 80,
-              seed,
+              seed: variantSeed,
               num_inference_steps: NUM_INFERENCE_STEPS,
               num_outputs: 1,
             },
           }).then((prediction) => {
             if (!prediction.id) {
-              throw new Error(`No prediction id for LoRA ${loraScale}`);
+              throw new Error(`No prediction id for candidate ${candidateIndex}`);
             }
             return {
               predictionId: prediction.id,
               status: prediction.status ?? "starting",
               candidateIndex,
-              loraScale,
+              loraScale: LORA_GENERATION_SCALE,
+              seed: variantSeed,
             } satisfies GenerationVariantContext;
           }),
           START_TIMEOUT_MS,
-          `Replicate prediction start for LoRA ${loraScale}`
+          `Replicate prediction start for candidate ${candidateIndex}`
         )
       )
     );
@@ -162,7 +195,7 @@ export async function POST(req: NextRequest) {
       result.status === "fulfilled" ? [result.value] : []
     );
 
-    if (variants.length !== ACTIVE_LORA_SCALES.length) {
+    if (variants.length !== seeds.length) {
       await Promise.allSettled(
         variants.map((variant) =>
           replicate.predictions.cancel(variant.predictionId)
@@ -212,12 +245,12 @@ export async function POST(req: NextRequest) {
 
     if (isDev) {
       console.log(
-        `[${requestId}] Started generation set ${generationSetId} with LoRA ${ACTIVE_LORA_SCALES[0]} and seed ${seed}`
+        `[${requestId}] Started generation set ${generationSetId} (${gateMode}) with seeds ${seeds.join(", ")}`
       );
     }
 
     return NextResponse.json(
-      { generationSet, qualityExpectations },
+      { generationSet, qualityExpectations, gateMode, candidateCount: seeds.length },
       { status: 202 }
     );
   } catch (error) {

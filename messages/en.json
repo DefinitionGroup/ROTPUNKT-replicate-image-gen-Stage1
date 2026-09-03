@@ -293,6 +293,7 @@
     },
     "loading": {
       "messages": {
+        "validating": "Checking the configuration\u2026",
         "generating": "Generating your visualisation...",
         "aiWorking": "The AI is working on your design...",
         "takingLonger": "This is taking a bit longer today – please be patient...",
@@ -305,6 +306,7 @@
         "neverGiveUp": "Just one more moment – we won't give up! 💪"
       },
       "subMessages": {
+        "validating": "A vision model verifies sink, cooktop and layout before the image is shown.",
         "usually30s": "The image is usually generated within 30 seconds.",
         "highLoad": "During high load, it can take up to 1-2 minutes.",
         "warmingUp": "Sometimes the AI model needs to warm up first.",
@@ -316,6 +318,7 @@
     },
     "error": {
       "title": "Something went wrong",
+      "qualityFailed": "No image matched the chosen configuration. Please try again \u2013 the next attempt uses fresh variants.",
       "unknown": "An unknown error occurred.",
       "aborted": "The request was aborted.",
       "retry": "Try again"

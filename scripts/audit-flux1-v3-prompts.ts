@@ -6,6 +6,7 @@ import {
   LORA_GENERATION_SCALE,
   MODEL_PROMPT_WORD_BUDGET,
   PROMPT_VERSION,
+  candidateSeeds,
   findPromptContractMismatch,
   isGenerationVariantManifest,
   normalizeGenerationSeed,
@@ -63,6 +64,32 @@ assert.equal(
     },
   ]),
   true
+);
+// Enforce mode: 1..3 parallel candidates with their own seeds.
+assert.deepEqual(candidateSeeds(260805, 2), [260805, 260806]);
+assert.deepEqual(candidateSeeds(260805, 9), [260805, 260806, 260807]);
+assert.equal(
+  isGenerationVariantManifest(
+    [0, 1].map((candidateIndex) => ({
+      predictionId: `parallel-${candidateIndex}`,
+      status: "starting",
+      candidateIndex,
+      loraScale: 0.85,
+      seed: 260805 + candidateIndex,
+    }))
+  ),
+  true
+);
+assert.equal(
+  isGenerationVariantManifest(
+    [0, 1, 2, 3].map((candidateIndex) => ({
+      predictionId: `too-many-${candidateIndex}`,
+      status: "starting",
+      candidateIndex,
+      loraScale: 0.85,
+    }))
+  ),
+  false
 );
 assert.equal(
   isGenerationVariantManifest(

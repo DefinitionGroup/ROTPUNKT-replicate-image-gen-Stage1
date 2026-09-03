@@ -293,6 +293,7 @@
     },
     "loading": {
       "messages": {
+        "validating": "Konfiguration wird geprüft …",
         "generating": "Ich generiere gerade deine Visualisierung...",
         "aiWorking": "Die KI arbeitet an deinem Design...",
         "takingLonger": "Das dauert heute etwas länger – bitte hab noch einen Moment Geduld...",
@@ -305,6 +306,7 @@
         "neverGiveUp": "Noch einen kleinen Moment – wir geben nicht auf! 💪"
       },
       "subMessages": {
+        "validating": "Ein Prüfmodell kontrolliert Spüle, Kochfeld und Aufteilung, bevor das Bild erscheint.",
         "usually30s": "Das Bild wird in aller Regel innerhalb von 30\u00A0s generiert.",
         "highLoad": "Bei hoher Auslastung kann es bis zu 1-2 Minuten dauern.",
         "warmingUp": "Manchmal muss das KI-Modell erst aufgewärmt werden.",
@@ -316,6 +318,7 @@
     },
     "error": {
       "title": "Etwas ist schiefgelaufen",
+      "qualityFailed": "Es konnte kein Bild erzeugt werden, das die gewählte Konfiguration erfüllt. Bitte erneut versuchen – der nächste Versuch nutzt neue Varianten.",
       "unknown": "Ein unbekannter Fehler ist aufgetreten.",
       "aborted": "Die Anfrage wurde abgebrochen.",
       "retry": "Erneut versuchen"

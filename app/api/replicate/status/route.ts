@@ -3,10 +3,20 @@ import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { uploadImages } from "@/lib/minioClient";
 import { createSupabaseUserClient } from "@/lib/supabaseServer";
-import { getQualityGateMode, runShadowValidation } from "@/lib/qualityGate";
+import {
+  attachImageToAttempt,
+  getQualityGateMode,
+  isQualityGateFailOpen,
+  readValidationAttempt,
+  runEnforceValidation,
+  runShadowValidation,
+  type QualityGateMode,
+} from "@/lib/qualityGate";
+import { resolveValidatorModel } from "@/lib/visionValidator";
 import {
   isGenerationQualityExpectations,
   isGenerationVariantManifest,
+  type CandidateQualityStatus,
   type GenerationCandidate,
   type GenerationQualityExpectations,
   type GenerationSetStatus,
@@ -41,7 +51,17 @@ type CandidateRow = {
   candidate_index: number;
   lora_scale: number;
   is_selected_best: boolean;
+  generation_metadata?: unknown;
 };
+
+type GateConfig = {
+  mode: QualityGateMode;
+  validatorModel: string;
+  failOpen: boolean;
+};
+
+const CANDIDATE_COLUMNS =
+  "id, url, generation_set_id, candidate_index, lora_scale, is_selected_best, generation_metadata";
 
 type VariantResult = {
   status: string;
@@ -93,6 +113,10 @@ function toErrorMessage(error: unknown): string {
 }
 
 function toCandidate(row: CandidateRow): GenerationCandidate {
+  const stored = (row.generation_metadata as { qualityStatus?: unknown } | null)
+    ?.qualityStatus;
+  const status: CandidateQualityStatus =
+    stored === "accepted" || stored === "rejected" ? stored : "not_evaluated";
   return {
     imageId: row.id,
     generationSetId: row.generation_set_id,
@@ -101,7 +125,7 @@ function toCandidate(row: CandidateRow): GenerationCandidate {
     loraScale: Number(row.lora_scale) as GenerationCandidate["loraScale"],
     isSelectedBest: row.is_selected_best,
     quality: {
-      status: "not_evaluated",
+      status,
       reasons: [],
     },
   };
@@ -115,9 +139,7 @@ async function getExistingCandidate(
 ): Promise<GenerationCandidate | null> {
   const { data, error } = await supabase
     .from("images")
-    .select(
-      "id, url, generation_set_id, candidate_index, lora_scale, is_selected_best"
-    )
+    .select(CANDIDATE_COLUMNS)
     .eq("generation_set_id", setId)
     .eq("candidate_index", candidateIndex)
     .eq("user_id", userId)
@@ -133,13 +155,16 @@ async function finalizeVariant(params: {
   variant: GenerationVariantContext;
   userId: string;
   qualityExpectations: GenerationQualityExpectations | null;
+  requestId: string;
+  gate: GateConfig;
   // Fires once per candidate, only from the poll that actually inserted it.
   onCandidatePersisted?: (
     candidate: GenerationCandidate,
     variant: GenerationVariantContext
   ) => void;
 }): Promise<VariantResult> {
-  const { supabase, set, variant, userId, qualityExpectations } = params;
+  const { supabase, set, variant, userId, qualityExpectations, requestId, gate } =
+    params;
   const existing = await getExistingCandidate(
     supabase,
     set.id,
@@ -182,6 +207,64 @@ async function finalizeVariant(params: {
     );
   }
 
+  // Enforce mode: the candidate is validated before it becomes an image row.
+  // The poll that finds no attempt claims it and validates in the background;
+  // later polls read the verdict.
+  let qualityStatus: CandidateQualityStatus = "not_evaluated";
+  let attemptId: string | null = null;
+  const enforce = gate.mode === "enforce" && qualityExpectations !== null;
+  if (enforce && qualityExpectations) {
+    const attempt = await readValidationAttempt(
+      set.id,
+      variant.candidateIndex,
+      gate.validatorModel
+    );
+    if (!attempt) {
+      const candidateUrl = finalUrl;
+      after(async () => {
+        try {
+          await runEnforceValidation({
+            requestId,
+            set: {
+              id: set.id,
+              userId,
+              seed: Number(set.seed),
+              promptVersion: set.prompt_version,
+            },
+            variant,
+            candidateUrl,
+            qualityExpectations,
+            model: gate.validatorModel,
+          });
+        } catch (validationError) {
+          console.error(
+            `[${requestId}] quality-gate enforce task crashed:`,
+            validationError
+          );
+        }
+      });
+      return { status: "validating" };
+    }
+    if (attempt.verdict === null) return { status: "validating" };
+    if (attempt.verdict === "pass") {
+      qualityStatus = "accepted";
+      attemptId = attempt.id;
+    } else if (attempt.verdict === "error" && gate.failOpen) {
+      console.warn(
+        `[${requestId}] quality-gate: validator error on set ${set.id}, delivering unevaluated (fail-open)`
+      );
+      attemptId = attempt.id;
+    } else {
+      return {
+        status: "rejected",
+        error:
+          attempt.reasons.join("; ") ||
+          attempt.error ||
+          `Validator verdict: ${attempt.verdict}`,
+      };
+    }
+  }
+
   const { data, error } = await supabase
     .from("images")
     .insert({
@@ -193,19 +276,17 @@ async function finalizeVariant(params: {
       candidate_index: variant.candidateIndex,
       generation_metadata: {
         promptVersion: set.prompt_version,
-        seed: Number(set.seed),
+        seed: variant.seed ?? Number(set.seed),
         modelVersion: set.model_version,
         guidanceScale: Number(set.guidance_scale),
         loraScale: variant.loraScale,
         numInferenceSteps: set.num_inference_steps,
         predictionId: variant.predictionId,
-        qualityStatus: "not_evaluated",
+        qualityStatus,
         qualityExpectations,
       },
     })
-    .select(
-      "id, url, generation_set_id, candidate_index, lora_scale, is_selected_best"
-    )
+    .select(CANDIDATE_COLUMNS)
     .single();
 
   if (error) {
@@ -224,7 +305,8 @@ async function finalizeVariant(params: {
   }
 
   const candidate = toCandidate(data as CandidateRow);
-  params.onCandidatePersisted?.(candidate, variant);
+  if (attemptId) await attachImageToAttempt(attemptId, candidate.imageId);
+  if (!enforce) params.onCandidatePersisted?.(candidate, variant);
   return { status: "succeeded", candidate };
 }
 
@@ -278,14 +360,18 @@ export async function POST(req: NextRequest) {
 
     // Shadow mode: validate after the response is sent so delivery is not
     // delayed; the attempt row's unique index keeps it to one run per candidate.
-    const gateMode = getQualityGateMode();
+    const gate: GateConfig = {
+      mode: getQualityGateMode(),
+      validatorModel: resolveValidatorModel(),
+      failOpen: isQualityGateFailOpen(),
+    };
     const scheduleValidation =
-      gateMode !== "off" && qualityExpectations
+      gate.mode === "shadow" && qualityExpectations
         ? (candidate: GenerationCandidate, variant: GenerationVariantContext) => {
             after(async () => {
               try {
                 await runShadowValidation({
-                  mode: gateMode,
+                  mode: "shadow",
                   requestId,
                   set: {
                     id: set.id,
@@ -315,6 +401,8 @@ export async function POST(req: NextRequest) {
           variant,
           userId,
           qualityExpectations,
+          requestId,
+          gate,
           onCandidatePersisted: scheduleValidation,
         })
       )
@@ -329,17 +417,50 @@ export async function POST(req: NextRequest) {
       (result) =>
         result.status === "starting" || result.status === "processing"
     );
+    const hasValidating = results.some(
+      (result) => result.status === "validating"
+    );
     const hasFailure = results.some(
       (result) =>
         result.status === "failed" || result.status === "canceled"
     );
-    const status: GenerationSetStatus = allSucceeded
-      ? "succeeded"
-      : hasRunning
-        ? "processing"
-        : hasFailure && candidates.length > 0
-          ? "partial_failed"
-          : "failed";
+    const rejectedCount = results.filter(
+      (result) => result.status === "rejected"
+    ).length;
+    const enforce = gate.mode === "enforce" && qualityExpectations !== null;
+
+    let status: GenerationSetStatus;
+    if (enforce) {
+      // One accepted candidate is enough; everything else only costs money.
+      status =
+        candidates.length > 0
+          ? "succeeded"
+          : hasRunning || hasValidating
+            ? "processing"
+            : "failed";
+      if (status === "succeeded") {
+        const stillRunning = set.prediction_manifest.filter((_, index) => {
+          const s = results[index]?.status;
+          return s === "starting" || s === "processing";
+        });
+        if (stillRunning.length > 0) {
+          void Promise.allSettled(
+            stillRunning.map((variant) =>
+              replicate.predictions.cancel(variant.predictionId)
+            )
+          );
+        }
+      }
+    } else {
+      status = allSucceeded
+        ? "succeeded"
+        : hasRunning
+          ? "processing"
+          : hasFailure && candidates.length > 0
+            ? "partial_failed"
+            : "failed";
+    }
+    const qualityFailure = enforce && status === "failed" && rejectedCount > 0;
     const errors = results.flatMap((result) =>
       result.error ? [result.error] : []
     );
@@ -359,6 +480,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       generationSetId,
       status,
+      phase:
+        candidates.length === 0 && hasValidating && !hasRunning
+          ? "validating"
+          : "generating",
+      gateMode: gate.mode,
+      qualityFailure,
+      rejectedCount,
       candidates,
       selectedImageId: set.selected_image_id,
       qualityExpectations,

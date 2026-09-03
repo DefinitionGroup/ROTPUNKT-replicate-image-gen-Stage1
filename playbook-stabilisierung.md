@@ -1,7 +1,7 @@
 # Stabilisierung-Playbook: visuelle Qualitätsprüfung
 
 **Status:** in Umsetzung – Shadow Mode läuft im Code, Enforce-Modus und Wiederholung stehen aus
-**Stand:** 3. September 2026 – Schritt 0 (Abschnitt 2a), Schritt 1 (Abschnitt 2b) und Schritt 2, der Validator im Shadow Mode (Abschnitt 2c), sind umgesetzt; Enforce-Modus und Wiederholung stehen aus. Die Abschnitte 4, 5, 7 und 9 wurden gegen den tatsächlichen Code-Stand korrigiert. Validator: Replicate-gehostetes Vision-Modell (Entscheidung vom 3. September 2026)
+**Stand:** 3. September 2026 – Schritt 0 (Abschnitt 2a), Schritt 1 (Abschnitt 2b), Schritt 2, der Validator im Shadow Mode (Abschnitt 2c), und Schritt 3, der Enforce-Modus mit parallelen Kandidaten (Abschnitt 2d), sind umgesetzt; Inpainting-Reparatur und Nachtraining stehen aus. Die Abschnitte 4, 5, 7 und 9 wurden gegen den tatsächlichen Code-Stand korrigiert. Validator: Replicate-gehostetes Vision-Modell (Entscheidung vom 3. September 2026)
 **Ziel:** Generierte Küchenbilder erst dann als gültig anzeigen und dauerhaft als Ergebnis speichern, wenn sie die fachlichen Bildregeln erfüllen. Das ergänzt das bestehende FLUX.1-dev-LoRA und vermeidet ein erneutes LoRA-Training.
 
 ## 1. Ausgangslage und Grundsatz
@@ -101,6 +101,20 @@ Diese Prüfung ist bewusst eng: Sie stellt nur sicher, dass Prompt und Vertrag d
 **Einschalten.** 1. Migration in Supabase ausführen. 2. `SUPABASE_SERVICE_ROLE_KEY` muss auf dem Server gesetzt sein (ist es bereits für den Clerk-Webhook). 3. `QUALITY_GATE_MODE=shadow` setzen; für die Kalibrierung `QUALITY_GATE_VALIDATOR_MODELS=openai/gpt-5.6-luna,google/gemini-3-flash`, sonst optional `QUALITY_GATE_VALIDATOR_MODEL`; dazu `QUALITY_GATE_ADMIN_USER_IDS`. Ausschalten: `off`, ohne Datenänderung. `enforce` ist erkannt, aber noch nicht implementiert und verhält sich wie `shadow` mit Warnung im Log.
 
 **Noch offen.** Enforce mit serverseitiger Wiederholung (Abschnitt 7), Statuswerte `validating`/`accepted`, Webhook/Queue (Abschnitt 5) und der Modellvergleich auf dem gelabelten Testsatz.
+
+## 2d. Schritt 3 (umgesetzt am 3. September 2026): Enforce-Modus mit parallelen Kandidaten
+
+**Ablauf.** Mit `QUALITY_GATE_MODE=enforce` startet `POST /api/replicate` pro Auftrag `QUALITY_GATE_CANDIDATES` Kandidaten parallel (Standard 2, höchstens 3, weil `images.candidate_index` 0–2 erlaubt) mit den Seeds `seed`, `seed + 1`, … aus `candidateSeeds`; jeder Kandidat trägt seinen Seed im `prediction_manifest`. Die Status-Route lädt jeden fertigen Kandidaten nach MinIO, legt aber **keine** `images`-Zeile an, sondern liest die Attempt-Zeile für (Satz, Kandidat, Versuch 1, Validator): keine Zeile → der Poll beansprucht sie und startet die Luna-Prüfung per `after()`, Antwort `validating`; Urteil `null` → weiter `validating`; `pass` → jetzt wird das Bild mit `qualityStatus: "accepted"` gespeichert und ausgeliefert, die Attempt-Zeile erhält die `image_id`; `fail` oder `uncertain` → `rejected`, kein Bild. Sobald ein Kandidat angenommen ist, gilt der Satz als `succeeded`, und noch laufende Vorhersagen werden abgebrochen. Sind alle Kandidaten abgelehnt, ist der Satz `failed` mit `qualityFailure: true`; die UI zeigt „Es konnte kein Bild erzeugt werden, das die gewählte Konfiguration erfüllt“ und einen Wiederholen-Knopf.
+
+**Wiederholung = Fortsetzung der Seed-Folge.** Der Client schickt bei „Erneut versuchen“ die `previousGenerationSetId`; der Server setzt den Seed hinter den höchsten bereits genutzten Seed dieses Satzes (bei zwei Kandidaten also 260807, 260808). Das gilt in jedem Modus – auch in Produktion ohne Gate erzeugt der Knopf damit erstmals ein anderes Bild statt desselben.
+
+**Validator-Ausfall.** `QUALITY_GATE_FAIL_OPEN` (Standard `true`): Meldet Luna einen technischen Fehler (nicht ein Urteil), wird das Bild unbewertet ausgeliefert, damit ein Validator-Ausfall nicht alle Nutzer blockiert; `false` behandelt den Fehler wie eine Ablehnung. Im Enforce-Modus zählt ausschließlich `QUALITY_GATE_VALIDATOR_MODEL` (Luna); die Modellliste für den Shadow-Vergleich wird dort nicht verwendet. Sätze mit Verträgen vor v4 werden im Enforce-Modus nicht geprüft und wie bisher ausgeliefert.
+
+**UI-Zustände.** `phase: "validating"` in der Statusantwort schaltet den Ladetext auf „Konfiguration wird geprüft …“; angenommene Kandidaten tragen `quality.status: "accepted"` und werden vom Client bevorzugt. Erwartete Wartezeit bis zum ersten Bild: Generierung (parallel, ca. 20 s) plus eine Luna-Prüfung (ca. 10 s), also rund 30–35 s statt bisher rund 20 s; Kosten pro Auftrag: N Generierungen plus bis zu N Prüfungen.
+
+**Verifiziert.** Audit (Seed-Folge, Manifeste mit 1–3 Kandidaten), TypeScript, Produktionsbuild, und ein echter Durchlauf des Claim-/Prüf-/Lese-/Zuordnungszyklus gegen die Datenbank mit Luna. Ein Ende-zu-Ende-Test über die Oberfläche steht noch aus, weil er den Dev-Server mit `QUALITY_GATE_MODE=enforce` braucht.
+
+**Noch offen.** Abgelehnte Kandidatdateien bleiben vorerst in MinIO (Löschfrist, Abschnitt 9); die Statuswerte `validating`/`accepted` werden auf `processing`/`succeeded` abgebildet, bis die CHECK-Constraint erweitert ist; Inpainting-Reparatur für lokale Fehler und LoRA-Nachtraining für die Inselaufteilung (Abschnitt 2c) sind die nächsten Hebel.
 
 ## 3. Zielarchitektur
 

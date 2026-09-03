@@ -35,6 +35,8 @@ interface StartGenerationResponse {
 
 interface StatusGenerationResponse {
   status: string;
+  phase?: "generating" | "validating";
+  qualityFailure?: boolean;
   candidates?: GenerationCandidate[];
   generationSetId: string;
   selectedImageId?: string | null;
@@ -47,6 +49,7 @@ interface StartGenerationParams {
   seed: number;
   promptVersion: PromptVersion;
   qualityExpectations: GenerationQualityExpectations;
+  previousGenerationSetId?: string | null;
   signal: AbortSignal;
 }
 
@@ -58,6 +61,8 @@ interface PollGenerationParams {
 interface StartGenerationMutationParams {
   spec: GenerationRequestSpec;
   seed: number;
+  // A retry continues the server-side seed sequence of this set.
+  previousGenerationSetId?: string | null;
 }
 
 async function startGenerationApi({
@@ -65,6 +70,7 @@ async function startGenerationApi({
   seed,
   promptVersion,
   qualityExpectations,
+  previousGenerationSetId,
   signal,
 }: StartGenerationParams): Promise<StartGenerationResponse> {
   const res = await fetch("/api/replicate", {
@@ -73,6 +79,7 @@ async function startGenerationApi({
       seed,
       promptVersion,
       qualityExpectations,
+      previousGenerationSetId: previousGenerationSetId ?? undefined,
     }),
     method: "POST",
     headers: {
@@ -152,7 +159,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     Error,
     StartGenerationMutationParams
   >({
-    mutationFn: async ({ spec: generationSpec, seed }) => {
+    mutationFn: async ({ spec: generationSpec, seed, previousGenerationSetId }) => {
       if (isDev) console.log("[ImageGenerator] Starting generation...");
       const controller = new AbortController();
       const data = await startGenerationApi({
@@ -160,6 +167,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         seed,
         promptVersion: generationSpec.promptVersion,
         qualityExpectations: generationSpec.qualityExpectations,
+        previousGenerationSetId,
         signal: controller.signal,
       });
       if (isDev) console.log("[ImageGenerator] Prediction started:", data);
@@ -200,10 +208,15 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     if (statusData.status !== "succeeded") return;
     if (!Array.isArray(statusData.candidates) || statusData.candidates.length === 0) return;
 
+    // Enforce mode delivers validated candidates first.
     const strongestCandidate =
       statusData.candidates.find(
+        (candidate) => candidate.quality.status === "accepted"
+      ) ??
+      statusData.candidates.find(
         (candidate) => candidate.loraScale === LORA_GENERATION_SCALE
-      ) ?? statusData.candidates[0];
+      ) ??
+      statusData.candidates[0];
     setGeneratedImage(strongestCandidate);
     setCompletedSpec((current) => spec ?? current);
     // Clear the spec to avoid accidental regeneration on remount.
@@ -211,14 +224,15 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   }, [spec, statusData]);
 
   const handleRetry = useCallback(() => {
+    const previousGenerationSetId = generationSetId;
     resetMutation();
     setGenerationSetId(null);
     setGeneratedImage(null);
 
     if (!spec) return;
     hasTriggered.current = spec.prompt;
-    startGeneration({ spec, seed: generationSeed });
-  }, [generationSeed, spec, resetMutation, startGeneration]);
+    startGeneration({ spec, seed: generationSeed, previousGenerationSetId });
+  }, [generationSeed, generationSetId, spec, resetMutation, startGeneration]);
 
   const handleDevRegenerate = useCallback(() => {
     const specToRegenerate = completedSpec ?? spec;
@@ -255,7 +269,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         (status === undefined || status === "starting" || status === "processing")));
   const errorMessage =
     isTerminalFailure
-      ? statusData?.error || t("error.unknown")
+      ? statusData?.qualityFailure
+        ? t("error.qualityFailed")
+        : statusData?.error || t("error.unknown")
       : startError?.message || statusError?.message || t("error.unknown");
   const isError = !hasImage && (isStartError || isStatusError || isTerminalFailure);
 
@@ -282,7 +298,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       {onBack && hasImage && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
 
       <AnimatePresence mode="wait">
-        {isPending && !hasImage && <LoadingState key="loading" />}
+        {isPending && !hasImage && (
+          <LoadingState key="loading" phase={statusData?.phase} />
+        )}
 
         {!isPending && isError && !hasImage && (
           <ErrorState
@@ -394,9 +412,10 @@ function BackButton({ onClick, backLabel }: { onClick: () => void; backLabel: st
   );
 }
 
-function LoadingState() {
+function LoadingState({ phase }: { phase?: "generating" | "validating" }) {
   const t = useTranslations('imageGenerator.loading');
   const [elapsed, setElapsed] = useState(0);
+  const isValidating = phase === "validating";
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -412,6 +431,7 @@ function LoadingState() {
   };
 
   const getMessage = () => {
+    if (isValidating) return t('messages.validating');
     if (elapsed < 15) return t('messages.generating');
     if (elapsed < 30) return t('messages.aiWorking');
     if (elapsed < 60) return t('messages.takingLonger');
@@ -425,6 +445,7 @@ function LoadingState() {
   };
 
   const getSubMessage = () => {
+    if (isValidating) return t('subMessages.validating');
     if (elapsed < 30) return t('subMessages.usually30s');
     if (elapsed < 60) return t('subMessages.highLoad');
     if (elapsed < 120) return t('subMessages.warmingUp');

@@ -13,6 +13,17 @@ export const ACTIVE_LORA_SCALES = [LORA_GENERATION_SCALE] as const;
 // A new seed may be supplied explicitly for development experiments.
 export const DEFAULT_GENERATION_SEED = 260805 as const;
 export const MAX_GENERATION_SEED = 2 ** 32 - 1;
+// Enforce mode generates up to this many candidates in parallel
+// (images.candidate_index allows 0..2).
+export const MAX_PARALLEL_CANDIDATES = 3;
+
+/** Deterministic seed sequence for parallel candidates and retries. */
+export function candidateSeeds(seedBase: number, count: number): number[] {
+  const n = Math.min(MAX_PARALLEL_CANDIDATES, Math.max(1, Math.trunc(count)));
+  return Array.from({ length: n }, (_, i) =>
+    Math.min(MAX_GENERATION_SEED, seedBase + i)
+  );
+}
 export type PromptVersion = typeof PROMPT_VERSION | "legacy-debug";
 export type LoraComparisonScale = (typeof LORA_COMPARISON_SCALES)[number];
 export type GenerationSetStatus =
@@ -88,6 +99,8 @@ export type GenerationVariantContext = {
   status: string;
   candidateIndex: number;
   loraScale: LoraComparisonScale;
+  // Per-candidate seed; absent on sets created before parallel candidates.
+  seed?: number;
 };
 
 export type GenerationSetContext = {
@@ -305,7 +318,9 @@ export function isGenerationVariantContext(
       typeof candidate.candidateIndex === "number" &&
       candidate.candidateIndex >= 0 &&
       candidate.candidateIndex < LORA_COMPARISON_SCALES.length &&
-      isLoraComparisonScale(candidate.loraScale)
+      isLoraComparisonScale(candidate.loraScale) &&
+      (candidate.seed === undefined ||
+        (typeof candidate.seed === "number" && Number.isFinite(candidate.seed)))
   );
 }
 
@@ -314,13 +329,15 @@ export function isGenerationVariantManifest(
 ): value is GenerationVariantContext[] {
   if (!Array.isArray(value)) return false;
 
+  // Active flow: 1..3 parallel candidates at the production LoRA scale.
   const isActiveSingleImageManifest =
-    value.length === ACTIVE_LORA_SCALES.length &&
+    value.length >= 1 &&
+    value.length <= MAX_PARALLEL_CANDIDATES &&
     value.every(
       (variant, index) =>
         isGenerationVariantContext(variant) &&
         variant.candidateIndex === index &&
-        variant.loraScale === ACTIVE_LORA_SCALES[index]
+        variant.loraScale === LORA_GENERATION_SCALE
     );
   const isLegacyComparisonManifest =
     value.length === LORA_COMPARISON_SCALES.length &&

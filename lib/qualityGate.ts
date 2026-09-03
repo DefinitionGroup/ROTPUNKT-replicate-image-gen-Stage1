@@ -1,8 +1,9 @@
 import { createSupabaseServiceClient } from "./supabaseServer";
-import type {
-  GenerationCandidate,
-  GenerationQualityExpectations,
-  GenerationVariantContext,
+import {
+  MAX_PARALLEL_CANDIDATES,
+  type GenerationCandidate,
+  type GenerationQualityExpectations,
+  type GenerationVariantContext,
 } from "./imageGenerationContract";
 import {
   VALIDATOR_PROMPT_VERSION,
@@ -12,112 +13,129 @@ import {
 
 export type QualityGateMode = "off" | "shadow" | "enforce";
 
-let warnedAboutEnforce = false;
-
 export function getQualityGateMode(): QualityGateMode {
   const raw = (process.env.QUALITY_GATE_MODE ?? "off").trim().toLowerCase();
   if (raw === "shadow") return "shadow";
-  if (raw === "enforce") {
-    if (!warnedAboutEnforce) {
-      console.warn(
-        "[quality-gate] QUALITY_GATE_MODE=enforce is not implemented yet; validating in shadow mode"
-      );
-      warnedAboutEnforce = true;
-    }
-    return "enforce";
-  }
+  if (raw === "enforce") return "enforce";
   return "off";
 }
 
-export type ShadowValidationOutcome =
-  | { status: "skipped"; reason: "already_claimed" | "claim_failed" }
-  | { status: "completed"; attemptId: string; verdict: string }
-  | { status: "error"; attemptId: string; error: string };
-
-type ShadowValidationParams = {
-  mode: Exclude<QualityGateMode, "off">;
-  requestId?: string;
-  set: { id: string; userId: string; seed: number; promptVersion: string };
-  variant: GenerationVariantContext;
-  candidate: GenerationCandidate;
-  qualityExpectations: GenerationQualityExpectations;
-  attemptNumber?: number;
-};
-
-/**
- * Runs every configured validator model on the candidate (in parallel) so the
- * calibration set compares models on identical inputs. Never throws.
- */
-export async function runShadowValidation(
-  params: ShadowValidationParams
-): Promise<ShadowValidationOutcome[]> {
-  const models = resolveValidatorModels();
-  return Promise.all(
-    models.map((model) => runShadowValidationWithModel({ ...params, model }))
-  );
+/** Enforce mode generates this many candidates in parallel (1..3, default 2). */
+export function getQualityGateCandidateCount(): number {
+  const raw = Number.parseInt(process.env.QUALITY_GATE_CANDIDATES ?? "2", 10);
+  if (!Number.isFinite(raw)) return 2;
+  return Math.min(MAX_PARALLEL_CANDIDATES, Math.max(1, raw));
 }
 
 /**
- * Claims the attempt row first so concurrent status polls cannot validate the
- * same candidate twice with the same model, then records the verdict. A failed
- * validation is a recorded "error" verdict, not a failed request.
+ * When the validator itself fails (not the image), fail-open delivers the
+ * image unevaluated instead of blocking every user on a validator outage.
  */
-async function runShadowValidationWithModel(
-  params: ShadowValidationParams & { model: string }
-): Promise<ShadowValidationOutcome> {
-  const {
-    mode,
-    requestId = "bg",
-    set,
-    variant,
-    candidate,
-    qualityExpectations,
-    attemptNumber = 1,
-    model,
-  } = params;
-  const supabase = createSupabaseServiceClient();
+export function isQualityGateFailOpen(): boolean {
+  const raw = (process.env.QUALITY_GATE_FAIL_OPEN ?? "true").trim().toLowerCase();
+  return raw !== "false" && raw !== "0" && raw !== "off";
+}
 
-  const { data: claimed, error: claimError } = await supabase
+export type AttemptVerdict = "pass" | "fail" | "uncertain" | "error";
+
+export type AttemptState = {
+  id: string;
+  verdict: AttemptVerdict | null;
+  reasons: string[];
+  error: string | null;
+  imageId: string | null;
+};
+
+type ClaimParams = {
+  mode: Exclude<QualityGateMode, "off">;
+  set: { id: string; userId: string; seed: number; promptVersion: string };
+  variant: GenerationVariantContext;
+  candidateUrl: string;
+  imageId: string | null;
+  qualityExpectations: GenerationQualityExpectations;
+  model: string;
+  attemptNumber?: number;
+};
+
+export async function readValidationAttempt(
+  setId: string,
+  candidateIndex: number,
+  model: string,
+  attemptNumber = 1
+): Promise<AttemptState | null> {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from("generation_validation_attempts")
+    .select("id, verdict, reasons, error, image_id")
+    .eq("generation_set_id", setId)
+    .eq("candidate_index", candidateIndex)
+    .eq("attempt_number", attemptNumber)
+    .eq("validator_model", model)
+    .maybeSingle();
+  if (error) throw new Error(`Validation attempt lookup failed: ${error.message}`);
+  if (!data) return null;
+  return {
+    id: data.id as string,
+    verdict: (data.verdict as AttemptVerdict | null) ?? null,
+    reasons: (data.reasons as string[] | null) ?? [],
+    error: (data.error as string | null) ?? null,
+    imageId: (data.image_id as string | null) ?? null,
+  };
+}
+
+/**
+ * The claim: inserting the attempt row wins or loses on the unique index, so
+ * only one poll ever pays for validating a given candidate with a given model.
+ */
+export async function claimValidationAttempt(
+  params: ClaimParams
+): Promise<{ claimed: true; attemptId: string } | { claimed: false; reason: "already_claimed" | "claim_failed" }> {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
     .from("generation_validation_attempts")
     .insert({
-      generation_set_id: set.id,
-      image_id: candidate.imageId,
-      user_id: set.userId,
-      attempt_number: attemptNumber,
-      candidate_index: variant.candidateIndex,
-      seed: set.seed,
-      prediction_id: variant.predictionId,
-      candidate_url: candidate.url,
-      gate_mode: mode,
-      prompt_version: set.promptVersion,
-      validator_model: model,
+      generation_set_id: params.set.id,
+      image_id: params.imageId,
+      user_id: params.set.userId,
+      attempt_number: params.attemptNumber ?? 1,
+      candidate_index: params.variant.candidateIndex,
+      seed: params.variant.seed ?? params.set.seed,
+      prediction_id: params.variant.predictionId,
+      candidate_url: params.candidateUrl,
+      gate_mode: params.mode,
+      prompt_version: params.set.promptVersion,
+      validator_model: params.model,
       validator_prompt_version: VALIDATOR_PROMPT_VERSION,
-      quality_expectations: qualityExpectations,
+      quality_expectations: params.qualityExpectations,
     })
     .select("id")
     .single();
 
-  if (claimError || !claimed) {
-    if (claimError?.code === "23505") {
-      return { status: "skipped", reason: "already_claimed" };
-    }
-    console.error(
-      `[${requestId}] quality-gate claim failed for set ${set.id}:`,
-      claimError?.message
-    );
-    return { status: "skipped", reason: "claim_failed" };
+  if (error || !data) {
+    if (error?.code === "23505") return { claimed: false, reason: "already_claimed" };
+    console.error(`quality-gate claim failed for set ${params.set.id}:`, error?.message);
+    return { claimed: false, reason: "claim_failed" };
   }
+  return { claimed: true, attemptId: data.id as string };
+}
 
-  const attemptId = claimed.id as string;
-
+/** Runs the validator for a claimed attempt and records the outcome. Never throws. */
+export async function completeValidationAttempt(params: {
+  attemptId: string;
+  model: string;
+  imageUrl: string;
+  qualityExpectations: GenerationQualityExpectations;
+  requestId?: string;
+}): Promise<AttemptVerdict> {
+  const supabase = createSupabaseServiceClient();
+  const requestId = params.requestId ?? "bg";
   try {
     const { report, durationMs } = await runVisionValidator({
-      imageUrl: candidate.url,
-      expectations: qualityExpectations,
-      model,
+      imageUrl: params.imageUrl,
+      expectations: params.qualityExpectations,
+      model: params.model,
     });
-
-    const { error: updateError } = await supabase
+    const { error } = await supabase
       .from("generation_validation_attempts")
       .update({
         verdict: report.verdict,
@@ -133,18 +151,14 @@ async function runShadowValidationWithModel(
         duration_ms: durationMs,
         completed_at: new Date().toISOString(),
       })
-      .eq("id", attemptId);
-
-    if (updateError) {
-      throw new Error(`Attempt update failed: ${updateError.message}`);
-    }
-
+      .eq("id", params.attemptId);
+    if (error) throw new Error(`Attempt update failed: ${error.message}`);
     if (process.env.NODE_ENV === "development") {
       console.log(
-        `[${requestId}] quality-gate ${mode}: set ${set.id} -> ${report.verdict} (${model}, ${durationMs}ms)`
+        `[${requestId}] quality-gate: attempt ${params.attemptId.slice(0, 8)} -> ${report.verdict} (${params.model}, ${durationMs}ms)`
       );
     }
-    return { status: "completed", attemptId, verdict: report.verdict };
+    return report.verdict;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[${requestId}] quality-gate validation failed:`, message);
@@ -155,7 +169,87 @@ async function runShadowValidationWithModel(
         error: message.slice(0, 1000),
         completed_at: new Date().toISOString(),
       })
-      .eq("id", attemptId);
-    return { status: "error", attemptId, error: message };
+      .eq("id", params.attemptId);
+    return "error";
   }
+}
+
+export async function attachImageToAttempt(attemptId: string, imageId: string): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+  await supabase
+    .from("generation_validation_attempts")
+    .update({ image_id: imageId })
+    .eq("id", attemptId);
+}
+
+export type ShadowValidationOutcome =
+  | { status: "skipped"; reason: "already_claimed" | "claim_failed" }
+  | { status: "completed"; attemptId: string; verdict: AttemptVerdict };
+
+/**
+ * Shadow mode: runs every configured model on an already delivered candidate
+ * (in parallel) so the calibration set compares models on identical inputs.
+ */
+export async function runShadowValidation(params: {
+  mode: Exclude<QualityGateMode, "off">;
+  requestId?: string;
+  set: { id: string; userId: string; seed: number; promptVersion: string };
+  variant: GenerationVariantContext;
+  candidate: GenerationCandidate;
+  qualityExpectations: GenerationQualityExpectations;
+}): Promise<ShadowValidationOutcome[]> {
+  return Promise.all(
+    resolveValidatorModels().map(async (model): Promise<ShadowValidationOutcome> => {
+      const claim = await claimValidationAttempt({
+        mode: params.mode,
+        set: params.set,
+        variant: params.variant,
+        candidateUrl: params.candidate.url,
+        imageId: params.candidate.imageId,
+        qualityExpectations: params.qualityExpectations,
+        model,
+      });
+      if (!claim.claimed) return { status: "skipped", reason: claim.reason };
+      const verdict = await completeValidationAttempt({
+        attemptId: claim.attemptId,
+        model,
+        imageUrl: params.candidate.url,
+        qualityExpectations: params.qualityExpectations,
+        requestId: params.requestId,
+      });
+      return { status: "completed", attemptId: claim.attemptId, verdict };
+    })
+  );
+}
+
+/**
+ * Enforce mode: claims and validates a candidate that is not yet delivered.
+ * Meant to run behind after(); the polling route reads the attempt row.
+ */
+export async function runEnforceValidation(params: {
+  requestId?: string;
+  set: { id: string; userId: string; seed: number; promptVersion: string };
+  variant: GenerationVariantContext;
+  candidateUrl: string;
+  qualityExpectations: GenerationQualityExpectations;
+  model: string;
+}): Promise<ShadowValidationOutcome> {
+  const claim = await claimValidationAttempt({
+    mode: "enforce",
+    set: params.set,
+    variant: params.variant,
+    candidateUrl: params.candidateUrl,
+    imageId: null,
+    qualityExpectations: params.qualityExpectations,
+    model: params.model,
+  });
+  if (!claim.claimed) return { status: "skipped", reason: claim.reason };
+  const verdict = await completeValidationAttempt({
+    attemptId: claim.attemptId,
+    model: params.model,
+    imageUrl: params.candidateUrl,
+    qualityExpectations: params.qualityExpectations,
+    requestId: params.requestId,
+  });
+  return { status: "completed", attemptId: claim.attemptId, verdict };
 }
