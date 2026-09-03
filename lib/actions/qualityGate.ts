@@ -24,6 +24,7 @@ export type ValidationAttemptRow = {
   verdict: "pass" | "fail" | "uncertain" | "error" | null;
   confidence: number | null;
   report: {
+    strictness?: "counts" | "full";
     modelVerdict?: string | null;
     fixtures?: ValidatorFixture[];
     checks?: Record<string, ValidatorCheck>;

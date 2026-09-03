@@ -120,10 +120,14 @@ function AttemptCard({ attempt }: { attempt: ValidationAttemptRow }) {
             </span>
           </div>
 
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground sm:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground sm:grid-cols-5">
             <Meta label="Seed" value={String(attempt.seed)} />
             <Meta label="Prompt" value={attempt.prompt_version} />
             <Meta label="Validator" value={attempt.validator_model} />
+            <Meta
+              label="Strenge"
+              value={`${attempt.gate_mode} · ${attempt.report?.strictness ?? "full"}`}
+            />
             <Meta
               label="Dauer"
               value={attempt.duration_ms ? `${(attempt.duration_ms / 1000).toFixed(1)} s` : "–"}

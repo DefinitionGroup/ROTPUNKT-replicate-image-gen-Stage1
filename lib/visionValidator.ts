@@ -57,6 +57,20 @@ export type ValidatorCheckSpec = {
   description: string;
 };
 
+/**
+ * Which checks decide the verdict. "counts" (phase 1) enforces the scene type
+ * and the fixture counts only; placement and island count stay advisory
+ * because FLUX misplaces island zones far too often to block on them yet.
+ * "full" enforces every hard check.
+ */
+export type ValidatorStrictness = "counts" | "full";
+export const DEFAULT_VALIDATOR_STRICTNESS: ValidatorStrictness = "counts";
+const TOPOLOGY_CHECK_IDS = new Set(["sink_location", "cooktop_location", "island_count"]);
+
+export function isValidatorStrictness(value: unknown): value is ValidatorStrictness {
+  return value === "counts" || value === "full";
+}
+
 // Input field names differ per Replicate model; every one of them streams
 // plain text back, which we concatenate and parse as JSON.
 type ValidatorModelSpec = {
@@ -189,6 +203,17 @@ const CAMERA_EXPECTATION: Record<string, string> = {
 };
 
 export function buildValidatorChecks(
+  expectations: GenerationQualityExpectations,
+  strictness: ValidatorStrictness = DEFAULT_VALIDATOR_STRICTNESS
+): ValidatorCheckSpec[] {
+  const checks: ValidatorCheckSpec[] = buildAllChecks(expectations);
+  if (strictness === "full") return checks;
+  return checks.map((check) =>
+    TOPOLOGY_CHECK_IDS.has(check.id) ? { ...check, hard: false } : check
+  );
+}
+
+function buildAllChecks(
   expectations: GenerationQualityExpectations
 ): ValidatorCheckSpec[] {
   const checks: ValidatorCheckSpec[] = [
@@ -296,9 +321,10 @@ export const VALIDATOR_SYSTEM_PROMPT =
   "You are a strict visual QA inspector for AI-generated kitchen renderings. You report only what is clearly visible, you never guess, and you answer with a single JSON object and nothing else.";
 
 export function buildValidatorInstruction(
-  expectations: GenerationQualityExpectations
+  expectations: GenerationQualityExpectations,
+  strictness: ValidatorStrictness = DEFAULT_VALIDATOR_STRICTNESS
 ): string {
-  const checks = buildValidatorChecks(expectations);
+  const checks = buildValidatorChecks(expectations, strictness);
   const specLines = checks.map(
     (check) =>
       `- ${check.id}${check.hard ? "" : " (soft)"}: expected ${JSON.stringify(check.expected)} — ${check.description}`
@@ -371,9 +397,10 @@ export function deriveVerdict(
 
 export function parseValidatorOutput(
   rawText: string,
-  expectations: GenerationQualityExpectations
+  expectations: GenerationQualityExpectations,
+  strictness: ValidatorStrictness = DEFAULT_VALIDATOR_STRICTNESS
 ): ValidatorReport {
-  const specs = buildValidatorChecks(expectations);
+  const specs = buildValidatorChecks(expectations, strictness);
   const hardChecks = specs.filter((s) => s.hard).map((s) => s.id);
   const truncated = rawText.slice(0, RAW_TEXT_LIMIT);
   const parsed = extractJsonObject(rawText);
@@ -515,8 +542,10 @@ export async function runVisionValidator(params: {
   imageUrl: string;
   expectations: GenerationQualityExpectations;
   model?: string;
+  strictness?: ValidatorStrictness;
 }): Promise<{ report: ValidatorReport; model: string; durationMs: number }> {
   const model = params.model ?? resolveValidatorModel();
+  const strictness = params.strictness ?? DEFAULT_VALIDATOR_STRICTNESS;
   const spec = VALIDATOR_MODELS[model];
   if (!spec) {
     throw new Error(
@@ -529,7 +558,7 @@ export async function runVisionValidator(params: {
   const replicate = new Replicate({ auth: token });
   const input = spec.buildInput({
     imageUrl: params.imageUrl,
-    instruction: buildValidatorInstruction(params.expectations),
+    instruction: buildValidatorInstruction(params.expectations, strictness),
     system: VALIDATOR_SYSTEM_PROMPT,
   });
 
@@ -542,7 +571,7 @@ export async function runVisionValidator(params: {
   const durationMs = Date.now() - startedAt;
 
   return {
-    report: parseValidatorOutput(outputToText(output), params.expectations),
+    report: parseValidatorOutput(outputToText(output), params.expectations, strictness),
     model,
     durationMs,
   };

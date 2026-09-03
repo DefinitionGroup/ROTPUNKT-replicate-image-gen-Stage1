@@ -6,9 +6,12 @@ import {
   type GenerationVariantContext,
 } from "./imageGenerationContract";
 import {
+  DEFAULT_VALIDATOR_STRICTNESS,
   VALIDATOR_PROMPT_VERSION,
+  isValidatorStrictness,
   resolveValidatorModels,
   runVisionValidator,
+  type ValidatorStrictness,
 } from "./visionValidator";
 
 export type QualityGateMode = "off" | "shadow" | "enforce";
@@ -34,6 +37,12 @@ export function getQualityGateCandidateCount(): number {
 export function isQualityGateFailOpen(): boolean {
   const raw = (process.env.QUALITY_GATE_FAIL_OPEN ?? "true").trim().toLowerCase();
   return raw !== "false" && raw !== "0" && raw !== "off";
+}
+
+/** Enforce-mode strictness (QUALITY_GATE_STRICTNESS: counts | full). */
+export function getQualityGateStrictness(): ValidatorStrictness {
+  const raw = process.env.QUALITY_GATE_STRICTNESS?.trim().toLowerCase();
+  return isValidatorStrictness(raw) ? raw : DEFAULT_VALIDATOR_STRICTNESS;
 }
 
 export type AttemptVerdict = "pass" | "fail" | "uncertain" | "error";
@@ -125,6 +134,7 @@ export async function completeValidationAttempt(params: {
   model: string;
   imageUrl: string;
   qualityExpectations: GenerationQualityExpectations;
+  strictness: ValidatorStrictness;
   requestId?: string;
 }): Promise<AttemptVerdict> {
   const supabase = createSupabaseServiceClient();
@@ -134,6 +144,7 @@ export async function completeValidationAttempt(params: {
       imageUrl: params.imageUrl,
       expectations: params.qualityExpectations,
       model: params.model,
+      strictness: params.strictness,
     });
     const { error } = await supabase
       .from("generation_validation_attempts")
@@ -141,6 +152,7 @@ export async function completeValidationAttempt(params: {
         verdict: report.verdict,
         confidence: report.confidence,
         report: {
+          strictness: params.strictness,
           modelVerdict: report.modelVerdict,
           fixtures: report.fixtures,
           checks: report.checks,
@@ -210,11 +222,13 @@ export async function runShadowValidation(params: {
         model,
       });
       if (!claim.claimed) return { status: "skipped", reason: claim.reason };
+      // Shadow keeps every check hard so the calibration set stays complete.
       const verdict = await completeValidationAttempt({
         attemptId: claim.attemptId,
         model,
         imageUrl: params.candidate.url,
         qualityExpectations: params.qualityExpectations,
+        strictness: "full",
         requestId: params.requestId,
       });
       return { status: "completed", attemptId: claim.attemptId, verdict };
@@ -249,6 +263,7 @@ export async function runEnforceValidation(params: {
     model: params.model,
     imageUrl: params.candidateUrl,
     qualityExpectations: params.qualityExpectations,
+    strictness: getQualityGateStrictness(),
     requestId: params.requestId,
   });
   return { status: "completed", attemptId: claim.attemptId, verdict };

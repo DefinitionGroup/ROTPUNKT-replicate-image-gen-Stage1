@@ -409,7 +409,13 @@ assert.doesNotMatch(
 
 // Vision validator: the instruction follows the contract and the verdict is
 // derived from the hard checks, never trusted from the model.
-const validatorChecks = buildValidatorChecks(islandSpec.qualityExpectations);
+// Strictness: phase 1 ("counts", default) keeps placement advisory; "full" enforces it.
+const countsChecks = buildValidatorChecks(islandSpec.qualityExpectations);
+assert.equal(countsChecks.find((c) => c.id === "sink_location")?.hard, false);
+assert.equal(countsChecks.find((c) => c.id === "island_count")?.hard, false);
+assert.equal(countsChecks.find((c) => c.id === "faucet_count")?.hard, true);
+assert.equal(countsChecks.find((c) => c.id === "scene_type")?.hard, true);
+const validatorChecks = buildValidatorChecks(islandSpec.qualityExpectations, "full");
 const validatorCheckIds = validatorChecks.map((c) => c.id);
 for (const id of [
   "scene_type",
@@ -429,7 +435,7 @@ assert.equal(
   "kitchen island"
 );
 assert.equal(validatorChecks.find((c) => c.id === "island_count")?.expected, 1);
-const validatorInstruction = buildValidatorInstruction(islandSpec.qualityExpectations);
+const validatorInstruction = buildValidatorInstruction(islandSpec.qualityExpectations, "full");
 assert.match(validatorInstruction, /faucet_count: expected 1/);
 assert.match(validatorInstruction, /camera_mode \(soft\)/);
 assert.match(validatorInstruction, /Respond with exactly this JSON shape/);
@@ -469,6 +475,30 @@ assert.equal(
   "uncertain"
 );
 
+// The same model output passes under "counts" and fails under "full" when only the placement is off.
+const misplacedOutput = JSON.stringify({
+  fixtures: [
+    { type: "sink", position: "wall run" },
+    { type: "faucet", position: "wall run" },
+    { type: "cooktop", position: "island" },
+    { type: "island", position: "centre" },
+  ],
+  verdict: "fail",
+  confidence: 0.9,
+  checks: Object.fromEntries(
+    validatorCheckIds.map((id) => [
+      id,
+      id === "sink_location"
+        ? { passed: false, observed: "wall run", expected: "kitchen island", note: "sink is on the wall" }
+        : { passed: true, observed: 1, expected: 1, note: "" },
+    ])
+  ),
+  reasons: ["Sink sits on the wall run instead of the island."],
+});
+assert.equal(parseValidatorOutput(misplacedOutput, islandSpec.qualityExpectations, "counts").verdict, "pass");
+assert.equal(parseValidatorOutput(misplacedOutput, islandSpec.qualityExpectations, "full").verdict, "fail");
+assert.equal(parseValidatorOutput(misplacedOutput, islandSpec.qualityExpectations).verdict, "pass", "counts is the default");
+
 const fencedOutput = [
   "```json",
   JSON.stringify({
@@ -486,7 +516,7 @@ const fencedOutput = [
   }),
   "```",
 ].join("\n");
-const parsedReport = parseValidatorOutput(fencedOutput, islandSpec.qualityExpectations);
+const parsedReport = parseValidatorOutput(fencedOutput, islandSpec.qualityExpectations, "full");
 assert.equal(parsedReport.verdict, "fail", "a failed hard check overrides the model's own pass");
 assert.equal(parsedReport.modelVerdict, "pass");
 assert.equal(parsedReport.confidence, 0.91);
@@ -512,7 +542,8 @@ const inventoryReport = parseValidatorOutput(
     ),
     reasons: [],
   }),
-  islandSpec.qualityExpectations
+  islandSpec.qualityExpectations,
+  "full"
 );
 assert.equal(inventoryReport.verdict, "fail");
 assert.equal(inventoryReport.checks.faucet_count?.observed, 2);
@@ -534,20 +565,22 @@ const absenceReport = parseValidatorOutput(
     checks: {},
     reasons: [],
   }),
-  islandSpec.qualityExpectations
+  islandSpec.qualityExpectations,
+  "full"
 );
 assert.equal(absenceReport.checks.cooktop_count?.observed, 0, "an absence entry is not a fixture");
 assert.equal(absenceReport.checks.sink_count?.observed, 1);
 assert.match(buildValidatorInstruction(islandSpec.qualityExpectations), /Step 1 - inventory/);
 
-const garbageReport = parseValidatorOutput("I cannot help with that.", islandSpec.qualityExpectations);
+const garbageReport = parseValidatorOutput("I cannot help with that.", islandSpec.qualityExpectations, "full");
 assert.equal(garbageReport.verdict, "uncertain");
 assert.equal(garbageReport.confidence, 0);
 assert.match(garbageReport.reasons[0] ?? "", /no parseable JSON/);
 
 const partialReport = parseValidatorOutput(
   JSON.stringify({ verdict: "pass", confidence: 0.8, checks: { scene_type: { passed: true } }, reasons: [] }),
-  islandSpec.qualityExpectations
+  islandSpec.qualityExpectations,
+  "full"
 );
 assert.equal(partialReport.verdict, "uncertain", "missing hard checks cannot pass");
 assert.match(partialReport.reasons.join(" "), /omitted hard checks/);
