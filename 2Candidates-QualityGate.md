@@ -70,10 +70,11 @@ Mit dem vorhandenen Batch-Harness 30 Inselaufträge mit zwei Kandidaten erzeugen
 
 ## 6. Entscheidungen
 
-**Entschieden (3. September 2026):** Kochfeld-Ort wiegt schwerer als Grifftyp. Die Gewichte aus Abschnitt 2 bleiben: Platzierung (Spüle, Kochfeld, Insel) je 3, Grifftyp und Kamera je 2, Details je 1.
+Alle Entscheidungen getroffen am 3. September 2026:
 
-Offen:
+1. **Gewichte:** Kochfeld-Ort wiegt schwerer als Grifftyp. Die Gewichte aus Abschnitt 2 bleiben: Platzierung (Spüle, Kochfeld, Insel) je 3, Grifftyp und Kamera je 2, Details je 1.
+2. **Abbruchkriterium:** `best` wartet immer auf alle Kandidaten, auch bei dreien. Kein Sonderfall „zwei bestanden reicht“.
+3. **Nicht gewählte, bestandene Kandidaten:** Der Nutzer sieht sie nicht. Sie werden aber als `images`-Zeile gespeichert und dem **Admin-Konto** zugeordnet (`user_id` = `QUALITY_GATE_ARCHIVE_USER_ID`, eine Clerk-ID aus der Admin-Allowlist), mit `generation_metadata.qualityStatus: "accepted"` und `selection: "not_selected"` sowie Verweis auf den Auftrag über `generation_set_id`. Damit landen sie in der Galerie des Admins und bleiben für Vergleich und Testsatz verfügbar, ohne den Nutzer zu verwirren. Ist keine Archiv-ID konfiguriert, werden sie verworfen (Datei bleibt bis zur Löschfrist in MinIO, Attempt-Zeile bleibt immer).
+4. **Umschalten auf `full`:** nach Messung im Shadow Mode, nicht nach Gefühl. Zwei Bedingungen: Luna liegt bei der Ortsbewertung in der menschlichen Markierung praktisch nie falsch (Warnfall: Satz `43cab866`), *und* die Platzierungstreue ist durch Reparatur oder Nachtraining so hoch, dass `full` mit zwei Kandidaten in deutlich mehr als der Hälfte der Inselaufträge ein Bild liefert.
 
-- Soll bei drei Kandidaten weiterhin auf alle gewartet werden, oder reicht „zwei bestanden, den besseren nehmen“ als Abbruchkriterium?
-- Sollen nicht gewählte, aber bestandene Kandidaten dem Nutzer später als Alternative angeboten werden (Galerie „weitere Varianten“) statt verworfen zu werden?
-- Ab wann kippt die Strenge von `counts` auf `full`, sodass Platzierung nicht mehr nur ein Score, sondern eine Bedingung ist?
+Ergänzung zu Abschnitt 4 aus Entscheidung 3: `.env.local.example` erhält `QUALITY_GATE_ARCHIVE_USER_ID`; die Status-Route schreibt nicht gewählte Kandidaten mit dieser `user_id`. Da `images.candidate_index` pro Satz eindeutig ist, kollidiert das nicht mit dem gelieferten Bild. Die RLS-Policy `images_select_own` sorgt dafür, dass nur das Admin-Konto sie sieht.
