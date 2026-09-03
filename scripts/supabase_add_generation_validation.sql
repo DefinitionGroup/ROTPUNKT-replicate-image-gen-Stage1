@@ -48,10 +48,11 @@ comment on table public.generation_validation_attempts is
 comment on column public.generation_validation_attempts.verdict is
   'pass/fail/uncertain derived server-side from the hard checks; error when the validator call failed.';
 
--- The claim: only one attempt per candidate and attempt number can exist, so
--- concurrent status polls cannot validate (and pay for) the same image twice.
+-- The claim: only one attempt per candidate, attempt number and validator model
+-- can exist, so concurrent status polls cannot validate (and pay for) the same
+-- image twice. Shadow mode may run several models per image for calibration.
 create unique index if not exists generation_validation_attempts_candidate_unique_idx
-  on public.generation_validation_attempts (generation_set_id, candidate_index, attempt_number);
+  on public.generation_validation_attempts (generation_set_id, candidate_index, attempt_number, validator_model);
 
 create index if not exists generation_validation_attempts_user_created_idx
   on public.generation_validation_attempts (user_id, created_at desc);

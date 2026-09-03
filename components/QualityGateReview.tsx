@@ -183,6 +183,15 @@ function AttemptCard({ attempt }: { attempt: ValidationAttemptRow }) {
             </table>
           )}
 
+          {(attempt.report?.fixtures?.length ?? 0) > 0 && (
+            <p className="text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Inventar: </span>
+              {attempt.report?.fixtures
+                ?.map((f) => `${f.type}${f.position ? ` (${f.position})` : ""}`)
+                .join(" · ")}
+            </p>
+          )}
+
           {attempt.reasons.length > 0 && (
             <ul className="list-disc pl-5 text-xs text-foreground">
               {attempt.reasons.map((reason, index) => (

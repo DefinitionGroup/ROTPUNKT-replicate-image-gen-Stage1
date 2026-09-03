@@ -466,6 +466,53 @@ assert.equal(parsedReport.confidence, 0.91);
 assert.equal(parsedReport.checks.faucet_count?.observed, 2);
 assert.deepEqual(parsedReport.reasons, ["Two faucets visible."]);
 
+// Inventory beats the model's own count: two enumerated faucets fail faucet_count
+// even when the model wrote observed 1 / passed true.
+const inventoryReport = parseValidatorOutput(
+  JSON.stringify({
+    fixtures: [
+      { type: "sink", position: "left wall run" },
+      { type: "faucet", position: "left wall run" },
+      { type: "faucet", position: "next to the hob" },
+      { type: "cooktop", position: "island" },
+      { type: "island", position: "centre" },
+      { type: "sink", position: "island" },
+    ],
+    verdict: "pass",
+    confidence: 0.7,
+    checks: Object.fromEntries(
+      validatorCheckIds.map((id) => [id, { passed: true, observed: 1, expected: 1, note: "" }])
+    ),
+    reasons: [],
+  }),
+  islandSpec.qualityExpectations
+);
+assert.equal(inventoryReport.verdict, "fail");
+assert.equal(inventoryReport.checks.faucet_count?.observed, 2);
+assert.equal(inventoryReport.checks.faucet_count?.passed, false);
+assert.equal(inventoryReport.checks.sink_count?.observed, 2);
+assert.equal(inventoryReport.checks.cooktop_count?.passed, true);
+assert.equal(inventoryReport.checks.island_count?.passed, true);
+assert.equal(inventoryReport.fixtures.length, 6);
+const absenceReport = parseValidatorOutput(
+  JSON.stringify({
+    fixtures: [
+      { type: "sink", position: "wall run" },
+      { type: "faucet", position: "wall run" },
+      { type: "cooktop", position: "no cooktop visible" },
+      { type: "island", position: "centre" },
+    ],
+    verdict: "pass",
+    confidence: 0.8,
+    checks: {},
+    reasons: [],
+  }),
+  islandSpec.qualityExpectations
+);
+assert.equal(absenceReport.checks.cooktop_count?.observed, 0, "an absence entry is not a fixture");
+assert.equal(absenceReport.checks.sink_count?.observed, 1);
+assert.match(buildValidatorInstruction(islandSpec.qualityExpectations), /Step 1 - inventory/);
+
 const garbageReport = parseValidatorOutput("I cannot help with that.", islandSpec.qualityExpectations);
 assert.equal(garbageReport.verdict, "uncertain");
 assert.equal(garbageReport.confidence, 0);

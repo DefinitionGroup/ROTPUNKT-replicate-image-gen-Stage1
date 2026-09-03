@@ -7,7 +7,7 @@ import {
   requireQualityGateAdmin,
 } from "@/lib/actions/qualityGate";
 import { getQualityGateMode } from "@/lib/qualityGate";
-import { resolveValidatorModel } from "@/lib/visionValidator";
+import { resolveValidatorModels } from "@/lib/visionValidator";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -61,7 +61,7 @@ export default async function QualityGatePage({ params }: Props) {
         </p>
         <dl className="mt-5 flex flex-wrap gap-3 text-xs">
           <Stat label="Modus" value={getQualityGateMode()} />
-          <Stat label="Modell" value={resolveValidatorModel()} />
+          <Stat label="Modelle" value={resolveValidatorModels().join(", ")} />
           <Stat label="Urteile" value={String(attempts.length)} />
           <Stat label="pass" value={String(counts.pass ?? 0)} />
           <Stat label="fail" value={String(counts.fail ?? 0)} />

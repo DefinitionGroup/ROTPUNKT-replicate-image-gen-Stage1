@@ -6,8 +6,10 @@ import type {
   WetZoneLocation,
 } from "./imageGenerationContract";
 
-export const VALIDATOR_PROMPT_VERSION = "validator-v1" as const;
-export const DEFAULT_VALIDATOR_MODEL = "google/gemini-2.5-flash";
+export const VALIDATOR_PROMPT_VERSION = "validator-v2" as const;
+// GPT-4.1 mini was the only candidate that counted a second sink and faucet on
+// the first real two-sink image (2026-09-03); the others missed it twice.
+export const DEFAULT_VALIDATOR_MODEL = "openai/gpt-4.1-mini";
 const VALIDATOR_TIMEOUT_MS = 90_000;
 const RAW_TEXT_LIMIT = 4_000;
 
@@ -20,14 +22,30 @@ export type ValidatorCheck = {
   note: string | null;
 };
 
+export type FixtureType = "sink" | "faucet" | "cooktop" | "island";
+
+export type ValidatorFixture = {
+  type: FixtureType;
+  position: string;
+};
+
 export type ValidatorReport = {
   verdict: ValidatorVerdict;
   modelVerdict: ValidatorVerdict | null;
   confidence: number;
+  // Every fixture the model enumerated; count checks are derived from this list.
+  fixtures: ValidatorFixture[];
   checks: Record<string, ValidatorCheck>;
   hardChecks: string[];
   reasons: string[];
   rawText: string;
+};
+
+const COUNT_CHECK_FIXTURE: Record<string, FixtureType> = {
+  sink_count: "sink",
+  faucet_count: "faucet",
+  cooktop_count: "cooktop",
+  island_count: "island",
 };
 
 export type ValidatorCheckSpec = {
@@ -60,11 +78,14 @@ const VALIDATOR_MODELS: Record<string, ValidatorModelSpec> = {
     }),
   },
   "anthropic/claude-4-sonnet": {
+    // Replicate downscales the image before sending it to Claude; keep the
+    // full 1 MP render so small fixtures at the frame edge stay countable.
     buildInput: ({ imageUrl, instruction, system }) => ({
       image: imageUrl,
       prompt: instruction,
       system_prompt: system,
       max_tokens: 4096,
+      max_image_resolution: 2,
     }),
   },
   "openai/gpt-4.1-mini": {
@@ -83,6 +104,20 @@ export const SUPPORTED_VALIDATOR_MODELS = Object.keys(VALIDATOR_MODELS);
 export function resolveValidatorModel(): string {
   const configured = process.env.QUALITY_GATE_VALIDATOR_MODEL?.trim();
   return configured || DEFAULT_VALIDATOR_MODEL;
+}
+
+/**
+ * Shadow mode may run several models per image so the calibration set
+ * compares them on identical inputs. QUALITY_GATE_VALIDATOR_MODELS (comma
+ * separated) wins; otherwise the single configured model is used.
+ */
+export function resolveValidatorModels(): string[] {
+  const list = (process.env.QUALITY_GATE_VALIDATOR_MODELS ?? "")
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+  const unique = Array.from(new Set(list.length > 0 ? list : [resolveValidatorModel()]));
+  return unique;
 }
 
 const WET_ZONE_LABEL: Record<WetZoneLocation, string> = {
@@ -242,17 +277,20 @@ export function buildValidatorInstruction(
   return [
     "Inspect the attached rendering against this specification.",
     "",
+    "Step 1 - inventory. Scan the whole image systematically from left to right, including the far edges, and list EVERY sink basin, EVERY faucet/tap/spout, EVERY cooktop/hob and EVERY freestanding island you can see, one entry each, with a short position (for example \"left wall run, near window\"). Two basins side by side are two entries. A tap standing on a dry worktop or next to the cooktop is still a faucet entry. Never add an entry for something that is absent: if there is no cooktop, the list simply contains no cooktop entry.",
+    "",
+    "Step 2 - checks. Judge each item of the specification. Counts must equal the number of matching inventory entries.",
+    "",
     "Specification:",
     ...specLines,
     "",
     "Rules:",
-    "- Count only fixtures that are clearly visible. If a fixture is cut off or occluded so that you cannot decide, set passed to null and say why in note.",
-    "- Any additional tap, spout or basin anywhere in the image counts against faucet_count or sink_count, even when it sits near the cooktop or on a dry worktop.",
+    "- Report only what is clearly visible. If a fixture is cut off or occluded so that you cannot decide, set passed to null and say why in note.",
     "- Report observed values as numbers for counts and as short strings for locations and modes.",
     `- The "checks" object must contain exactly these ids: ${checks.map((c) => c.id).join(", ")}.`,
     "",
     "Respond with exactly this JSON shape and no other text:",
-    '{"verdict":"pass"|"fail"|"uncertain","confidence":<0.0-1.0>,"checks":{"<id>":{"passed":true|false|null,"observed":<number|string|null>,"expected":<number|string>,"note":"<short reason>"}},"reasons":["<why the verdict>"]}',
+    '{"fixtures":[{"type":"sink"|"faucet"|"cooktop"|"island","position":"<short>"}],"verdict":"pass"|"fail"|"uncertain","confidence":<0.0-1.0>,"checks":{"<id>":{"passed":true|false|null,"observed":<number|string|null>,"expected":<number|string>,"note":"<short reason>"}},"reasons":["<why the verdict>"]}',
   ].join("\n");
 }
 
@@ -315,6 +353,7 @@ export function parseValidatorOutput(
       verdict: "uncertain",
       modelVerdict: null,
       confidence: 0,
+      fixtures: [],
       checks: {},
       hardChecks,
       reasons: ["Validator returned no parseable JSON object"],
@@ -323,6 +362,32 @@ export function parseValidatorOutput(
   }
 
   const candidate = parsed as Record<string, unknown>;
+  const fixtures: ValidatorFixture[] = Array.isArray(candidate.fixtures)
+    ? candidate.fixtures
+        .map((entry) => {
+          if (!entry || typeof entry !== "object") return null;
+          const raw = entry as Record<string, unknown>;
+          const type = raw.type;
+          if (
+            type !== "sink" &&
+            type !== "faucet" &&
+            type !== "cooktop" &&
+            type !== "island"
+          ) {
+            return null;
+          }
+          const position =
+            typeof raw.position === "string" ? raw.position.slice(0, 120) : "";
+          // Some models enumerate an absence ("no cooktop visible"); that is not a fixture.
+          if (/\b(none|no\b|not visible|absent|missing|nicht)/i.test(position)) {
+            return null;
+          }
+          return { type, position };
+        })
+        .filter((entry): entry is ValidatorFixture => entry !== null)
+        .slice(0, 40)
+    : [];
+  const hasInventory = Array.isArray(candidate.fixtures);
   const rawChecks =
     candidate.checks && typeof candidate.checks === "object"
       ? (candidate.checks as Record<string, unknown>)
@@ -340,6 +405,33 @@ export function parseValidatorOutput(
       expected: normalizeScalar(entry.expected) ?? spec.expected,
       note: typeof entry.note === "string" ? entry.note.slice(0, 300) : null,
     };
+  }
+
+  // Models enumerate more reliably than they count: when an inventory exists,
+  // the enumerated fixtures decide every count check.
+  if (hasInventory) {
+    for (const spec of specs) {
+      const fixtureType = COUNT_CHECK_FIXTURE[spec.id];
+      if (!fixtureType) continue;
+      const counted = fixtures.filter((f) => f.type === fixtureType).length;
+      const existing = checks[spec.id];
+      if (existing && existing.passed === null && counted === 0) continue;
+      const expected = Number(spec.expected);
+      checks[spec.id] = {
+        passed: counted === expected,
+        observed: counted,
+        expected: spec.expected,
+        note:
+          counted === expected
+            ? existing?.note ?? null
+            : `inventory lists ${counted}: ${fixtures
+                .filter((f) => f.type === fixtureType)
+                .map((f) => f.position)
+                .filter(Boolean)
+                .join("; ")
+                .slice(0, 240)}`,
+      };
+    }
   }
 
   const reasons = Array.isArray(candidate.reasons)
@@ -361,6 +453,7 @@ export function parseValidatorOutput(
     verdict,
     modelVerdict: normalizeVerdict(candidate.verdict),
     confidence,
+    fixtures,
     checks,
     hardChecks,
     reasons,

@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServer";
-import type { ValidatorCheck } from "@/lib/visionValidator";
+import type { ValidatorCheck, ValidatorFixture } from "@/lib/visionValidator";
 
 export type HumanVerdict = "validator_correct" | "validator_wrong";
 
@@ -25,6 +25,7 @@ export type ValidationAttemptRow = {
   confidence: number | null;
   report: {
     modelVerdict?: string | null;
+    fixtures?: ValidatorFixture[];
     checks?: Record<string, ValidatorCheck>;
     hardChecks?: string[];
     rawText?: string;

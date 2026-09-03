@@ -6,7 +6,7 @@ import type {
 } from "./imageGenerationContract";
 import {
   VALIDATOR_PROMPT_VERSION,
-  resolveValidatorModel,
+  resolveValidatorModels,
   runVisionValidator,
 } from "./visionValidator";
 
@@ -45,12 +45,25 @@ type ShadowValidationParams = {
 };
 
 /**
- * Claims the attempt row first so concurrent status polls cannot validate the
- * same candidate twice, then records the verdict. Never throws: a failed
- * validation is a recorded "error" verdict, not a failed request.
+ * Runs every configured validator model on the candidate (in parallel) so the
+ * calibration set compares models on identical inputs. Never throws.
  */
 export async function runShadowValidation(
   params: ShadowValidationParams
+): Promise<ShadowValidationOutcome[]> {
+  const models = resolveValidatorModels();
+  return Promise.all(
+    models.map((model) => runShadowValidationWithModel({ ...params, model }))
+  );
+}
+
+/**
+ * Claims the attempt row first so concurrent status polls cannot validate the
+ * same candidate twice with the same model, then records the verdict. A failed
+ * validation is a recorded "error" verdict, not a failed request.
+ */
+async function runShadowValidationWithModel(
+  params: ShadowValidationParams & { model: string }
 ): Promise<ShadowValidationOutcome> {
   const {
     mode,
@@ -60,9 +73,9 @@ export async function runShadowValidation(
     candidate,
     qualityExpectations,
     attemptNumber = 1,
+    model,
   } = params;
   const supabase = createSupabaseServiceClient();
-  const model = resolveValidatorModel();
 
   const { data: claimed, error: claimError } = await supabase
     .from("generation_validation_attempts")
@@ -111,6 +124,7 @@ export async function runShadowValidation(
         confidence: report.confidence,
         report: {
           modelVerdict: report.modelVerdict,
+          fixtures: report.fixtures,
           checks: report.checks,
           hardChecks: report.hardChecks,
           rawText: report.rawText,
