@@ -7,9 +7,10 @@ import type {
 } from "./imageGenerationContract";
 
 export const VALIDATOR_PROMPT_VERSION = "validator-v2" as const;
-// GPT-4.1 mini was the only candidate that counted a second sink and faucet on
-// the first real two-sink image (2026-09-03); the others missed it twice.
-export const DEFAULT_VALIDATOR_MODEL = "openai/gpt-4.1-mini";
+// On the first real two-sink image (2026-09-03) Gemini 2.5 Flash and Claude 4
+// Sonnet missed the second sink; Gemini 3 Flash, GPT-5.2, Claude Sonnet 5 and
+// GPT-4.1 mini caught it. Gemini 3 Flash is the fastest of those.
+export const DEFAULT_VALIDATOR_MODEL = "google/gemini-3-flash";
 const VALIDATOR_TIMEOUT_MS = 90_000;
 const RAW_TEXT_LIMIT = 4_000;
 
@@ -65,38 +66,55 @@ type ValidatorModelSpec = {
   }) => Record<string, unknown>;
 };
 
+// Input schemas verified against the Replicate API on 2026-09-03.
+const geminiInput: ValidatorModelSpec["buildInput"] = ({ imageUrl, instruction, system }) => ({
+  images: [imageUrl],
+  prompt: instruction,
+  system_instruction: system,
+  temperature: 0,
+  max_output_tokens: 4096,
+});
+
+// Replicate downscales the image before sending it to Claude; keep the full
+// 1 MP render so small fixtures at the frame edge stay countable.
+const claudeInput: ValidatorModelSpec["buildInput"] = ({ imageUrl, instruction, system }) => ({
+  image: imageUrl,
+  prompt: instruction,
+  system_prompt: system,
+  max_tokens: 4096,
+  max_image_resolution: 2,
+});
+
+const gpt41Input: ValidatorModelSpec["buildInput"] = ({ imageUrl, instruction, system }) => ({
+  image_input: [imageUrl],
+  prompt: instruction,
+  system_prompt: system,
+  temperature: 0,
+  max_completion_tokens: 4096,
+});
+
+// GPT-5 family: no temperature; reasoning effort replaces it.
+const gpt5Input: ValidatorModelSpec["buildInput"] = ({ imageUrl, instruction, system }) => ({
+  image_input: [imageUrl],
+  prompt: instruction,
+  system_prompt: system,
+  reasoning_effort: "low",
+  verbosity: "low",
+  max_completion_tokens: 4096,
+});
+
 const VALIDATOR_MODELS: Record<string, ValidatorModelSpec> = {
-  "google/gemini-2.5-flash": {
-    // thinking_budget: 0 makes this model stop after ~100 output tokens on
-    // Replicate (verified 2026-09-03), so thinking is left at its default.
-    buildInput: ({ imageUrl, instruction, system }) => ({
-      images: [imageUrl],
-      prompt: instruction,
-      system_instruction: system,
-      temperature: 0,
-      max_output_tokens: 4096,
-    }),
-  },
-  "anthropic/claude-4-sonnet": {
-    // Replicate downscales the image before sending it to Claude; keep the
-    // full 1 MP render so small fixtures at the frame edge stay countable.
-    buildInput: ({ imageUrl, instruction, system }) => ({
-      image: imageUrl,
-      prompt: instruction,
-      system_prompt: system,
-      max_tokens: 4096,
-      max_image_resolution: 2,
-    }),
-  },
-  "openai/gpt-4.1-mini": {
-    buildInput: ({ imageUrl, instruction, system }) => ({
-      image_input: [imageUrl],
-      prompt: instruction,
-      system_prompt: system,
-      temperature: 0,
-      max_completion_tokens: 4096,
-    }),
-  },
+  // thinking_budget: 0 makes Gemini 2.5 stop after ~100 output tokens on
+  // Replicate (verified 2026-09-03), so thinking is left at its default.
+  "google/gemini-2.5-flash": { buildInput: geminiInput },
+  "google/gemini-3-flash": { buildInput: geminiInput },
+  "google/gemini-3.1-pro": { buildInput: geminiInput },
+  "anthropic/claude-4-sonnet": { buildInput: claudeInput },
+  "anthropic/claude-sonnet-4.6": { buildInput: claudeInput },
+  "anthropic/claude-sonnet-5": { buildInput: claudeInput },
+  "openai/gpt-4.1-mini": { buildInput: gpt41Input },
+  "openai/gpt-5-mini": { buildInput: gpt5Input },
+  "openai/gpt-5.2": { buildInput: gpt5Input },
 };
 
 export const SUPPORTED_VALIDATOR_MODELS = Object.keys(VALIDATOR_MODELS);
