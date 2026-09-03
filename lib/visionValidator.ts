@@ -58,17 +58,64 @@ export type ValidatorCheckSpec = {
 };
 
 /**
- * Which checks decide the verdict. "counts" (phase 1) enforces the scene type
- * and the fixture counts only; placement and island count stay advisory
- * because FLUX misplaces island zones far too often to block on them yet.
- * "full" enforces every hard check.
+ * Which checks decide the verdict. A preset name or an explicit list of check ids.
+ * Phase 1 default "counts+camera": scene type, the fixture counts and the camera
+ * perspective block an image; placement and handle type stay advisory because
+ * FLUX misplaces island zones far too often to block on them yet.
  */
-export type ValidatorStrictness = "counts" | "full";
-export const DEFAULT_VALIDATOR_STRICTNESS: ValidatorStrictness = "counts";
-const TOPOLOGY_CHECK_IDS = new Set(["sink_location", "cooktop_location", "island_count"]);
+export const HARD_CHECK_PRESETS = {
+  counts: ["scene_type", "sink_count", "faucet_count", "cooktop_count"],
+  "counts+camera": [
+    "scene_type",
+    "sink_count",
+    "faucet_count",
+    "cooktop_count",
+    "camera_mode",
+  ],
+  full: [
+    "scene_type",
+    "sink_count",
+    "faucet_count",
+    "cooktop_count",
+    "camera_mode",
+    "sink_location",
+    "cooktop_location",
+    "island_count",
+    "handle_kind",
+  ],
+} as const satisfies Record<string, readonly string[]>;
 
-export function isValidatorStrictness(value: unknown): value is ValidatorStrictness {
-  return value === "counts" || value === "full";
+export type ValidatorStrictnessPreset = keyof typeof HARD_CHECK_PRESETS;
+export type ValidatorStrictness = ValidatorStrictnessPreset | readonly string[];
+export const DEFAULT_VALIDATOR_STRICTNESS: ValidatorStrictness = "counts+camera";
+export const KNOWN_CHECK_IDS = [
+  "scene_type",
+  "sink_count",
+  "faucet_count",
+  "sink_location",
+  "faucet_orientation",
+  "cooktop_count",
+  "cooktop_location",
+  "island_count",
+  "camera_mode",
+  "handle_kind",
+  "handle_containment",
+] as const;
+
+export function isValidatorStrictnessPreset(
+  value: unknown
+): value is ValidatorStrictnessPreset {
+  return typeof value === "string" && value in HARD_CHECK_PRESETS;
+}
+
+export function resolveHardCheckIds(strictness: ValidatorStrictness): Set<string> {
+  return new Set(
+    typeof strictness === "string" ? HARD_CHECK_PRESETS[strictness] : strictness
+  );
+}
+
+export function describeStrictness(strictness: ValidatorStrictness): string {
+  return typeof strictness === "string" ? strictness : [...strictness].join(",");
 }
 
 // Input field names differ per Replicate model; every one of them streams
@@ -206,11 +253,11 @@ export function buildValidatorChecks(
   expectations: GenerationQualityExpectations,
   strictness: ValidatorStrictness = DEFAULT_VALIDATOR_STRICTNESS
 ): ValidatorCheckSpec[] {
-  const checks: ValidatorCheckSpec[] = buildAllChecks(expectations);
-  if (strictness === "full") return checks;
-  return checks.map((check) =>
-    TOPOLOGY_CHECK_IDS.has(check.id) ? { ...check, hard: false } : check
-  );
+  const hardIds = resolveHardCheckIds(strictness);
+  return buildAllChecks(expectations).map((check) => ({
+    ...check,
+    hard: hardIds.has(check.id),
+  }));
 }
 
 function buildAllChecks(

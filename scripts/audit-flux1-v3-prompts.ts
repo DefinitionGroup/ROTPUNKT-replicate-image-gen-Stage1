@@ -409,13 +409,23 @@ assert.doesNotMatch(
 
 // Vision validator: the instruction follows the contract and the verdict is
 // derived from the hard checks, never trusted from the model.
-// Strictness: phase 1 ("counts", default) keeps placement advisory; "full" enforces it.
-const countsChecks = buildValidatorChecks(islandSpec.qualityExpectations);
-assert.equal(countsChecks.find((c) => c.id === "sink_location")?.hard, false);
-assert.equal(countsChecks.find((c) => c.id === "island_count")?.hard, false);
-assert.equal(countsChecks.find((c) => c.id === "faucet_count")?.hard, true);
-assert.equal(countsChecks.find((c) => c.id === "scene_type")?.hard, true);
+// Strictness: default "counts+camera" blocks on counts and the camera, keeps placement advisory.
+const defaultChecks = buildValidatorChecks(islandSpec.qualityExpectations);
+assert.equal(defaultChecks.find((c) => c.id === "camera_mode")?.hard, true);
+assert.equal(defaultChecks.find((c) => c.id === "faucet_count")?.hard, true);
+assert.equal(defaultChecks.find((c) => c.id === "scene_type")?.hard, true);
+assert.equal(defaultChecks.find((c) => c.id === "sink_location")?.hard, false);
+assert.equal(defaultChecks.find((c) => c.id === "island_count")?.hard, false);
+assert.equal(defaultChecks.find((c) => c.id === "handle_kind")?.hard, false);
+const countsChecks = buildValidatorChecks(islandSpec.qualityExpectations, "counts");
+assert.equal(countsChecks.find((c) => c.id === "camera_mode")?.hard, false);
+const customChecks = buildValidatorChecks(islandSpec.qualityExpectations, ["faucet_count", "handle_kind"]);
+assert.equal(customChecks.find((c) => c.id === "handle_kind")?.hard, true);
+assert.equal(customChecks.find((c) => c.id === "sink_count")?.hard, false);
 const validatorChecks = buildValidatorChecks(islandSpec.qualityExpectations, "full");
+assert.equal(validatorChecks.find((c) => c.id === "sink_location")?.hard, true);
+assert.equal(validatorChecks.find((c) => c.id === "handle_kind")?.hard, true);
+assert.equal(validatorChecks.find((c) => c.id === "faucet_orientation")?.hard, false);
 const validatorCheckIds = validatorChecks.map((c) => c.id);
 for (const id of [
   "scene_type",
@@ -437,7 +447,8 @@ assert.equal(
 assert.equal(validatorChecks.find((c) => c.id === "island_count")?.expected, 1);
 const validatorInstruction = buildValidatorInstruction(islandSpec.qualityExpectations, "full");
 assert.match(validatorInstruction, /faucet_count: expected 1/);
-assert.match(validatorInstruction, /camera_mode \(soft\)/);
+assert.match(validatorInstruction, /faucet_orientation \(soft\)/);
+assert.doesNotMatch(validatorInstruction, /camera_mode \(soft\)/);
 assert.match(validatorInstruction, /Respond with exactly this JSON shape/);
 
 const interiorChecks = buildValidatorChecks(resetStateResult.qualityExpectations);
@@ -461,7 +472,7 @@ assert.equal(
 );
 assert.equal(
   deriveVerdict(
-    { ...allPass, camera_mode: { passed: false, observed: "plan view", expected: "x", note: null } },
+    { ...allPass, faucet_orientation: { passed: false, observed: "spout sideways", expected: "x", note: null } },
     hardIds
   ),
   "pass",
@@ -497,7 +508,29 @@ const misplacedOutput = JSON.stringify({
 });
 assert.equal(parseValidatorOutput(misplacedOutput, islandSpec.qualityExpectations, "counts").verdict, "pass");
 assert.equal(parseValidatorOutput(misplacedOutput, islandSpec.qualityExpectations, "full").verdict, "fail");
-assert.equal(parseValidatorOutput(misplacedOutput, islandSpec.qualityExpectations).verdict, "pass", "counts is the default");
+assert.equal(parseValidatorOutput(misplacedOutput, islandSpec.qualityExpectations).verdict, "pass", "placement is advisory by default");
+// An eye-level render of a bird's-eye order fails under the default but passes under "counts".
+const wrongCameraOutput = JSON.stringify({
+  fixtures: [
+    { type: "sink", position: "island" },
+    { type: "faucet", position: "island" },
+    { type: "cooktop", position: "island" },
+    { type: "island", position: "centre" },
+  ],
+  verdict: "fail",
+  confidence: 0.9,
+  checks: Object.fromEntries(
+    validatorCheckIds.map((id) => [
+      id,
+      id === "camera_mode"
+        ? { passed: false, observed: "eye level", expected: "bird's eye", note: "camera at eye level" }
+        : { passed: true, observed: 1, expected: 1, note: "" },
+    ])
+  ),
+  reasons: ["Camera is at eye level."],
+});
+assert.equal(parseValidatorOutput(wrongCameraOutput, islandSpec.qualityExpectations).verdict, "fail");
+assert.equal(parseValidatorOutput(wrongCameraOutput, islandSpec.qualityExpectations, "counts").verdict, "pass");
 
 const fencedOutput = [
   "```json",

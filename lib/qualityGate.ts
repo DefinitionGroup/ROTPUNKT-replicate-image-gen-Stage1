@@ -7,8 +7,10 @@ import {
 } from "./imageGenerationContract";
 import {
   DEFAULT_VALIDATOR_STRICTNESS,
+  KNOWN_CHECK_IDS,
   VALIDATOR_PROMPT_VERSION,
-  isValidatorStrictness,
+  describeStrictness,
+  isValidatorStrictnessPreset,
   resolveValidatorModels,
   runVisionValidator,
   type ValidatorStrictness,
@@ -39,10 +41,21 @@ export function isQualityGateFailOpen(): boolean {
   return raw !== "false" && raw !== "0" && raw !== "off";
 }
 
-/** Enforce-mode strictness (QUALITY_GATE_STRICTNESS: counts | full). */
+/**
+ * Enforce-mode strictness. QUALITY_GATE_STRICTNESS is a preset
+ * (counts | counts+camera | full) or a comma-separated list of check ids.
+ */
 export function getQualityGateStrictness(): ValidatorStrictness {
   const raw = process.env.QUALITY_GATE_STRICTNESS?.trim().toLowerCase();
-  return isValidatorStrictness(raw) ? raw : DEFAULT_VALIDATOR_STRICTNESS;
+  if (!raw) return DEFAULT_VALIDATOR_STRICTNESS;
+  if (isValidatorStrictnessPreset(raw)) return raw;
+  const ids = raw
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id): id is (typeof KNOWN_CHECK_IDS)[number] =>
+      (KNOWN_CHECK_IDS as readonly string[]).includes(id)
+    );
+  return ids.length > 0 ? ids : DEFAULT_VALIDATOR_STRICTNESS;
 }
 
 export type AttemptVerdict = "pass" | "fail" | "uncertain" | "error";
@@ -152,7 +165,7 @@ export async function completeValidationAttempt(params: {
         verdict: report.verdict,
         confidence: report.confidence,
         report: {
-          strictness: params.strictness,
+          strictness: describeStrictness(params.strictness),
           modelVerdict: report.modelVerdict,
           fixtures: report.fixtures,
           checks: report.checks,
