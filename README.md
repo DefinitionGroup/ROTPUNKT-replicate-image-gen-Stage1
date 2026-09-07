@@ -99,3 +99,6 @@ The deployment is fully automated and requires no manual intervention.
 ## License
 
 MIT
+
+
+Martin Adelstein
