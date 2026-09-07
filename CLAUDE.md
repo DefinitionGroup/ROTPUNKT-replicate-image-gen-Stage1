@@ -1,11 +1,11 @@
 # CLAUDE.md — RDDOT-dfn-AI-IMAGEGEN
 
 ## Project Overview
-AI kitchen image generation app built with Next.js 15 (App Router). Combines a Sanity CMS marketing site with a client-side wizard that builds prompts, calls Replicate for generation/upscaling, stores assets in MinIO, and records metadata in Supabase. Auth via Clerk, i18n via `next-intl`.
+AI kitchen image generation app built with Next.js 15 (App Router). A marketing site (content from `content/content.md` in dev, Sanity CMS otherwise) plus the studio at `/studio`: a step-by-step configurator that builds prompts, calls Replicate for generation/upscaling, validates results (quality gate), stores assets in MinIO, and records metadata in Supabase. Auth via Clerk, i18n via `next-intl`. Design contract in `DESIGN.md`, product schema in `PRODUCT.md`.
 
 ## Tech Stack
 - **Framework**: Next.js 15, React 19, TypeScript (strict mode)
-- **Styling**: Tailwind CSS v4 (`@import "tailwindcss"` in `app/globals.css`), dark high-contrast palette
+- **Styling**: Tailwind CSS v4 (`@theme inline` tokens in `app/globals.css`), dark-only palette (canvas/charcoal/hairline/graphite/ash/ink/porcelain/signature), Manrope + Instrument Serif self-hosted via `@fontsource`
 - **Animation**: `motion/react` (framer-motion), Lottie
 - **CMS**: Sanity v4 + Studio at `/studio`, Cloudinary plugin, document internationalization
 - **Auth**: Clerk (`@clerk/nextjs`)
@@ -20,6 +20,7 @@ AI kitchen image generation app built with Next.js 15 (App Router). Combines a S
 ```bash
 pnpm install      # install deps
 pnpm dev          # dev server (Turbopack)
+DEV_CONTENT=true pnpm dev   # marketing content from content/content.md instead of Sanity
 pnpm build        # production build
 pnpm lint         # eslint
 pnpm fix          # eslint --fix
@@ -28,19 +29,28 @@ pnpm fix          # eslint --fix
 ## Project Structure
 ```
 app/
-  (site)/[locale]/page.tsx          # Home (Sanity HOME_PAGE_QUERY → PageBuilder)
-  (site)/[locale]/[slug]/page.tsx   # CMS pages (PAGE_QUERY)
-  (site)/[locale]/my-images/        # Auth-protected gallery
-  (studio)/studio/[[...tool]]/      # Sanity Studio
-  api/replicate/route.ts            # Image generation endpoint
-  api/replicate/upscale/route.ts    # Upscale endpoint
-  api/clerk-user-webhook/route.ts   # Clerk → Supabase user sync
-  store/                            # nanostores
+  (site)/[locale]/layout.tsx              # Providers only
+  (site)/[locale]/(marketing)/page.tsx    # Home (sections from lib/content)
+  (site)/[locale]/(marketing)/[slug]/     # About + legal pages
+  (site)/[locale]/(app)/studio/           # The configurator (StudioShell)
+  (site)/[locale]/(app)/my-images/        # Auth-protected gallery
+  (site)/[locale]/(app)/quality-gate/     # Admin review of validator verdicts
+  (studio)/studio/[[...tool]]/            # Sanity Studio (CMS, not the configurator)
+  api/replicate/route.ts                  # Start a generation set
+  api/replicate/status/route.ts           # Poll, validate, persist
+  api/replicate/upscale/route.ts          # Upscale endpoint
+  api/clerk-user-webhook/route.ts         # Clerk → Supabase user sync
+  store/                                  # nanostores (wizardStore, prompt, runtimeConfig)
 components/
-  PageBuilder.tsx                   # Maps Sanity blocks → React components
-  pagebuildercomponents/            # Individual CMS block components
-  wizard/                           # Prompt wizard + ImageGenerator
-  ui/                               # Navbar, Footer, shadcn primitives
+  design-system/                    # Pill, Label, Emphasis, Glass, Card, Overlay, Reveal …
+  site/                             # SiteHeader, SiteFooter, AppHeader, LanguageToggle
+  sections/                         # Homepage + about/legal sections
+  studio/                           # StudioShell, StudioRail, StudioIntro
+  wizard/                           # Step components, promptBuilder, ImageGenerator
+  ui/                               # shadcn primitives
+content/content.md                  # Dev content (## de / ## en yaml blocks)
+lib/content/                        # Content model, md loader, Sanity adapter
+lib/motion.ts                       # Motion contract (easing, durations)
 sanity/
   schemaTypes/                      # CMS schema types
   lib/queries.ts                    # GROQ queries
@@ -58,17 +68,17 @@ public/                             # Fonts (Raleway), assets, lottie
 ## Key Conventions
 - **Locales**: `de` (German), `en` (English) — prefix always shown in URL
 - **Fonts**: Raleway (multiple weights, `public/fonts/`)
-- **Brand colors**: CSS variables (`--color-brand-primary-2`, etc.) in `app/globals.css`
-- **CMS blocks**: Schema in `sanity/schemaTypes/`, registered in `pageBuilderType.ts`, rendered via `PageBuilder.tsx`
-- **Image generation**: Wizard → `POST /api/replicate` → Replicate → MinIO + Supabase → client
+- **Design tokens**: `app/globals.css` (`@theme inline`) + `lib/motion.ts`; see `DESIGN.md`. Headlines mark one serif word with `*asterisks*` (`Emphasis`)
+- **Content**: `DEV_CONTENT=true` → `content/content.md`; otherwise `lib/content/fromSanity.ts` maps existing Sanity blocks onto the same `LocaleContent` model
+- **Image generation**: StudioShell captures prompt + quality contract together (`GenerationRequestSpec`) → `POST /api/replicate` → poll `/api/replicate/status` → MinIO + Supabase → client
+- **Quality gate**: `QUALITY_GATE_MODE=off|shadow|enforce`, validator on Replicate (`lib/visionValidator.ts`, `lib/qualityGate.ts`); see `playbook-stabilisierung.md`
 - **Upscaling**: `POST /api/replicate/upscale` → same storage flow
 - **Draft preview**: Sanity live mode via `/api/draft-mode/enable`
 
-## Adding a New CMS Block
-1. Create schema in `sanity/schemaTypes/`
-2. Register in `sanity/schemaTypes/pageBuilderType.ts`
-3. Create React component in `components/pagebuildercomponents/`
-4. Map in `components/PageBuilder.tsx`
+## Adding a Homepage Section
+1. Extend the content model in `lib/content/types.ts`
+2. Add the data to `content/content.md` (both locales) and map it in `lib/content/fromSanity.ts`
+3. Create the section in `components/sections/` and render it in `(marketing)/page.tsx`
 
 ## Environment Variables
 See `.env.local.example`. Key groups: Replicate, MinIO, Supabase, Clerk, Sanity.
@@ -77,4 +87,4 @@ See `.env.local.example`. Key groups: Replicate, MinIO, Supabase, Clerk, Sanity.
 Automated Jenkins deploy on `main` branch push to `https://rotpunkt-visions.de/` (~2 min).
 
 ## Testing
-No test suite configured. Use `pnpm lint` for static checks.
+No test suite configured. Use `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm audit:prompts` for static checks.

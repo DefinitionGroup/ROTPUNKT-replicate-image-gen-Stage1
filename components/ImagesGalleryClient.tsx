@@ -1,43 +1,33 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
-import ImageModal from "./ImageModal";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { getPaginatedImages, type ImageRow } from "@/lib/actions/images";
-import { Loader2, Star } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { motion } from "motion/react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
 import AiGeneratedLabel from "@/components/AiGeneratedLabel";
+import { GlassBadge } from "@/components/design-system/glass";
+import { getPaginatedImages, type ImageRow } from "@/lib/actions/images";
+import { DURATION, REVEAL_RISE, SIGNATURE_EASE, STAGGER } from "@/lib/motion";
+import ImageModal from "./ImageModal";
 
 const itemVariants = {
-  hidden: { opacity: 0, scale: 0.8, y: 50 },
-  visible: (i: number) => ({
+  hidden: { opacity: 0, y: REVEAL_RISE },
+  visible: (index: number) => ({
     opacity: 1,
-    scale: 1,
     y: 0,
-    transition: {
-      delay: i * 0.05,
-      duration: 0.5,
-      type: "spring" as const,
-      stiffness: 260,
-      damping: 20
-    }
+    transition: { delay: index * STAGGER, duration: DURATION.reveal, ease: SIGNATURE_EASE },
   }),
 };
 
+/** The person's own images, newest first, loading more as the page scrolls. */
 export default function ImagesGalleryClient() {
-  const t = useTranslations('imageGallery');
+  const t = useTranslations("imageGallery");
   const [selected, setSelected] = useState<ImageRow | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery({
     queryKey: ["images"],
     queryFn: ({ pageParam = 0 }) => getPaginatedImages(pageParam),
     getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -53,106 +43,78 @@ export default function ImagesGalleryClient() {
       },
       { threshold: 0.1 }
     );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
+    if (observerTarget.current) observer.observe(observerTarget.current);
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (status === "pending") {
     return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="w-8 h-8 text-brand-primary-2 animate-spin" />
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="size-6 animate-spin text-signature" />
       </div>
     );
   }
 
   if (status === "error") {
-    return (
-      <div className="rounded-xl border border-border bg-card p-8 text-destructive">
-        {t('error')}
-      </div>
-    );
+    return <p className="rounded-card border border-hairline bg-charcoal p-6 text-body text-signature">{t("error")}</p>;
   }
 
   const allImages = data?.pages.flatMap((page) => page.images) || [];
 
   if (allImages.length === 0) {
-    return (
-      <div className="rounded-xl border border-border bg-card p-8 text-muted-foreground">
-        {t('empty')}
-      </div>
-    );
+    return <p className="rounded-card border border-hairline bg-charcoal p-6 text-body text-graphite">{t("empty")}</p>;
   }
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {allImages.map((img, index) => (
-          <motion.button
+          <motion.li
+            custom={index % 12}
+            initial="hidden"
             key={img.id}
             variants={itemVariants}
-            initial="hidden"
+            viewport={{ once: true, margin: "-40px" }}
             whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            custom={index % 12}
-            type="button"
-            onClick={() => setSelected(img)}
-            className="group relative block text-left rounded-xl overflow-hidden border border-border bg-card hover:border-brand-primary-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-2"
           >
-            {img.is_upscaled && (
-              <div className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-[10px] font-medium text-white">
-                ✨ High-Res
-              </div>
-            )}
-            {img.is_selected_best && (
-              <div
-                className="absolute left-2 top-2 z-10 inline-flex size-8 items-center justify-center rounded-full bg-emerald-400 text-black shadow-lg"
-                title={t("selectedBest")}
-              >
-                <Star className="size-4" fill="currentColor" />
-              </div>
-            )}
-            <div className="relative">
-              <Image
-                src={img.url}
-                alt="Generated"
-                width={800}
-                height={800}
-                unoptimized
-                className="w-full h-auto object-cover"
-              />
-              <AiGeneratedLabel className="pointer-events-none absolute bottom-2 left-2" />
-            </div>
-            <div
-              className="px-4 py-3 text-xs text-muted-foreground group-hover:text-foreground transition"
-              suppressHydrationWarning
+            <button
+              className="group relative block w-full overflow-hidden rounded-card border border-hairline bg-charcoal text-left transition-colors duration-state ease-signature hover:border-graphite focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ink"
+              onClick={() => setSelected(img)}
+              type="button"
             >
-              {new Date(img.created_at).toLocaleString()}
-            </div>
-          </motion.button>
+              <div className="absolute left-3 top-3 z-10 flex gap-2">
+                {img.is_selected_best && <GlassBadge>{t("selectedBest")}</GlassBadge>}
+                {img.is_upscaled && <GlassBadge>High-Res</GlassBadge>}
+              </div>
+              <div className="relative aspect-[4/3] overflow-hidden">
+                <Image
+                  alt={t("generatedImageAlt")}
+                  className="object-cover transition-transform duration-reveal ease-signature group-hover:scale-[1.02]"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"
+                  src={img.url}
+                  unoptimized
+                />
+                <AiGeneratedLabel className="pointer-events-none absolute bottom-2 left-2" />
+              </div>
+              <p className="tnum px-4 py-3 text-caption text-graphite transition-colors duration-state ease-signature group-hover:text-ink" suppressHydrationWarning>
+                {new Date(img.created_at).toLocaleString()}
+              </p>
+            </button>
+          </motion.li>
         ))}
-      </div>
+      </ul>
 
-      {/* Loading target for Infinite Scroll */}
-      <div ref={observerTarget} className="flex justify-center items-center py-10 mt-6 min-h-20">
+      <div className="mt-6 flex min-h-20 items-center justify-center py-10" ref={observerTarget}>
         {isFetchingNextPage ? (
-          <Loader2 className="w-6 h-6 text-brand-primary-2 animate-spin" />
-        ) : hasNextPage ? (
-          <span className="text-xs text-muted-foreground">{t('scrollMore')}</span>
+          <Loader2 className="size-5 animate-spin text-signature" />
         ) : (
-          <span className="text-xs text-muted-foreground">{t('allImages')}</span>
+          <span className="text-caption text-graphite">{hasNextPage ? t("scrollMore") : t("allImages")}</span>
         )}
       </div>
 
       {selected && (
-        <ImageModal
-          src={selected.url}
-          onClose={() => setSelected(null)}
-          prompt={selected.imageprompt || ""}
-        />
+        <ImageModal onClose={() => setSelected(null)} prompt={selected.imageprompt || ""} src={selected.url} />
       )}
     </>
   );

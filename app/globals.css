@@ -1,339 +1,345 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Raleway — explicit weight/italic variants */
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-Thin.ttf") format("truetype");
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-ThinItalic.ttf") format("truetype");
-  font-weight: 100;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-ExtraLight.ttf") format("truetype");
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-ExtraLightItalic.ttf")
-    format("truetype");
-  font-weight: 200;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-Light.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-LightItalic.ttf") format("truetype");
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-Italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-Medium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-MediumItalic.ttf") format("truetype");
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-SemiBold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-SemiBoldItalic.ttf")
-    format("truetype");
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-Bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-BoldItalic.ttf") format("truetype");
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-ExtraBold.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-ExtraBoldItalic.ttf")
-    format("truetype");
-  font-weight: 800;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Optional Black (900) if you want the heaviest weight */
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-Black.ttf") format("truetype");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/static/Raleway-BlackItalic.ttf") format("truetype");
-  font-weight: 900;
-  font-style: italic;
-  font-display: swap;
-}
-/* 
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/Raleway-VariableFont_wght.ttf") format("truetype");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-} */
-
-@font-face {
-  font-family: "Raleway";
-  src: url("/fonts/Raleway/Raleway-Italic-VariableFont_wght.ttf")
-    format("truetype");
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Raleway Light Font Face */
-@font-face {
-  font-family: "RalewayLight";
-  src: url("/fonts/ralewayLight.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-body {
-  background: var(--background) !important;
-  color: var(--foreground);
-  font-family: "Raleway", Arial, Helvetica, sans-serif;
-}
-html {
-  background: var(--background) !important;
-  color: var(--foreground);
-  font-family: "Raleway", Arial, Helvetica, sans-serif;
-}
-
-/* Custom utility for extra-small copy aligned with typographic scale */
-.text-xxs {
-  font-size: 0.625rem; /* 10px equivalent */
-  line-height: 0.875rem; /* 14px equivalent */
-}
-
+/*
+ * Rotpunkt after dark — the visual world of rotpunkt-visions.de.
+ * Black stage, charcoal surfaces, three greys, white structure, one red.
+ * Names stay semantic so a surface never picks a hex directly.
+ * The shadcn tokens below are mapped onto the same seven colours so every
+ * existing component (wizard, gallery, modals) sits in the same world.
+ */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: "RalewayLight", "Raleway", var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
+  --font-sans: "Manrope Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: "Instrument Serif", "Times New Roman", Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* The seven colours */
+  --color-canvas: #000000;
+  --color-charcoal: #202020;
+  --color-mist: #202020;
+  --color-hairline: #333333;
+  --color-graphite: #999999;
+  --color-ash: #666666;
+  --color-ink: #ffffff;
+  --color-paper: #000000;
+  --color-porcelain: #f5f1ea;
+  --color-signature: #e30613;
+  --color-signature-hover: #c90511;
+  --color-signature-pressed: #a9040e;
+
+  /* shadcn semantic tokens, dark only */
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-card: #202020;
+  --color-card-foreground: #ffffff;
+  --color-popover: #202020;
+  --color-popover-foreground: #ffffff;
+  --color-primary: #ffffff;
+  --color-primary-foreground: #000000;
+  --color-secondary: #202020;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #202020;
+  --color-muted-foreground: #999999;
+  --color-accent: #2a2a2a;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #e30613;
+  --color-border: #333333;
+  --color-input: #333333;
+  --color-ring: #e30613;
+  --color-chart-1: #e30613;
+  --color-chart-2: #999999;
+  --color-chart-3: #666666;
+  --color-chart-4: #f5f1ea;
+  --color-chart-5: #333333;
+  --color-sidebar: #202020;
+  --color-sidebar-foreground: #ffffff;
+  --color-sidebar-primary: #ffffff;
+  --color-sidebar-primary-foreground: #000000;
+  --color-sidebar-accent: #2a2a2a;
+  --color-sidebar-accent-foreground: #ffffff;
+  --color-sidebar-border: #333333;
+  --color-sidebar-ring: #e30613;
+
+  /* Brand aliases kept for the existing components */
+  --color-brand-primary-1: #2d2d2d;
+  --color-brand-primary-2: #e30613;
+  --color-brand-secondary-1: #f5f1ea;
+  --color-brand-secondary-2: #5c782b;
+
+  /* Two radii: pills and cards. Inputs stay square (underline only). */
+  --radius: 0.625rem;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-card: 10px;
+  --radius-pill: 9999px;
 
-  --color-brand-primary-1: var(--brand-primary-1);
-  --color-brand-primary-2: var(--brand-primary-2);
-  --color-brand-secondary-1: var(--brand-secondary-1);
-  --color-brand-secondary-2: var(--brand-secondary-2);
+  /* One family, three weights. Headlines go light; labels and actions medium. */
+  --font-weight-base: 400;
+  --font-weight-display: 300;
+  --font-weight-label: 500;
+
+  /* The type scale */
+  --text-display: clamp(3rem, 6.7vw, 6rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.05em;
+  --text-display--font-weight: 300;
+  --text-heading-lg: clamp(2.5rem, 5vw, 4.5rem);
+  --text-heading-lg--line-height: 1;
+  --text-heading-lg--letter-spacing: -0.05em;
+  --text-heading-lg--font-weight: 300;
+  --text-heading: clamp(2.25rem, 3.75vw, 3.375rem);
+  --text-heading--line-height: 1.1;
+  --text-heading--letter-spacing: -0.025em;
+  --text-heading--font-weight: 300;
+  --text-title: 2rem;
+  --text-title--line-height: 1.1;
+  --text-title--letter-spacing: -0.025em;
+  --text-title--font-weight: 300;
+  --text-panel: 1.875rem;
+  --text-panel--line-height: 1.1;
+  --text-panel--letter-spacing: -0.025em;
+  --text-panel--font-weight: 300;
+  --text-card-title: 1.3125rem;
+  --text-card-title--line-height: 1.2;
+  --text-card-title--font-weight: 500;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.5;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+  --text-nav: 0.9375rem;
+  --text-nav--line-height: 1.5;
+  --text-nav--font-weight: 500;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.5;
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.08em;
+  --text-xxs: 0.625rem;
+  --text-xxs--line-height: 0.875rem;
+
+  --tracking-label: 0.08em;
+  --tracking-badge: 0.05em;
+  --tracking-film: 0.03em;
+
+  --shadow-action: 0 4px 20px rgb(0 0 0 / 0.15);
+  --shadow-glass: rgb(0 0 0 / 0.35) 0 10px 30px 0, inset rgb(255 255 255 / 0.08) 0 1px 0 0;
+
+  /* One curve; the durations live on :root so reduced motion can collapse them. */
+  --ease-signature: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --container-signature: 82rem;
 }
 
 :root {
-  --radius: 0.625rem;
-  color-scheme: light;
-  --background: #f7f5f2;
-  --foreground: #151515;
-
-  --card: #ffffff;
-  --card-foreground: #171717;
-  
-  --popover: #ffffff;
-  --popover-foreground: #171717;
-
-  --primary: #151515;
-  --primary-foreground: #ffffff;
-
-  --secondary: #f1eeea;
-  --secondary-foreground: #1f1f1f;
-
-  --muted: #f1eeea;
-  --muted-foreground: #6b6b6b;
-
-  --accent: #efece7;
-  --accent-foreground: #1a1a1a;
-
-  --destructive: #b91c1c;
-  --destructive-foreground: #ffffff;
-
-  --border: #e3ded7;
-  --input: #e3ded7;
-  --ring: #e30421; /* Brand Red for focus rings */
-
-  --chart-1: #e30421;
-  --chart-2: #5c782b;
-  --chart-3: #2d2d2d;
-  --chart-4: #7c7c7c;
-  --chart-5: #151515;
-
-  --sidebar: #ffffff;
-  --sidebar-foreground: #151515;
-  --sidebar-primary: #e30421;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1eeea;
-  --sidebar-accent-foreground: #1f1f1f;
-  --sidebar-border: #e3ded7;
-  --sidebar-ring: #e30421;
-
-  /* Brand Colors - Preserved */
-  --brand-primary-1: #2d2d2d;
-  --brand-primary-1-rgb: 45 45 45;
-  --brand-primary-2: #e30421;
-  --brand-primary-2-rgb: 227 4 33;
-  --brand-secondary-1: #f8f8f8;
-  --brand-secondary-1-rgb: 237 237 237;
-  --brand-secondary-2: #5c782b;
-  --brand-secondary-2-rgb: 91 120 19;
+  --motion-factor: 1;
+  --duration-state: calc(160ms * var(--motion-factor));
+  --duration-accordion: calc(240ms * var(--motion-factor));
+  --duration-overlay: calc(420ms * var(--motion-factor));
+  --duration-reveal: calc(600ms * var(--motion-factor));
+  color-scheme: dark;
 }
 
-/* Enforce dark mode look by default generally, but keep .dark class structure if needed */
-.dark {
-  color-scheme: dark;
-  --background: #050505;
-  --foreground: #f4f4f5;
-  --card: #0f0f10;
-  --card-foreground: #f4f4f5;
-  --popover: #0f0f10;
-  --popover-foreground: #f4f4f5;
-  --primary: #f4f4f5;
-  --primary-foreground: #09090b;
-  --secondary: #27272a;
-  --secondary-foreground: #f4f4f5;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #f4f4f5;
-  --destructive: #991b1b;
-  --destructive-foreground: #f4f4f5;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #e30421;
-  --sidebar: #0f0f10;
-  --sidebar-foreground: #f4f4f5;
-  --sidebar-primary: #e30421;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #f4f4f5;
-  --sidebar-border: #27272a;
-  --sidebar-ring: #e30421;
+@utility duration-state {
+  transition-duration: var(--duration-state);
+}
+@utility duration-accordion {
+  transition-duration: var(--duration-accordion);
+}
+@utility duration-overlay {
+  transition-duration: var(--duration-overlay);
+}
+@utility duration-reveal {
+  transition-duration: var(--duration-reveal);
+}
+
+/* The only width authority for marketing sections. */
+@utility signature-container {
+  width: min(100% - 2.5rem, var(--container-signature));
+  margin-inline: auto;
+  @media (min-width: 768px) {
+    width: min(100% - 6rem, var(--container-signature));
+  }
+  @media (min-width: 1024px) {
+    width: min(100% - 8rem, var(--container-signature));
+  }
+}
+
+/* Frosted chip over imagery. */
+@utility glass {
+  background: rgb(200 200 200 / 0.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow:
+    rgb(0 0 0 / 0.35) 0 10px 30px 0,
+    inset rgb(255 255 255 / 0.08) 0 1px 0 0;
+}
+
+/* Gradients that seat a caption on imagery. */
+@utility media-shade {
+  background: linear-gradient(180deg, rgb(0 0 0 / 0) 45%, rgb(0 0 0 / 0.55) 100%);
+}
+@utility media-shade-deep {
+  background: linear-gradient(180deg, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / 0.7) 100%);
+}
+@utility media-shade-frame {
+  background: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 0.38) 0%,
+    rgb(0 0 0 / 0) 32%,
+    rgb(0 0 0 / 0) 48%,
+    rgb(0 0 0 / 0.62) 100%
+  );
+}
+@utility hero-shade {
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.05) 35%, rgb(0 0 0 / 0.75) 100%);
+}
+@utility tnum {
+  font-variant-numeric: tabular-nums;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+    border-color: var(--color-border);
   }
+
+  html {
+    background: var(--color-canvas);
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    min-height: 100vh;
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-base);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-signature);
+    color: var(--color-ink);
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2 {
+    font-weight: var(--font-weight-display);
+  }
+
+  h3,
+  h4,
+  strong,
+  b {
+    font-weight: var(--font-weight-label);
+  }
+
+  /* Exactly one serif word per headline: <em> is that word. */
+  em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  a {
+    transition: color var(--duration-state) var(--ease-signature);
+  }
+
+  img,
+  video {
+    max-width: 100%;
+  }
+
+  /* Themed scrollbar: hairline thumb on the void. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-hairline) transparent;
   }
 }
 
-/* Ensure Clerk modals/popovers render above the fixed navbar layers */
+/* Long-form legal and editorial text rendered from markdown or Portable Text. */
+.prose-signature {
+  max-width: 68ch;
+  color: var(--color-graphite);
+}
+.prose-signature h1 {
+  margin: 0 0 1.5rem;
+  color: var(--color-ink);
+  font-size: var(--text-heading);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.prose-signature h2,
+.prose-signature h3,
+.prose-signature h4 {
+  margin: 2.5rem 0 0.75rem;
+  color: var(--color-ink);
+  font-size: var(--text-card-title);
+  line-height: 1.2;
+  font-weight: var(--font-weight-label);
+}
+.prose-signature p,
+.prose-signature li {
+  margin: 0 0 1rem;
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+.prose-signature strong {
+  color: var(--color-ink);
+}
+.prose-signature a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--color-hairline);
+}
+.prose-signature a:hover {
+  color: var(--color-porcelain);
+  text-decoration-color: var(--color-porcelain);
+}
+.prose-signature ul,
+.prose-signature ol {
+  padding-left: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-factor: 0;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Clerk modals and popovers above the fixed header. */
 .cl-modalBackdrop {
   z-index: 2147483646 !important;
 }
-
 .cl-modalContent,
 .cl-modalCloseButton,
 .cl-userButtonPopoverRootBox,

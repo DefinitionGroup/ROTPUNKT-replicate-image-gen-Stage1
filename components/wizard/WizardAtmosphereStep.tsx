@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
 import { TimeSlider } from "./TimeSlider";
+import { StepHeader } from "./StepHeader";
 
 /* ─── Types ──────────────────────────────────────────────────── */
 
@@ -88,7 +89,6 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
   onContinue,
   loading = false,
 }) => {
-  const t = useTranslations("wizard");
   const tSteps = useTranslations("wizard.steps");
   const tAtmosphere = useTranslations("wizard.atmosphere");
 
@@ -168,19 +168,7 @@ export const WizardAtmosphereStep: React.FC<WizardAtmosphereStepProps> = ({
       transition={{ duration: 0.25 }}
     >
       {/* ─── Header ────────────────────────────────── */}
-      <div className="flex items-center gap-3 mb-3 shrink-0">
-        <div className="h-9 w-9 shrink-0 rounded-full bg-brand-primary-2/15 border border-brand-primary-2/40 flex items-center justify-center text-brand-primary-2">
-          <FaCouch className="w-full h-full text-red-600" />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-lg sm:text-xl md:text-2xl text-left tracking-tight text-foreground">
-            {tAtmosphere("title")}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-0.5 max-w-xl text-left leading-snug">
-            {tAtmosphere("description")}
-          </p>
-        </div>
-      </div>
+      <StepHeader icon={<FaCouch />} title={tAtmosphere("title")} description={tAtmosphere("description")} />
 
       {/* ─── Segmented Tab Bar ─────────────────────── */}
       <div className="mb-3 shrink-0">

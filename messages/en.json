@@ -14,11 +14,14 @@
     "toHomepage": "Go to Homepage",
     "contact": "Contact",
     "login": "Log In",
-    "register": "Register"
+    "register": "Register",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "account": "Account"
   },
   "metadata": {
-    "title": "Rotpunkt Kitchen AI Image Generator",
-    "description": "Generate your dream kitchen with AI"
+    "title": "Rotpunkt Visions",
+    "description": "Your Rotpunkt kitchen, visualised: configure, generate, view verified images."
   },
   "notFound": {
     "title": "Page Not Found",
@@ -293,7 +296,7 @@
     },
     "loading": {
       "messages": {
-        "validating": "Checking the configuration\u2026",
+        "validating": "Checking the configuration…",
         "generating": "Generating your visualisation...",
         "aiWorking": "The AI is working on your design...",
         "takingLonger": "This is taking a bit longer today – please be patient...",
@@ -318,7 +321,7 @@
     },
     "error": {
       "title": "Something went wrong",
-      "qualityFailed": "No image matched the chosen configuration. Please try again \u2013 the next attempt uses fresh variants.",
+      "qualityFailed": "No image matched the chosen configuration. Please try again – the next attempt uses fresh variants.",
       "unknown": "An unknown error occurred.",
       "aborted": "The request was aborted.",
       "retry": "Try again"
@@ -332,7 +335,9 @@
     "generatedImageAlt": "Generated image",
     "selectedBest": "Selected as best image",
     "scrollMore": "Scroll for more images",
-    "allImages": "That's all your images ✨"
+    "allImages": "That's all your images ✨",
+    "headline": "My *images*.",
+    "lead": "Every visualisation you have created in the studio, newest first."
   },
   "aiDisclosure": {
     "label": "AI-generated",
@@ -372,5 +377,41 @@
   },
   "languageSwitcher": {
     "label": "Select language"
+  },
+  "studio": {
+    "eyebrow": "Studio",
+    "intro": {
+      "title": "Choose a *starting point*.",
+      "lead": "Begin with a curated template or make every decision yourself. Everything can be changed later.",
+      "blankTitle": "Your own combination",
+      "blankLead": "Start from an empty selection and decide each step yourself.",
+      "presetsLabel": "Templates",
+      "start": "Start"
+    },
+    "rail": {
+      "title": "Your selection",
+      "step": "Step {current} of {total}",
+      "open": "open",
+      "wishes": "Additional wishes",
+      "wishesEmpty": "none",
+      "edit": "Change selection",
+      "prompt": "View prompt",
+      "reset": "Start over",
+      "toWishes": "Continue to wishes",
+      "generate": "Create image",
+      "signIn": "Sign in and create",
+      "incomplete": "{count} still open"
+    },
+    "stage": {
+      "back": "Back",
+      "backToStart": "To the start",
+      "result": "Your *visualisation*.",
+      "resultLead": "Open the image at full size, download it, or generate another variant.",
+      "variant": "New variant",
+      "gallery": "My images",
+      "checked": "Verified",
+      "generating": "Generating",
+      "validating": "Checking"
+    }
   }
 }

@@ -6,6 +6,10 @@ const compat = new FlatCompat({
 })
 
 const eslintConfig = [
+  {
+    // Training data, build output and generated code are not source.
+    ignores: ['arc/**', 'Frontfarben/**', 'grifffronten/**', '.next/**', 'public/**', 'sanity/sanity.types.ts', 'next-env.d.ts', 'debug-*.js'],
+  },
   ...compat.config({
     extends: ['next/core-web-vitals', 'next/typescript'],
   }),

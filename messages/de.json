@@ -14,11 +14,14 @@
     "toHomepage": "Zur Startseite",
     "contact": "Kontakt",
     "login": "Einloggen",
-    "register": "Registrieren"
+    "register": "Registrieren",
+    "menuOpen": "Menü öffnen",
+    "menuClose": "Menü schließen",
+    "account": "Konto"
   },
   "metadata": {
-    "title": "Rotpunkt Küchen AI Bildgenerator",
-    "description": "Generieren Sie Ihre Traumküche mit KI"
+    "title": "Rotpunkt Visions",
+    "description": "Ihre Rotpunkt Küche, visualisiert: konfigurieren, erzeugen, geprüft ansehen."
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -307,7 +310,7 @@
       },
       "subMessages": {
         "validating": "Ein Prüfmodell kontrolliert Spüle, Kochfeld und Aufteilung, bevor das Bild erscheint.",
-        "usually30s": "Das Bild wird in aller Regel innerhalb von 30\u00A0s generiert.",
+        "usually30s": "Das Bild wird in aller Regel innerhalb von 30 s generiert.",
         "highLoad": "Bei hoher Auslastung kann es bis zu 1-2 Minuten dauern.",
         "warmingUp": "Manchmal muss das KI-Modell erst aufgewärmt werden.",
         "coldStart": "Ein Kaltstart kann bis zu 3 Minuten dauern – aber es lohnt sich!",
@@ -332,7 +335,9 @@
     "generatedImageAlt": "Generiertes Bild",
     "selectedBest": "Als bestes Bild ausgewählt",
     "scrollMore": "Scrolle weiter für mehr Bilder",
-    "allImages": "Das sind alle deine Bilder ✨"
+    "allImages": "Das sind alle deine Bilder ✨",
+    "headline": "Meine *Bilder*.",
+    "lead": "Alle Visualisierungen, die Sie im Studio erzeugt haben, neueste zuerst."
   },
   "aiDisclosure": {
     "label": "KI-generiert",
@@ -372,5 +377,41 @@
   },
   "languageSwitcher": {
     "label": "Sprache wählen"
+  },
+  "studio": {
+    "eyebrow": "Studio",
+    "intro": {
+      "title": "Wählen Sie einen *Startpunkt*.",
+      "lead": "Beginnen Sie mit einer kuratierten Vorlage oder stellen Sie jede Entscheidung selbst zusammen. Alles lässt sich später noch ändern.",
+      "blankTitle": "Eigene Kombination",
+      "blankLead": "Mit einer leeren Auswahl starten und jeden Schritt selbst bestimmen.",
+      "presetsLabel": "Vorlagen",
+      "start": "Starten"
+    },
+    "rail": {
+      "title": "Ihre Auswahl",
+      "step": "Schritt {current} von {total}",
+      "open": "offen",
+      "wishes": "Zusätzliche Wünsche",
+      "wishesEmpty": "keine",
+      "edit": "Auswahl ändern",
+      "prompt": "Prompt ansehen",
+      "reset": "Neu beginnen",
+      "toWishes": "Weiter zu den Wünschen",
+      "generate": "Bild erstellen",
+      "signIn": "Anmelden und erstellen",
+      "incomplete": "Noch {count} offen"
+    },
+    "stage": {
+      "back": "Zurück",
+      "backToStart": "Zum Anfang",
+      "result": "Ihre *Visualisierung*.",
+      "resultLead": "Öffnen Sie das Bild in voller Größe, laden Sie es herunter oder erzeugen Sie eine weitere Variante.",
+      "variant": "Neue Variante",
+      "gallery": "Meine Bilder",
+      "checked": "Geprüft",
+      "generating": "Wird erzeugt",
+      "validating": "Wird geprüft"
+    }
   }
 }
