@@ -1,13 +1,33 @@
+"use client";
+
+import { useState } from "react";
 import { MediaCard } from "@/components/design-system/card";
 import { Emphasis } from "@/components/design-system/emphasis";
 import { SectionIntro } from "@/components/design-system/label";
+import { Lightbox } from "@/components/design-system/lightbox";
 import { Pill } from "@/components/design-system/pill";
 import { Reveal } from "@/components/design-system/reveal";
 import { Tilt } from "@/components/design-system/tilt";
 import type { GalleryContent } from "@/lib/content/types";
 
-/** Generated kitchens as cinematic cards: a snap band on phones, a grid above. */
-export function Gallery({ gallery }: { gallery: GalleryContent }) {
+type GalleryProps = {
+  gallery: GalleryContent;
+  labels: { close: string; previous: string; next: string };
+};
+
+/**
+ * Generated kitchens as cinematic cards: a snap band on phones, a grid above.
+ * Every card opens the image at full size in the lightbox.
+ */
+export function Gallery({ gallery, labels }: GalleryProps) {
+  const [active, setActive] = useState<number | null>(null);
+  const items = gallery.items.map((item) => ({
+    image: item.image,
+    alt: item.alt ?? item.title,
+    title: item.title,
+    description: item.description,
+  }));
+
   return (
     <section className="pt-20 md:pt-[120px]" id="galerie">
       <Reveal className="signature-container grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end lg:gap-16">
@@ -19,15 +39,22 @@ export function Gallery({ gallery }: { gallery: GalleryContent }) {
           {gallery.items.map((item, index) => (
             <Reveal as="li" className="w-[300px] shrink-0 snap-start md:w-auto" index={index} key={item.image}>
               <Tilt>
-                <MediaCard
-                  alt={item.alt ?? item.title}
-                  body={item.description}
-                  image={item.image}
-                  ratio="aspect-[4/5] md:aspect-[16/11]"
-                  shade="deep"
-                  sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 300px"
-                  title={item.title}
-                />
+                <button
+                  aria-haspopup="dialog"
+                  className="block w-full cursor-zoom-in rounded-card text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ink"
+                  onClick={() => setActive(index)}
+                  type="button"
+                >
+                  <MediaCard
+                    alt={item.alt ?? item.title}
+                    body={item.description}
+                    image={item.image}
+                    ratio="aspect-[4/5] md:aspect-[16/11]"
+                    shade="deep"
+                    sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 300px"
+                    title={item.title}
+                  />
+                </button>
               </Tilt>
             </Reveal>
           ))}
@@ -40,6 +67,7 @@ export function Gallery({ gallery }: { gallery: GalleryContent }) {
           </Pill>
         </div>
       )}
+      <Lightbox index={active} items={items} labels={labels} onChange={setActive} />
     </section>
   );
 }

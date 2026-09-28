@@ -25,7 +25,12 @@ export default async function Home({ params }: Props) {
       <Hero hero={home.hero} />
       {home.manifest && <Manifest manifest={home.manifest} />}
       {home.promises && <Promises closeLabel={t("close")} promises={home.promises} />}
-      {home.gallery && <Gallery gallery={home.gallery} />}
+      {home.gallery && (
+        <Gallery
+          gallery={home.gallery}
+          labels={{ close: t("close"), previous: t("back"), next: t("next") }}
+        />
+      )}
       {home.studio && <StudioTeaser closeLabel={t("close")} studio={home.studio} />}
       {home.closing && <Closing closing={home.closing} />}
     </main>

@@ -21,16 +21,16 @@ export function BrandLogo({ className = "", compact = false, label = "Rotpunkt V
     >
       <Image
         alt="Rotpunkt"
-        className={`${large ? "h-[60px]" : "h-[22px]"} w-auto transition-opacity duration-state ease-signature group-hover:opacity-90`}
-        height={large ? 60 : 22}
+        className={`${large ? "h-[60px]" : "h-[33px]"} w-auto transition-opacity duration-state ease-signature group-hover:opacity-90`}
+        height={large ? 60 : 33}
         priority
         src="/rotpunkt-kuechen-logo.svg"
         unoptimized
-        width={large ? 380 : 140}
+        width={large ? 380 : 210}
       />
       {!compact && (
         <>
-          <span aria-hidden="true" className={`${large ? "h-9" : "h-[18px]"} w-px bg-hairline`} />
+          <span aria-hidden="true" className={`${large ? "h-9" : "h-6"} w-px bg-hairline`} />
           <span className="text-[0.875rem] tracking-[0.02em] text-graphite">Visions</span>
         </>
       )}
