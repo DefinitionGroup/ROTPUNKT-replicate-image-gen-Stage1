@@ -83,7 +83,7 @@ export function SiteHeader({ items, cta }: { items: ContentLink[]; cta: ContentL
           isScrolled || menuOpen ? "border-hairline bg-canvas/80 backdrop-blur-[20px]" : "border-transparent bg-transparent"
         }`}
       >
-        <nav className="signature-container flex h-16 items-center justify-between lg:h-20">
+        <nav className="signature-container flex h-20 items-center justify-between">
           <BrandLogo size="lg" />
           <div className="hidden items-center gap-7 lg:flex">
             {items.map((item) => (
@@ -134,7 +134,7 @@ export function SiteHeader({ items, cta }: { items: ContentLink[]; cta: ContentL
         {menuOpen && (
           <motion.div
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-40 flex flex-col bg-canvas pt-16 lg:hidden"
+            className="fixed inset-0 z-40 flex flex-col bg-canvas pt-20 lg:hidden"
             exit={{ opacity: 0 }}
             id="site-menu"
             initial={{ opacity: 0 }}
