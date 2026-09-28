@@ -55,7 +55,8 @@ function homeFromBlocks(blocks: Block[], locale: Locale, studioLabel: string): H
   const items = Array.isArray(ticker?.tickerItems) ? (ticker!.tickerItems as Block[]) : [];
   if (items.length > 0) {
     home.gallery = {
-      title: asString(ticker?.name) ?? (locale === "de" ? "Inspirationen" : "Inspirations"),
+      // The block's `name` is an editor label ("Ticker Gallery"), not a headline.
+      title: locale === "de" ? "*Galerie*." : "*Gallery*.",
       items: items
         .map((item) => ({
           title: asString(item.title) ?? "",

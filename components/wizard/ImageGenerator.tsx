@@ -155,6 +155,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const {
     mutate: startGeneration,
     isPending: isStarting,
+    status: startStatus,
     isError: isStartError,
     error: startError,
     reset: resetMutation,
@@ -204,6 +205,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       if (!status) return 3000;
       return status === "starting" || status === "processing" ? 3000 : false;
     },
+    // Keep polling while the tab is in the background: the image is only
+    // stored by a poll, and people switch tabs during a minute-long wait.
+    refetchIntervalInBackground: true,
     retry: 1,
   });
 
@@ -279,21 +283,27 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   const status = statusData?.status;
   const isTerminalFailure =
     status === "failed" || status === "partial_failed";
+  // Once a set id exists the start is over, whatever the mutation still
+  // reports (a StrictMode remount in development can leave it "pending").
+  // From then on only the poll status decides what the stage shows.
   const isPending =
     !hasImage &&
-    (isStarting ||
-      (!!generationSetId &&
-        (status === undefined || status === "starting" || status === "processing")));
+    (generationSetId
+      ? status === undefined || status === "starting" || status === "processing"
+      : isStarting);
   const errorMessage =
     isTerminalFailure
       ? statusData?.qualityFailure
         ? t("error.qualityFailed")
         : statusData?.error || t("error.unknown")
       : startError?.message || statusError?.message || t("error.unknown");
-  const isError = !hasImage && (isStartError || isStatusError || isTerminalFailure);
+  const isError =
+    !hasImage && ((isStartError && !generationSetId) || isStatusError || isTerminalFailure);
 
   if (isDev) {
     console.log("[ImageGenerator] State:", {
+      isStarting,
+      startStatus,
       isPending,
       isError,
       hasImage,

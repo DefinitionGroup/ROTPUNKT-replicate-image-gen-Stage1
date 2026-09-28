@@ -213,31 +213,34 @@ async function finalizeVariant(params: {
     return { status: "failed", error: "No output received" };
   }
 
-  let finalUrl = generatedUrl;
-  try {
-    const [uploadedUrl] = await uploadImages([generatedUrl], {
-      deterministicPrefix: `set-${set.id}-variant-${variant.candidateIndex}`,
-    });
-    if (uploadedUrl) finalUrl = uploadedUrl;
-  } catch (storageError) {
-    console.error(
-      `MinIO upload failed for set ${set.id}, variant ${variant.candidateIndex}:`,
-      storageError
-    );
-  }
-
   // Enforce mode: the candidate is validated before it becomes an image row.
   // The poll that finds no attempt claims it and validates in the background;
-  // later polls read the verdict.
+  // later polls read the verdict. The attempt remembers where the candidate
+  // was stored, so only the first poll downloads and uploads it.
+  const enforce = gate.mode === "enforce" && qualityExpectations !== null;
+  const attempt =
+    enforce && qualityExpectations
+      ? await readValidationAttempt(set.id, variant.candidateIndex, gate.validatorModel)
+      : null;
+
+  let finalUrl = attempt?.candidateUrl ?? generatedUrl;
+  if (!attempt) {
+    try {
+      const [uploadedUrl] = await uploadImages([generatedUrl], {
+        deterministicPrefix: `set-${set.id}-variant-${variant.candidateIndex}`,
+      });
+      if (uploadedUrl) finalUrl = uploadedUrl;
+    } catch (storageError) {
+      console.error(
+        `MinIO upload failed for set ${set.id}, variant ${variant.candidateIndex}:`,
+        storageError
+      );
+    }
+  }
+
   let qualityStatus: CandidateQualityStatus = "not_evaluated";
   let attemptId: string | null = null;
-  const enforce = gate.mode === "enforce" && qualityExpectations !== null;
   if (enforce && qualityExpectations) {
-    const attempt = await readValidationAttempt(
-      set.id,
-      variant.candidateIndex,
-      gate.validatorModel
-    );
     if (!attempt) {
       const candidateUrl = finalUrl;
       after(async () => {

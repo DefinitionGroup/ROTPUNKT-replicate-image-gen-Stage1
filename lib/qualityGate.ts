@@ -66,6 +66,8 @@ export type AttemptState = {
   reasons: string[];
   error: string | null;
   imageId: string | null;
+  /** Where the candidate was stored when the attempt was claimed. */
+  candidateUrl: string | null;
 };
 
 type ClaimParams = {
@@ -88,7 +90,7 @@ export async function readValidationAttempt(
   const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("generation_validation_attempts")
-    .select("id, verdict, reasons, error, image_id")
+    .select("id, verdict, reasons, error, image_id, candidate_url")
     .eq("generation_set_id", setId)
     .eq("candidate_index", candidateIndex)
     .eq("attempt_number", attemptNumber)
@@ -102,6 +104,7 @@ export async function readValidationAttempt(
     reasons: (data.reasons as string[] | null) ?? [],
     error: (data.error as string | null) ?? null,
     imageId: (data.image_id as string | null) ?? null,
+    candidateUrl: (data.candidate_url as string | null) ?? null,
   };
 }
 

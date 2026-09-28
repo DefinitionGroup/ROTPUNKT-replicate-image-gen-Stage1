@@ -91,8 +91,7 @@ home:
     cta: { label: "Küche visualisieren", href: "/studio" }
 
   gallery:
-    label: "Galerie"
-    title: "Aus dem *Studio*."
+    title: "*Galerie*."
     intro: "Sechs Visualisierungen, wie Nutzerinnen und Nutzer sie erzeugt haben – jede aus einer eigenen Konfiguration."
     items:
       - title: "Schwarze Küche auf einer Mittelmeerinsel."
@@ -633,8 +632,7 @@ home:
     cta: { label: "Visualise your kitchen", href: "/studio" }
 
   gallery:
-    label: "Gallery"
-    title: "From the *studio*."
+    title: "*Gallery*."
     intro: "Six visualisations as users created them – each from its own configuration."
     items:
       - title: "Exterior terrace kitchen"
