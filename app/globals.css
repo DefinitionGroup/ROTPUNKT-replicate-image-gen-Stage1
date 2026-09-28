@@ -195,7 +195,10 @@
   );
 }
 @utility hero-shade {
-  background: linear-gradient(180deg, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.05) 35%, rgb(0 0 0 / 0.75) 100%);
+  /* A flat veil over the whole film, then the header and copy gradients on top. */
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.6) 0%, rgb(0 0 0 / 0.1) 32%, rgb(0 0 0 / 0.45) 60%, rgb(0 0 0 / 0.88) 100%),
+    rgb(0 0 0 / 0.22);
 }
 @utility tnum {
   font-variant-numeric: tabular-nums;

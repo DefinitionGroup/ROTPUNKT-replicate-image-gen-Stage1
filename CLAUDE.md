@@ -70,7 +70,7 @@ public/                             # Fonts (Raleway), assets, lottie
 - **Fonts**: Raleway (multiple weights, `public/fonts/`)
 - **Design tokens**: `app/globals.css` (`@theme inline`) + `lib/motion.ts`; see `DESIGN.md`. Headlines mark one serif word with `*asterisks*` (`Emphasis`)
 - **Content**: `DEV_CONTENT=true` → `content/content.md`; otherwise `lib/content/fromSanity.ts` maps existing Sanity blocks onto the same `LocaleContent` model
-- **Image generation**: StudioShell captures prompt + quality contract together (`GenerationRequestSpec`) → `POST /api/replicate` → poll `/api/replicate/status` → MinIO + Supabase → client
+- **Image generation**: StudioShell captures prompt + quality contract together (`GenerationRequestSpec`) → `POST /api/replicate` → poll `/api/replicate/status` → MinIO + Supabase → client. The Replicate target is `lib/generationModel.ts`: default public runner `black-forest-labs/flux-dev-lora` + trained weights URL; `REPLICATE_GENERATION_MODEL` / `REPLICATE_LORA_WEIGHTS` override (fine-tune form `owner/model:version`)
 - **Quality gate**: `QUALITY_GATE_MODE=off|shadow|enforce`, validator on Replicate (`lib/visionValidator.ts`, `lib/qualityGate.ts`); see `playbook-stabilisierung.md`
 - **Upscaling**: `POST /api/replicate/upscale` → same storage flow
 - **Draft preview**: Sanity live mode via `/api/draft-mode/enable`

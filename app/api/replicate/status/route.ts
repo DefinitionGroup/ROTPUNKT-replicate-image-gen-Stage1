@@ -29,6 +29,12 @@ const replicate = new Replicate({
 
 const isDev = process.env.NODE_ENV === "development";
 const STATUS_TIMEOUT_MS = 20_000;
+// A healthy prediction leaves "starting" within seconds. One that has not
+// after this long will never run (the model cannot boot); the set fails with
+// a clear message instead of the client polling until it gives up.
+const STALE_START_MS = 8 * 60_000;
+const MODEL_NOT_STARTING_ERROR =
+  "The image model did not start. Please try again in a few minutes.";
 
 type GenerationSetRow = {
   id: string;
@@ -42,6 +48,7 @@ type GenerationSetRow = {
   quality_expectations: unknown;
   prediction_manifest: unknown;
   selected_image_id: string | null;
+  created_at: string;
 };
 
 type CandidateRow = {
@@ -149,6 +156,11 @@ async function getExistingCandidate(
   return data ? toCandidate(data as CandidateRow) : null;
 }
 
+function isStaleStart(createdAt: string): boolean {
+  const started = Date.parse(createdAt);
+  return Number.isFinite(started) && Date.now() - started > STALE_START_MS;
+}
+
 async function finalizeVariant(params: {
   supabase: ReturnType<typeof createSupabaseUserClient>;
   set: GenerationSetRow;
@@ -179,6 +191,13 @@ async function finalizeVariant(params: {
     `Replicate status check for variant ${variant.candidateIndex}`
   );
   const status = prediction.status ?? "starting";
+  if (status === "starting" && isStaleStart(set.created_at)) {
+    void replicate.predictions.cancel(variant.predictionId).catch(() => undefined);
+    console.error(
+      `[${requestId}] prediction ${variant.predictionId} for set ${set.id} never left "starting" (${set.model_version})`
+    );
+    return { status: "failed", error: MODEL_NOT_STARTING_ERROR };
+  }
   if (status !== "succeeded") {
     return {
       status,
@@ -332,7 +351,7 @@ export async function POST(req: NextRequest) {
     const { data, error: setError } = await supabase
       .from("generation_sets")
       .select(
-        "id, user_id, prompt, prompt_version, seed, model_version, guidance_scale, num_inference_steps, quality_expectations, prediction_manifest, selected_image_id"
+        "id, user_id, prompt, prompt_version, seed, model_version, guidance_scale, num_inference_steps, quality_expectations, prediction_manifest, selected_image_id, created_at"
       )
       .eq("id", generationSetId)
       .eq("user_id", userId)

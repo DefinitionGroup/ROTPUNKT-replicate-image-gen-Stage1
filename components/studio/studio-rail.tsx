@@ -211,7 +211,7 @@ export function StudioStepStrip({
   ];
 
   return (
-    <div className={`-mx-6 overflow-x-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}>
+    <div className={`-mx-6 max-w-[100vw] overflow-x-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}>
       <ol className="flex w-max gap-2">
         {chips.map((chip) => {
           const active = chip.index === currentStep;

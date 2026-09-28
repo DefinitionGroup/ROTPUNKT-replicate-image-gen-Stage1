@@ -3,6 +3,13 @@ import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { createSupabaseUserClient } from "@/lib/supabaseServer";
 import {
+  GUIDANCE_SCALE,
+  NUM_INFERENCE_STEPS,
+  buildPredictionInput,
+  getGenerationTarget,
+  predictionCreateTarget,
+} from "@/lib/generationModel";
+import {
   DEFAULT_GENERATION_SEED,
   LORA_GENERATION_SCALE,
   PROMPT_VERSION,
@@ -27,11 +34,6 @@ const replicate = new Replicate({
 
 const isDev = process.env.NODE_ENV === "development";
 const START_TIMEOUT_MS = 30_000;
-const MODEL =
-  "rotpunkt007/basemodel-5-2026:0672a9098a0c17393feeb70989b90488a89e80404be9543ccabe9c87aca4ac08";
-const MODEL_VERSION = MODEL.split(":")[1];
-const GUIDANCE_SCALE = 3.2;
-const NUM_INFERENCE_STEPS = 28;
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -74,9 +76,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (!MODEL_VERSION) {
-      throw new Error("Replicate model version is not configured");
-    }
+    const target = getGenerationTarget();
 
     supabase = createSupabaseUserClient(() =>
       getToken({ template: "supabase" })
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
         prompt: prompt.trim(),
         prompt_version: promptVersion,
         seed,
-        model_version: MODEL_VERSION,
+        model_version: target.label,
         guidance_scale: GUIDANCE_SCALE,
         num_inference_steps: NUM_INFERENCE_STEPS,
         requested_lora_scales: seeds.map(() => LORA_GENERATION_SCALE),
@@ -159,20 +159,12 @@ export async function POST(req: NextRequest) {
       seeds.map((variantSeed, candidateIndex) =>
         withTimeout(
           replicate.predictions.create({
-            version: MODEL_VERSION,
-            input: {
+            ...predictionCreateTarget(target),
+            input: buildPredictionInput(target, {
               prompt: finalPrompt,
-              go_fast: false,
-              guidance_scale: GUIDANCE_SCALE,
-              megapixels: "1",
-              lora_scale: LORA_GENERATION_SCALE,
-              aspect_ratio: "16:9",
-              output_format: "webp",
-              output_quality: 80,
               seed: variantSeed,
-              num_inference_steps: NUM_INFERENCE_STEPS,
-              num_outputs: 1,
-            },
+              loraScale: LORA_GENERATION_SCALE,
+            }),
           }).then((prediction) => {
             if (!prediction.id) {
               throw new Error(`No prediction id for candidate ${candidateIndex}`);
@@ -237,7 +229,7 @@ export async function POST(req: NextRequest) {
       status: "processing",
       promptVersion,
       seed,
-      modelVersion: MODEL_VERSION,
+      modelVersion: target.label,
       guidanceScale: GUIDANCE_SCALE,
       numInferenceSteps: NUM_INFERENCE_STEPS,
       variants,

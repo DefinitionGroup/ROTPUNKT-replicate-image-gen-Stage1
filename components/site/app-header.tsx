@@ -16,11 +16,11 @@ export function AppHeader({ action }: { action?: { href: string; label: string }
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-hairline bg-canvas/90 backdrop-blur-[20px]">
       <div className="signature-container flex h-16 items-center justify-between gap-4">
-        <BrandLogo compact />
+        <BrandLogo compact size="lg" />
         <div className="flex items-center gap-1 md:gap-3">
           {action && (
             <Link
-              className="group inline-flex min-h-11 items-center gap-2 rounded-pill px-3 text-nav leading-none text-graphite transition-colors duration-state ease-signature hover:text-ink"
+              className="group inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-pill px-3 text-nav leading-none text-graphite transition-colors duration-state ease-signature hover:text-ink"
               href={action.href}
             >
               <svg aria-hidden="true" className="size-3 transition-transform duration-state ease-signature group-hover:-translate-x-0.5" fill="none" viewBox="0 0 12 12">
@@ -29,7 +29,7 @@ export function AppHeader({ action }: { action?: { href: string; label: string }
               {action.label}
             </Link>
           )}
-          <LanguageToggle className="hidden sm:inline-flex" />
+          <LanguageToggle className="max-sm:hidden" />
           <SignedOut>
             <SignInButton mode="modal">
               <button className="inline-flex min-h-11 items-center px-2 text-nav text-graphite transition-colors duration-state ease-signature hover:text-ink" type="button">

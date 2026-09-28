@@ -84,7 +84,7 @@ export function SiteHeader({ items, cta }: { items: ContentLink[]; cta: ContentL
         }`}
       >
         <nav className="signature-container flex h-16 items-center justify-between lg:h-20">
-          <BrandLogo />
+          <BrandLogo size="lg" />
           <div className="hidden items-center gap-7 lg:flex">
             {items.map((item) => (
               <NavLink className={desktopLink} item={item} key={item.label} />
@@ -96,7 +96,7 @@ export function SiteHeader({ items, cta }: { items: ContentLink[]; cta: ContentL
             </SignedIn>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
-            <LanguageToggle className="hidden md:inline-flex" />
+            <LanguageToggle className="max-md:hidden" />
             <SignedOut>
               <SignInButton mode="modal">
                 <button
@@ -112,7 +112,7 @@ export function SiteHeader({ items, cta }: { items: ContentLink[]; cta: ContentL
                 <UserButton />
               </div>
             </SignedIn>
-            <Pill className="hidden md:inline-flex" href={cta.href} variant="secondary">
+            <Pill className="max-md:hidden" href={cta.href} variant="secondary">
               {cta.label}
             </Pill>
             <RoundButton

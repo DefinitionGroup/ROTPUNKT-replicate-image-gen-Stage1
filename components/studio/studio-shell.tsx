@@ -58,6 +58,10 @@ export function StudioShell() {
   const selectionItems = useWizardSelectionSummary(wizardState.selectedOptions);
 
   const [stage, setStage] = useState<Stage>("configure");
+  // The wizard state is restored from localStorage, which the server never
+  // sees. Until the client has mounted, render the empty stage on both sides
+  // so a returning visitor's saved step cannot disagree with the server HTML.
+  const [mounted, setMounted] = useState(false);
   const [showKitchenLayout, setShowKitchenLayout] = useState(false);
   const [showKitchenZones, setShowKitchenZones] = useState(false);
 
@@ -103,6 +107,7 @@ export function StudioShell() {
       : `${wizardState.currentStep + 1}/${totalSteps} (${currentStepDefinition?.key ?? "unknown"})`;
 
   useEffect(() => {
+    setMounted(true);
     void loadRuntimeConfig();
   }, []);
 
@@ -221,6 +226,10 @@ export function StudioShell() {
     current: Math.min(wizardState.currentStep + 1, totalSteps + 1),
     total: totalSteps + 1,
   });
+
+  if (!mounted) {
+    return <main aria-busy="true" className="min-h-screen bg-canvas pt-16" />;
+  }
 
   return (
     <main className="min-h-screen bg-canvas pt-16">

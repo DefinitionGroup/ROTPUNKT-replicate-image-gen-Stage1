@@ -82,16 +82,16 @@ export function Hero({ hero }: { hero: HeroContent }) {
       />
 
       <div className="signature-container absolute inset-x-0 bottom-8 flex items-end justify-between gap-16 md:bottom-[72px]">
-        <div className="flex max-w-[860px] flex-col gap-5 md:gap-7">
+        <div className="flex max-w-[910px] flex-col gap-5 md:gap-7">
           {hero.eyebrow && (
-            <motion.p className="m-0 font-label text-label uppercase tracking-label text-graphite" {...rise(0)}>
+            <motion.p className="m-0 font-label text-label uppercase tracking-label text-porcelain/80" {...rise(0)}>
               {hero.eyebrow}
             </motion.p>
           )}
           <motion.h1 className="m-0 text-balance text-display" {...rise(0)}>
             <Emphasis text={hero.title} />
           </motion.h1>
-          <motion.p className="m-0 max-w-[42ch] text-body text-graphite md:text-lead" {...rise(1)}>
+          <motion.p className="m-0 max-w-[51ch] text-body text-porcelain md:text-lead" {...rise(1)}>
             {hero.subline}
           </motion.p>
           <motion.div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3" {...rise(2)}>
