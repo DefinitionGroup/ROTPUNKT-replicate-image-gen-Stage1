@@ -20,7 +20,7 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: [
     // Skip Studio and Next internals and static assets
-    "/((?!studio|_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|webm|png|gif|svg|lottie|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/((?!studio|_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|webm|mp4|m4v|mov|mp3|m4a|ogg|wav|png|gif|svg|lottie|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
     "/(api|trpc)(.*)",
   ],

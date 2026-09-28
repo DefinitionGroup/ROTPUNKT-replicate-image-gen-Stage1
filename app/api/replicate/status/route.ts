@@ -1,11 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 import { uploadImages } from "@/lib/minioClient";
 import { createSupabaseUserClient } from "@/lib/supabaseServer";
 import {
+  attachImageToAttempt,
+  getQualityGateMode,
+  isQualityGateFailOpen,
+  readValidationAttempt,
+  runEnforceValidation,
+  runShadowValidation,
+  type QualityGateMode,
+} from "@/lib/qualityGate";
+import { resolveValidatorModel } from "@/lib/visionValidator";
+import {
   isGenerationQualityExpectations,
   isGenerationVariantManifest,
+  type CandidateQualityStatus,
   type GenerationCandidate,
   type GenerationQualityExpectations,
   type GenerationSetStatus,
@@ -18,6 +29,12 @@ const replicate = new Replicate({
 
 const isDev = process.env.NODE_ENV === "development";
 const STATUS_TIMEOUT_MS = 20_000;
+// A healthy prediction leaves "starting" within seconds. One that has not
+// after this long will never run (the model cannot boot); the set fails with
+// a clear message instead of the client polling until it gives up.
+const STALE_START_MS = 8 * 60_000;
+const MODEL_NOT_STARTING_ERROR =
+  "The image model did not start. Please try again in a few minutes.";
 
 type GenerationSetRow = {
   id: string;
@@ -31,6 +48,7 @@ type GenerationSetRow = {
   quality_expectations: unknown;
   prediction_manifest: unknown;
   selected_image_id: string | null;
+  created_at: string;
 };
 
 type CandidateRow = {
@@ -40,7 +58,17 @@ type CandidateRow = {
   candidate_index: number;
   lora_scale: number;
   is_selected_best: boolean;
+  generation_metadata?: unknown;
 };
+
+type GateConfig = {
+  mode: QualityGateMode;
+  validatorModel: string;
+  failOpen: boolean;
+};
+
+const CANDIDATE_COLUMNS =
+  "id, url, generation_set_id, candidate_index, lora_scale, is_selected_best, generation_metadata";
 
 type VariantResult = {
   status: string;
@@ -92,6 +120,10 @@ function toErrorMessage(error: unknown): string {
 }
 
 function toCandidate(row: CandidateRow): GenerationCandidate {
+  const stored = (row.generation_metadata as { qualityStatus?: unknown } | null)
+    ?.qualityStatus;
+  const status: CandidateQualityStatus =
+    stored === "accepted" || stored === "rejected" ? stored : "not_evaluated";
   return {
     imageId: row.id,
     generationSetId: row.generation_set_id,
@@ -100,7 +132,7 @@ function toCandidate(row: CandidateRow): GenerationCandidate {
     loraScale: Number(row.lora_scale) as GenerationCandidate["loraScale"],
     isSelectedBest: row.is_selected_best,
     quality: {
-      status: "not_evaluated",
+      status,
       reasons: [],
     },
   };
@@ -114,9 +146,7 @@ async function getExistingCandidate(
 ): Promise<GenerationCandidate | null> {
   const { data, error } = await supabase
     .from("images")
-    .select(
-      "id, url, generation_set_id, candidate_index, lora_scale, is_selected_best"
-    )
+    .select(CANDIDATE_COLUMNS)
     .eq("generation_set_id", setId)
     .eq("candidate_index", candidateIndex)
     .eq("user_id", userId)
@@ -126,14 +156,27 @@ async function getExistingCandidate(
   return data ? toCandidate(data as CandidateRow) : null;
 }
 
+function isStaleStart(createdAt: string): boolean {
+  const started = Date.parse(createdAt);
+  return Number.isFinite(started) && Date.now() - started > STALE_START_MS;
+}
+
 async function finalizeVariant(params: {
   supabase: ReturnType<typeof createSupabaseUserClient>;
   set: GenerationSetRow;
   variant: GenerationVariantContext;
   userId: string;
   qualityExpectations: GenerationQualityExpectations | null;
+  requestId: string;
+  gate: GateConfig;
+  // Fires once per candidate, only from the poll that actually inserted it.
+  onCandidatePersisted?: (
+    candidate: GenerationCandidate,
+    variant: GenerationVariantContext
+  ) => void;
 }): Promise<VariantResult> {
-  const { supabase, set, variant, userId, qualityExpectations } = params;
+  const { supabase, set, variant, userId, qualityExpectations, requestId, gate } =
+    params;
   const existing = await getExistingCandidate(
     supabase,
     set.id,
@@ -148,6 +191,13 @@ async function finalizeVariant(params: {
     `Replicate status check for variant ${variant.candidateIndex}`
   );
   const status = prediction.status ?? "starting";
+  if (status === "starting" && isStaleStart(set.created_at)) {
+    void replicate.predictions.cancel(variant.predictionId).catch(() => undefined);
+    console.error(
+      `[${requestId}] prediction ${variant.predictionId} for set ${set.id} never left "starting" (${set.model_version})`
+    );
+    return { status: "failed", error: MODEL_NOT_STARTING_ERROR };
+  }
   if (status !== "succeeded") {
     return {
       status,
@@ -176,6 +226,64 @@ async function finalizeVariant(params: {
     );
   }
 
+  // Enforce mode: the candidate is validated before it becomes an image row.
+  // The poll that finds no attempt claims it and validates in the background;
+  // later polls read the verdict.
+  let qualityStatus: CandidateQualityStatus = "not_evaluated";
+  let attemptId: string | null = null;
+  const enforce = gate.mode === "enforce" && qualityExpectations !== null;
+  if (enforce && qualityExpectations) {
+    const attempt = await readValidationAttempt(
+      set.id,
+      variant.candidateIndex,
+      gate.validatorModel
+    );
+    if (!attempt) {
+      const candidateUrl = finalUrl;
+      after(async () => {
+        try {
+          await runEnforceValidation({
+            requestId,
+            set: {
+              id: set.id,
+              userId,
+              seed: Number(set.seed),
+              promptVersion: set.prompt_version,
+            },
+            variant,
+            candidateUrl,
+            qualityExpectations,
+            model: gate.validatorModel,
+          });
+        } catch (validationError) {
+          console.error(
+            `[${requestId}] quality-gate enforce task crashed:`,
+            validationError
+          );
+        }
+      });
+      return { status: "validating" };
+    }
+    if (attempt.verdict === null) return { status: "validating" };
+    if (attempt.verdict === "pass") {
+      qualityStatus = "accepted";
+      attemptId = attempt.id;
+    } else if (attempt.verdict === "error" && gate.failOpen) {
+      console.warn(
+        `[${requestId}] quality-gate: validator error on set ${set.id}, delivering unevaluated (fail-open)`
+      );
+      attemptId = attempt.id;
+    } else {
+      return {
+        status: "rejected",
+        error:
+          attempt.reasons.join("; ") ||
+          attempt.error ||
+          `Validator verdict: ${attempt.verdict}`,
+      };
+    }
+  }
+
   const { data, error } = await supabase
     .from("images")
     .insert({
@@ -187,19 +295,17 @@ async function finalizeVariant(params: {
       candidate_index: variant.candidateIndex,
       generation_metadata: {
         promptVersion: set.prompt_version,
-        seed: Number(set.seed),
+        seed: variant.seed ?? Number(set.seed),
         modelVersion: set.model_version,
         guidanceScale: Number(set.guidance_scale),
         loraScale: variant.loraScale,
         numInferenceSteps: set.num_inference_steps,
         predictionId: variant.predictionId,
-        qualityStatus: "not_evaluated",
+        qualityStatus,
         qualityExpectations,
       },
     })
-    .select(
-      "id, url, generation_set_id, candidate_index, lora_scale, is_selected_best"
-    )
+    .select(CANDIDATE_COLUMNS)
     .single();
 
   if (error) {
@@ -217,7 +323,10 @@ async function finalizeVariant(params: {
     return { status: "failed", error: `Image insert failed: ${error.message}` };
   }
 
-  return { status: "succeeded", candidate: toCandidate(data as CandidateRow) };
+  const candidate = toCandidate(data as CandidateRow);
+  if (attemptId) await attachImageToAttempt(attemptId, candidate.imageId);
+  if (!enforce) params.onCandidatePersisted?.(candidate, variant);
+  return { status: "succeeded", candidate };
 }
 
 export async function POST(req: NextRequest) {
@@ -242,7 +351,7 @@ export async function POST(req: NextRequest) {
     const { data, error: setError } = await supabase
       .from("generation_sets")
       .select(
-        "id, user_id, prompt, prompt_version, seed, model_version, guidance_scale, num_inference_steps, quality_expectations, prediction_manifest, selected_image_id"
+        "id, user_id, prompt, prompt_version, seed, model_version, guidance_scale, num_inference_steps, quality_expectations, prediction_manifest, selected_image_id, created_at"
       )
       .eq("id", generationSetId)
       .eq("user_id", userId)
@@ -268,6 +377,41 @@ export async function POST(req: NextRequest) {
       ? set.quality_expectations
       : null;
 
+    // Shadow mode: validate after the response is sent so delivery is not
+    // delayed; the attempt row's unique index keeps it to one run per candidate.
+    const gate: GateConfig = {
+      mode: getQualityGateMode(),
+      validatorModel: resolveValidatorModel(),
+      failOpen: isQualityGateFailOpen(),
+    };
+    const scheduleValidation =
+      gate.mode === "shadow" && qualityExpectations
+        ? (candidate: GenerationCandidate, variant: GenerationVariantContext) => {
+            after(async () => {
+              try {
+                await runShadowValidation({
+                  mode: "shadow",
+                  requestId,
+                  set: {
+                    id: set.id,
+                    userId,
+                    seed: Number(set.seed),
+                    promptVersion: set.prompt_version,
+                  },
+                  variant,
+                  candidate,
+                  qualityExpectations,
+                });
+              } catch (validationError) {
+                console.error(
+                  `[${requestId}] quality-gate background task crashed:`,
+                  validationError
+                );
+              }
+            });
+          }
+        : undefined;
+
     const results = await Promise.all(
       set.prediction_manifest.map((variant) =>
         finalizeVariant({
@@ -276,6 +420,9 @@ export async function POST(req: NextRequest) {
           variant,
           userId,
           qualityExpectations,
+          requestId,
+          gate,
+          onCandidatePersisted: scheduleValidation,
         })
       )
     );
@@ -289,17 +436,50 @@ export async function POST(req: NextRequest) {
       (result) =>
         result.status === "starting" || result.status === "processing"
     );
+    const hasValidating = results.some(
+      (result) => result.status === "validating"
+    );
     const hasFailure = results.some(
       (result) =>
         result.status === "failed" || result.status === "canceled"
     );
-    const status: GenerationSetStatus = allSucceeded
-      ? "succeeded"
-      : hasRunning
-        ? "processing"
-        : hasFailure && candidates.length > 0
-          ? "partial_failed"
-          : "failed";
+    const rejectedCount = results.filter(
+      (result) => result.status === "rejected"
+    ).length;
+    const enforce = gate.mode === "enforce" && qualityExpectations !== null;
+
+    let status: GenerationSetStatus;
+    if (enforce) {
+      // One accepted candidate is enough; everything else only costs money.
+      status =
+        candidates.length > 0
+          ? "succeeded"
+          : hasRunning || hasValidating
+            ? "processing"
+            : "failed";
+      if (status === "succeeded") {
+        const stillRunning = set.prediction_manifest.filter((_, index) => {
+          const s = results[index]?.status;
+          return s === "starting" || s === "processing";
+        });
+        if (stillRunning.length > 0) {
+          void Promise.allSettled(
+            stillRunning.map((variant) =>
+              replicate.predictions.cancel(variant.predictionId)
+            )
+          );
+        }
+      }
+    } else {
+      status = allSucceeded
+        ? "succeeded"
+        : hasRunning
+          ? "processing"
+          : hasFailure && candidates.length > 0
+            ? "partial_failed"
+            : "failed";
+    }
+    const qualityFailure = enforce && status === "failed" && rejectedCount > 0;
     const errors = results.flatMap((result) =>
       result.error ? [result.error] : []
     );
@@ -319,6 +499,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       generationSetId,
       status,
+      phase:
+        candidates.length === 0 && hasValidating && !hasRunning
+          ? "validating"
+          : "generating",
+      gateMode: gate.mode,
+      qualityFailure,
+      rejectedCount,
       candidates,
       selectedImageId: set.selected_image_id,
       qualityExpectations,

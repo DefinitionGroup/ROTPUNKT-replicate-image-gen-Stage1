@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import { kitchenLayoutOptions } from "./wizardSteps";
 import { useTranslations } from "next-intl";
+import { StepHeader } from "./StepHeader";
 
 interface WizardKitchenLayoutPanelProps {
   onSelect: (value: string) => void;
@@ -49,19 +50,7 @@ export function WizardKitchenLayoutPanel({
       transition={{ duration: 0.25 }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4 shrink-0">
-        <div className="h-9 w-9 shrink-0 rounded-full bg-brand-primary-2/15 border border-brand-primary-2/40 flex items-center justify-center text-brand-primary-2 text-lg">
-          🍳
-        </div>
-        <div>
-          <h3 className="text-lg sm:text-xl md:text-2xl text-left tracking-tight text-foreground">
-            {tLayout("title")}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-xl text-left leading-snug break-words">
-            {tLayout("description")}
-          </p>
-        </div>
-      </div>
+      <StepHeader title={tLayout("title")} description={tLayout("description")} />
 
       {/* Options Grid */}
       <div className="flex-1 overflow-y-auto min-h-0 pr-1 sm:pr-2 touch-pan-y [-webkit-overflow-scrolling:touch]">

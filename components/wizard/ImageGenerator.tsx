@@ -1,30 +1,29 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useStore } from "@nanostores/react";
-import { $prompt } from "@/store/prompt";
-import { wizardStore } from "@/store/wizardStore";
+import { $generationSpec } from "@/store/prompt";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ImageModal from "@/components/ImageModal";
 import AiGeneratedLabel from "@/components/AiGeneratedLabel";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
-import { buildPrompt } from "./promptBuilder";
 import { PromptDebugPopover } from "./PromptDebugPopover";
+import { Emphasis } from "@/components/design-system/emphasis";
+import { GlassBadge } from "@/components/design-system/glass";
+import { Label } from "@/components/design-system/label";
+import { Pill } from "@/components/design-system/pill";
+import { DURATION, REVEAL_RISE, SIGNATURE_EASE } from "@/lib/motion";
 import {
   DEFAULT_GENERATION_SEED,
   LORA_GENERATION_SCALE,
   MAX_GENERATION_SEED,
 } from "@/lib/imageGenerationContract";
-import {
-  $promptPipelineV2Enabled,
-  loadRuntimeConfig,
-} from "@/store/runtimeConfig";
+import { loadRuntimeConfig } from "@/store/runtimeConfig";
 import type {
   GenerationCandidate,
+  GenerationRequestSpec,
   GenerationSetContext,
   GenerationQualityExpectations,
   PromptVersion,
@@ -39,6 +38,8 @@ interface StartGenerationResponse {
 
 interface StatusGenerationResponse {
   status: string;
+  phase?: "generating" | "validating";
+  qualityFailure?: boolean;
   candidates?: GenerationCandidate[];
   generationSetId: string;
   selectedImageId?: string | null;
@@ -51,6 +52,7 @@ interface StartGenerationParams {
   seed: number;
   promptVersion: PromptVersion;
   qualityExpectations: GenerationQualityExpectations;
+  previousGenerationSetId?: string | null;
   signal: AbortSignal;
 }
 
@@ -60,8 +62,10 @@ interface PollGenerationParams {
 }
 
 interface StartGenerationMutationParams {
-  prompt: string;
+  spec: GenerationRequestSpec;
   seed: number;
+  // A retry continues the server-side seed sequence of this set.
+  previousGenerationSetId?: string | null;
 }
 
 async function startGenerationApi({
@@ -69,6 +73,7 @@ async function startGenerationApi({
   seed,
   promptVersion,
   qualityExpectations,
+  previousGenerationSetId,
   signal,
 }: StartGenerationParams): Promise<StartGenerationResponse> {
   const res = await fetch("/api/replicate", {
@@ -77,6 +82,7 @@ async function startGenerationApi({
       seed,
       promptVersion,
       qualityExpectations,
+      previousGenerationSetId: previousGenerationSetId ?? undefined,
     }),
     method: "POST",
     headers: {
@@ -115,12 +121,13 @@ async function pollGenerationApi({
 }
 
 export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
-  const prompt = useStore($prompt);
-  const wizardState = useStore(wizardStore);
-  const promptPipelineV2Enabled = useStore($promptPipelineV2Enabled);
+  const spec = useStore($generationSpec);
   const t = useTranslations('imageGenerator');
+  const tStudio = useTranslations('studio');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [completedPrompt, setCompletedPrompt] = useState<string | null>(null);
+  const [completedSpec, setCompletedSpec] = useState<GenerationRequestSpec | null>(
+    null
+  );
   const [generatedImage, setGeneratedImage] = useState<GenerationCandidate | null>(
     null
   );
@@ -142,16 +149,6 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
       promptDebugEnv === "yes" ||
       promptDebugEnv === "on");
 
-  const summaryData = useMemo(
-    () =>
-      buildPrompt({
-        selections: wizardState.selectedOptions,
-        extraWishes: wizardState.extraWishes,
-        pipelineV2Enabled: promptPipelineV2Enabled,
-      }),
-    [wizardState.selectedOptions, wizardState.extraWishes, promptPipelineV2Enabled]
-  );
-
   // Ref to prevent duplicate starts for identical prompt strings.
   const hasTriggered = useRef<string | null>(null);
 
@@ -166,14 +163,15 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     Error,
     StartGenerationMutationParams
   >({
-    mutationFn: async ({ prompt: generationPrompt, seed }) => {
+    mutationFn: async ({ spec: generationSpec, seed, previousGenerationSetId }) => {
       if (isDev) console.log("[ImageGenerator] Starting generation...");
       const controller = new AbortController();
       const data = await startGenerationApi({
-        prompt: generationPrompt,
+        prompt: generationSpec.prompt,
         seed,
-        promptVersion: summaryData.promptVersion,
-        qualityExpectations: summaryData.qualityExpectations,
+        promptVersion: generationSpec.promptVersion,
+        qualityExpectations: generationSpec.qualityExpectations,
+        previousGenerationSetId,
         signal: controller.signal,
       });
       if (isDev) console.log("[ImageGenerator] Prediction started:", data);
@@ -195,7 +193,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     isError: isStatusError,
   } = useQuery<StatusGenerationResponse, Error>({
     queryKey: ["replicate-status", generationSetId],
-    enabled: Boolean(generationSetId && (prompt || completedPrompt)),
+    enabled: Boolean(generationSetId && (spec || completedSpec)),
     queryFn: ({ signal }) =>
       pollGenerationApi({
         generationSetId: generationSetId!,
@@ -214,49 +212,69 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
     if (statusData.status !== "succeeded") return;
     if (!Array.isArray(statusData.candidates) || statusData.candidates.length === 0) return;
 
+    // Enforce mode delivers validated candidates first.
     const strongestCandidate =
       statusData.candidates.find(
+        (candidate) => candidate.quality.status === "accepted"
+      ) ??
+      statusData.candidates.find(
         (candidate) => candidate.loraScale === LORA_GENERATION_SCALE
-      ) ?? statusData.candidates[0];
+      ) ??
+      statusData.candidates[0];
     setGeneratedImage(strongestCandidate);
-    setCompletedPrompt((current) => prompt ?? current);
-    // Clear the prompt to avoid accidental regeneration on remount.
-    $prompt.set(null);
-  }, [prompt, statusData]);
+    setCompletedSpec((current) => spec ?? current);
+    // Clear the spec to avoid accidental regeneration on remount.
+    $generationSpec.set(null);
+  }, [spec, statusData]);
 
   const handleRetry = useCallback(() => {
+    const previousGenerationSetId = generationSetId;
     resetMutation();
     setGenerationSetId(null);
     setGeneratedImage(null);
 
-    if (!prompt) return;
-    hasTriggered.current = prompt;
-    startGeneration({ prompt, seed: generationSeed });
-  }, [generationSeed, prompt, resetMutation, startGeneration]);
+    if (!spec) return;
+    hasTriggered.current = spec.prompt;
+    startGeneration({ spec, seed: generationSeed, previousGenerationSetId });
+  }, [generationSeed, generationSetId, spec, resetMutation, startGeneration]);
 
   const handleDevRegenerate = useCallback(() => {
-    const promptToRegenerate = completedPrompt ?? prompt;
-    if (!promptToRegenerate) return;
+    const specToRegenerate = completedSpec ?? spec;
+    if (!specToRegenerate) return;
 
     resetMutation();
     setGenerationSetId(null);
     setGeneratedImage(null);
-    hasTriggered.current = promptToRegenerate;
-    startGeneration({ prompt: promptToRegenerate, seed: generationSeed });
-  }, [completedPrompt, generationSeed, prompt, resetMutation, startGeneration]);
+    hasTriggered.current = specToRegenerate.prompt;
+    startGeneration({ spec: specToRegenerate, seed: generationSeed });
+  }, [completedSpec, generationSeed, spec, resetMutation, startGeneration]);
+
+  // Another image for the same brief: the server continues this set's seed
+  // sequence, so the variant is new rather than a repeat.
+  const handleNewVariant = useCallback(() => {
+    const specToVary = completedSpec ?? spec;
+    if (!specToVary) return;
+    const previousGenerationSetId = generationSetId;
+    resetMutation();
+    setGenerationSetId(null);
+    setGeneratedImage(null);
+    hasTriggered.current = specToVary.prompt;
+    startGeneration({ spec: specToVary, seed: generationSeed, previousGenerationSetId });
+  }, [completedSpec, generationSeed, generationSetId, spec, resetMutation, startGeneration]);
 
   useEffect(() => {
     void loadRuntimeConfig();
   }, []);
 
   useEffect(() => {
-    if (prompt && hasTriggered.current !== prompt) {
-      hasTriggered.current = prompt;
+    if (spec && hasTriggered.current !== spec.prompt) {
+      hasTriggered.current = spec.prompt;
       if (isDev) console.log("[ImageGenerator] Triggering generation");
-      startGeneration({ prompt, seed: generationSeed });
+      startGeneration({ spec, seed: generationSeed });
     }
-  }, [generationSeed, prompt, startGeneration]);
+  }, [generationSeed, spec, startGeneration]);
 
+  const debugSpec = spec ?? completedSpec;
   const hasImage = Boolean(generatedImage);
   const status = statusData?.status;
   const isTerminalFailure =
@@ -268,7 +286,9 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         (status === undefined || status === "starting" || status === "processing")));
   const errorMessage =
     isTerminalFailure
-      ? statusData?.error || t("error.unknown")
+      ? statusData?.qualityFailure
+        ? t("error.qualityFailed")
+        : statusData?.error || t("error.unknown")
       : startError?.message || statusError?.message || t("error.unknown");
   const isError = !hasImage && (isStartError || isStatusError || isTerminalFailure);
 
@@ -283,24 +303,25 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col items-center justify-center px-4 lg:px-0">
+    <div className="flex w-full flex-col">
       <PromptDebugPopover
         enabled={showPromptDebugPopover}
         stepLabel="image generation"
-        missingKeys={summaryData.missingKeys}
-        sections={summaryData.modelSections}
-        prompt={summaryData.modelPrompt || prompt || "Prompt is currently empty."}
+        missingKeys={debugSpec?.missingKeys ?? []}
+        sections={debugSpec?.modelSections ?? []}
+        prompt={debugSpec?.prompt ?? "Prompt is currently empty."}
       />
 
-      {onBack && hasImage && !isPending && <BackButton onClick={onBack} backLabel={t('backToWizard')} />}
-
       <AnimatePresence mode="wait">
-        {isPending && !hasImage && <LoadingState key="loading" />}
+        {isPending && !hasImage && (
+          <LoadingState key="loading" phase={statusData?.phase} />
+        )}
 
         {!isPending && isError && !hasImage && (
           <ErrorState
             key="error"
             message={errorMessage}
+            onBack={onBack}
             onRetry={handleRetry}
           />
         )}
@@ -308,23 +329,41 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
         {!isPending && hasImage && generatedImage && (
           <motion.div
             key="images"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: REVEAL_RISE }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: DURATION.reveal, ease: SIGNATURE_EASE }}
             className="w-full"
           >
-            <div className="mx-auto mb-8 max-w-2xl text-center">
-              <h2 className="text-2xl font-semibold text-foreground">
-                {t("result.title")}
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t("result.description")}
-              </p>
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-xl">
+                <Label>{tStudio("eyebrow")}</Label>
+                <h2 className="mt-3 text-heading text-ink">
+                  <Emphasis text={tStudio("stage.result")} />
+                </h2>
+                <p className="mt-3 text-body text-graphite">{tStudio("stage.resultLead")}</p>
+              </div>
+              {generatedImage.quality.status === "accepted" && (
+                <GlassBadge className="self-start md:self-auto">{tStudio("stage.checked")}</GlassBadge>
+              )}
             </div>
-            <GeneratedImage
-              candidate={generatedImage}
-              onImageClick={setSelectedImage}
-            />
+
+            <GeneratedImage candidate={generatedImage} onImageClick={setSelectedImage} />
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Pill onClick={handleNewVariant} type="button">
+                {tStudio("stage.variant")}
+              </Pill>
+              <Pill href="/my-images" variant="secondary">
+                {tStudio("stage.gallery")}
+              </Pill>
+              {onBack && (
+                <Pill onClick={onBack} type="button" variant="ghost">
+                  {tStudio("rail.edit")}
+                </Pill>
+              )}
+            </div>
+
             {isDev && (
               <DevSeedControls
                 seed={generationSeed}
@@ -333,7 +372,6 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
                 onRegenerate={handleDevRegenerate}
               />
             )}
-            <QuickLink />
           </motion.div>
         )}
       </AnimatePresence>
@@ -343,7 +381,7 @@ export default function ImageGenerator({ onBack }: { onBack?: () => void }) {
           <ImageModal
             src={selectedImage}
             onClose={() => setSelectedImage(null)}
-            prompt={completedPrompt ?? undefined}
+            prompt={completedSpec?.prompt}
           />
         )}
       </AnimatePresence>
@@ -363,13 +401,13 @@ function DevSeedControls({
   onRegenerate: () => void;
 }) {
   return (
-    <div className="mx-auto mt-5 flex w-full max-w-5xl flex-wrap items-end justify-between gap-4 border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-left">
+    <div className="mt-8 flex flex-wrap items-end justify-between gap-4 rounded-card border border-dashed border-hairline px-4 py-3 text-left">
       <div>
-        <p className="text-sm font-semibold text-foreground">Development seed</p>
-        <p className="mt-1 text-xs text-muted-foreground">
+        <p className="text-caption text-ink">Development seed</p>
+        <p className="tnum mt-1 text-caption text-graphite">
           Last generated seed: {lastGenerationSeed ?? "not started"}
         </p>
-        <label className="mt-3 flex flex-col gap-1 text-xs font-medium text-foreground" htmlFor="generation-seed">
+        <label className="mt-3 flex flex-col gap-1 text-caption text-graphite" htmlFor="generation-seed">
           Seed
           <input
             id="generation-seed"
@@ -385,31 +423,22 @@ function DevSeedControls({
                 Math.min(MAX_GENERATION_SEED, Math.max(0, Math.trunc(nextSeed)))
               );
             }}
-            className="h-9 w-48 border border-border bg-background px-2 text-sm text-foreground"
+            className="tnum h-10 w-48 border-0 border-b border-hairline bg-transparent px-0 text-body text-ink outline-none focus:border-ink"
           />
         </label>
       </div>
-      <Button type="button" onClick={onRegenerate}>
+      <Pill onClick={onRegenerate} type="button" variant="secondary">
         Regenerate with this seed
-      </Button>
+      </Pill>
     </div>
   );
 }
 
-function BackButton({ onClick, backLabel }: { onClick: () => void; backLabel: string }) {
-  return (
-    <Button
-      onClick={onClick}
-      className="mb-10 px-4 py-2 rounded-full bg-accent text-foreground text-xs hover:bg-accent/80 transition-all"
-    >
-      ⇦ {backLabel}
-    </Button>
-  );
-}
-
-function LoadingState() {
+function LoadingState({ phase }: { phase?: "generating" | "validating" }) {
   const t = useTranslations('imageGenerator.loading');
+  const tStudio = useTranslations('studio.stage');
   const [elapsed, setElapsed] = useState(0);
+  const isValidating = phase === "validating";
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -425,6 +454,7 @@ function LoadingState() {
   };
 
   const getMessage = () => {
+    if (isValidating) return t('messages.validating');
     if (elapsed < 15) return t('messages.generating');
     if (elapsed < 30) return t('messages.aiWorking');
     if (elapsed < 60) return t('messages.takingLonger');
@@ -438,6 +468,7 @@ function LoadingState() {
   };
 
   const getSubMessage = () => {
+    if (isValidating) return t('subMessages.validating');
     if (elapsed < 30) return t('subMessages.usually30s');
     if (elapsed < 60) return t('subMessages.highLoad');
     if (elapsed < 120) return t('subMessages.warmingUp');
@@ -447,93 +478,92 @@ function LoadingState() {
     return t('subMessages.unusualWait');
   };
 
+  // The line fills over the usual wait; a check that follows the render fills it.
+  const progress = isValidating ? 100 : Math.min(92, (elapsed / 120) * 100);
+
   return (
-    <div className="w-full max-w-3xl mx-auto flex items-center justify-center min-h-[45rem]">
-      <motion.div
-        key="loading"
-        initial={{ opacity: 0, y: 16 }}
+    <motion.div
+      key="loading"
+      initial={{ opacity: 0, y: REVEAL_RISE }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: DURATION.reveal, ease: SIGNATURE_EASE }}
+      className="flex min-h-[60vh] w-full flex-col items-center justify-center text-center"
+      role="status"
+    >
+      <div className="size-40">
+        <DotLottieReact src="/UI/LoadingImageAnimation.lottie" loop autoplay />
+      </div>
+
+      <GlassBadge className="mt-2">
+        {isValidating ? tStudio("validating") : tStudio("generating")}
+        <span className="tnum ml-2 text-porcelain/70">{formatTime(elapsed)}</span>
+      </GlassBadge>
+
+      <motion.p
+        key={getMessage()}
+        initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 16 }}
-        className="flex flex-col items-center justify-center w-full max-w-3xl min-h-[600px] bg-card/95 border border-border shadow-2xl rounded-2xl p-8"
+        className="mt-6 max-w-lg text-lead text-ink"
       >
-        <div className="flex items-center justify-center w-48 h-48 mb-4">
-          <DotLottieReact
-            src="/UI/LoadingImageAnimation.lottie"
-            loop
-            autoplay
-          />
-        </div>
+        {getMessage()}
+      </motion.p>
 
-        {/* Timer */}
-        <div className="mb-3 px-4 py-1.5 rounded-full bg-muted/60 border border-border">
-          <span className="text-sm font-mono text-muted-foreground">⏱️ {formatTime(elapsed)}</span>
-        </div>
+      <motion.p
+        key={getSubMessage()}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="mt-2 max-w-md text-body text-graphite"
+      >
+        {getSubMessage()}
+      </motion.p>
 
-        {/* Main message - animated on change */}
-        <motion.span
-          key={getMessage()}
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-2 text-lg text-foreground font-medium text-center"
-        >
-          {getMessage()}
-        </motion.span>
-
-        {/* Sub message */}
+      <div className="mt-8 h-px w-64 overflow-hidden bg-hairline">
         <motion.div
-          key={getSubMessage()}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-xs text-muted-foreground mt-2 text-center max-w-md"
-        >
-          {getSubMessage()}
-        </motion.div>
-
-        {/* Progress bar for visual feedback */}
-        {elapsed >= 30 && (
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-          className="mt-6 w-full max-w-xs"
-        >
-          <div className="h-1 bg-muted rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-brand-primary-2 to-red-400"
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 300, ease: "linear" }}
-              />
-            </div>
-          </motion.div>
-        )}
-      </motion.div>
-    </div>
+          className="h-px bg-signature"
+          initial={{ width: "0%" }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 1, ease: "linear" }}
+        />
+      </div>
+    </motion.div>
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+function ErrorState({
+  message,
+  onRetry,
+  onBack,
+}: {
+  message: string;
+  onRetry: () => void;
+  onBack?: () => void;
+}) {
   const t = useTranslations('imageGenerator.error');
+  const tStudio = useTranslations('studio.rail');
   return (
     <motion.div
       key="error"
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: REVEAL_RISE }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="flex flex-col items-center justify-center p-8 bg-card/95 border border-border shadow-2xl rounded-2xl"
+      exit={{ opacity: 0 }}
+      transition={{ duration: DURATION.reveal, ease: SIGNATURE_EASE }}
+      className="max-w-xl rounded-card border border-hairline bg-charcoal p-6 md:p-8"
+      role="alert"
     >
-      <div className="text-4xl mb-4">😕</div>
-      <h3 className="text-lg font-medium text-foreground mb-2">
-        {t('title')}
-      </h3>
-      <p className="text-destructive text-center text-sm mb-6 max-w-md">
-        {message}
-      </p>
-      <Button
-        onClick={onRetry}
-        className="px-6 py-3 text-sm font-medium shadow-lg rounded-full bg-brand-primary-2 hover:bg-red-600"
-      >
-        🔄 {t('retry')}
-      </Button>
+      <span aria-hidden="true" className="block size-2.5 rounded-pill bg-signature" />
+      <h3 className="mt-5 text-title text-ink">{t('title')}</h3>
+      <p className="mt-3 text-body text-graphite">{message}</p>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Pill onClick={onRetry} type="button">
+          {t('retry')}
+        </Pill>
+        {onBack && (
+          <Pill onClick={onBack} type="button" variant="ghost">
+            {tStudio('edit')}
+          </Pill>
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -548,36 +578,24 @@ function GeneratedImage({
   const t = useTranslations("imageGenerator");
 
   return (
-    <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card">
+    <div className="mt-8 overflow-hidden rounded-card border border-hairline bg-charcoal">
       <button
         type="button"
         onClick={() => onImageClick(candidate.url)}
         aria-label={t("generatedImageAlt")}
-        className="group relative block w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary-2"
+        className="group relative block w-full overflow-hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ink"
       >
         <motion.img
           src={candidate.url}
           alt={t("generatedImageAlt")}
           crossOrigin="anonymous"
-          initial={{ opacity: 0.7 }}
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          className="aspect-video w-full object-cover transition-transform group-hover:scale-[1.01]"
+          transition={{ duration: DURATION.reveal, ease: SIGNATURE_EASE }}
+          className="aspect-video w-full object-cover transition-transform duration-reveal ease-signature group-hover:scale-[1.01]"
         />
-        <AiGeneratedLabel className="pointer-events-none absolute bottom-2 left-2" />
+        <AiGeneratedLabel className="pointer-events-none absolute bottom-3 left-3" />
       </button>
     </div>
-  );
-}
-
-function QuickLink() {
-  const t = useTranslations('imageGenerator');
-  return (
-    <Link
-      href="/my-images"
-      className="mx-auto mt-6 flex w-fit px-6 py-3 bg-brand-primary-2 text-white rounded-full font-semibold shadow hover:bg-red-600 transition hover:scale-105"
-    >
-      📁 {t('goToMyImages')}
-    </Link>
   );
 }

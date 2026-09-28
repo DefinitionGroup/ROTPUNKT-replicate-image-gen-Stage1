@@ -13,6 +13,7 @@ import {
   parseHandleSelectionValue,
   getHandleSelectionByValue,
 } from "./handleCatalog";
+import { StepHeader } from "./StepHeader";
 
 interface WizardHandleStepProps {
   icon: ReactNode;
@@ -83,19 +84,7 @@ export function WizardHandleStep({
       transition={{ duration: 0.25 }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4 shrink-0">
-        <div className="h-9 w-9 shrink-0 rounded-full bg-brand-primary-2/15 border border-brand-primary-2/40 flex items-center justify-center text-brand-primary-2">
-          {icon}
-        </div>
-        <div>
-          <h3 className="text-lg sm:text-xl text-left md:text-2xl tracking-tight text-foreground">
-            {title}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-xl text-left leading-snug break-words">
-            {description}
-          </p>
-        </div>
-      </div>
+      <StepHeader icon={icon} title={title} description={description} />
 
       {/* Category Tab Bar */}
       <div className="mb-4 flex flex-col gap-2 shrink-0">

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { TranslatedWizardOption } from "./useTranslatedWizardSteps";
+import { StepHeader } from "./StepHeader";
 
 interface WizardMultiSelectStepProps {
   icon: React.ReactNode;
@@ -55,19 +56,7 @@ export const WizardMultiSelectStep: React.FC<WizardMultiSelectStepProps> = ({
       transition={{ duration: 0.25 }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4 shrink-0">
-        <div className="h-9 w-9 shrink-0 rounded-full bg-brand-primary-2/15 border border-brand-primary-2/40 flex items-center justify-center text-brand-primary-2">
-          {icon}
-        </div>
-        <div>
-          <h3 className="text-lg sm:text-xl md:text-2xl text-left tracking-tight text-foreground">
-            {title}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-xl text-left leading-snug break-words">
-            {description}
-          </p>
-        </div>
-      </div>
+      <StepHeader icon={icon} title={title} description={description} />
 
       {/* Selection counter */}
       <div className="flex items-center justify-between mb-4 shrink-0">
