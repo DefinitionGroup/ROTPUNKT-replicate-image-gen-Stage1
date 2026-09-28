@@ -228,11 +228,11 @@ export function StudioShell() {
   });
 
   if (!mounted) {
-    return <main aria-busy="true" className="min-h-screen bg-canvas pt-16" />;
+    return <main aria-busy="true" className="min-h-screen bg-canvas pt-20" />;
   }
 
   return (
-    <main className="min-h-screen bg-canvas pt-16">
+    <main className="min-h-screen bg-canvas pt-20">
       <PromptDebugPopover
         enabled={showPromptDebugPopover}
         stepLabel={debugStepLabel}

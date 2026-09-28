@@ -15,7 +15,7 @@ export function AppHeader({ action }: { action?: { href: string; label: string }
   const t = useTranslations("common");
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-hairline bg-canvas/90 backdrop-blur-[20px]">
-      <div className="signature-container flex h-16 items-center justify-between gap-4">
+      <div className="signature-container flex h-20 items-center justify-between gap-4">
         <BrandLogo compact size="lg" />
         <div className="flex items-center gap-1 md:gap-3">
           {action && (
