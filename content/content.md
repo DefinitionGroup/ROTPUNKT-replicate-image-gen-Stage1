@@ -92,7 +92,7 @@ home:
 
   gallery:
     label: "Galerie"
-    title: "Aus dem *Studio*."
+    title: "*Inspiration*."
     intro: "Sechs Visualisierungen, wie Nutzerinnen und Nutzer sie erzeugt haben – jede aus einer eigenen Konfiguration."
     items:
       - title: "Schwarze Küche auf einer Mittelmeerinsel."
@@ -634,7 +634,7 @@ home:
 
   gallery:
     label: "Gallery"
-    title: "From the *studio*."
+    title: "*Inspiration*."
     intro: "Six visualisations as users created them – each from its own configuration."
     items:
       - title: "Exterior terrace kitchen"
